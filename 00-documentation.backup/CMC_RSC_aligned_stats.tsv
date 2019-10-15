@@ -1,103 +1,103 @@
 SampleID	Queries	Aligned
-../04-analysis/malt/RefSeqCustom/CMC001.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3090142	Aligned queries:    1909404
-../04-analysis/malt/RefSeqCustom/CMC001.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4623425	Aligned queries:    2838451
-../04-analysis/malt/RefSeqCustom/CMC001.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3799235	Aligned queries:    2793890
-../04-analysis/malt/RefSeqCustom/CMC002.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2952979	Aligned queries:    2093741
-../04-analysis/malt/RefSeqCustom/CMC002.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    1498956	Aligned queries:    1293133
-../04-analysis/malt/RefSeqCustom/CMC003.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2944443	Aligned queries:    2213930
-../04-analysis/malt/RefSeqCustom/CMC003.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3181650	Aligned queries:    2642434
-../04-analysis/malt/RefSeqCustom/CMC004.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3235666	Aligned queries:    1937518
-../04-analysis/malt/RefSeqCustom/CMC004.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    5656380	Aligned queries:    3847873
-../04-analysis/malt/RefSeqCustom/CMC005.A0202.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3342616	Aligned queries:    2532471
-../04-analysis/malt/RefSeqCustom/CMC005.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4758317	Aligned queries:    3861364
-../04-analysis/malt/RefSeqCustom/CMC006.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3928422	Aligned queries:    3349171
-../04-analysis/malt/RefSeqCustom/CMC006.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    5083196	Aligned queries:    3980775
-../04-analysis/malt/RefSeqCustom/CMC007.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4208841	Aligned queries:    3301630
-../04-analysis/malt/RefSeqCustom/CMC008.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4762497	Aligned queries:    3745911
-../04-analysis/malt/RefSeqCustom/CMC008.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3778581	Aligned queries:    2963248
-../04-analysis/malt/RefSeqCustom/CMC009.A0202.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2843838	Aligned queries:    2377909
-../04-analysis/malt/RefSeqCustom/CMC009.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4113019	Aligned queries:    2719809
-../04-analysis/malt/RefSeqCustom/CMC010.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3460931	Aligned queries:    2505784
-../04-analysis/malt/RefSeqCustom/CMC010.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3788278	Aligned queries:    3005979
-../04-analysis/malt/RefSeqCustom/CMC011.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3875861	Aligned queries:    2604418
-../04-analysis/malt/RefSeqCustom/CMC011.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4090557	Aligned queries:    3015398
-../04-analysis/malt/RefSeqCustom/CMC012.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3451019	Aligned queries:    2554510
-../04-analysis/malt/RefSeqCustom/CMC012.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2896917	Aligned queries:    2224395
-../04-analysis/malt/RefSeqCustom/CMC013.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4245818	Aligned queries:    3158115
-../04-analysis/malt/RefSeqCustom/CMC013.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3570368	Aligned queries:    2962305
-../04-analysis/malt/RefSeqCustom/CMC014.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3046677	Aligned queries:    2404886
-../04-analysis/malt/RefSeqCustom/CMC015.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3183848	Aligned queries:    2280860
-../04-analysis/malt/RefSeqCustom/CMC015.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3890233	Aligned queries:    2900993
-../04-analysis/malt/RefSeqCustom/CMC016.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4119883	Aligned queries:    2921718
-../04-analysis/malt/RefSeqCustom/CMC016.A0102.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3981956	Aligned queries:    2989227
-../04-analysis/malt/RefSeqCustom/CMC017.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4409843	Aligned queries:    2801010
-../04-analysis/malt/RefSeqCustom/CMC017.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3649710	Aligned queries:    2539326
-../04-analysis/malt/RefSeqCustom/CMC018.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3901693	Aligned queries:    2761088
-../04-analysis/malt/RefSeqCustom/CMC018.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3747020	Aligned queries:    2213393
-../04-analysis/malt/RefSeqCustom/CMC020.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4088385	Aligned queries:    2725488
-../04-analysis/malt/RefSeqCustom/CMC020.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3755815	Aligned queries:    2823460
-../04-analysis/malt/RefSeqCustom/CMC021.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3677679	Aligned queries:    2580367
-../04-analysis/malt/RefSeqCustom/CMC021.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3941952	Aligned queries:    2928574
-../04-analysis/malt/RefSeqCustom/CMC022.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3900758	Aligned queries:    3007523
-../04-analysis/malt/RefSeqCustom/CMC022.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4230806	Aligned queries:    2603343
-../04-analysis/malt/RefSeqCustom/CMC023.A0301.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3896441	Aligned queries:    2520565
-../04-analysis/malt/RefSeqCustom/CMC023.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3768854	Aligned queries:    2956208
-../04-analysis/malt/RefSeqCustom/CMC024.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4269710	Aligned queries:    3239721
-../04-analysis/malt/RefSeqCustom/CMC024.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3259871	Aligned queries:    2203910
-../04-analysis/malt/RefSeqCustom/CMC025.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3809658	Aligned queries:    2373148
-../04-analysis/malt/RefSeqCustom/CMC026.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3996210	Aligned queries:    2637605
-../04-analysis/malt/RefSeqCustom/CMC026.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3892447	Aligned queries:    3103967
-../04-analysis/malt/RefSeqCustom/CMC027.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2400776	Aligned queries:    1317319
-../04-analysis/malt/RefSeqCustom/CMC027.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4024388	Aligned queries:    2915281
-../04-analysis/malt/RefSeqCustom/CMC028.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4250093	Aligned queries:    3145276
-../04-analysis/malt/RefSeqCustom/CMC028.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3854668	Aligned queries:    2801774
-../04-analysis/malt/RefSeqCustom/CMC029.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2263373	Aligned queries:    1525123
-../04-analysis/malt/RefSeqCustom/CMC029.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3772779	Aligned queries:    3014126
-../04-analysis/malt/RefSeqCustom/CMC030.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3324931	Aligned queries:    2552000
-../04-analysis/malt/RefSeqCustom/CMC030.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3928090	Aligned queries:    2779805
-../04-analysis/malt/RefSeqCustom/CMC031.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3191317	Aligned queries:    2590147
-../04-analysis/malt/RefSeqCustom/CMC031.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4223745	Aligned queries:    3633269
-../04-analysis/malt/RefSeqCustom/CMC032.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3234047	Aligned queries:    2682705
-../04-analysis/malt/RefSeqCustom/CMC032.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:        108	Aligned queries:         94
-../04-analysis/malt/RefSeqCustom/CMC033.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4465579	Aligned queries:    3540797
-../04-analysis/malt/RefSeqCustom/CMC033.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3870517	Aligned queries:    2845685
-../04-analysis/malt/RefSeqCustom/CMC034.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3638742	Aligned queries:    2666317
-../04-analysis/malt/RefSeqCustom/CMC034.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3543548	Aligned queries:    2787050
-../04-analysis/malt/RefSeqCustom/CMC035.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    5036968	Aligned queries:    3863701
-../04-analysis/malt/RefSeqCustom/CMC035.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4173780	Aligned queries:    3179616
-../04-analysis/malt/RefSeqCustom/CMC036.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4431830	Aligned queries:    3252076
-../04-analysis/malt/RefSeqCustom/CMC036.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3913688	Aligned queries:    3263015
-../04-analysis/malt/RefSeqCustom/CMC037.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3613847	Aligned queries:    2614173
-../04-analysis/malt/RefSeqCustom/CMC037.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4093975	Aligned queries:    3653747
-../04-analysis/malt/RefSeqCustom/CMC038.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    2433875	Aligned queries:    1518552
-../04-analysis/malt/RefSeqCustom/CMC038.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3063925	Aligned queries:    1742626
-../04-analysis/malt/RefSeqCustom/CMC039.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4891842	Aligned queries:    3895904
-../04-analysis/malt/RefSeqCustom/CMC040.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3871678	Aligned queries:    2853391
-../04-analysis/malt/RefSeqCustom/CMC041.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    5579941	Aligned queries:    3822612
-../04-analysis/malt/RefSeqCustom/CMC042.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3265400	Aligned queries:    2765299
-../04-analysis/malt/RefSeqCustom/CMC042.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3824054	Aligned queries:    2812899
-../04-analysis/malt/RefSeqCustom/CMC043.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3739049	Aligned queries:    3221842
-../04-analysis/malt/RefSeqCustom/CMC043.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3248145	Aligned queries:    2791296
-../04-analysis/malt/RefSeqCustom/CMC044.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3353707	Aligned queries:    2620256
-../04-analysis/malt/RefSeqCustom/CMC045.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3686378	Aligned queries:    2615106
-../04-analysis/malt/RefSeqCustom/CMC045.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    3696668	Aligned queries:    2698136
-../04-analysis/malt/RefSeqCustom/CMC046.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4049598	Aligned queries:    3219265
-../04-analysis/malt/RefSeqCustom/CMC047.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:    4888303	Aligned queries:    4394752
-	Num. of queries:    1068290	Aligned queries:     777995
-	Num. of queries:     576535	Aligned queries:     400715
-	Num. of queries:    5611327	Aligned queries:    4856591
-	Num. of queries:     768912	Aligned queries:     529077
-	Num. of queries:    1736975	Aligned queries:    1515090
-	Num. of queries:     825072	Aligned queries:     510940
-	Num. of queries:     302069	Aligned queries:     179387
-	Num. of queries:        152	Aligned queries:        104
-	Num. of queries:     466964	Aligned queries:     323908
-	Num. of queries:    1383197	Aligned queries:    1015957
-	Num. of queries:     934007	Aligned queries:     818664
-	Num. of queries:     757852	Aligned queries:     527696
-	Num. of queries:     388965	Aligned queries:     301138
-	Num. of queries:     271747	Aligned queries:     194879
-	Num. of queries:     635450	Aligned queries:     309814
-	Num. of queries:        107	Aligned queries:         60
-	Num. of queries:     538972	Aligned queries:     393313
-	Num. of queries:     659822	Aligned queries:     448190
+../04-analysis/malt/RefSeqCustom/CMC001.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3090142	1909404
+../04-analysis/malt/RefSeqCustom/CMC001.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4623425	2838451
+../04-analysis/malt/RefSeqCustom/CMC001.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3799235	2793890
+../04-analysis/malt/RefSeqCustom/CMC002.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2952979	2093741
+../04-analysis/malt/RefSeqCustom/CMC002.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	1498956	1293133
+../04-analysis/malt/RefSeqCustom/CMC003.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2944443	2213930
+../04-analysis/malt/RefSeqCustom/CMC003.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3181650	2642434
+../04-analysis/malt/RefSeqCustom/CMC004.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3235666	1937518
+../04-analysis/malt/RefSeqCustom/CMC004.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	5656380	3847873
+../04-analysis/malt/RefSeqCustom/CMC005.A0202.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3342616	2532471
+../04-analysis/malt/RefSeqCustom/CMC005.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4758317	3861364
+../04-analysis/malt/RefSeqCustom/CMC006.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3928422	3349171
+../04-analysis/malt/RefSeqCustom/CMC006.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	5083196	3980775
+../04-analysis/malt/RefSeqCustom/CMC007.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4208841	3301630
+../04-analysis/malt/RefSeqCustom/CMC008.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4762497	3745911
+../04-analysis/malt/RefSeqCustom/CMC008.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3778581	2963248
+../04-analysis/malt/RefSeqCustom/CMC009.A0202.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2843838	2377909
+../04-analysis/malt/RefSeqCustom/CMC009.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4113019	2719809
+../04-analysis/malt/RefSeqCustom/CMC010.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3460931	2505784
+../04-analysis/malt/RefSeqCustom/CMC010.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3788278	3005979
+../04-analysis/malt/RefSeqCustom/CMC011.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3875861	2604418
+../04-analysis/malt/RefSeqCustom/CMC011.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4090557	3015398
+../04-analysis/malt/RefSeqCustom/CMC012.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3451019	2554510
+../04-analysis/malt/RefSeqCustom/CMC012.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2896917	2224395
+../04-analysis/malt/RefSeqCustom/CMC013.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4245818	3158115
+../04-analysis/malt/RefSeqCustom/CMC013.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3570368	2962305
+../04-analysis/malt/RefSeqCustom/CMC014.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3046677	2404886
+../04-analysis/malt/RefSeqCustom/CMC015.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3183848	2280860
+../04-analysis/malt/RefSeqCustom/CMC015.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3890233	2900993
+../04-analysis/malt/RefSeqCustom/CMC016.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4119883	2921718
+../04-analysis/malt/RefSeqCustom/CMC016.A0102.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3981956	2989227
+../04-analysis/malt/RefSeqCustom/CMC017.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4409843	2801010
+../04-analysis/malt/RefSeqCustom/CMC017.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3649710	2539326
+../04-analysis/malt/RefSeqCustom/CMC018.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3901693	2761088
+../04-analysis/malt/RefSeqCustom/CMC018.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3747020	2213393
+../04-analysis/malt/RefSeqCustom/CMC020.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4088385	2725488
+../04-analysis/malt/RefSeqCustom/CMC020.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3755815	2823460
+../04-analysis/malt/RefSeqCustom/CMC021.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3677679	2580367
+../04-analysis/malt/RefSeqCustom/CMC021.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3941952	2928574
+../04-analysis/malt/RefSeqCustom/CMC022.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3900758	3007523
+../04-analysis/malt/RefSeqCustom/CMC022.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4230806	2603343
+../04-analysis/malt/RefSeqCustom/CMC023.A0301.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3896441	2520565
+../04-analysis/malt/RefSeqCustom/CMC023.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3768854	2956208
+../04-analysis/malt/RefSeqCustom/CMC024.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4269710	3239721
+../04-analysis/malt/RefSeqCustom/CMC024.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3259871	2203910
+../04-analysis/malt/RefSeqCustom/CMC025.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3809658	2373148
+../04-analysis/malt/RefSeqCustom/CMC026.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3996210	2637605
+../04-analysis/malt/RefSeqCustom/CMC026.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3892447	3103967
+../04-analysis/malt/RefSeqCustom/CMC027.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2400776	1317319
+../04-analysis/malt/RefSeqCustom/CMC027.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4024388	2915281
+../04-analysis/malt/RefSeqCustom/CMC028.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4250093	3145276
+../04-analysis/malt/RefSeqCustom/CMC028.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3854668	2801774
+../04-analysis/malt/RefSeqCustom/CMC029.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2263373	1525123
+../04-analysis/malt/RefSeqCustom/CMC029.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3772779	3014126
+../04-analysis/malt/RefSeqCustom/CMC030.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3324931	2552000
+../04-analysis/malt/RefSeqCustom/CMC030.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3928090	2779805
+../04-analysis/malt/RefSeqCustom/CMC031.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3191317	2590147
+../04-analysis/malt/RefSeqCustom/CMC031.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4223745	3633269
+../04-analysis/malt/RefSeqCustom/CMC032.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3234047	2682705
+../04-analysis/malt/RefSeqCustom/CMC032.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	108	94
+../04-analysis/malt/RefSeqCustom/CMC033.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4465579	3540797
+../04-analysis/malt/RefSeqCustom/CMC033.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3870517	2845685
+../04-analysis/malt/RefSeqCustom/CMC034.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3638742	2666317
+../04-analysis/malt/RefSeqCustom/CMC034.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3543548	2787050
+../04-analysis/malt/RefSeqCustom/CMC035.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	5036968	3863701
+../04-analysis/malt/RefSeqCustom/CMC035.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4173780	3179616
+../04-analysis/malt/RefSeqCustom/CMC036.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4431830	3252076
+../04-analysis/malt/RefSeqCustom/CMC036.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3913688	3263015
+../04-analysis/malt/RefSeqCustom/CMC037.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3613847	2614173
+../04-analysis/malt/RefSeqCustom/CMC037.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4093975	3653747
+../04-analysis/malt/RefSeqCustom/CMC038.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	2433875	1518552
+../04-analysis/malt/RefSeqCustom/CMC038.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3063925	1742626
+../04-analysis/malt/RefSeqCustom/CMC039.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4891842	3895904
+../04-analysis/malt/RefSeqCustom/CMC040.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3871678	2853391
+../04-analysis/malt/RefSeqCustom/CMC041.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	5579941	3822612
+../04-analysis/malt/RefSeqCustom/CMC042.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3265400	2765299
+../04-analysis/malt/RefSeqCustom/CMC042.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3824054	2812899
+../04-analysis/malt/RefSeqCustom/CMC043.A0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3739049	3221842
+../04-analysis/malt/RefSeqCustom/CMC043.B0101.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3248145	2791296
+../04-analysis/malt/RefSeqCustom/CMC044.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3353707	2620256
+../04-analysis/malt/RefSeqCustom/CMC045.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3686378	2615106
+../04-analysis/malt/RefSeqCustom/CMC045.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	3696668	2698136
+../04-analysis/malt/RefSeqCustom/CMC046.B0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4049598	3219265
+../04-analysis/malt/RefSeqCustom/CMC047.A0201.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	4888303	4394752
+	1068290	777995
+	576535	400715
+	5611327	4856591
+	768912	529077
+	1736975	1515090
+	825072	510940
+	302069	179387
+	152	104
+	466964	323908
+	1383197	1015957
+	934007	818664
+	757852	527696
+	388965	301138
+	271747	194879
+	635450	309814
+	107	60
+	538972	393313
+	659822	448190
