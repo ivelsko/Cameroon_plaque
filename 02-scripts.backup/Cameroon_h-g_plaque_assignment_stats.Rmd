@@ -31,9 +31,9 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
 # load the table generated from the MALT log file with the # reads and # aligned reads
-maltnt_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
-maltRSC_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
-malt_CMC_HMP_RSC_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
+maltnt_assignments <- fread("00-documentation.backup/CMC_nt_aligned_stats.tsv")
+maltRSC_assignments <- fread("00-documentation.backup/CMC_RSC_aligned_stats.tsv")
+malt_CMC_HMP_RSC_assignments <- fread("00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv")
 
 # clean the file names
 maltnt_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltnt_assignments$SampleID)
@@ -41,6 +41,10 @@ maltRSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.pr
 malt_CMC_HMP_RSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_RSC_assignments$SampleID)
 malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_RSC_assignments$SampleID)
 malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","_10M", malt_CMC_HMP_RSC_assignments$SampleID)
+
+maltnt_assignments$SampleID <- gsub("../04-analysis/malt/nt/","", maltnt_assignments$SampleID)
+maltRSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", maltRSC_assignments$SampleID)
+malt_CMC_HMP_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", malt_CMC_HMP_RSC_assignments$SampleID)
 
 # load the metadata file
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
