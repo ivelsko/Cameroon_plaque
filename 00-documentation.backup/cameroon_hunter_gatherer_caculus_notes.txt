@@ -64,29 +64,29 @@ sbatch \
 
 # To get the mapping stats from malt runs to input into R, use the log output file and run the following code:
 # malt-nt CMC only
-grep "Num. of queries:" malt-genbank_rma_20190903.log.log > CMC_nt_numbers.txt
-grep "Aligned queries:" malt-genbank_rma_20190903.log > CMC_nt_aligned.txt
-ls CMC*.rma6 > CMC_nt_names.txt
-paste CMC_nt_names.txt CMC_nt_numbers.txt CMC_nt_aligned.txt > CMC_nt_aligned_stats.tsv
+grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190903.log > ../00-documentation.backup/CMC_nt_numbers.txt
+grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190903.log > ../00-documentation.backup/CMC_nt_aligned.txt
+ls ../04-analysis/malt/nt/CMC*.rma6 > ../00-documentation.backup/CMC_nt_names.txt
+paste ../00-documentation.backup/CMC_nt_names.txt ../00-documentation.backup/CMC_nt_numbers.txt ../00-documentation.backup/CMC_nt_aligned.txt > ../00-documentation.backup/CMC_nt_aligned_stats.tsv
 
 # malt-RefSeqCustom CMC only
-grep "Num. of queries:" malt-genbank_rma_20190925.log > CMCnumbers.txt
-grep "Aligned queries:" malt-genbank_rma_20190925.log > CMCaligned.txt
-ls CMC*.rma6 > CMCnames.txt
-paste CMCnames.txt CMCnumbers.txt CMCaligned.txt > CMC_RSC_aligned_stats.tsv
+grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCnumbers.txt
+grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCaligned.txt
+ls ../04-analysis/malt/RefSeqCustom/CMC*.rma6 > ../00-documentation.backup/CMCnames.txt
+paste ../00-documentation.backup/CMCnames.txt ../00-documentation.backup/CMCnumbers.txt ../00-documentation.backup/CMCaligned.txt > ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
 
 # malt-RefSeqCustom HMP only
-grep "Num. of queries:" malt-genbank_rma_20190930.log > HMPnumbers.txt
-grep "Aligned queries:" malt-genbank_rma_20190930.log > HMPaligned.txt
-ls SRR*.rma6 > HMPnames.txt
-paste HMPnames.txt HMPnumbers.txt HMPaligned.txt > HMP_RSC_aligned_stats.tsv
+grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190930.log > ../00-documentation.backup/HMPnumbers.txt
+grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190930.log > ../00-documentation.backup/HMPaligned.txt
+ls ../04-analysis/malt/RefSeqCustom/SRR*.rma6 > ../00-documentation.backup/HMPnames.txt
+paste ../00-documentation.backup/HMPnames.txt ../00-documentation.backup/HMPnumbers.txt ../00-documentation.backup/HMPaligned.txt > ../00-documentation.backup/HMP_RSC_aligned_stats.tsv
 
 # combine CMC and HMP RefSeqCustom stats files
-cat CMC_aligned_stats.tsv HMP_aligned_stats.tsv > CMC_HMP_RSC_aligned_stats.tsv
+cat ../00-documentation.backup/CMC_RSC_aligned_stats.tsv ../00-documentation.backup/HMP_RSC_aligned_stats.tsv > ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 
-perl -p -i -e 's/ //g' CMC_HMP_RSC_aligned_stats.tsv
-perl -p -i -e 's/Num.ofqueries://g' CMC_HMP_RSC_aligned_stats.tsv 
-perl -p -i -e 's/Alignedqueries://g' CMC_HMP_RSC_aligned_stats.tsv 
+perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv 
+perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv 
 # manually add column titles SampleID, Queries, Aligned
 
 # symlink the HMP data for Eager processing (and subsampling)
