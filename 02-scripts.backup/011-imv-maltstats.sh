@@ -18,6 +18,18 @@ paste ../00-documentation.backup/HMPnames.txt ../00-documentation.backup/HMPnumb
 # combine CMC and HMP RefSeqCustom stats files
 cat ../00-documentation.backup/CMC_RSC_aligned_stats.tsv ../00-documentation.backup/HMP_RSC_aligned_stats.tsv > ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 
+perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_nt_aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_nt_aligned_stats.tsv
+perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_nt_aligned_stats.tsv
+
+perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
+perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
+
+perl -p -i -e 's/ //g' ../00-documentation.backup/HMP_RSC_aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/HMP_RSC_aligned_stats.tsv
+perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/HMP_RSC_aligned_stats.tsv
+
 perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv 
 perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv 
