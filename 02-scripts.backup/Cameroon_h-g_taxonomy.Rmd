@@ -30,29 +30,26 @@ opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 Set the working directory of the notebook to the parent directory of the 
 notebook itself.  
 
-```{r setup, eval=F}
-knitr::opts_knit$set(root.dir = normalizePath("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus"))
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
 # MALT read stats
 The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
 ## load the species and genus tables generated in MEGAN
-# malt_species <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_MALT_nt_species_bacteria_archaea.txt")
-# malt_genus <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_MALT_nt_genus_bacteria_archaea.txt")
-# malt_species <- fread("/Users/oval_portrait/Dropbox/MPI-SHH/CMC/CMC_MALT_nt_species_bacteria_archaea.txt")
-# malt_genus <- fread("/Users/oval_portrait/Dropbox/MPI-SHH/CMC/CMC_MALT_nt_genus_bacteria_archaea.txt")
+# malt_species <- fread("05-results.backup/CMC_MALT_nt_species_bacteria_archaea.txt")
+# malt_genus <- fread("05-results.backup/CMC_MALT_nt_genus_bacteria_archaea.txt")
+
+# malt_species <- fread("05-results.backup/CMC_MALT_RSC_species_bacteria_archaea.txt")
+# malt_genus <- fread("05-results.backup/CMC_MALT_RSC_genus_bacteria_archaea.txt")
 
 
-# malt_species <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_MALT_RSC_genus_bacteria_archaea.txt")
+# malt_species <- fread("05-results.backup/CMC_someHMP_MALT_RSC_species_bacteria_archaea.txt")
+# malt_genus <- fread("05-results.backup/CMC_someHMP_MALT_RSC_genus_bacteria_archaea.txt")
 
-
-# malt_species <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_someHMP_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_someHMP_MALT_RSC_genus_bacteria_archaea.txt")
-
-malt_species <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_HMP_MALT_RSC_species_bacteria_archaea.txt")
-malt_genus <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/tables.backup/CMC_HMP_MALT_RSC_genus_bacteria_archaea.txt")
+malt_species <- fread("./05-results.backup/CMC_HMP_MALT_RSC_species_bacteria_archaea.txt")
+malt_genus <- fread("./05-results.backup/CMC_HMP_MALT_RSC_genus_bacteria_archaea.txt")
 
 # clean the file names
 malt_species <- rename(malt_species, Species = `#Datasets`)
@@ -72,8 +69,7 @@ colnames(malt_genus) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.ext
 malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo sapiens"))
 
 # load the metadata file
-metadata <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-# metadata <- fread("/Users/oval_portrait/Dropbox/MPI-SHH/CMC/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata <- metadata %>% rename(SampleID = `#SampleID`)
 ```
 
@@ -406,8 +402,8 @@ malt_species.decontam <- malt_species %>%
   # spread(Species, Counts) %>%
   anti_join(., contaminants_species)
 
-# write.table(malt_species.decontam, file = "/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/malt_species.decontam.tsv", sep="\t", quote=F, row.names = F)
-# write.table(malt_species, "/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/malt_species.tsv", sep="\t", quote=F, row.names = F)
+# write.table(malt_species.decontam, file = "05-results.backup/malt_species.decontam.tsv", sep="\t", quote=F, row.names = F)
+# write.table(malt_species, "05-results.backup/malt_species.tsv", sep="\t", quote=F, row.names = F)
 
 contaminants_genus <- cont_comb_genus_list %>% rownames_to_column("Species") %>% select(Species)
 malt_genus.decontam <- malt_genus %>%
@@ -478,7 +474,7 @@ pca_nt_species_pc1pc2 <- ggplot(nt_species.pca.varmet, aes(PC1, PC2, colour = En
 
 pca_nt_species_pc1pc2
 
-# ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
+# ggsave("05-results.backup/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
@@ -577,7 +573,7 @@ pca_nt_genus_pc1pc2 <- ggplot(nt_genus.pca.varmet, aes(PC1, PC2, colour = Env, s
 
 pca_nt_genus_pc1pc2
 
-# ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/pca_nt_genus_pc1pc2.pdf", plot = pca_nt_genus_pc1pc2, device = "pdf",
+# ggsave("05-results.backup/pca_nt_genus_pc1pc2.pdf", plot = pca_nt_genus_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
@@ -668,7 +664,7 @@ pca_nt_species_pc1pc2 <- ggplot(nt_species.pca.varmet, aes(PC1, PC2, colour = Et
 
 pca_nt_species_pc1pc2
 
-# ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
+# ggsave("05-results.backup/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
@@ -771,7 +767,7 @@ pca_nt_genus_pc1pc2 <- ggplot(nt_genus.pca.varmet, aes(PC1, PC2, colour = Ethnic
 
 pca_nt_genus_pc1pc2
 
-# ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/pca_nt_genus_pc1pc2.pdf", plot = pca_nt_genus_pc1pc2, device = "pdf",
+# ggsave("05-results.backup/pca_nt_genus_pc1pc2.pdf", plot = pca_nt_genus_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
@@ -953,7 +949,7 @@ evenness.species <- evenness.species %>%
   rownames_to_column("SampleID") %>%
   inner_join(., metadata) 
 
-# make the poplabel a factor for plotting
+# make the metadata factors for plotting
 evenness.species$Env <- factor(evenness.species$Env, 
                                 levels = c("HunterGatherer","HMP10M","HMP","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
 evenness.species$Village <- factor(evenness.species$Village, 
@@ -1100,7 +1096,7 @@ evenness.genus <- evenness.genus %>%
   rownames_to_column("SampleID") %>%
   inner_join(., metadata) 
 
-# make the poplabel a factor for plotting
+# make the metadata factors for plotting
 evenness.genus$Env <- factor(evenness.genus$Env, 
                                 levels = c("HunterGatherer","HMP10M","HMP","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
 evenness.genus$Village <- factor(evenness.genus$Village, 
