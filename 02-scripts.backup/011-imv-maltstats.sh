@@ -6,7 +6,7 @@ paste ../00-documentation.backup/CMC_nt_names.txt ../00-documentation.backup/CMC
 # malt-RefSeqCustom CMC only
 grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCnumbers.txt
 grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCaligned.txt
-ls ../04-analysis/malt/RefSeqCustom/CMC*.rma6 > ../00-documentation.backup/CMCnames.txt
+ls ../04-analysis/malt/RefSeqCustom/*.rma6 | grep -v SRR > ../00-documentation.backup/CMCnames.txt
 paste ../00-documentation.backup/CMCnames.txt ../00-documentation.backup/CMCnumbers.txt ../00-documentation.backup/CMCaligned.txt > ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
 
 # malt-RefSeqCustom HMP only
