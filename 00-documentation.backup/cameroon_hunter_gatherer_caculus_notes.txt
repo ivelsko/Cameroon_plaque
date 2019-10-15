@@ -1,0 +1,154 @@
+# to run zipit script
+./005-imv-zipit.sh <filename>
+
+# to build a malt database
+#!/usr/bin/env bash
+sbatch \
+-c 112 \
+--mem 1950000 \
+--partition=supercruncher \
+-o ~/slurm_logs/slurm.%j.out \
+-e ~/slurm_logs/slurm.%j.err \
+--mail-type=fail \
+--mail-user=velsko@shh.mpg.de \
+-J "MALT-Build-RSC_Pasolli2019MAGs" \
+--wrap="/projects1/malt/versions/malt040/malt-build \
+--step 2 \
+-i /projects1/microbiome_sciences/reference_databases/refseq_Pasolli2019MAGS/refseq_genomes_bacteria_archaea_homo_complete_chromosome_scaffold_Pasolli2019MAGs_20190930.fna.gz \
+-s DNA \
+-d /projects1/microbiome_sciences/reference_databases/refseq_Pasolli2019MAGS/maltindexed \
+-t 112 -a2taxonomy /projects1/microbiome_calculus/evolution/01-data/databases/malt/raw/nucl_acc2tax-May2017.abin"
+
+
+# all Pasolli, et al. 2019 MAGs are here /projects1/microbiome_sciences/reference_databases/Pasolli2019_MAGs/representatives/
+# all oral or non-western stool Pasolli, et al. 2019 MAGs are here /projects1/microbiome_sciences/reference_databases/Pasolli2019_MAGs/representatives/oral_nonwest
+# cat'd into one files with 
+cat *.fa > Pasolli2019MAGs.fasta
+# need to combine these with the RefSeq genomes James used to make the Custom RefSeq database to the folder here
+/projects1/microbiome_sciences/reference_databases/refseq/genomes/bacteria_archea_homo_20181122/refseq_genomes_bacteria_archaea_homo_complete_chromosome_scaffold_20181122.fna.gz
+
+# as below:
+
+#!/usr/bin/env bash
+sbatch \
+-c 2 \
+--mem 4G \
+--partition=medium \
+-o ~/slurm_logs/slurm.%j.out \
+-e ~/slurm_logs/slurm.%j.err \
+--mail-type=fail \
+--mail-user=velsko@shh.mpg.de \
+-J "catmalt" \
+--wrap="zcat /projects1/microbiome_sciences/reference_databases/refseq/genomes/bacteria_archea_homo_20181122/refseq_genomes_bacteria_archaea_homo_complete_chromosome_scaffold_20181122.fna.gz | cat - /projects1/microbiome_sciences/reference_databases/Pasolli2019_MAGs/representatives/oral_nonwest/Pasolli2019MAGs.fasta > /projects1/microbiome_sciences/reference_databases/refseq_Pasolli2019MAGS/refseq_genomes_bacteria_archaea_homo_complete_chromosome_scaffold_Pasolli2019MAGs_20190930.fna && pigz -n2 /projects1/microbiome_sciences/reference_databases/refseq_Pasolli2019MAGS/refseq_genomes_bacteria_archaea_homo_complete_chromosome_scaffold_Pasolli2019MAGs_20190930.fna"
+
+# then run the malt build script to use all for taxonomic identification
+# then need to create a tree of all of the same genomes used to build this new MALT database with PhyloPhlan2 (this is not easy to install yet, the conda install isn't ready yet)
+# then need to convert the tree from PhyloPhlan2 into NCBI format for MEGAN
+
+# use this to run MALT
+#!/usr/bin/env bash
+sbatch \
+-c 112 \
+--mem 1850000 \
+--partition=supercruncher \
+-o ~/slurm_logs/slurm.%j.out \
+-e ~/slurm_logs/slurm.%j.err \
+--mail-type=fail \
+--mail-type=time_limit \
+--mail-user=velsko@shh.mpg.de \
+-J "MaltCMCnt" \
+--wrap="/projects1/microbiome_calculus/evolution/02-scripts.backup/007-malt-genbank-nt_2017_2step_85pc_supp_0.01 \
+/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp/*.gz \
+/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/nt-correct"
+
+
+# To get the mapping stats from malt runs to input into R, use the log output file and run the following 7 lines of code:
+grep "Num. of queries:" malt-genbank_rma_20190925.log > CMCnumbers.txt
+grep "Aligned queries:" malt-genbank_rma_20190925.log > CMCaligned.txt
+ls CMC*.rma6 > CMCnames.txt
+paste CMCnames.txt CMCnumbers.txt CMCaligned.txt > CMC_aligned_stats.tsv
+
+grep "Num. of queries:" malt-genbank_rma_20190930.log > HMPnumbers.txt
+grep "Aligned queries:" malt-genbank_rma_20190930.log > HMPaligned.txt
+ls SRR*.rma6 > HMPnames.txt
+paste HMPnames.txt HMPnumbers.txt HMPaligned.txt > HMP_aligned_stats.tsv
+
+cat CMC_aligned_stats.tsv HMP_aligned_stats.tsv > aligned_stats.tsv
+
+perl -p -i -e 's/ //g' aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' aligned_stats.tsv 
+perl -p -i -e 's/Alignedqueries://g' aligned_stats.tsv 
+# manually add column titles SampleID, Queries, Aligned
+
+# symlink the HMP data for Eager processing (and subsampling)
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR061294
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR062298
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR062299
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR513165
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR513768
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR513775
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR514202
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR514239
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR514306
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR514329
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR061192
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR061320
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR061365
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR061562
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR062083
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR063517
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR1804664
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR1804823
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR512767
+ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR513828
+
+# subsample the HMP samples to 10000000 reads each to be more similar to the read number of the CMC samples
+
+#!/bin/bash
+
+#SBATCH -n 8
+#SBATCH --mem 24G
+#SBATCH --partition=medium
+#SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.out
+#SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.err
+#SBATCH --mail-type=fail
+#SBATCH --mail-type=time_limit
+#SBATCH --mail-use=velsko@shh.mpg.de
+#SBATCH --export=ALL
+#SBATCH --array=0-19%2
+#SBATCH -J "subsample"
+
+SAMPLES=($(find /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/*/ -name '*.gz' -type f | rev | cut -d/ -f 1 | rev | cut -d_ -f 1))
+SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
+
+seqtk sample -s100 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
+pigz -8 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
+seqtk sample -s100 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R2_000.fastq.gz 10000000 > /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
+pigz -8 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

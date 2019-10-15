@@ -1,0 +1,1326 @@
+MaltRun - Aligns sequences using MALT (MEGAN alignment tool)
+Options:
+Mode:
+	--mode: BlastN
+	--alignmentType: SemiGlobal
+Input:
+	--inFile: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+	--index: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11
+Output:
+	--output: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom
+	--includeUnaligned: false
+	--alignments: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom
+	--format: SAM
+	--gzipAlignments: true
+	--samSoftClip: true
+	--sparseSAM: false
+Performance:
+	--numThreads: 112
+	--memoryMode: load
+	--maxTables: 0
+	--replicateQueryCache: false
+Filter:
+	--minBitScore: 50.0
+	--maxExpected: 1.0
+	--minPercentIdentity: 85.0
+	--maxAlignmentsPerQuery: 100
+	--maxAlignmentsPerRef: 1
+BlastN parameters:
+	--matchScore: 2
+	--mismatchScore: -3
+	--setLambda: 0.625
+	--setK: 0.41
+DNA query parameters:
+	--forwardOnly: false
+	--reverseOnly: false
+LCA parameters:
+	--topPercent: 1.0
+	--minSupportPercent: 0.01
+	--minSupport: 0
+	--minPercentIdentityLCA: 0.0
+	--useMinPercentIdentityFilterLCA: false
+	--weightedLCA: false
+	--magnitudes: false
+Heuristics:
+	--maxSeedsPerFrame: 100
+	--maxSeedsPerRef: 20
+	--seedShift: 1
+Banded alignment parameters:
+	--gapOpen: 7
+	--gapExtend: 3
+	--band: 4
+Other:
+	--replicateQueryCacheBits: 20
+	--xPart: false
+	--verbose: true
+Version   MALT (version 0.4.0, built 6 Sep 2017)
+Copyright (C) 2017 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.
+--- LOADING ---:
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/ref.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (0.3s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/ref.db
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (1182.8s)
+100% (0.0s)
+Number of sequences:    1,780,321
+Number of letters:130,589,137,643
+LOADING table (0) ...
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/index0.idx
+Reference sequence type: DNA
+Index was built using stepSize=2
+100% (0.0s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/table0.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (69.8s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/table0.db
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (1993.9s)
+Table size: 65,022,892,631
+Loading ncbi.map: 1,601,128
+Loading ncbi.tre: 1,601,131
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/taxonomy.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (0.1s)
+--- ALIGNING ---:
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (2981.7s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp790466.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        7,570,749
+With hits:           7,570,749 
+Alignments:        124,065,086
+Assig. Taxonomy:     7,557,909
+MinSupport set to: 757
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,942
+Binning reads: Writing classification tables
+Numb. Tax. classes:        429
+Binning reads: Syncing
+Class. Taxonomy:           429
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (2.1s)
+Copying from temporary file:
+100% (1675.1s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp790466.sam.gz
+Num. of queries:    9159474
+Aligned queries:    7570749
+Num. alignments:  124065086
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (6263.6s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp663375.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       18,125,780
+With hits:          18,125,780 
+Alignments:        297,003,289
+Assig. Taxonomy:    18,094,768
+MinSupport set to: 1812
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,719
+Binning reads: Writing classification tables
+Numb. Tax. classes:        431
+Binning reads: Syncing
+Class. Taxonomy:           431
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.3s)
+Copying from temporary file:
+100% (3996.4s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061192_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp663375.sam.gz
+Num. of queries:   21921358
+Aligned queries:   18125780
+Num. alignments:  297003289
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (908.8s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp927341.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        2,991,573
+With hits:           2,991,573 
+Alignments:         38,480,694
+Assig. Taxonomy:     2,985,274
+MinSupport set to: 299
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,793
+Binning reads: Writing classification tables
+Numb. Tax. classes:        402
+Binning reads: Syncing
+Class. Taxonomy:           402
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.7s)
+Copying from temporary file:
+100% (537.4s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp927341.sam.gz
+Num. of queries:    3664990
+Aligned queries:    2991573
+Num. alignments:   38480694
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (2597.1s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp51423.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        8,468,065
+With hits:           8,468,065 
+Alignments:        108,844,768
+Assig. Taxonomy:     8,450,088
+MinSupport set to: 846
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,537
+Binning reads: Writing classification tables
+Numb. Tax. classes:        401
+Binning reads: Syncing
+Class. Taxonomy:           401
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.1s)
+Copying from temporary file:
+100% (1555.8s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061294_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp51423.sam.gz
+Num. of queries:   10378304
+Aligned queries:    8468065
+Num. alignments:  108844768
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (2527.1s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp1002716.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        7,785,269
+With hits:           7,785,269 
+Alignments:        120,362,855
+Assig. Taxonomy:     7,778,543
+MinSupport set to: 778
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,415
+Binning reads: Writing classification tables
+Numb. Tax. classes:        372
+Binning reads: Syncing
+Class. Taxonomy:           372
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.3s)
+Copying from temporary file:
+100% (1523.8s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp1002716.sam.gz
+Num. of queries:    9571698
+Aligned queries:    7785269
+Num. alignments:  120362855
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (6095.1s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp172069.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       19,136,736
+With hits:          19,136,736 
+Alignments:        295,721,233
+Assig. Taxonomy:    19,120,219
+MinSupport set to: 1913
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       7,358
+Binning reads: Writing classification tables
+Numb. Tax. classes:        379
+Binning reads: Syncing
+Class. Taxonomy:           379
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (2.6s)
+Copying from temporary file:
+100% (4051.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061320_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp172069.sam.gz
+Num. of queries:   23532819
+Aligned queries:   19136736
+Num. alignments:  295721233
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3274.5s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp998526.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        8,174,489
+With hits:           8,174,489 
+Alignments:        155,329,472
+Assig. Taxonomy:     8,169,039
+MinSupport set to: 817
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,758
+Binning reads: Writing classification tables
+Numb. Tax. classes:        257
+Binning reads: Syncing
+Class. Taxonomy:           257
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.8s)
+Copying from temporary file:
+100% (2063.8s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp998526.sam.gz
+Num. of queries:    9679937
+Aligned queries:    8174489
+Num. alignments:  155329472
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (9145.9s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp945521.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       22,726,366
+With hits:          22,726,366 
+Alignments:        431,613,490
+Assig. Taxonomy:    22,711,353
+MinSupport set to: 2272
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       6,292
+Binning reads: Writing classification tables
+Numb. Tax. classes:        259
+Binning reads: Syncing
+Class. Taxonomy:           259
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.1s)
+Copying from temporary file:
+100% (5772.5s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061365_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp945521.sam.gz
+Num. of queries:   26911316
+Aligned queries:   22726366
+Num. alignments:  431613490
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3301.4s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp609387.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       10,013,455
+With hits:          10,013,455 
+Alignments:        166,969,765
+Assig. Taxonomy:     9,996,400
+MinSupport set to: 1001
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,138
+Binning reads: Writing classification tables
+Numb. Tax. classes:        442
+Binning reads: Syncing
+Class. Taxonomy:           442
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.3s)
+Copying from temporary file:
+100% (2058.3s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp609387.sam.gz
+Num. of queries:   11976542
+Aligned queries:   10013455
+Num. alignments:  166969765
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (9096.1s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp187502.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       27,566,512
+With hits:          27,566,512 
+Alignments:        459,520,159
+Assig. Taxonomy:    27,519,601
+MinSupport set to: 2756
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       7,394
+Binning reads: Writing classification tables
+Numb. Tax. classes:        443
+Binning reads: Syncing
+Class. Taxonomy:           443
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (1.7s)
+Copying from temporary file:
+100% (5653.5s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR061562_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp187502.sam.gz
+Num. of queries:   32963554
+Aligned queries:   27566512
+Num. alignments:  459520159
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3844.5s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp930521.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       11,102,367
+With hits:          11,102,367 
+Alignments:        207,590,173
+Assig. Taxonomy:    11,100,066
+MinSupport set to: 1110
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,506
+Binning reads: Writing classification tables
+Numb. Tax. classes:        309
+Binning reads: Syncing
+Class. Taxonomy:           309
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (2.3s)
+Copying from temporary file:
+100% (2472.5s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp930521.sam.gz
+Num. of queries:   12996283
+Aligned queries:   11102367
+Num. alignments:  207590173
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (10023.4s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp354020.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       28,859,382
+With hits:          28,859,382 
+Alignments:        539,507,205
+Assig. Taxonomy:    28,853,318
+MinSupport set to: 2885
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       7,535
+Binning reads: Writing classification tables
+Numb. Tax. classes:        306
+Binning reads: Syncing
+Class. Taxonomy:           306
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (1.5s)
+Copying from temporary file:
+100% (7070.1s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062083_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp354020.sam.gz
+Num. of queries:   33779445
+Aligned queries:   28859382
+Num. alignments:  539507205
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (847.8s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp332248.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        3,022,280
+With hits:           3,022,280 
+Alignments:         37,877,423
+Assig. Taxonomy:     3,014,613
+MinSupport set to: 302
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,909
+Binning reads: Writing classification tables
+Numb. Tax. classes:        487
+Binning reads: Syncing
+Class. Taxonomy:           487
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.8s)
+Copying from temporary file:
+100% (604.4s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp332248.sam.gz
+Num. of queries:    4603450
+Aligned queries:    3022280
+Num. alignments:   37877423
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (2535.0s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp519819.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        9,176,389
+With hits:           9,176,389 
+Alignments:        114,963,725
+Assig. Taxonomy:     9,153,048
+MinSupport set to: 917
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       6,474
+Binning reads: Writing classification tables
+Numb. Tax. classes:        492
+Binning reads: Syncing
+Class. Taxonomy:           492
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.2s)
+Copying from temporary file:
+100% (1684.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062298_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp519819.sam.gz
+Num. of queries:   13972493
+Aligned queries:    9176389
+Num. alignments:  114963725
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (491.4s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp12418.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        1,726,173
+With hits:           1,726,173 
+Alignments:         22,199,769
+Assig. Taxonomy:     1,723,375
+MinSupport set to: 172
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,870
+Binning reads: Writing classification tables
+Numb. Tax. classes:        434
+Binning reads: Syncing
+Class. Taxonomy:           434
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.8s)
+Copying from temporary file:
+100% (320.3s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp12418.sam.gz
+Num. of queries:    2263295
+Aligned queries:    1726173
+Num. alignments:   22199769
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (1448.5s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp427033.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        5,106,901
+With hits:           5,106,901 
+Alignments:         65,761,216
+Assig. Taxonomy:     5,098,481
+MinSupport set to: 510
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,962
+Binning reads: Writing classification tables
+Numb. Tax. classes:        439
+Binning reads: Syncing
+Class. Taxonomy:           439
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.1s)
+Copying from temporary file:
+100% (839.1s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR062299_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp427033.sam.gz
+Num. of queries:    6693156
+Aligned queries:    5106901
+Num. alignments:   65761216
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3576.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp389176.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        8,801,954
+With hits:           8,801,954 
+Alignments:        208,771,005
+Assig. Taxonomy:     8,800,349
+MinSupport set to: 880
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,324
+Binning reads: Writing classification tables
+Numb. Tax. classes:        318
+Binning reads: Syncing
+Class. Taxonomy:           318
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.2s)
+Copying from temporary file:
+100% (2345.6s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp389176.sam.gz
+Num. of queries:    9731798
+Aligned queries:    8801954
+Num. alignments:  208771005
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (9662.3s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp764916.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       23,486,759
+With hits:          23,486,759 
+Alignments:        557,203,856
+Assig. Taxonomy:    23,482,526
+MinSupport set to: 2348
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,987
+Binning reads: Writing classification tables
+Numb. Tax. classes:        322
+Binning reads: Syncing
+Class. Taxonomy:           322
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (3.3s)
+Copying from temporary file:
+100% (6296.3s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR063517_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp764916.sam.gz
+Num. of queries:   25968577
+Aligned queries:   23486759
+Num. alignments:  557203856
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (2967.8s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp91548.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       10,015,805
+With hits:          10,015,805 
+Alignments:        126,754,371
+Assig. Taxonomy:     9,991,658
+MinSupport set to: 1001
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,837
+Binning reads: Writing classification tables
+Numb. Tax. classes:        293
+Binning reads: Syncing
+Class. Taxonomy:           293
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.0s)
+Copying from temporary file:
+100% (1737.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp91548.sam.gz
+Num. of queries:   11608697
+Aligned queries:   10015805
+Num. alignments:  126754371
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (7054.6s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp785979.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       23,770,741
+With hits:          23,770,741 
+Alignments:        300,777,515
+Assig. Taxonomy:    23,713,256
+MinSupport set to: 2377
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,318
+Binning reads: Writing classification tables
+Numb. Tax. classes:        293
+Binning reads: Syncing
+Class. Taxonomy:           293
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.2s)
+Copying from temporary file:
+100% (4110.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804664_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp785979.sam.gz
+Num. of queries:   27549629
+Aligned queries:   23770741
+Num. alignments:  300777515
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (2768.5s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp720503.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        6,057,909
+With hits:           6,057,909 
+Alignments:        162,027,862
+Assig. Taxonomy:     6,055,004
+MinSupport set to: 605
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,539
+Binning reads: Writing classification tables
+Numb. Tax. classes:        329
+Binning reads: Syncing
+Class. Taxonomy:           329
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.7s)
+Copying from temporary file:
+100% (2056.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp720503.sam.gz
+Num. of queries:    6893754
+Aligned queries:    6057909
+Num. alignments:  162027862
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (7553.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp372182.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       16,967,883
+With hits:          16,967,883 
+Alignments:        454,067,571
+Assig. Taxonomy:    16,959,526
+MinSupport set to: 1696
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,020
+Binning reads: Writing classification tables
+Numb. Tax. classes:        334
+Binning reads: Syncing
+Class. Taxonomy:           334
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (2.2s)
+Copying from temporary file:
+100% (5205.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR1804823_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp372182.sam.gz
+Num. of queries:   19305346
+Aligned queries:   16967883
+Num. alignments:  454067571
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (4188.9s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp359450.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       12,246,625
+With hits:          12,246,625 
+Alignments:        216,576,664
+Assig. Taxonomy:    12,221,940
+MinSupport set to: 1224
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,295
+Binning reads: Writing classification tables
+Numb. Tax. classes:        267
+Binning reads: Syncing
+Class. Taxonomy:           267
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.0s)
+Copying from temporary file:
+100% (2642.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp359450.sam.gz
+Num. of queries:   13286831
+Aligned queries:   12246625
+Num. alignments:  216576664
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (20482.0s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp429334.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       61,349,910
+With hits:          61,349,910 
+Alignments:      1,085,191,715
+Assig. Taxonomy:    61,226,981
+MinSupport set to: 6134
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,673
+Binning reads: Writing classification tables
+Numb. Tax. classes:        270
+Binning reads: Syncing
+Class. Taxonomy:           270
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (1.6s)
+Copying from temporary file:
+100% (13285.3s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR512767_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp429334.sam.gz
+Num. of queries:   66568439
+Aligned queries:   61349910
+Num. alignments: 1085191715
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (800.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp380034.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        2,565,686
+With hits:           2,565,686 
+Alignments:         36,112,521
+Assig. Taxonomy:     2,557,372
+MinSupport set to: 256
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,568
+Binning reads: Writing classification tables
+Numb. Tax. classes:        479
+Binning reads: Syncing
+Class. Taxonomy:           479
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (0.9s)
+Copying from temporary file:
+100% (562.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp380034.sam.gz
+Num. of queries:    3351936
+Aligned queries:    2565686
+Num. alignments:   36112521
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3425.9s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp1030555.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       10,985,380
+With hits:          10,985,380 
+Alignments:        154,554,851
+Assig. Taxonomy:    10,949,769
+MinSupport set to: 1098
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,701
+Binning reads: Writing classification tables
+Numb. Tax. classes:        492
+Binning reads: Syncing
+Class. Taxonomy:           492
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.0s)
+Copying from temporary file:
+100% (2064.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513165_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp1030555.sam.gz
+Num. of queries:   14349537
+Aligned queries:   10985380
+Num. alignments:  154554851
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (892.7s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp139103.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        2,584,408
+With hits:           2,584,408 
+Alignments:         41,247,111
+Assig. Taxonomy:     2,577,105
+MinSupport set to: 258
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,687
+Binning reads: Writing classification tables
+Numb. Tax. classes:        385
+Binning reads: Syncing
+Class. Taxonomy:           385
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.1s)
+Copying from temporary file:
+100% (533.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp139103.sam.gz
+Num. of queries:    3333541
+Aligned queries:    2584408
+Num. alignments:   41247111
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (7615.6s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp898045.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       21,596,536
+With hits:          21,596,536 
+Alignments:        344,496,478
+Assig. Taxonomy:    21,535,092
+MinSupport set to: 2159
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       6,867
+Binning reads: Writing classification tables
+Numb. Tax. classes:        386
+Binning reads: Syncing
+Class. Taxonomy:           386
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (1.6s)
+Copying from temporary file:
+100% (4504.5s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513768_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp898045.sam.gz
+Num. of queries:   27863732
+Aligned queries:   21596536
+Num. alignments:  344496478
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (1527.0s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp644800.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        4,182,431
+With hits:           4,182,431 
+Alignments:         73,671,825
+Assig. Taxonomy:     4,181,153
+MinSupport set to: 418
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,339
+Binning reads: Writing classification tables
+Numb. Tax. classes:        435
+Binning reads: Syncing
+Class. Taxonomy:           435
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.6s)
+Copying from temporary file:
+100% (924.7s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp644800.sam.gz
+Num. of queries:    4989005
+Aligned queries:    4182431
+Num. alignments:   73671825
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (7227.0s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp892139.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       20,238,129
+With hits:          20,238,129 
+Alignments:        356,128,730
+Assig. Taxonomy:    20,231,797
+MinSupport set to: 2023
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       6,203
+Binning reads: Writing classification tables
+Numb. Tax. classes:        439
+Binning reads: Syncing
+Class. Taxonomy:           439
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.2s)
+Copying from temporary file:
+100% (4931.6s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513775_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp892139.sam.gz
+Num. of queries:   24143332
+Aligned queries:   20238129
+Num. alignments:  356128730
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (2029.9s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp655436.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        8,049,207
+With hits:           8,049,207 
+Alignments:         89,292,753
+Assig. Taxonomy:     8,045,457
+MinSupport set to: 804
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,790
+Binning reads: Writing classification tables
+Numb. Tax. classes:        334
+Binning reads: Syncing
+Class. Taxonomy:           334
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.4s)
+Copying from temporary file:
+100% (1239.4s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp655436.sam.gz
+Num. of queries:    9513452
+Aligned queries:    8049207
+Num. alignments:   89292753
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (9863.7s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp875586.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       39,247,936
+With hits:          39,247,936 
+Alignments:        435,478,510
+Assig. Taxonomy:    39,229,229
+MinSupport set to: 3924
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       6,901
+Binning reads: Writing classification tables
+Numb. Tax. classes:        336
+Binning reads: Syncing
+Class. Taxonomy:           336
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.6s)
+Copying from temporary file:
+100% (5517.1s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR513828_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp875586.sam.gz
+Num. of queries:   46404039
+Aligned queries:   39247936
+Num. alignments:  435478510
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (348.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp756052.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        1,013,750
+With hits:           1,013,750 
+Alignments:         20,221,746
+Assig. Taxonomy:     1,013,605
+MinSupport set to: 101
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       1,356
+Binning reads: Writing classification tables
+Numb. Tax. classes:        369
+Binning reads: Syncing
+Class. Taxonomy:           369
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (0.6s)
+Copying from temporary file:
+100% (236.9s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp756052.sam.gz
+Num. of queries:    1093663
+Aligned queries:    1013750
+Num. alignments:   20221746
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3748.1s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp237056.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       10,893,300
+With hits:          10,893,300 
+Alignments:        217,783,779
+Assig. Taxonomy:    10,891,694
+MinSupport set to: 1089
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,995
+Binning reads: Writing classification tables
+Numb. Tax. classes:        391
+Binning reads: Syncing
+Class. Taxonomy:           391
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.3s)
+Copying from temporary file:
+100% (2442.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514202_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp237056.sam.gz
+Num. of queries:   11751119
+Aligned queries:   10893300
+Num. alignments:  217783779
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (413.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp297847.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        1,564,473
+With hits:           1,564,473 
+Alignments:         20,775,354
+Assig. Taxonomy:     1,563,302
+MinSupport set to: 156
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,248
+Binning reads: Writing classification tables
+Numb. Tax. classes:        427
+Binning reads: Syncing
+Class. Taxonomy:           427
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.4s)
+Copying from temporary file:
+100% (250.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp297847.sam.gz
+Num. of queries:    1980843
+Aligned queries:    1564473
+Num. alignments:   20775354
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (3531.3s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp343645.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       13,144,841
+With hits:          13,144,841 
+Alignments:        174,805,415
+Assig. Taxonomy:    13,135,350
+MinSupport set to: 1314
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,998
+Binning reads: Writing classification tables
+Numb. Tax. classes:        432
+Binning reads: Syncing
+Class. Taxonomy:           432
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (2.0s)
+Copying from temporary file:
+100% (2222.4s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514239_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp343645.sam.gz
+Num. of queries:   16641906
+Aligned queries:   13144841
+Num. alignments:  174805415
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (1923.9s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp626810.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        5,914,743
+With hits:           5,914,743 
+Alignments:         64,535,539
+Assig. Taxonomy:     5,608,360
+MinSupport set to: 591
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,507
+Binning reads: Writing classification tables
+Numb. Tax. classes:        361
+Binning reads: Syncing
+Class. Taxonomy:           361
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+100% (1.6s)
+Copying from temporary file:
+100% (1138.0s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp626810.sam.gz
+Num. of queries:    7132047
+Aligned queries:    5914743
+Num. alignments:   64535539
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 30% 100% (10403.5s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp504662.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       31,450,314
+With hits:          31,450,314 
+Alignments:        343,244,738
+Assig. Taxonomy:    29,817,973
+MinSupport set to: 3145
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,846
+Binning reads: Writing classification tables
+Numb. Tax. classes:        371
+Binning reads: Syncing
+Class. Taxonomy:           371
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.2s)
+Copying from temporary file:
+100% (5422.2s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514306_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp504662.sam.gz
+Num. of queries:   37924739
+Aligned queries:   31450314
+Num. alignments:  343244738
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (1200.2s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp599407.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        2,820,717
+With hits:           2,820,717 
+Alignments:         78,283,969
+Assig. Taxonomy:     2,819,616
+MinSupport set to: 282
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,672
+Binning reads: Writing classification tables
+Numb. Tax. classes:        470
+Binning reads: Syncing
+Class. Taxonomy:           470
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 100% (1.1s)
+Copying from temporary file:
+100% (801.5s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp599407.sam.gz
+Num. of queries:    3399307
+Aligned queries:    2820717
+Num. alignments:   78283969
++++++ Aligning file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp_HMP/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+Starting file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+10% 20% 100% (9908.0s)
+Alignments written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp256587.sam.gz
+Finishing file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Loading MEGAN File: SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:       23,353,974
+With hits:          23,353,974 
+Alignments:        648,419,528
+Assig. Taxonomy:    23,344,363
+MinSupport set to: 2335
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       7,824
+Binning reads: Writing classification tables
+Numb. Tax. classes:        478
+Binning reads: Syncing
+Class. Taxonomy:           478
+Analysis written to file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz
+10% 20% 100% (2.0s)
+Copying from temporary file:
+100% (6594.6s)
+Deleted temporary file: /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn-tmp256587.sam.gz
+Num. of queries:   28153779
+Aligned queries:   23353974
+Num. alignments:  648419528
+Number of input files:         40
+Total num. of queries:  657007162
+Total aligned queries:  553855897
+Total num. alignments: 9396233728
+Total time:  858080s
+Peak memory: 1387.4 of 1688.9G
