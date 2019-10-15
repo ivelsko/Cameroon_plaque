@@ -24,16 +24,16 @@ Set the working directory of the notebook to the parent directory of the
 notebook itself.  
 
 ```{r setup}
-knitr::opts_knit$set(root.dir = normalizePath("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus"))
+knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
 # MALT read stats
 The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
 # load the table generated from the MALT log file with the # reads and # aligned reads
-maltnt_assignments <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/nt/aligned_stats.tsv")
-maltRSC_assignments <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/aligned_stats.tsv")
-malt_CMC_HMP_RSC_assignments <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/RefSeqCustom/aligned_stats.tsv")
+maltnt_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
+maltRSC_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
+malt_CMC_HMP_RSC_assignments <- fread("00-documentation.backup/aligned_stats.tsv")
 
 # clean the file names
 maltnt_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltnt_assignments$SampleID)
@@ -43,7 +43,7 @@ malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq
 malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","_10M", malt_CMC_HMP_RSC_assignments$SampleID)
 
 # load the metadata file
-metadata <- fread("/Users/oval_portrait/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata <- metadata %>% rename(SampleID = `#SampleID`)
 ```
 
@@ -271,9 +271,9 @@ ggplot(., aes(x=Env, y = Percent, fill=Database)) +
 
 malt_assignments_plots_pct_group
 
-ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/malt_assignments_plots_pct_group.pdf", plot = malt_assignments_plots_pct_group, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
+# ggsave("05-results.backup/malt_assignments_plots_pct_group.pdf", plot = malt_assignments_plots_pct_group, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
 
 malt_assignments_plots_pct_village <- malt_stats %>%
 ggplot(., aes(x=Village, y = Percent, fill=Database)) +
@@ -286,9 +286,9 @@ ggplot(., aes(x=Village, y = Percent, fill=Database)) +
 
 malt_assignments_plots_pct_village
 
-ggsave("/Users/oval_portrait/Dropbox (Personal)/MPI-SHH/CMC/malt_assignments_plots_pct_village.pdf", plot = malt_assignments_plots_pct_village, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
+# ggsave("05-results.backup/malt_assignments_plots_pct_village.pdf", plot = malt_assignments_plots_pct_village, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
 
 ```
 
