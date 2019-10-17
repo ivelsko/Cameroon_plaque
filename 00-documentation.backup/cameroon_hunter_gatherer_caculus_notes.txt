@@ -59,8 +59,8 @@ sbatch \
 --mail-user=velsko@shh.mpg.de \
 -J "MaltCMCnt" \
 --wrap="/projects1/microbiome_calculus/evolution/02-scripts.backup/007-malt-genbank-nt_2017_2step_85pc_supp_0.01 \
-/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/input-temp/*.gz \
-/projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/04-analysis/malt/nt-correct"
+/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp/*.gz \
+/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/nt-correct"
 
 
 # To get the mapping stats from malt runs to input into R, use the log output file and run the following code:
@@ -144,15 +144,45 @@ ln -s /projects1/microbiome_calculus/evolution/01-data/public_data/raw/SRR513828
 #SBATCH --array=0-19%2
 #SBATCH -J "subsample"
 
-SAMPLES=($(find /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/*/ -name '*.gz' -type f | rev | cut -d/ -f 1 | rev | cut -d_ -f 1))
+SAMPLES=($(find /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/*/ -name '*.gz' -type f | rev | cut -d/ -f 1 | rev | cut -d_ -f 1))
 SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 
-seqtk sample -s100 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
-pigz -8 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
-seqtk sample -s100 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R2_000.fastq.gz 10000000 > /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
-pigz -8 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
+seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
+pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
+seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R2_000.fastq.gz 10000000 > /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
+pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
 
+# symlink the JAE data for Eager processing (and subsampling)
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE006.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE007.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE008.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE009.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE010.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE012.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE013.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE014.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE015.A0101
+ln -s /projects1/microbiome_sciences/raw_data/internal.backup/JAE016.A0101
 
+#!/bin/bash
+
+#SBATCH -n 8
+#SBATCH --mem 24G
+#SBATCH --partition=medium
+#SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.out
+#SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.err
+#SBATCH --mail-type=fail
+#SBATCH --mail-type=time_limit
+#SBATCH --mail-use=velsko@shh.mpg.de
+#SBATCH --export=ALL
+#SBATCH --array=0-19%2
+#SBATCH -J "subsample"
+
+SAMPLES=($(find /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/ -name '*.gz' -type f | rev | cut -d/ -f 1 | rev | cut -d_ -f 1))
+SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
+
+seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
+pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 
 
 
