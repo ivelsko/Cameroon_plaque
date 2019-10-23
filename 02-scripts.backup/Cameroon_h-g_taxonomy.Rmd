@@ -71,6 +71,12 @@ malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo sapiens"))
 # load the metadata file
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata <- metadata %>% rename(SampleID = `#SampleID`)
+
+fullSRR <- metadata %>%
+  select(SampleID) %>%
+  filter(str_detect(SampleID, "SRR")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull
 ```
 
 ```{r colors_shapes_passionfruit, eval = F}
@@ -578,8 +584,6 @@ Check the rank abundance curves to see how changing the cut-off threshold change
 
 contaminants_species <- cont_prev_species_list %>% rownames_to_column("Species") %>% select(Species)
 malt_species.decontam <- malt_species %>%
-  # gather("SampleID","Counts", 2:ncol(.)) %>%
-  # spread(Species, Counts) %>%
   anti_join(., contaminants_species)
 
 # write.table(malt_species.decontam, file = "05-results.backup/malt_species.decontam.tsv", sep="\t", quote=F, row.names = F)
@@ -587,17 +591,13 @@ malt_species.decontam <- malt_species %>%
 
 contaminants_genus <- cont_prev_genus_list %>% rownames_to_column("Species") %>% select(Species)
 malt_genus.decontam <- malt_genus %>%
-  # gather("SampleID","Counts", 2:ncol(.)) %>%
-  # spread(Species, Counts) %>%
   anti_join(., contaminants_genus)
 
-
-
-
 malt_species.decontamL <- malt_species.decontam %>%
-  adorn_percentages(denominator = "row", na.rm=F) %>%
+  adorn_percentages(denominator = "col", na.rm=F) %>%
   gather("SampleID","Relab",2:ncol(.)) %>%
-  inner_join(., metadata)
+  inner_join(., metadata %>%
+              select(SampleID, Env), by = "SampleID")
 
 malt_species.decontamL_HG <- malt_species.decontamL %>%
   filter(str_detect(Env, "HunterGatherer")) %>%
@@ -607,8 +607,6 @@ malt_species.decontamL_HG <- malt_species.decontamL %>%
   filter(mean_relab > 0) %>%
   rownames_to_column("order") %>%
   mutate(order = as.numeric(order))
-
-# malt_species.decontamL_HG$Env <- factor(malt_species.decontamL_HG$Env, levels = c("HunterGatherer","ExtractionGauze","ExtractionBlank","LibraryBlank"))
 
 malt_species.decontamL_EG <- malt_species.decontamL %>%
   filter(str_detect(Env, "ExtractionGauze")) %>%
@@ -663,6 +661,7 @@ malt_species.decontamL_HG_plot <- malt_species.decontamL_HG %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
      xlab("species order") +
@@ -674,6 +673,7 @@ malt_species.decontamL_EG_plot <- malt_species.decontamL_EG %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
      xlab("species order") +
@@ -685,6 +685,7 @@ malt_species.decontamL_EB_plot <- malt_species.decontamL_EB %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
      xlab("species order") +
@@ -695,6 +696,7 @@ malt_species.decontamL_LB_plot <- malt_species.decontamL_LB %>%
      geom_point() +
      theme_minimal() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      scale_y_log10() +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
@@ -706,6 +708,7 @@ malt_species.decontamL_HMP_plot <- malt_species.decontamL_HMP%>%
      geom_point() +
      theme_minimal() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      scale_y_log10() +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
@@ -717,6 +720,7 @@ malt_species.decontamL_HMP10M_plot <- malt_species.decontamL_HMP10 %>%
      geom_point() +
      theme_minimal() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      scale_y_log10() +
      xlim(NA, 500) +
      ylab("mean relative abundance") +
@@ -729,7 +733,7 @@ plot_grid(malt_species.decontamL_HG_plot, malt_species.decontamL_HMP_plot, malt_
 
 
 malt_genus.decontamL <- malt_genus.decontam %>%
-  adorn_percentages(denominator = "row", na.rm=F) %>%
+  adorn_percentages(denominator = "col", na.rm=F) %>%
   gather("SampleID","Relab",2:ncol(.)) %>%
   inner_join(., metadata)
 
@@ -797,6 +801,7 @@ malt_genus.decontamL_HG_plot <- malt_genus.decontamL_HG %>%
      geom_point() +
      theme_minimal() +
      scale_y_log10() +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
@@ -809,6 +814,7 @@ malt_genus.decontamL_EG_plot <- malt_genus.decontamL_EG %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
      xlab("genus order") +
@@ -820,6 +826,7 @@ malt_genus.decontamL_EB_plot <- malt_genus.decontamL_EB %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
      xlab("genus order") +
@@ -831,6 +838,7 @@ malt_genus.decontamL_LB_plot <- malt_genus.decontamL_LB %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
      xlab("genus order") +
@@ -842,6 +850,7 @@ malt_genus.decontamL_HMP_plot <- malt_genus.decontamL_HMP %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
      xlab("genus order") +
@@ -853,6 +862,7 @@ malt_genus.decontamL_HMP10M_plot <- malt_genus.decontamL_HMP10M %>%
      theme_minimal() +
      scale_y_log10() +
      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+     geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
      xlim(NA, 100) +
      ylab("mean relative abundance") +
      xlab("genus order") +
@@ -938,6 +948,7 @@ Let's do a quick and not at all enough data filtering so we can run a quick PCA 
 malt_species_unfiltered <- malt_species %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
@@ -956,7 +967,6 @@ tune.species_pca
 
 # perform a PCA to see how the data cluster
 species.pca <- mixOmics::pca(malt_species_unfiltered, ncomp = 3, logratio = 'CLR')
-plot(species.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 species.pca.variates <- as.data.frame(species.pca$variates$X)
@@ -972,29 +982,33 @@ pca_species_unfiltered_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour
   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - unfiltered')
+  ggtitle(paste('MALT - unfiltered', malt_species_unfiltered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
 pca_species_unfiltered_pc1pc2
 
-pca_species_unfiltered_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
-  geom_point(size = 4) +
-  scale_shape_manual(values = Env_shapes) +
-  xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - unfiltered')
-
-pca_species_unfiltered_pc1pc2
-
-pca_species_unfiltered_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
-  geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
-  scale_colour_manual(values = Env_colors) +
-  xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - unfiltered')
-
-pca_species_unfiltered_pc1pc2
+# pca_species_unfiltered_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+#   geom_point(size = 4) +
+#   scale_shape_manual(values = Env_shapes) +
+#   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - unfiltered')
+# 
+# pca_species_unfiltered_pc1pc2
+ 
+# pca_species_unfiltered_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+#   geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
+#   scale_colour_manual(values = Env_colors) +
+#   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - unfiltered')
+# 
+# pca_species_unfiltered_pc1pc2
 
 # ggsave("05-results.backup/pca_species_unfiltered_pc1pc2.pdf", plot = pca_species_unfiltered_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
@@ -1005,6 +1019,7 @@ pca_species_unfiltered_pc1pc2
 malt_species_filtered <- malt_species %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
@@ -1024,7 +1039,6 @@ tune.species_pca
 
 # perform a PCA to see how the data cluster
 species.pca <- mixOmics::pca(malt_species_filtered, ncomp = 3, logratio = 'CLR')
-plot(species.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 species.pca.variates <- as.data.frame(species.pca$variates$X)
@@ -1040,29 +1054,48 @@ pca_species_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Env, sha
   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - filtered')
+  ggtitle(paste('MALT - filtered', malt_species_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
 pca_species_pc1pc2
 
-pca_species_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+pca_species_pc3pc2 <- ggplot(species.pca.varmet, aes(PC3, PC2, colour = Env, shape = Env)) +
   geom_point(size = 4) +
-  scale_shape_manual(values = Env_shapes) +
-  xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - filtered')
-
-pca_species_pc1pc2
-
-pca_species_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
-  geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
   scale_colour_manual(values = Env_colors) +
-  xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
+  scale_shape_manual(values = Env_shapes) +
+  xlab(paste("PC3 - ", round(species.pca$explained_variance[3], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - filtered')
+  ggtitle(paste('MALT - filtered', malt_species_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
-pca_species_pc1pc2
+pca_species_pc3pc2
+
+# pca_species_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+#   geom_point(size = 4) +
+#   scale_shape_manual(values = Env_shapes) +
+#   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - filtered')
+# 
+# pca_species_pc1pc2
+
+# pca_species_pc1pc2 <- ggplot(species.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+#   geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
+#   scale_colour_manual(values = Env_colors) +
+#   xlab(paste("PC1 - ", round(species.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - filtered')
+# 
+# pca_species_pc1pc2
 
 # ggsave("05-results.backup/pca_species_pc1pc2.pdf", plot = pca_species_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
@@ -1073,8 +1106,8 @@ pca_species_pc1pc2
 malt_species.decontam_unfilt <- malt_species.decontam %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         # filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
@@ -1092,7 +1125,6 @@ tune.species.decontam_pca
 
 # perform a PCA to see how the data cluster
 species.decontam.pca <- mixOmics::pca(malt_species.decontam_unfilt, ncomp = 3, logratio = 'CLR')
-plot(species.decontam.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 species.decontam.pca.variates <- as.data.frame(species.decontam.pca$variates$X)
@@ -1108,37 +1140,42 @@ pca_species.decontam_pc1pc2 <- ggplot(species.decontam.pca.varmet, aes(PC1, PC2,
   xlab(paste("PC1 - ", round(species.decontam.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.decontam.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam only')
+  ggtitle(paste('MALT - decontam only', malt_species.decontam_unfilt %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
 pca_species.decontam_pc1pc2
 
-pca_species.decontam_pc1pc2 <- ggplot(species.decontam.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
-  scale_colour_manual(values = Env_colors) +
-  geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
-  xlab(paste("PC1 - ", round(species.decontam.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.decontam.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam only')
+# pca_species.decontam_pc1pc2 <- ggplot(species.decontam.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+#   scale_colour_manual(values = Env_colors) +
+#   geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
+#   xlab(paste("PC1 - ", round(species.decontam.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.decontam.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - decontam only')
+# 
+# pca_species.decontam_pc1pc2
 
-pca_species.decontam_pc1pc2
-
-pca_species.decontam_pc1pc2 <- ggplot(species.decontam.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
-  geom_point(size = 4) +
-  scale_shape_manual(values = Env_shapes) +
-  xlab(paste("PC1 - ", round(species.decontam.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.decontam.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam only')
-
-pca_species.decontam_pc1pc2
+# pca_species.decontam_pc1pc2 <- ggplot(species.decontam.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+#   geom_point(size = 4) +
+#   scale_shape_manual(values = Env_shapes) +
+#   xlab(paste("PC1 - ", round(species.decontam.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.decontam.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - decontam only')
+# 
+# pca_species.decontam_pc1pc2
 
 
 
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
@@ -1156,7 +1193,6 @@ tune.species.decontam_filtered_pca
 
 # perform a PCA to see how the data cluster
 species.decontam_filtered.pca <- mixOmics::pca(malt_species.decontam_filtered, ncomp = 3, logratio = 'CLR')
-plot(species.decontam_filtered.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 species.decontam_filtered.pca.variates <- as.data.frame(species.decontam_filtered.pca$variates$X)
@@ -1172,35 +1208,104 @@ pca_species.decontam_filtered_pc1pc2 <- ggplot(species.decontam_filtered.pca.var
   xlab(paste("PC1 - ", round(species.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam_filtered only')
+  ggtitle(paste('MALT - decontam filtered', malt_species.decontam_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
 pca_species.decontam_filtered_pc1pc2
 
-pca_species.decontam_filtered_pc1pc2 <- ggplot(species.decontam_filtered.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
-  scale_colour_manual(values = Env_colors) +
-  geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
-  xlab(paste("PC1 - ", round(species.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(species.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam_filtered only')
-
-pca_species.decontam_filtered_pc1pc2
-
-pca_species.decontam_filtered_pc1pc2 <- ggplot(species.decontam_filtered.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+pca_species.decontam_filtered_pc2pc3 <- ggplot(species.decontam_filtered.pca.varmet, aes(PC3, PC2, colour = Env, shape = Env)) +
   geom_point(size = 4) +
+  scale_colour_manual(values = Env_colors) +
   scale_shape_manual(values = Env_shapes) +
-  xlab(paste("PC1 - ", round(species.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
+  xlab(paste("PC3 - ", round(species.decontam_filtered.pca$explained_variance[3], 2), sep = "")) +
   ylab(paste("PC2 - ", round(species.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
   theme_minimal(base_size = 14) +
-  ggtitle('MALT - decontam_filtered only')
+  ggtitle(paste('MALT - decontam filtered', malt_species.decontam_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'species'))
 
-pca_species.decontam_filtered_pc1pc2
+pca_species.decontam_filtered_pc2pc3
+
+# pca_species.decontam_filtered_pc1pc2 <- ggplot(species.decontam_filtered.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+#   scale_colour_manual(values = Env_colors) +
+#   geom_text(aes(label = species.pca.varmet$SampleID), size = 2) +
+#   xlab(paste("PC1 - ", round(species.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - decontam and filtered')
+# 
+# pca_species.decontam_filtered_pc1pc2
+
+# pca_species.decontam_filtered_pc1pc2 <- ggplot(species.decontam_filtered.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Env)) +
+#   geom_point(size = 4) +
+#   scale_shape_manual(values = Env_shapes) +
+#   xlab(paste("PC1 - ", round(species.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
+#   ylab(paste("PC2 - ", round(species.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
+#   theme_minimal(base_size = 14) +
+#   ggtitle('MALT - decontam and filtered')
+# 
+# pca_species.decontam_filtered_pc1pc2
+
 ```
 
 ```{r pca_all_genus}
+malt_genus_unfiltered <- malt_genus %>%
+                                         adorn_totals(where = "col", name = "Sum_genus") %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
+                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+                                         select(-one_of(c("Sum_genus","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus_unfiltered) <- malt_genus_unfiltered$SampleID
+
+malt_genus_unfiltered <- malt_genus_unfiltered %>% select(-SampleID)
+
+malt_genus_unfiltered = malt_genus_unfiltered+1
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.nt_genus_pca <- tune.pca(malt_genus_unfiltered, logratio = 'CLR')
+tune.nt_genus_pca
+
+# perform a PCA to see how the data cluster
+nt_genus.pca <- mixOmics::pca(malt_genus_unfiltered, ncomp = 3, logratio = 'CLR')
+#plot(nt_genus.pca)
+
+# Select out the PC variates into a new table and add the metadata for plotting
+nt_genus.pca.variates <- as.data.frame(nt_genus.pca$variates$X)
+nt_genus.pca.variates <- nt_genus.pca.variates %>%
+  rownames_to_column("SampleID")
+  
+nt_genus.pca.varmet <- inner_join(nt_genus.pca.variates, metadata, by = "SampleID")
+
+pca_nt_genus_pc1pc2 <- ggplot(nt_genus.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Env_colors) +
+  scale_shape_manual(values = Env_shapes) +
+  xlab(paste("PC1 - ", round(nt_genus.pca$explained_variance[1], 2), sep = "")) +
+  ylab(paste("PC2 - ", round(nt_genus.pca$explained_variance[2], 2), sep = "")) +
+  theme_minimal(base_size = 14) +
+  ggtitle(paste('MALT - filtered', malt_genus_unfiltered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'genera'))
+
+
+pca_nt_genus_pc1pc2
+
+
 malt_genus_filtered <- malt_genus %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
@@ -1220,7 +1325,7 @@ tune.nt_genus_pca
 
 # perform a PCA to see how the data cluster
 nt_genus.pca <- mixOmics::pca(malt_genus_filtered, ncomp = 3, logratio = 'CLR')
-plot(nt_genus.pca)
+#plot(nt_genus.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 nt_genus.pca.variates <- as.data.frame(nt_genus.pca$variates$X)
@@ -1235,7 +1340,12 @@ pca_nt_genus_pc1pc2 <- ggplot(nt_genus.pca.varmet, aes(PC1, PC2, colour = Env, s
   scale_shape_manual(values = Env_shapes) +
   xlab(paste("PC1 - ", round(nt_genus.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(nt_genus.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  theme_minimal(base_size = 14) +
+  ggtitle(paste('MALT - filtered', malt_genus_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'genera'))
 
 pca_nt_genus_pc1pc2
 
@@ -1243,9 +1353,57 @@ pca_nt_genus_pc1pc2
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
+
+malt_genus.decontam_unfiltered <- malt_genus.decontam %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus.decontam_unfiltered) <- malt_genus.decontam_unfiltered$SampleID
+
+malt_genus.decontam_unfiltered <- malt_genus.decontam_unfiltered %>% select(-SampleID)
+
+malt_genus.decontam_unfiltered = malt_genus.decontam_unfiltered+1
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.nt_genus.decontam_pca <- tune.pca(malt_genus.decontam_unfiltered, logratio = 'CLR')
+tune.nt_genus.decontam_pca
+
+# perform a PCA to see how the data cluster
+nt_genus.decontam.pca <- mixOmics::pca(malt_genus.decontam_unfiltered, ncomp = 3, logratio = 'CLR')
+#plot(nt_genus.decontam.pca)
+
+# Select out the PC variates into a new table and add the metadata for plotting
+nt_genus.decontam.pca.variates <- as.data.frame(nt_genus.decontam.pca$variates$X)
+nt_genus.decontam.pca.variates <- nt_genus.decontam.pca.variates %>%
+  rownames_to_column("SampleID")
+  
+nt_genus.decontam.pca.varmet <- inner_join(nt_genus.decontam.pca.variates, metadata, by = "SampleID")
+
+pca_nt_genus.decontam_pc1pc2 <- ggplot(nt_genus.decontam.pca.varmet, aes(PC1, PC2, colour = Env, shape = Env)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Env_colors) +
+  scale_shape_manual(values = Env_shapes) +
+  xlab(paste("PC1 - ", round(nt_genus.decontam.pca$explained_variance[1], 2), sep = "")) +
+  ylab(paste("PC2 - ", round(nt_genus.decontam.pca$explained_variance[2], 2), sep = "")) +
+  theme_minimal(base_size = 14) +
+  ggtitle(paste('MALT - decontam filtered', malt_genus.decontam_unfiltered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'genera'))
+
+pca_nt_genus.decontam_pc1pc2
+
 malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
                                          select(-one_of(outliers)) %>%
+                                         select(-contains("10M")) %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
@@ -1265,7 +1423,7 @@ tune.nt_genus.decontam_pca
 
 # perform a PCA to see how the data cluster
 nt_genus.decontam.pca <- mixOmics::pca(malt_genus.decontam_filtered, ncomp = 3, logratio = 'CLR')
-plot(nt_genus.decontam.pca)
+#plot(nt_genus.decontam.pca)
 
 # Select out the PC variates into a new table and add the metadata for plotting
 nt_genus.decontam.pca.variates <- as.data.frame(nt_genus.decontam.pca$variates$X)
@@ -1280,7 +1438,12 @@ pca_nt_genus.decontam_pc1pc2 <- ggplot(nt_genus.decontam.pca.varmet, aes(PC1, PC
   scale_shape_manual(values = Env_shapes) +
   xlab(paste("PC1 - ", round(nt_genus.decontam.pca$explained_variance[1], 2), sep = "")) +
   ylab(paste("PC2 - ", round(nt_genus.decontam.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  theme_minimal(base_size = 14) +
+  ggtitle(paste('MALT - decontam filtered', malt_genus.decontam_filtered %>%
+                                     rownames_to_column("SampleID") %>%
+                                     gather("Species","Counts",2:ncol(.)) %>%
+                                     spread(SampleID, Counts) %>%
+                                     count, 'genera'))
 
 pca_nt_genus.decontam_pc1pc2
 
@@ -1291,9 +1454,10 @@ pca_nt_genus.decontam_pc1pc2
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-starts_with("EXB")) %>%
                                          select(-starts_with("LIB")) %>%
+                                         select(-one_of(fullSRR)) %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
@@ -1394,6 +1558,7 @@ pca_nt_species_pc1pc2
 malt_genus.decontam_filtered_noblanks <- malt_genus.decontam %>%
                                          select(-starts_with("EXB")) %>%
                                          select(-starts_with("LIB")) %>%
+                                         select(-one_of(fullSRR)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
@@ -1551,7 +1716,7 @@ presabs_table_f <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts) %>%
@@ -1654,7 +1819,7 @@ malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts) %>% select(-SampleID))
@@ -1774,7 +1939,7 @@ ggplot(evenness.species_filtered, aes(x=Village, y = Pielou_evenness, fill=Villa
 
 
 ```
-The populations look pretty similar in evenness, which indicates that the differnces in Shannon index are likely due to CAZyme richness differences and not evenness differences. 
+In this dataset EXB059.A1601 has no detected genera, and this is the samples that was removed in the warning notice (it ends up with NA for the evenness calculation).
 
 Now alpha-diversity at the genus level
 ```{r observed_genera}
@@ -1834,7 +1999,7 @@ presabs_table_filtered <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts) %>%
@@ -1939,7 +2104,7 @@ malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.01) %>%
+                                         filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts) %>% select(-SampleID))
@@ -2056,12 +2221,15 @@ ggplot(evenness_filtered.genus, aes(x=Village, y = Pielou_evenness, fill=Village
   ylab("Pielou's evenness") +
   ggtitle("Pielou's evenness - genus")
 ```
+In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these are the 2 samples that were removed in the warning notice (they end up with NA for the evenness calculation).
 
-Now make a heatmap of the top 50 most abundant species (as an arbitrary cut-off)
+
+Now make a heatmap of the top 50 most abundant species and genera (as an arbitrary cut-off)
 ```{r heatmaps, eval = F}
 malt_species.decontam_top50 <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-contains("SRR")) %>%
+                                         # select(-contains("SRR")) %>%
+                                         select(-contains("10M")) %>%
                                          select(-contains("EXB")) %>%
                                          select(-contains("LIB")) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
@@ -2085,6 +2253,35 @@ malt_species.decontam_top50_clr.heatmap <- heatmap.2(malt_species.decontam_top50
          trace = "none", col = viridis_pal(),
          margins = c(8,6), srtCol = 30, cexCol = 0.6, cexRow = 0.5,
           key = T, keysize = 0.8, main = "50 most abundant species")
+
+
+malt_genus.decontam_top50 <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         # select(-contains("SRR")) %>%
+                                         select(-contains("10M")) %>%
+                                         select(-contains("EXB")) %>%
+                                         select(-contains("LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         top_n(50, Percent) %>%
+                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus.decontam_top50) <- malt_genus.decontam_top50$SampleID
+malt_genus.decontam_top50 <- malt_genus.decontam_top50 %>% select(-SampleID)
+
+# CLR-transform the matrix for plotting the heatmap
+malt_genus.decontam_top50_clr = malt_genus.decontam_top50+1
+#malt_genus.decontam_top50_clr <- as.matrix(logratio.transfo(malt_genus.decontam_top50_clr, logratio = "CLR"))
+malt_genus.decontam_top50_clr <- clr(malt_genus.decontam_top50_clr)
+malt_genus.decontam_top50_clr <- as.matrix(malt_genus.decontam_top50_clr)
+
+
+malt_genus.decontam_top50_clr.heatmap <- heatmap.2(malt_genus.decontam_top50_clr, Colv = T, Rowv = T, dendrogram = "both",
+         trace = "none", col = viridis_pal(),
+         margins = c(8,6), srtCol = 30, cexCol = 0.6, cexRow = 0.5,
+          key = T, keysize = 0.8, main = "50 most abundant genus")
 
 ```
 
