@@ -1,0 +1,146 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque HUMAnN2"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries}
+library(knitr)
+library(decontam)
+library(data.table)
+library(psych)
+library(mixOmics)
+library(compositions)
+library(vegan)
+library(janitor)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r colors_shapes_peachpear}
+# lacroix_palette("PeachPear", n = 8, type = "continuous")
+# "#FF3200" "#EF8158" "#E9BD8E" "#CBDDA7" "#38BCAD" "#0B91B5" "#065FA3" "#172869"
+
+village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
+                    HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                     ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                    ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+ethnic_group_colors <- c(Baka = "#FF3200", Nzime = "#172869", HMP = "#969696", HMP10M = "#d9d9d9", JAE10M = "#ffeda0", JAE = "#feb24c",
+                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+ethnic_group_shapes <- c(Baka = 19, Nzime = 17,  HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                         ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+market_economy_colors <- c(logging_road = "#FF3200", forrest_camp = "#172869", farming = "#82CDAA", Industrial = "#969696",
+                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, HMP = 7, HMP10M = 9, Industrial = 15,
+                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
+                      HMP = "#969696", HMP10M = "#d9d9d9",
+                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, HMP = 7, HMP10M = 9,
+                      ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
+                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+```
+
+# HUMAnN2 assignment stats
+The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
+```{r load_data}
+## load the species and genus tables generated in MEGAN
+humann2_path <- fread("./05-results.backup/XXXXXXXXXXXXXXXXXXXXXX")
+humann2_KOs <- fread("./05-results.backup/XXXXXXXXXXXXXXXXXXXXXX")
+
+# clean the file names
+malt_species <- rename(malt_species, Species = `#Datasets`)
+colnames(malt_species) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
+colnames(malt_species) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
+colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(humann2_path))
+colnames(malt_species) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(humann2_path))
+colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
+
+
+# remove human and unassigned reads
+humann2_path <- humann2_path %>% filter(!str_detect(Species, "Homo sapiens"))
+humann2_path <- humann2_path %>% filter(!str_detect(Species, "Not assigned"))
+# get rid of the extra column at the begining
+humann2_path <- humann2_path %>% select(-CMC_HMP_comparison)
+
+# load metadata
+metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
+# list out the full SRR (HMP) and JAE samples to separate them from the set subsampled to 10M reads
+fullSRR <- metadata %>%
+  select(SampleID) %>%
+  filter(str_detect(SampleID, "SRR")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull
+
+fullJAE <- metadata %>%
+  select(SampleID) %>%
+  filter(str_detect(SampleID, "JAE")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull
+```
+
+Before we proceed with looking at differences in abundance of different enzymes, let's compare the how many reads were identified by HUMAnN2 for each sample type. With the first step we'll read in the default HUMAnN2 output table with all UniRef90 assignments. We'll select out just the rows with no species assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per kilobase* for the initial output, so we'll be calculating the percent of total assigned/mapped reads per kilobase (RPK). Then write out the file with just the unmapped and total reads assigned so we never have to load this huge file again. This has to be done with a table for which the samples were renormed individually and then joined, and not renormed after they were joined (with HUMAnN2 scripts). 
+
+```{r}
+
+```
+
+Plot the total number of assigned reads in each subsistence strategy, and the proportion of assigned reads in each subsistence strategy. 
+```{r}
+
+```
+
+# Community-level functional analysis with individual gene families assigned KEGG Orthology numbers
+## KEGG ortholog distribution
+We will start analysis of KEGG orthologs by looking at the total number of KOs assigned to each population to see if this may bias further analyses. The proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs is consistent and high across all sample types, which is good b/c we have no major population/subsistence strategy biases. 
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
