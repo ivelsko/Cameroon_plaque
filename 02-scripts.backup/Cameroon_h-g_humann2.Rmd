@@ -79,26 +79,31 @@ tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
 The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
 ## load the species and genus tables generated in MEGAN
-humann2_path <- fread("./05-results.backup/XXXXXXXXXXXXXXXXXXXXXX")
-humann2_KOs <- fread("./05-results.backup/XXXXXXXXXXXXXXXXXXXXXX")
+humann2_path <- fread("./05-results.backup/humann2.pathabundance.all.tss.tsv")
+humann2_KOs_full <- fread("./05-results.backup/humann2.genefamilies.all.i.tss.renorm.ko.tsv")
 
 # clean the file names
-malt_species <- rename(malt_species, Species = `#Datasets`)
-colnames(malt_species) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
-colnames(malt_species) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
-colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(humann2_path))
-colnames(malt_species) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(humann2_path))
-colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(humann2_path))
+humann2_KOs_full <- rename(humann2_KOs_full, Ortholog = `# Gene Family`)
+colnames(humann2_KOs_full) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
+colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
+colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M_Abundance-RPKs","_10M", colnames(humann2_KOs_full))
+colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","_10M", colnames(humann2_KOs_full))
+colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
 
+humann2_path <- rename(humann2_path, Pathway = `# Pathway`)
+colnames(humann2_path) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
+colnames(humann2_path) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
+colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M_Abundance","_10M", colnames(humann2_path))
+colnames(humann2_path) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","_10M", colnames(humann2_path))
+colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
 
-# remove human and unassigned reads
-humann2_path <- humann2_path %>% filter(!str_detect(Species, "Homo sapiens"))
-humann2_path <- humann2_path %>% filter(!str_detect(Species, "Not assigned"))
-# get rid of the extra column at the begining
-humann2_path <- humann2_path %>% select(-CMC_HMP_comparison)
+# remove unmapped and ungrouped reads
+humann2_KOs <- humann2_KOs_full %>% filter(!str_detect(Ortholog, "UNMAPPED"))
+humann2_KOs <- humann2_KOs_full %>% filter(!str_detect(Ortholog, "UNGROUPED"))
 
 # load metadata
 metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- rename(metadata, SampleID = `#SampleID`)
 
 # list out the full SRR (HMP) and JAE samples to separate them from the set subsampled to 10M reads
 fullSRR <- metadata %>%
@@ -116,14 +121,25 @@ fullJAE <- metadata %>%
 
 Before we proceed with looking at differences in abundance of different enzymes, let's compare the how many reads were identified by HUMAnN2 for each sample type. With the first step we'll read in the default HUMAnN2 output table with all UniRef90 assignments. We'll select out just the rows with no species assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per kilobase* for the initial output, so we'll be calculating the percent of total assigned/mapped reads per kilobase (RPK). Then write out the file with just the unmapped and total reads assigned so we never have to load this huge file again. This has to be done with a table for which the samples were renormed individually and then joined, and not renormed after they were joined (with HUMAnN2 scripts). 
 
+```{r functions}
+
+# add functions for:
+# running PCA
+# plotting PCA
+
+
+```
+
+Plot the total number of assigned reads in each subsistence strategy, and the proportion of assigned reads in each group. 
 ```{r}
 
 ```
 
-Plot the total number of assigned reads in each subsistence strategy, and the proportion of assigned reads in each subsistence strategy. 
+# Pathway analysis
 ```{r}
 
 ```
+
 
 # Community-level functional analysis with individual gene families assigned KEGG Orthology numbers
 ## KEGG ortholog distribution
