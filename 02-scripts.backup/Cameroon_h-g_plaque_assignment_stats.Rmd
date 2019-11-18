@@ -34,17 +34,21 @@ The number of reads assigned in each sample appears very low (~50%). We want to 
 maltnt_assignments <- fread("00-documentation.backup/CMC_nt_aligned_stats.tsv")
 maltRSC_assignments <- fread("00-documentation.backup/CMC_RSC_aligned_stats.tsv")
 malt_CMC_HMP_RSC_assignments <- fread("00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv")
+malt_CMC_HMP_JAE_RSC_assignments <- fread("00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv")
 
 # clean the file names
 maltnt_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltnt_assignments$SampleID)
 maltRSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltRSC_assignments$SampleID)
-malt_CMC_HMP_RSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_RSC_assignments$SampleID)
-malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_RSC_assignments$SampleID)
-malt_CMC_HMP_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","_10M", malt_CMC_HMP_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","_10M", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.rma6","_10M", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
 
 maltnt_assignments$SampleID <- gsub("../04-analysis/malt/nt/","", maltnt_assignments$SampleID)
 maltRSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", maltRSC_assignments$SampleID)
 malt_CMC_HMP_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", malt_CMC_HMP_RSC_assignments$SampleID)
+malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", malt_CMC_HMP_JAE_RSC_assignments$SampleID)
 
 # load the metadata file
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
@@ -56,10 +60,10 @@ village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, H
                     ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
-                    HMP = "#172869", HMP10M = "#065FA3",
+                    HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 
-Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3",
+Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
@@ -85,6 +89,10 @@ malt_CMC_HMP_RSC_assignments <- malt_CMC_HMP_RSC_assignments %>%
   filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
   mutate(Percent = Aligned/Queries*100)
 
+malt_CMC_HMP_JAE_RSC_assignments <- malt_CMC_HMP_JAE_RSC_assignments %>%
+  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
+  mutate(Percent = Aligned/Queries*100)
+ 
 ```
 
 ```{r graphs_nt}
@@ -157,14 +165,14 @@ maltnt_assignments_plots_tot
 
 ```{r graphs_RSC}
 # merge with metadata
-maltRSC_stats <- malt_CMC_HMP_RSC_assignments %>%
+maltRSC_stats <- malt_CMC_HMP_JAE_RSC_assignments %>%
   inner_join(., metadata)
 
 # make the Env a factor for plotting
 maltRSC_stats$Env <- factor(maltRSC_stats$Env, 
-                                levels = c("HunterGatherer","HMP10M","HMP","ExtractionGauze","ExtractionBlank","LibraryBlank"))
+                                levels = c("HunterGatherer","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank"))
 maltRSC_stats$Village <- factor(maltRSC_stats$Village, 
-                                levels = c("202","204","205","203","206","HMP10M","HMP","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
+                                levels = c("202","204","205","203","206","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
 
 # make box plots of the % of assigned reads and of the total # of reads
 maltRSC_assignments_plots_pct <- maltRSC_stats %>%
@@ -232,9 +240,9 @@ malt_stats <- bind_rows(maltnt_stats %>%
 
 # make the Env a factor for plotting
 malt_stats$Env <- factor(malt_stats$Env, 
-                                levels = c("HunterGatherer","HMP10M","HMP","ExtractionGauze","ExtractionBlank","LibraryBlank"))
+                                levels = c("HunterGatherer","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank"))
 malt_stats$Village <- factor(malt_stats$Village, 
-                                levels = c("202","204","205","203","206","HMP10M","HMP","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
+                                levels = c("202","204","205","203","206","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
 
 # make box plots of the % of assigned reads and of the total # of reads
 malt_assignments_plots_tot <- malt_stats %>%
