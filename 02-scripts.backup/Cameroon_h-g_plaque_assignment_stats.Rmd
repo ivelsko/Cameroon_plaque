@@ -67,7 +67,7 @@ Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, ExtractionGauze = 8, E
 
 ```{r outliers}
 # these sampls are outliers based on PCA of the taxonomic profile in Cameroon_h-g_taxonomy.Rmd
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201","EXB059.A1901","EXB059.A1301","EXB059.A1101")
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201","EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901")
 
 ```
 
