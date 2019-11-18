@@ -153,6 +153,7 @@ seqtk sample -s100 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calcu
 pigz -8 /projects1/microbiome_calculus/cameroon_hunter_gatherer_calculus/03-preprocessing/human_filering/input/public_data/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R2_000.10M.fastq
 
 
+# need to run conda activate py27 before running /projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/014-imv-humann2.sh
 
 
 
