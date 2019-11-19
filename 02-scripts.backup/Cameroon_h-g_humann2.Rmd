@@ -14,10 +14,7 @@ output:
 library(knitr)
 library(decontam)
 library(data.table)
-library(psych)
 library(mixOmics)
-library(compositions)
-library(vegan)
 library(janitor)
 library(tidyverse)
 library(gplots)
@@ -38,39 +35,39 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 # lacroix_palette("PeachPear", n = 8, type = "continuous")
 # "#FF3200" "#EF8158" "#E9BD8E" "#CBDDA7" "#38BCAD" "#0B91B5" "#065FA3" "#172869"
 
-village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
+Village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
                     HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+Village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                     ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-ethnic_group_colors <- c(Baka = "#FF3200", Nzime = "#172869", HMP = "#969696", HMP10M = "#d9d9d9", JAE10M = "#ffeda0", JAE = "#feb24c",
+Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", HMP = "#969696", HMP10M = "#d9d9d9", JAE10M = "#ffeda0", JAE = "#feb24c",
                          ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-ethnic_group_shapes <- c(Baka = 19, Nzime = 17,  HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                          ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-market_economy_colors <- c(logging_road = "#FF3200", forrest_camp = "#172869", farming = "#82CDAA", Industrial = "#969696",
+Market_economy_colors <- c(logging_road = "#FF3200", forrest_camp = "#172869", farming = "#82CDAA", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, HMP = 7, HMP10M = 9, Industrial = 15,
+Market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, HMP = 7, HMP10M = 9, Industrial = 15,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
+Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
                       HMP = "#969696", HMP10M = "#d9d9d9",
                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, HMP = 7, HMP10M = 9,
+Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, HMP = 7, HMP10M = 9,
                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+Sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
+Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
                        ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 ```
@@ -103,6 +100,28 @@ colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extra
 humann2_KOs <- humann2_KOs_full %>% filter(!str_detect(Ortholog, "UNMAPPED"))
 humann2_KOs <- humann2_KOs_full %>% filter(!str_detect(Ortholog, "UNGROUPED"))
 
+```
+
+```{r load_metadata}
+
+metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`) %>%
+  as_tibble() %>%
+  mutate(Description = fct_relevel(Description, "HunterGatherer", "HMP_supPlaque", "HMP_subPlaque",
+                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
+                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Industrial",
+                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP","HMP10M"),
+         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
+         Village = fct_relevel(Village, "202","204","205","203","206","ExtractionGauze","ExtractionBlank",
+                               "LibraryBlank","HMP","HMP10M","JAE","JAE10M"))
+
 # list out the full SRR (HMP) and JAE samples to separate them from the set subsampled to 10M reads
 fullSRR <- metadata %>%
   select(SampleID) %>%
@@ -115,30 +134,6 @@ fullJAE <- metadata %>%
   filter(str_detect(SampleID, "JAE")) %>%
   filter(!str_detect(SampleID, "10M")) %>%
   pull
-```
-
-```{r load_metadata}
-
-metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-metadata <- metadata %>%
-  rename(SampleID = `#SampleID`) %>%
-  as_tibble()
-
-
-  mutate(Description = fct_relevel(Description, "HunterGatherer", "HMP_supPlaque", "HMP_subPlaque",
-                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
-                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Ethnic_group = fct_relevel(Ethnic_group, "Baka","Nzime","HMP","HMP10M","JAE","JAE10M",
-                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Industrial",
-                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M","NA"),
-         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP","HMP10M"),
-         Type = fct_relevel(Type, "Calculus","Plaque","ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Village = fct_relevel(Village, "202","204","205","203","206","ExtractionGauze","ExtractionBlank",
-                               "LibraryBlank","HMP","HMP10M","JAE","JAE10M"))
-
 
 ```
 
@@ -147,23 +142,27 @@ Before we proceed with looking at differences in abundance of different enzymes,
 ```{r functions}
 
 # add functions for:
-# running PCA
+# making the input table for PCA?
+
 # plotting PCA
-plot_pca <- function(df) {
+plot_pca <- function(df, pc1, pc2, metadata_group) {
+    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
+    metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
+    # metadata_group = metadata$metadata_group
+
     exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
     df_X <- df$variates$X %>%
               as.data.frame() %>%
-              rownames_to_column("sample") %>%
-              inner_join(metadata_sample, by = "SampleID") %>%
-              mutate(environment = fct_relevel(environment, "palaeofaeces", "traditional SS", "industrial FP",
-                                                            "soil","ancient calculus", "modern calculus"))
+              rownames_to_column("SampleID") %>%
+              inner_join(metadata, by = "SampleID")
     
-    pca_plot <- ggplot(df_X, aes(PC1, PC2, colour = environment)) +
+    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group, shape = metadata_group)) +
                         geom_point(size = 4) +
-                        scale_colour_manual(values = c(unique(groups_colours$groupColor), "grey20", "deepskyblue3", "lightskyblue1")) +
-                        stat_ellipse() +
-                        xlab(paste("PC1 - ", exp_var[1])) +
-                        ylab(paste("PC2 - ", exp_var[2])) +
+                        scale_colour_manual(values = metadata_group_colors) +
+                        scale_colour_manual(values = metadata_group_shapes) +
+                        # stat_ellipse() +
+                        xlab(paste(pc1, " - ", exp_var[1])) +
+                        ylab(paste(pc2, " - ", exp_var[2])) +
                         theme_minimal(base_size = 10) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
@@ -183,21 +182,23 @@ Start with a PCA to see if there are any outlier samples that should be removed
 ```{r}
 
 humann2_path_mat <- humann2_path %>%
-  filter(!str_detect(Pathway, "\\|"))
+  filter(!str_detect(Pathway, "\\|")) %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM)
 
-rownames(humann2_path_mat) <- humann2_path_mat$Pathway
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
 humann2_path_mat <- as.matrix(humann2_path_mat %>%
-  select(-Pathway)) + 1
+  select(-SampleID)) + 1
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
-tune.humann2_path_pca
 
 # perform a PCA to see how the data cluster
-humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 4, logratio = 'CLR')
 
 
-
+pca_test_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_test_plot
 ```
 
 
@@ -205,7 +206,10 @@ humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
 ## KEGG ortholog distribution
 We will start analysis of KEGG orthologs by looking at the total number of KOs assigned to each population to see if this may bias further analyses. The proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs is consistent and high across all sample types, which is good b/c we have no major population/subsistence strategy biases. 
 ```{r}
-
+df_test <- humann2_path.pca$variates$X %>%
+     as.data.frame() %>%
+     rownames_to_column("SampleID") %>%
+     inner_join(metadata, by = "SampleID")
 ```
 
 
