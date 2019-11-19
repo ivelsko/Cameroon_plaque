@@ -62,7 +62,8 @@ sbatch \
 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp/*.gz \
 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/nt-correct"
 
-
+# in 02-scripts.backup
+# 011-imv-maltstats.sh
 # To get the mapping stats from malt runs to input into R, use the log output file and run the following code:
 # malt-nt CMC only
 grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190903.log > ../00-documentation.backup/CMC_nt_numbers.txt
@@ -73,7 +74,7 @@ paste ../00-documentation.backup/CMC_nt_names.txt ../00-documentation.backup/CMC
 # malt-RefSeqCustom CMC only
 grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCnumbers.txt
 grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190925.log > ../00-documentation.backup/CMCaligned.txt
-ls ../04-analysis/malt/RefSeqCustom/*.rma6 | grep -v SRR > ../00-documentation.backup/CMCnames.txt
+ls ../04-analysis/malt/RefSeqCustom/*.rma6 | grep -v SRR | grep -v JAE > ../00-documentation.backup/CMCnames.txt
 paste ../00-documentation.backup/CMCnames.txt ../00-documentation.backup/CMCnumbers.txt ../00-documentation.backup/CMCaligned.txt > ../00-documentation.backup/CMC_RSC_aligned_stats.tsv
 
 # malt-RefSeqCustom HMP only
@@ -82,8 +83,14 @@ grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20190930.log
 ls ../04-analysis/malt/RefSeqCustom/SRR*.rma6 > ../00-documentation.backup/HMPnames.txt
 paste ../00-documentation.backup/HMPnames.txt ../00-documentation.backup/HMPnumbers.txt ../00-documentation.backup/HMPaligned.txt > ../00-documentation.backup/HMP_RSC_aligned_stats.tsv
 
-# combine CMC and HMP RefSeqCustom stats files
-cat ../00-documentation.backup/CMC_RSC_aligned_stats.tsv ../00-documentation.backup/HMP_RSC_aligned_stats.tsv > ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
+# malt-RefSeqCustom JAE only
+grep "Num. of queries:" ../00-documentation.backup/malt-genbank_rma_20191021.log > ../00-documentation.backup/JAEnumbers.txt
+grep "Aligned queries:" ../00-documentation.backup/malt-genbank_rma_20191021.log > ../00-documentation.backup/JAEaligned.txt
+ls ../04-analysis/malt/RefSeqCustom/JAE*.rma6 > ../00-documentation.backup/JAEnames.txt
+paste ../00-documentation.backup/JAEnames.txt ../00-documentation.backup/JAEnumbers.txt ../00-documentation.backup/JAEaligned.txt > ../00-documentation.backup/JAE_RSC_aligned_stats.tsv
+
+# combine CMC, HMP, and JAE RefSeqCustom stats files
+cat ../00-documentation.backup/CMC_RSC_aligned_stats.tsv ../00-documentation.backup/HMP_RSC_aligned_stats.tsv ../00-documentation.backup/JAE_RSC_aligned_stats.tsv > ../00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv
 
 perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_nt_aligned_stats.tsv
 perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_nt_aligned_stats.tsv
@@ -101,9 +108,13 @@ perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv
 
-rm ../00-documentation.backup/*numbers.txt
-rm ../00-documentation.backup/*aligned.txt
-rm ../00-documentation.backup/*names.txt
+perl -p -i -e 's/ //g' ../00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv
+perl -p -i -e 's/Num.ofqueries://g' ../00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv
+perl -p -i -e 's/Alignedqueries://g' ../00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv
+
+#rm ../00-documentation.backup/*numbers.txt
+#rm ../00-documentation.backup/*aligned.txt
+#rm ../00-documentation.backup/*names.txt
 # manually add column titles SampleID, Queries, Aligned
 
 # symlink the HMP data for Eager processing (and subsampling)
@@ -185,19 +196,80 @@ SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 
+####
+# to change the names of the HUMAnN2 folders that didn't match the basename do
+rename 's/_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz/.10M/' *_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz
+rename 's/_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz/.10M/' *_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+rename 's/_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz//' *_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+
+
+mkdir genefamilies pathabundance pathcoverage
+
+ls | while read line; do cp $line/*genefamilies.tsv ./genefamilies; done
+ls | while read line; do cp $line/*pathabundance.tsv ./pathabundance; done
+ls | while read line; do cp $line/*pathcoverage.tsv ./pathcoverage; done
+
+# merge the output files and normalize them for direct comparison of samples within each output type
+humann2_join_tables -i genefamilies -o humann2.genefamilies.all.tsv
+humann2_renorm_table -i humann2.genefamilies.all.tsv -o humann2.genefamilies.all.tss.tsv -s y
+
+humann2_join_tables -i pathabundance -o humann2.pathabundance.all.tsv
+humann2_renorm_table -i pathabundance.all.tsv -o humann2.pathabundance.all.tss.tsv -s n
+
+humann2_join_tables -i pathcoverage -o humann2.pathcoverage.all.tsv
+humann2_renorm_table -i humann2.pathcoverage.all.tsv -o humann2.pathcoverage.all.tss.tsv -s n
+
+mkdir genefamilies/renormed
+for f in ./genefamilies/*.tsv; do humann2_renorm_table -i $f -o ./genefamilies/renormed/$(basename $f .tsv).tss.tsv; done
+
+# download databases for regrouping entries
+humann2_databases --download utility_mapping full ~/bin/humann2_regroup_databases
+
+humann2_join_tables -i ./genefamilies/renormed -o ./humann2.genefamilies.all.i.tss.tsv
+humann2_regroup_table --input humann2.genefamilies.all.i.tss.tsv --output ./humann2.genefamilies.all.i.tss.ko.tsv --groups uniref90_ko
+humann2_renorm_table -i ./humann2.genefamilies.all.i.tss.ko.tsv -o ./humann2.genefamilies.all.i.tss.renorm.ko.tsv -s y
+
+###
+run kraken 10X with both databases to see if there are more reads assigned when including MAGs, account for variability with the 10 runs
+
+###
+To download oral bacteriophage sequences from MG-RAST
+
+wget ftp://ftp.metagenomics.anl.gov/tools/download/mg-download.py
+chmod u+x mg-download.py
+
+source activate 2.7
+mg-download.py --project mgp7236 --dir /projects1/microbiome_sciences/raw_data/public/abeles2014
+
+# run the Abeles 2014 data through FastQC to see if there are adapters that need removing
+TACGAGTATGCCTACGGGAGGCAGCAGTAGGGAATCTTCGGCAATGGACG	
+CGTAGACTAGCCTACGGGAGGCAGCAGTGAGGAATATTGGTCAATGGGCG
+ACGACTACAGCCTACGGGAGGCAGCAGTAGGGAATCTTCGGCAATGGACG
+ACGAGTGCGTCCTACGGGAGGCAGCAGTAGGGAATCTTCGGCAATGGACG
+
+
+# try running the reads through cutadapt to match the parameters that were used by Abeles, et al. 2014
+cutadapt -a GCCTACGGGAGGCAGCAGTAGGGAATCTTCGGCAATGGACG -m 50 -M 300 --max-n 0.25 -j <NumberOfCores> -o <output.fastq.gz> <input.fastq.gz>
+cutadapt -u 10 -o trimmed.fastq reads.fastq # to cut off 10 bases from the begining
+
+
+# assemble the phage reads with SPAdes
+sbatch 018-assemblephage.sh
+
+# check assemblies with quast (or metaquast?)
+019-imv-quast.sh /projects1/microbiome_calculus/Cameroon_plaque/01-data/phage/abeles2014assemblies/SPAdes/scaffolds.list
+
+
+# index the phage sequences from the assemblies in /projects1/microbiome_calculus/Cameroon_plaque/01-data/databases
+bwa index -p abeles2014phage /projects1/microbiome_calculus/Cameroon_plaque/01-data/databases/abeles2014phage.fastq.gz
 
 
 
 
+find /projects1/microbiome_sciences/raw_data/public/abeles2014/ -name '*.gz' -type f | rev | cut -d/ -f 1 | rev | cut -d. -f 1 | awk '{print "/projects1/microbiome_calculus/Cameroon_plaque/01-data/phage/abeles2014assemblies/SPAdes/"$1"/scaffolds.fasta"}' > contig.list
 
 
-
-
-
-
-
-
-
+find /projects1/microbiome_calculus/Cameroon_plaque/01-data/phage/abeles2014assemblies/SPAdes/*/ -name '*ds.fasta' -type f | rev | cut -d/ -f 2 | rev | cut -d. -f1 | grep -v K | grep -v misc
 
 
 
