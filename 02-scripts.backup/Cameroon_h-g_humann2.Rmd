@@ -10,7 +10,7 @@ output:
 ---
 
 
-```{r load_libraries}
+```{r load_libraries, echo = F}
 library(knitr)
 library(decontam)
 library(data.table)
@@ -73,7 +73,7 @@ Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
 ```
 
 # HUMAnN2 assignment stats
-The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
+*This section needs to be checked and re-written*The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
 ## load the species and genus tables generated in MEGAN
 humann2_path <- fread("./05-results.backup/humann2.pathabundance.all.tss.tsv")
@@ -137,14 +137,24 @@ fullJAE <- metadata %>%
 
 ```
 
-Before we proceed with looking at differences in abundance of different enzymes, let's compare the how many reads were identified by HUMAnN2 for each sample type. With the first step we'll read in the default HUMAnN2 output table with all UniRef90 assignments. We'll select out just the rows with no species assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per kilobase* for the initial output, so we'll be calculating the percent of total assigned/mapped reads per kilobase (RPK). Then write out the file with just the unmapped and total reads assigned so we never have to load this huge file again. This has to be done with a table for which the samples were renormed individually and then joined, and not renormed after they were joined (with HUMAnN2 scripts). 
+Before we proceed with looking at differences in abundance of different enzymes,
+let's compare the how many reads were identified by HUMAnN2 for each sample
+type. With the first step we'll read in the default HUMAnN2 output table with
+all UniRef90 assignments. We'll select out just the rows with no species
+assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per
+kilobase* for the initial output, so we'll be calculating the percent of total
+assigned/mapped reads per kilobase (RPK). Then write out the file with just the
+unmapped and total reads assigned so we never have to load this huge file again.
+This has to be done with a table for which the samples were renormed
+individually and then joined, and not renormed after they were joined (with
+HUMAnN2 scripts).
 
 ```{r functions}
 
 # add functions for:
 # making the input table for PCA?
 
-# plotting PCA
+# plotting PCA with colored dots
 plot_pca <- function(df, pc1, pc2, metadata_group) {
     metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
     metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
@@ -179,8 +189,8 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
                         scale_colour_manual(values = metadata_group_colors) +
                         scale_shape_manual(values = metadata_group_shapes) +
                         # stat_ellipse() +
-                        xlab(paste(pc1, " - ", exp_var[1])) +
-                        ylab(paste(pc2, " - ", exp_var[2])) +
+                        xlab(paste(colnames(pc1), " - ", exp_var[1])) +
+                        ylab(paste(colnames(pc2), " - ", exp_var[2])) +
                         theme_minimal(base_size = 10) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
@@ -188,19 +198,164 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
     return(pca_plot)
 }
 
+# this function plots the PCA with the sample names instead of points
+plot_pca_names <- function(df, pc1, pc2, metadata_group) {
+    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
+
+    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
+    df_X <- df$variates$X %>%
+              as.data.frame() %>%
+              rownames_to_column("SampleID") %>%
+              inner_join(metadata %>%
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+    
+    metadata_group = df_X[[metadata_group]]
+    
+                       if (pc1 == 'PC1') {
+                           pc1 <- df_X$PC1
+                       }  else if (pc1 == 'PC2') {
+                           pc1 <- df_X$PC2
+                       } else if (pc1 == 'PC3') {
+                           pc1 <- df_X$PC3
+                       }
+
+                       if (pc2 == 'PC1') {
+                           pc2 <- df_X$PC1
+                       }  else if (pc2 == 'PC2') {
+                           pc2 <- df_X$PC2
+                       } else if (pc2 == 'PC3') {
+                           pc2 <- df_X$PC3
+                       }
+
+    pca_plot_names <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group)) +
+                        geom_text(aes(label = df_X$SampleID), size = 2) +
+                        scale_colour_manual(values = metadata_group_colors) +
+                        # stat_ellipse() +
+                        xlab(paste(colnames(pc1), " - ", exp_var[1])) +
+                        ylab(paste(colnames(pc2), " - ", exp_var[2])) +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+    return(pca_plot_names)
+}
+
+# this function plots the PCA with biplots to look at the categories with strongest loadings
+plot_pca_bi <- function(df, pc1, pc2, metadata_group) {
+    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
+    metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
+
+    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
+    df_X <- df$variates$X %>%
+              as.data.frame() %>%
+              rownames_to_column("SampleID") %>%
+              inner_join(metadata %>%
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+    
+    metadata_group = df_X[[metadata_group]]
+    
+                       if (pc1 == 'PC1') {
+                           pc1 <- df_X$PC1
+                       }  else if (pc1 == 'PC2') {
+                           pc1 <- df_X$PC2
+                       } else if (pc1 == 'PC3') {
+                           pc1 <- df_X$PC3
+                       }
+
+                       if (pc2 == 'PC1') {
+                           pc2 <- df_X$PC1
+                       }  else if (pc2 == 'PC2') {
+                           pc2 <- df_X$PC2
+                       } else if (pc2 == 'PC3') {
+                           pc2 <- df_X$PC3
+                       }
+
+    pca_plot_bi <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group, shape = metadata_group)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = metadata_group_colors) +
+                        scale_shape_manual(values = metadata_group_shapes) +
+                        # stat_ellipse() +
+                        xlab(paste(colnames(pc1), " - ", exp_var[1])) +
+                        ylab(paste(colnames(pc2), " - ", exp_var[2])) +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+    return(pca_plot_bi)
+}
+
+
+decontam.outrem.calc.aadder_L4.pca_df <- as.data.frame(decontam.outrem.calc.aadder_L4.pca$x) %>%
+  rownames_to_column("SampleID") %>%
+  # Add meta data
+  inner_join(fullmetadata, by="SampleID") %>%
+  select(SampleID,Host_Genus,Host_Common,PC1,PC2,PC3)
+
+# Extract explained variance
+pca_expl_vars <- paste0(round(decontam.outrem.calc.aadder_L4.pca$explained_variance * 100, 2), "%")
+
+# Extract loadings (eigenvectors) from PC analysis
+pca_loadings_df <- as.data.frame(decontam.outrem.calc.aadder_L4.pca$loadings$X) %>%
+  rownames_to_column(var = "seed_id")
+
+# Identify the 10 pathways that have highest positive and negative loadings in PC1
+pc1_pws <- pca_loadings_df %>%
+  top_n(10, PC1) %>%
+  mutate(Protein = sapply(seed_id, function(f) {
+                                  unlist(str_split(f, ";"))[4]
+                           }))
+
+pc1_neg <- pca_loadings_df %>%
+  top_n(-10, PC1) %>%
+  mutate(Protein = sapply(seed_id, function(f) {
+                                  unlist(str_split(f, ";"))[4]
+                           }))
+
+# Calculate correction factor for coordinate systems of principal coordinates
+# so that they have the same units as the rotations of PC1 and PC2; from
+# ggfortify::autoplot
+corr_lam <- decontam.outrem.calc.aadder_L4.pca$sdev[c("PC1", "PC2")] * sqrt(nrow(decontam.outrem.calc.aadder_L4.pca_df))
+
+# Plot the top 10 negative and positive paths that are strongest loading in PC1 
+pca_decontam.outrem.calc.aadder_L4_pc1pc2_pc1bi <- decontam.outrem.calc.aadder_L4.pca_df %>%
+  mutate(PC1 = PC1 / corr_lam[1],
+         PC2 = PC2 / corr_lam[2]) %>%
+  ggplot(.,
+         aes(x = PC1, y = PC2, colour = Host_Genus)) +
+  geom_point(size = 2, aes(colour = Host_Genus, shape = Host_Genus)) +
+  geom_segment(data = pc1_pws,
+               aes(xend = PC1, yend = PC2),
+               x = 0, y = 0, colour = "black",
+               size = 0.5,
+               arrow = arrow(length = unit(0.03, "npc"))) +
+  geom_segment(data = pc1_neg,
+               aes(xend = PC1, yend = PC2),
+               x = 0, y = 0, colour = "grey50",
+               size = 0.5,
+               arrow = arrow(length = unit(0.03, "npc"))) +
+labs(x = paste("PC1 -", pca_expl_vars[1]),
+       y = paste("PC2 -", pca_expl_vars[2])) +
+  scale_colour_manual(values = genus_colours[c(1, 2, 3, 4, 4)]) +
+  scale_shape_manual(values = c(8, 0, 1, 2, 6)) +
+  theme_minimal() + theme(text = element_text(size = 14)) +
+  theme(legend.position = "top")
 ```
 
-Plot the total number of assigned reads in each subsistence strategy, and the proportion of assigned reads in each group. 
+Plot the total number of assigned reads in each subsistence strategy, and the
+proportion of assigned reads in each group.
 ```{r}
 
 ```
 
 # Pathway analysis
-Start with a PCA to see if there are any outlier samples that should be removed
-```{r}
-
+Start with a PCA to see if there are any outlier samples that should be removed,
+other than CMC032.B0101, which has very few reads compared to the other samples
+and will be removed before starting any analyses.
+```{r pca_paths_with_controls}
+# create the input matrix
 humann2_path_mat <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
   gather("SampleID","CPM", 2:ncol(.)) %>%
   spread(Pathway, CPM)
 
@@ -214,14 +369,175 @@ tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 humann2_path.pca <- pca(humann2_path_mat, ncomp = 4, logratio = 'CLR')
 
-
+# plot the PCA
 pca_test_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
 pca_test_plot
+
+pca_test_plot_names <- plot_pca_names(humann2_path.pca, "PC1", "PC3", "Ethnic_Group")
+pca_test_plot_names
+```
+
+Four of the gauze extraction blanks look like they are oral, and probably had
+saliva or plaque that wasn't visible on the control strip that was cut. Now
+repeat the PCA without any of the controls to compare the samples to known oral
+plaque and calculus profiles. If the sub-sampled plaque (HMP) and calculus (JAE)
+samples are similar (10M), then use just the full samples and not the
+sub-sampled ones for all further analysis.
+
+```{r pca_paths_no_controls}
+
+# create the input matrix
+humann2_path_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB"))
+
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
+humann2_path_mat <- as.matrix(humann2_path_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot
+
+```
+There is more overlap in functional profiles of CMC and JAE samples than with
+HMP. The sub-sampled HMP and JAE samples are plotting in the same space as their
+full samples, so we'll continue with the full samples.
+
+```{r pca_paths_selected_samples}
+# create the input matrix
+humann2_path_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M"))
+
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
+humann2_path_mat <- as.matrix(humann2_path_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot
+
+```
+The plaque (HMP) and calculus (JAE) samples separate along PC2, but the CMC
+samples have more overlap with JAE than HMP. There is much more spread of the
+samples along PC1. Do any other metadata categories appear to drive separation
+of the CMC samples along PC1?
+
+```{r pca_paths_metadata}
+# create the input matrix
+humann2_path_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M"))
+
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
+humann2_path_mat <- as.matrix(humann2_path_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot
+
+pca_AG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot
+
+pca_ME_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot
+
+pca_S_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Sex")
+pca_S_plot
+
+pca_TS_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot
+
+pca_V_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Village")
+pca_V_plot
+
+```
+Only the tooth site (anterior vs posterior) appears to be separating along PC1.
+Let's also run these without the HMP and JAE samples to see how the CMC samples
+cluster without industrialized samples included.
+
+```{r pca_paths_cmc_metadata}
+humann2_path_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE"))
+
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
+humann2_path_mat <- as.matrix(humann2_path_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot
+
+pca_AG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot
+
+pca_ME_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot
+
+pca_S_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Sex")
+pca_S_plot
+
+pca_TS_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot
+
+pca_V_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Village")
+pca_V_plot
+
+```
+Again the only sort-of clustering that we see is by tooth site (anterior or
+posterior). Now let's look at which pathways are driving separation of the
+sample groups. 
+
+
+**We should also run adonis to test for sample separation by the
+different metadata categories to say if sample clustering is significant.**
+
+```{r pca_biplot}
+
 ```
 
 
-```{r}
-
+```{r outliers, eval=F}
+path_outliers <- c("CMC032.B0101")
 ```
 
 
@@ -229,81 +545,14 @@ pca_test_plot
 ## KEGG ortholog distribution
 We will start analysis of KEGG orthologs by looking at the total number of KOs assigned to each population to see if this may bias further analyses. The proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs is consistent and high across all sample types, which is good b/c we have no major population/subsistence strategy biases. 
 ```{r, eval = F}
-plot_pca <- function(df, pc1, pc2, metadata_group) {
-    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
-    metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
-
-    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
-    df_X <- df$variates$X %>%
-              as.data.frame() %>%
-              rownames_to_column("SampleID") %>%
-              inner_join(metadata %>%
-                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
-    
-    metadata_group = df_X[[metadata_group]]
-    
-                       if (pc1 == 'PC1') {
-                           pc1 <- df_X$PC1
-                       }  else if (pc1 == 'PC2') {
-                           pc1 <- df_X$PC2
-                       } else if (pc1 == 'PC3') {
-                           pc1 <- df_X$PC3
-                       }
-
-                       if (pc2 == 'PC1') {
-                           pc2 <- df_X$PC1
-                       }  else if (pc2 == 'PC2') {
-                           pc2 <- df_X$PC2
-                       } else if (pc2 == 'PC3') {
-                           pc2 <- df_X$PC3
-                       }
-
-    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group, shape = metadata_group)) +
-                        geom_point(size = 4) +
-                        scale_colour_manual(values = metadata_group_colors) +
-                        scale_shape_manual(values = metadata_group_shapes) +
-                        # stat_ellipse() +
-                        xlab(paste(pc1, " - ", exp_var[1])) +
-                        ylab(paste(pc2, " - ", exp_var[2])) +
-                        theme_minimal(base_size = 10) +
-                        theme(legend.position = "top") +
-                        theme(legend.title = element_blank())
-
-    return(pca_plot)
-}
 
 pca_test_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Village")
 pca_test_plot
 
 ```
 
-
-
-
-
 ```{r}
 
-exp_var <- paste0(round(humann2_path.pca$explained_variance * 100, 2), "%")
-df_X <- humann2_path.pca$variates$X %>%
-              as.data.frame() %>%
-              rownames_to_column("SampleID") %>%
-              inner_join(metadata %>%
-                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
-
-
-pca_plot <- ggplot(df_X, aes(PC1, PC2, colour = Ethnic_Group, shape = Ethnic_Group)) +
-                        geom_point(size = 4) +
-                        scale_colour_manual(values = Ethnic_Group_colors) +
-                        scale_shape_manual(values = Ethnic_Group_shapes) +
-                        # stat_ellipse() +
-                        xlab(paste("PC1 - ", exp_var[1])) +
-                        ylab(paste("PC2 - ", exp_var[2])) +
-                        theme_minimal(base_size = 10) +
-                        theme(legend.position = "top") +
-                        theme(legend.title = element_blank())
-
-
-pca_plot
 ```
 
 
