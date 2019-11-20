@@ -154,7 +154,8 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
     df_X <- df$variates$X %>%
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
-              inner_join(metadata, by = "SampleID")
+              inner_join(metadata %>%
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
     
     pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group, shape = metadata_group)) +
                         geom_point(size = 4) +
@@ -202,14 +203,44 @@ pca_test_plot
 ```
 
 
+```{r}
+
+```
+
+
 # Community-level functional analysis with individual gene families assigned KEGG Orthology numbers
 ## KEGG ortholog distribution
 We will start analysis of KEGG orthologs by looking at the total number of KOs assigned to each population to see if this may bias further analyses. The proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs is consistent and high across all sample types, which is good b/c we have no major population/subsistence strategy biases. 
-```{r}
-df_test <- humann2_path.pca$variates$X %>%
-     as.data.frame() %>%
-     rownames_to_column("SampleID") %>%
-     inner_join(metadata, by = "SampleID")
+```{r, eval = F}
+plot_pca <- function(df, pc1, pc2, metadata_group) {
+    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
+    metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
+
+    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
+    df_X <- df$variates$X %>%
+              as.data.frame() %>%
+              rownames_to_column("SampleID") %>%
+              inner_join(metadata %>%
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+    metadata_group = df_X$metadata_group
+
+    pca_plot <- ggplot(df_X, aes(df_X$pc1, df_X$pc2, colour = metadata_group, shape = metadata_group)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = metadata_group_colors) +
+                        scale_colour_manual(values = metadata_group_shapes) +
+                        # stat_ellipse() +
+                        xlab(paste(pc1, " - ", exp_var[1])) +
+                        ylab(paste(pc2, " - ", exp_var[2])) +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+    return(pca_plot)
+}
+
+pca_test_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_test_plot
+
 ```
 
 
