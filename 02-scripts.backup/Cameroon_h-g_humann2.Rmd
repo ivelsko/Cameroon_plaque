@@ -373,8 +373,8 @@ humann2_path.pca <- pca(humann2_path_mat, ncomp = 4, logratio = 'CLR')
 pca_test_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
 pca_test_plot
 
-pca_test_plot_names <- plot_pca_names(humann2_path.pca, "PC1", "PC3", "Ethnic_Group")
-pca_test_plot_names
+# pca_test_plot_names <- plot_pca_names(humann2_path.pca, "PC1", "PC3", "Ethnic_Group")
+# pca_test_plot_names
 ```
 
 Four of the gauze extraction blanks look like they are oral, and probably had

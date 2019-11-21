@@ -52,14 +52,31 @@ malt_CMC_HMP_JAE_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCus
 
 # load the metadata file
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-metadata <- metadata %>% rename(SampleID = `#SampleID`)
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  mutate(Description = fct_relevel(Description, "HunterGatherer", "HMP_supPlaque", "HMP_subPlaque",
+                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
+                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Industrial",
+                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP","HMP10M"),
+         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
+         Village = fct_relevel(Village, "202","204","205","203","206","HMP","HMP10M","JAE","JAE10M",
+                               "ExtractionGauze","ExtractionBlank","LibraryBlank"))
 ```
 
 ```{r colors_shapes}
-village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9,
+Village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9,
                     ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
+Village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
                     HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 
@@ -67,6 +84,7 @@ Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
+Database_colors <- c("#172869", "#FF3200")
 ```
 
 ```{r outliers}
@@ -95,184 +113,80 @@ malt_CMC_HMP_JAE_RSC_assignments <- malt_CMC_HMP_JAE_RSC_assignments %>%
  
 ```
 
+```{r graphing_functions}
+
+# plotting PCA with colored dots
+plot_box_whisker <- function(df, stat_info, metadata_group, fill_group,title_text) {
+    fill_group_colors <- get(paste(fill_group, "_colors", sep = ""))
+
+    if (df == "malt_stats_new") {
+      df_X <- df
+    } else {
+    df_X <- df %>%
+              inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+    }
+    
+    stat_info_table = df_X[[stat_info]]
+    metadata_group = df_X[[metadata_group]]
+    fill_group = df_X[[fill_group]]
+    
+    bx_wh_plot <- ggplot(df_X, aes(x = metadata_group, y = stat_info_table, fill = fill_group)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = fill_group_colors) +
+                         theme_classic() +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+                         ylab(stat_info) +
+                         ggtitle(title_text)
+
+    return(bx_wh_plot)
+}
+
+test_plot <- plot_box_whisker(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
+test_plot
+```
+
+
 ```{r graphs_nt}
-# merge with metadata
-maltnt_stats <- maltnt_assignments %>%
-  inner_join(., metadata)
 
-# make the Env a factor for plotting
-maltnt_stats$Env <- factor(maltnt_stats$Env, 
-                                levels = c("HunterGatherer","ExtractionGauze","ExtractionBlank","LibraryBlank"))
-maltnt_stats$Village <- factor(maltnt_stats$Village, 
-                                levels = c("202","204","205","203","206","HMP10M","HMP","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
-
-
-# make box plots of the % of assigned reads and of the total # of reads
-maltnt_assignments_plots_pct <- maltnt_stats %>%
-ggplot(., aes(x=Env, y = Percent, fill=Env)) +
-  geom_boxplot() +
-  scale_fill_manual(values = Env_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with nt2017")
-
-maltnt_assignments_plots_pct
-
-maltnt_assignments_plots_pct <- maltnt_stats %>%
-ggplot(., aes(x=Village, y = Percent, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with nt2017")
-
-maltnt_assignments_plots_pct
-
-maltnt_assignments_plots_tot <- maltnt_stats %>%
-ggplot(., aes(x=Env, y = Queries, fill=Env)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-maltnt_assignments_plots_tot
-
-maltnt_assignments_plots_tot <- maltnt_stats %>%
-ggplot(., aes(x=Village, y = Queries, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-maltnt_assignments_plots_tot
-
+plot_box_whisker(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, "Percent", "Village", "Village", "Percent of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, "Queries", "Env", "Env", "Number of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, "Queries", "Village", "Village", "Number of reads assigned by MALT with nt2017")
 
 ```
 
 ```{r graphs_RSC}
-# merge with metadata
-maltRSC_stats <- malt_CMC_HMP_JAE_RSC_assignments %>%
-  inner_join(., metadata)
 
-# make the Env a factor for plotting
-maltRSC_stats$Env <- factor(maltRSC_stats$Env, 
-                                levels = c("HunterGatherer","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank"))
-maltRSC_stats$Village <- factor(maltRSC_stats$Village, 
-                                levels = c("202","204","205","203","206","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
-
-# make box plots of the % of assigned reads and of the total # of reads
-maltRSC_assignments_plots_pct <- maltRSC_stats %>%
-ggplot(., aes(x=Env, y = Percent, fill=Env)) +
-  geom_boxplot() +
-  scale_fill_manual(values = Env_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with RefSeqCustom")
-
-maltRSC_assignments_plots_pct
-
-maltRSC_assignments_plots_pct <- maltRSC_stats %>%
-ggplot(., aes(x=Village, y = Percent, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with RefSeqCustom")
-
-maltRSC_assignments_plots_pct
-
-maltRSC_assignments_plots_tot <- maltRSC_stats %>%
-ggplot(., aes(x=Env, y = Queries, fill=Env)) +
-  geom_boxplot() +
-  scale_fill_manual(values = Env_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-maltRSC_assignments_plots_tot
-
-maltRSC_assignments_plots_tot <- maltRSC_stats %>%
-ggplot(., aes(x=Village, y = Queries, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-maltRSC_assignments_plots_tot
-
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Queries", "Env", "Env", "Number of reads submitted to MALT for classification")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Queries", "Village", "Village", "Number of reads submitted to MALT for classification")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Aligned", "Env", "Env", "Number of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Aligned", "Village", "Village", "Number of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Percent", "Village", "Village", "Percent of reads assigned by MALT with RefSeqCustom")
 
 ```
 
 
 Now combine the data to see how much of a difference there is the % assignments between databases
 ```{r compare}
-malt_stats <- bind_rows(maltnt_stats %>%
-                          mutate(Database = 'nt'),
-                        maltRSC_stats %>%
-                          mutate(Database = 'RefSeqCustom'))
 
-# make the Env a factor for plotting
-malt_stats$Env <- factor(malt_stats$Env, 
-                                levels = c("HunterGatherer","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank"))
-malt_stats$Village <- factor(malt_stats$Village, 
-                                levels = c("202","204","205","203","206","HMP10M","HMP","JAE10M","JAE","ExtractionGauze","ExtractionBlank", "LibraryBlank"))
+malt_stats_new <- as_tibble(bind_rows(maltnt_assignments %>%
+                          mutate(Database = 'nt') %>%
+                          inner_join(., metadata %>%
+                                       select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID"),
+                        malt_CMC_HMP_JAE_RSC_assignments %>%
+                          mutate(Database = 'RefSeqCustom') %>%
+                          inner_join(., metadata %>%
+                                       select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")))
+
+db_plot_test <- plot_box_whisker(malt_stats_new, "Queries", "Env", "Database", "Percent of reads assigned by MALT with nt2017 and RefSeqCustom")
+db_plot_test
 
 # make box plots of the % of assigned reads and of the total # of reads
-malt_assignments_plots_tot <- malt_stats %>%
-ggplot(., aes(x=Env, y = Queries, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-malt_assignments_plots_tot
-
-malt_assignments_plots_tot <- malt_stats %>%
-ggplot(., aes(x=Village, y = Queries, fill=Village)) +
-  geom_boxplot() +
-  scale_fill_manual(values = village_colors) +
-  theme_classic() +
-  #scale_y_continuous(trans='log10') +
-  #scale_y_continuous(trans='pseudo_log') +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Reads") +
-  ggtitle("Number of reads submitted to MALT for classification")
-
-malt_assignments_plots_tot
-
-
-malt_assignments_plots_pct_group <- malt_stats %>%
+malt_assignments_plots_pct_group <- malt_stats_new %>%
 ggplot(., aes(x=Env, y = Percent, fill=Database)) +
   geom_boxplot() +
   scale_fill_manual(values = c("#172869", "#FF3200")) +
@@ -287,7 +201,7 @@ malt_assignments_plots_pct_group
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
-malt_assignments_plots_pct_village <- malt_stats %>%
+malt_assignments_plots_pct_village <- malt_stats_new %>%
 ggplot(., aes(x=Village, y = Percent, fill=Database)) +
   geom_boxplot() +
   scale_fill_manual(values = c("#172869", "#FF3200")) +
