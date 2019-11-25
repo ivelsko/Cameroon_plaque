@@ -380,9 +380,6 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
     return(bx_wh_plot)
 }
 
-test_plot_1 <- plot_box_whisker(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
-test_plot_1
-
 ```
 
 
@@ -468,139 +465,102 @@ metadata.decontam <- metadata %>%
 
 Make a species abundance curve for the samples based on Env to get an idea of the number of species identified in each prior to filtering, and how long the tail is. 
 ```{r rank_abundance_curves}
-# malt_species.dataframeL <- malt_species.dataframe %>%
-#   adorn_percentages(denominator = "row", na.rm=F) %>%
-#   gather("Species","Relab",2:ncol(.)) %>%
-#   inner_join(., metadata) %>%
-#   mutate(binid = findInterval(Relab, seq(0, 100, 0.01))) %>%
-#   group_by(Env, binid) %>%
-#   count()
-#   
-# malt_species.dataframeL %>%
-#   filter(binid != 0) %>%
-#   ggplot(., aes(x=binid, y=n)) +
-#   geom_point() 
 
 malt_species.dataframeL <- malt_species.dataframe %>%
   adorn_percentages(denominator = "row", na.rm=F) %>%
   gather("Species","Relab",2:ncol(.)) %>%
   inner_join(., metadata)
 
-# malt_species.dataframeL <- malt_species.dataframeL %>%
-# #  filter(str_detect(Env, "HunterGatherer")) %>%
-#   group_by(Species, Env) %>%
-#   summarise(mean_relab = mean(Relab)) %>%
-#   arrange(desc(mean_relab)) %>%
-#   filter(mean_relab > 0) %>%
-#   rownames_to_column("order") %>%
-#   mutate(order = as.numeric(order))
-# 
-# malt_species.dataframeL$Env <- factor(malt_species.dataframeL$Env, levels = c("HunterGatherer","ExtractionGauze","ExtractionBlank","LibraryBlank"))
+Envmt <- unique(malt_species.dataframeL$Env)
 
-# options(scipen = 10)
-# malt_species.dataframeL %>%
-# #  top_n(50) %>%
-#      ggplot(., aes(x=order, y=mean_relab)) +
-#      geom_point() +
-#      theme_minimal() +
-#      scale_y_log10() +
-#      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-#      facet_wrap(~Env) +
-#      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#      ylab("mean relative abundance") +
-#     xlab("species order") +
-#     ggtitle("Species rank abundance curves - unfiltered data")
-
-
-malt_species.dataframeL_HG <- malt_species.dataframeL %>%
-  filter(str_detect(Env, "HunterGatherer")) %>%
+species_orders <- lapply(Envmt, function(envmt) {
+malt_species.dataframeL_check <- malt_species.dataframeL %>%
+  filter(Env == envmt) %>%
   group_by(Species) %>%
   summarise(mean_relab = mean(Relab)) %>%
   arrange(desc(mean_relab)) %>%
   filter(mean_relab > 0) %>%
   rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
+  mutate(order = as.numeric(order)) %>%
+  mutate(Env = envmt)
+}) %>%
+  bind_rows(.)
+  
+species_abundance_curves <- function(df, envt, title_text) {
+      options(scipen = 10)
+      
+    species_abundance_plot <- species_orders %>%
+        filter(Env == envt) %>%
+           ggplot(., aes(x=order, y=mean_relab)) +
+           geom_point() +
+           theme_minimal() +
+           scale_y_log10() +
+           geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+           xlim(NA, 600) +
+           ylab("mean relative abundance") +
+           xlab("species order") +
+           ggtitle(title_text)
+  
+    return(species_abundance_plot)
+}
 
-malt_species.dataframeL_EG <- malt_species.dataframeL %>%
-  filter(str_detect(Env, "ExtractionGauze")) %>%
-  group_by(Species) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
+sp_curve_HG <- species_abundance_curves(species_orders, "HunterGatherer", "Hunter Gatherer - species")
+sp_curve_EG <- species_abundance_curves(species_orders, "ExtractionGauze", "Extraction Gauze - species")
+sp_curve_EB <- species_abundance_curves(species_orders, "ExtractionBlank", "Extraction Blank - species")
+sp_curve_LB <- species_abundance_curves(species_orders, "LibraryBlank", "Library Blank - species")
 
-malt_species.dataframeL_EB <- malt_species.dataframeL %>%
-  filter(str_detect(Env, "ExtractionBlank")) %>%
-  group_by(Species) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
-
-malt_species.dataframeL_LB <- malt_species.dataframeL %>%
-  filter(str_detect(Env, "LibraryBlank")) %>%
-  group_by(Species) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
-
-options(scipen = 10)
-malt_species.dataframeL_HG_plot <- malt_species.dataframeL_HG %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 600) +
-     ylab("mean relative abundance") +
-     xlab("species order") +
-     ggtitle("Hunter Gatherer - species")
-
-malt_species.dataframeL_EG_plot <- malt_species.dataframeL_EG %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 600) +
-     ylab("mean relative abundance") +
-     xlab("species order") +
-     ggtitle("Extraction Gauze - species")
-
-malt_species.dataframeL_EB_plot <- malt_species.dataframeL_EB %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 600) +
-     ylab("mean relative abundance") +
-     xlab("species order") +
-     ggtitle("Extraction Blank - species")
-
-malt_species.dataframeL_LB_plot <- malt_species.dataframeL_LB %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 600) +
-     ylab("mean relative abundance") +
-     xlab("species order") +
-     ggtitle("Library Blank - species")
-
-plot_grid(malt_species.dataframeL_HG_plot, malt_species.dataframeL_EG_plot,
-          malt_species.dataframeL_EB_plot, malt_species.dataframeL_LB_plot,
+plot_grid(sp_curve_HG, sp_curve_EG,
+          sp_curve_EB, sp_curve_LB,
           nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
 
+
+# repeat for genus level
 malt_genus.dataframeL <- malt_genus.dataframe %>%
   adorn_percentages(denominator = "row", na.rm=F) %>%
   gather("genus","Relab",2:ncol(.)) %>%
   inner_join(., metadata)
+
+Envmt <- unique(malt_genus.dataframeL$Env)
+
+genus_orders <- lapply(Envmt, function(envmt) {
+malt_genus.dataframeL_check <- malt_genus.dataframeL %>%
+  filter(Env == envmt) %>%
+  group_by(genus) %>%
+  summarise(mean_relab = mean(Relab)) %>%
+  arrange(desc(mean_relab)) %>%
+  filter(mean_relab > 0) %>%
+  rownames_to_column("order") %>%
+  mutate(order = as.numeric(order)) %>%
+  mutate(Env = envmt)
+}) %>%
+  bind_rows(.)
+  
+genus_abundance_curves <- function(df, envt, title_text) {
+      options(scipen = 10)
+      
+    genus_abundance_plot <- genus_orders %>%
+        filter(Env == envt) %>%
+           ggplot(., aes(x=order, y=mean_relab)) +
+           geom_point() +
+           theme_minimal() +
+           scale_y_log10() +
+           geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+           xlim(NA, 600) +
+           ylab("mean relative abundance") +
+           xlab("genus order") +
+           ggtitle(title_text)
+  
+    return(genus_abundance_plot)
+}
+
+gn_curve_HG <- genus_abundance_curves(genus_orders, "HunterGatherer", "Hunter Gatherer - genus")
+gn_curve_EG <- genus_abundance_curves(genus_orders, "ExtractionGauze", "Extraction Gauze - genus")
+gn_curve_EB <- genus_abundance_curves(genus_orders, "ExtractionBlank", "Extraction Blank - genus")
+gn_curve_LB <- genus_abundance_curves(genus_orders, "LibraryBlank", "Library Blank - genus")
+
+plot_grid(sp_curve_HG, sp_curve_EG,
+          sp_curve_EB, sp_curve_LB,
+          nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
 
 # malt_genus.dataframeL <- malt_genus.dataframeL %>%
 # #  filter(str_detect(Env, "HunterGatherer")) %>%
@@ -626,90 +586,91 @@ malt_genus.dataframeL <- malt_genus.dataframe %>%
 #     xlab("genus order") +
 #     ggtitle("Genus rank abundance curves - unfiltered data")
 # 
-malt_genus.dataframeL_HG <- malt_genus.dataframeL %>%
-  filter(str_detect(Env, "HunterGatherer")) %>%
-  group_by(genus) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
+# malt_genus.dataframeL_HG <- malt_genus.dataframeL %>%
+#   filter(str_detect(Env, "HunterGatherer")) %>%
+#   group_by(genus) %>%
+#   summarise(mean_relab = mean(Relab)) %>%
+#   arrange(desc(mean_relab)) %>%
+#   filter(mean_relab > 0) %>%
+#   rownames_to_column("order") %>%
+#   mutate(order = as.numeric(order))
+# 
+# malt_genus.dataframeL_EG <- malt_genus.dataframeL %>%
+#   filter(str_detect(Env, "ExtractionGauze")) %>%
+#   group_by(genus) %>%
+#   summarise(mean_relab = mean(Relab)) %>%
+#   arrange(desc(mean_relab)) %>%
+#   filter(mean_relab > 0) %>%
+#   rownames_to_column("order") %>%
+#   mutate(order = as.numeric(order))
+# 
+# malt_genus.dataframeL_EB <- malt_genus.dataframeL %>%
+#   filter(str_detect(Env, "ExtractionBlank")) %>%
+#   group_by(genus) %>%
+#   summarise(mean_relab = mean(Relab)) %>%
+#   arrange(desc(mean_relab)) %>%
+#   filter(mean_relab > 0) %>%
+#   rownames_to_column("order") %>%
+#   mutate(order = as.numeric(order))
+# 
+# malt_genus.dataframeL_LB <- malt_genus.dataframeL %>%
+#   filter(str_detect(Env, "LibraryBlank")) %>%
+#   group_by(genus) %>%
+#   summarise(mean_relab = mean(Relab)) %>%
+#   arrange(desc(mean_relab)) %>%
+#   filter(mean_relab > 0) %>%
+#   rownames_to_column("order") %>%
+#   mutate(order = as.numeric(order))
+# 
+# options(scipen = 10)
+# malt_genus.dataframeL_HG_plot <- malt_genus.dataframeL_HG %>%
+#      ggplot(., aes(x=order, y=mean_relab)) +
+#      geom_point() +
+#      theme_minimal() +
+#      scale_y_log10() +
+#      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+#      xlim(NA, 250) +
+#      ylab("mean relative abundance") +
+#      xlab("genus order") +
+#      ggtitle("Hunter Gatherer - genus")
+# 
+# malt_genus.dataframeL_EG_plot <- malt_genus.dataframeL_EG %>%
+#      ggplot(., aes(x=order, y=mean_relab)) +
+#      geom_point() +
+#      theme_minimal() +
+#      scale_y_log10() +
+#      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+#      xlim(NA, 250) +
+#      ylab("mean relative abundance") +
+#      xlab("genus order") +
+#      ggtitle("Extraction Gauze - genus")
+# 
+# malt_genus.dataframeL_EB_plot <- malt_genus.dataframeL_EB %>%
+#      ggplot(., aes(x=order, y=mean_relab)) +
+#      geom_point() +
+#      theme_minimal() +
+#      scale_y_log10() +
+#      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+#      xlim(NA, 250) +
+#      ylab("mean relative abundance") +
+#      xlab("genus order") +
+#      ggtitle("Extraction Blank - genus")
+# 
+# malt_genus.dataframeL_LB_plot <- malt_genus.dataframeL_LB %>%
+#      ggplot(., aes(x=order, y=mean_relab)) +
+#      geom_point() +
+#      theme_minimal() +
+#      scale_y_log10() +
+#      geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
+#      xlim(NA, 250) +
+#      ylab("mean relative abundance") +
+#      xlab("genus order") +
+#      ggtitle("Library Blank - genus")
+# 
+# plot_grid(malt_genus.dataframeL_HG_plot, malt_genus.dataframeL_EG_plot,
+#           malt_genus.dataframeL_EB_plot, malt_genus.dataframeL_LB_plot,
+          # nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
 
-malt_genus.dataframeL_EG <- malt_genus.dataframeL %>%
-  filter(str_detect(Env, "ExtractionGauze")) %>%
-  group_by(genus) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
-
-malt_genus.dataframeL_EB <- malt_genus.dataframeL %>%
-  filter(str_detect(Env, "ExtractionBlank")) %>%
-  group_by(genus) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
-
-malt_genus.dataframeL_LB <- malt_genus.dataframeL %>%
-  filter(str_detect(Env, "LibraryBlank")) %>%
-  group_by(genus) %>%
-  summarise(mean_relab = mean(Relab)) %>%
-  arrange(desc(mean_relab)) %>%
-  filter(mean_relab > 0) %>%
-  rownames_to_column("order") %>%
-  mutate(order = as.numeric(order))
-
-options(scipen = 10)
-malt_genus.dataframeL_HG_plot <- malt_genus.dataframeL_HG %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 250) +
-     ylab("mean relative abundance") +
-     xlab("genus order") +
-     ggtitle("Hunter Gatherer - genus")
-
-malt_genus.dataframeL_EG_plot <- malt_genus.dataframeL_EG %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 250) +
-     ylab("mean relative abundance") +
-     xlab("genus order") +
-     ggtitle("Extraction Gauze - genus")
-
-malt_genus.dataframeL_EB_plot <- malt_genus.dataframeL_EB %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 250) +
-     ylab("mean relative abundance") +
-     xlab("genus order") +
-     ggtitle("Extraction Blank - genus")
-
-malt_genus.dataframeL_LB_plot <- malt_genus.dataframeL_LB %>%
-     ggplot(., aes(x=order, y=mean_relab)) +
-     geom_point() +
-     theme_minimal() +
-     scale_y_log10() +
-     geom_hline(yintercept=0.01, linetype="dashed", color = "red") +
-     xlim(NA, 250) +
-     ylab("mean relative abundance") +
-     xlab("genus order") +
-     ggtitle("Library Blank - genus")
-
-plot_grid(malt_genus.dataframeL_HG_plot, malt_genus.dataframeL_EG_plot,
-          malt_genus.dataframeL_EB_plot, malt_genus.dataframeL_LB_plot,
-          nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
 ```
 
 
