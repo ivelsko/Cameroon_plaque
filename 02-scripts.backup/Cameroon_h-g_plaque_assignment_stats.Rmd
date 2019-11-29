@@ -115,43 +115,12 @@ malt_CMC_HMP_JAE_RSC_assignments <- malt_CMC_HMP_JAE_RSC_assignments %>%
 
 ```{r graphing_functions}
 
-# plotting box and whisker for input
-plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_text) {
+# plotting box and whisker
+plot_box_whisker <- function(df, hasmtdta = c("TRUE","FALSE"), stat_info, metadata_group, fill_group, title_text) {
     fill_group_colors <- get(paste(fill_group, "_colors", sep = ""))
 
-      df_X <- df %>%
-              inner_join(metadata %>%
-                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
-
-    stat_info_table = df_X[[stat_info]]
-    metadata_group = df_X[[metadata_group]]
-    fill_group = df_X[[fill_group]]
-
-    bx_wh_plot <- ggplot(df_X, aes(x = metadata_group, y = stat_info_table, fill = fill_group)) +
-                         geom_boxplot() +
-                         scale_fill_manual(values = fill_group_colors) +
-                         theme_classic() +
-                         #scale_y_continuous(trans='log10') +
-                         #scale_y_continuous(trans='pseudo_log') +
-                         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-                         ylab(stat_info) +
-                         ggtitle(title_text)
-
-    return(bx_wh_plot)
-}
-
-test_plot_1 <- plot_box_whisker(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
-test_plot_1
-
-
-# plotting box and whisker for comparing nt vs RefSeq
-plot_box_whisker_db <- function(df, stat_info, metadata_group, fill_group, title_text) {
-    fill_group_colors <- get(paste(fill_group, "_colors", sep = ""))
-
-    if (df == malt_stats_new) { # this one will plot for test_plot_2 with the error: the condition has length > 1 and only the first element will be used; not for test_plot_3 with the error: Error in Ops.data.frame(df, malt_stats_new) : ‘==’ only defined for equally-sized data frames
-    # if (df == "malt_stats_new") { # this one will plot for test_plot_3 with the error: the condition has length > 1 and only the first element will be used; not for test_plot_2 with the error: Error: Aesthetics must be either length 1 or the same as the data (248): x, fil
-     df_X <- df
+    if (hasmtdta == T) { 
+      df_X <- df
       fill_group = df_X[[fill_group]]
     } else {
       df_X <- df %>%
@@ -177,32 +146,26 @@ plot_box_whisker_db <- function(df, stat_info, metadata_group, fill_group, title
     return(bx_wh_plot)
 }
 
-test_plot_2 <- plot_box_whisker_db(malt_stats_new, "Percent", "Env", "Database", "Percent of reads assigned by MALT")
-test_plot_2
-
-test_plot_3 <- plot_box_whisker_db(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
-test_plot_3
-
 ```
 
 
 ```{r graphs_nt}
 
-plot_box_whisker(maltnt_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
-plot_box_whisker(maltnt_assignments, "Percent", "Village", "Village", "Percent of reads assigned by MALT with nt2017")
-plot_box_whisker(maltnt_assignments, "Queries", "Env", "Env", "Number of reads assigned by MALT with nt2017")
-plot_box_whisker(maltnt_assignments, "Queries", "Village", "Village", "Number of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, hasmtdta = F, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, hasmtdta = F, "Percent", "Village", "Village", "Percent of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, hasmtdta = F, "Queries", "Env", "Env", "Number of reads assigned by MALT with nt2017")
+plot_box_whisker(maltnt_assignments, hasmtdta = F, "Queries", "Village", "Village", "Number of reads assigned by MALT with nt2017")
 
 ```
 
 ```{r graphs_RSC}
 
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Queries", "Env", "Env", "Number of reads submitted to MALT for classification")
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Queries", "Village", "Village", "Number of reads submitted to MALT for classification")
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Aligned", "Env", "Env", "Number of reads assigned by MALT with RefSeqCustom")
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Aligned", "Village", "Village", "Number of reads assigned by MALT with RefSeqCustom")
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Percent", "Env", "Env", "Percent of reads assigned by MALT with RefSeqCustom")
-plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, "Percent", "Village", "Village", "Percent of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Queries", "Env", "Env", "Number of reads submitted to MALT for classification")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Queries", "Village", "Village", "Number of reads submitted to MALT for classification")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Aligned", "Env", "Env", "Number of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Aligned", "Village", "Village", "Number of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Percent", "Env", "Env", "Percent of reads assigned by MALT with RefSeqCustom")
+plot_box_whisker(malt_CMC_HMP_JAE_RSC_assignments, hasmtdta = F, "Percent", "Village", "Village", "Percent of reads assigned by MALT with RefSeqCustom")
 
 ```
 
@@ -220,38 +183,11 @@ malt_stats_new <- as_tibble(bind_rows(maltnt_assignments %>%
                                        select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID"))) %>%
   mutate(Database = fct_relevel(Database, "nt", "RefSeqCustom"))
 
-db_plot_env <- plot_box_whisker_db(malt_stats_new, "Percent", "Env", "Database", "Percent of reads assigned by MALT with nt2017 and RefSeqCustom")
+db_plot_env <- plot_box_whisker(malt_stats_new, hasmtdta = T, "Percent", "Env", "Database", "Percent of reads assigned by MALT")
 db_plot_env
 
-db_plot_village <- plot_box_whisker_db(malt_stats_new, "Percent", "Village", "Database", "Percent of reads assigned by MALT with nt2017 and RefSeqCustom")
+db_plot_village <- plot_box_whisker(malt_stats_new, hasmtdta = T, "Percent", "Village", "Database", "Percent of reads assigned by MALT")
 db_plot_village
-
-# make box plots of the % of assigned reads and of the total # of reads
-malt_assignments_plots_pct_group <- malt_stats_new %>%
-ggplot(., aes(x=Env, y = Percent, fill=Database)) +
-  geom_boxplot() +
-  scale_fill_manual(values = c("#172869", "#FF3200")) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with nt2017 and RefSeqCustom")
-
-malt_assignments_plots_pct_group
-
-# ggsave("05-results.backup/malt_assignments_plots_pct_group.pdf", plot = malt_assignments_plots_pct_group, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
-
-malt_assignments_plots_pct_village <- malt_stats_new %>%
-ggplot(., aes(x=Village, y = Percent, fill=Database)) +
-  geom_boxplot() +
-  scale_fill_manual(values = c("#172869", "#FF3200")) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ylab("Percent") +
-  ggtitle("Percent of reads assigned by MALT with nt2017 and RefSeqCustom")
-
-malt_assignments_plots_pct_village
 
 # ggsave("05-results.backup/malt_assignments_plots_pct_village.pdf", plot = malt_assignments_plots_pct_village, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),

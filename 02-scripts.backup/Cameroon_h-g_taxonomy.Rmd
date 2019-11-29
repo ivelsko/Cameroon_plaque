@@ -10,7 +10,7 @@ output:
 ---
 
 
-```{r load_libraries, echo = F}
+```{r load_libraries, echo = F, message = F}
 library(knitr)
 library(decontam)
 library(data.table)
