@@ -14,7 +14,7 @@
 SAMPLES=( $(find /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/input-temp/ -name '*.gz' | rev | cut -d/ -f 1 | rev))
 SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 
-/projects1/clusterhomes/velsko/bin/kraken2-2.0.8-beta/kraken2 \
+/projects1/users/velsko/bin/kraken2-2.0.8-beta/kraken2 \
 --db /projects1/microbiome_sciences/reference_databases/refseq20191017_Pasolli2019/kraken2_db/MiniKraken_RefSeq1910PlusPasolliSGBs \
 --threads 7 \
 --gzip-compressed \
