@@ -229,10 +229,28 @@ humann2_join_tables -i ./genefamilies/renormed -o ./humann2.genefamilies.all.i.t
 humann2_regroup_table --input humann2.genefamilies.all.i.tss.tsv --output ./humann2.genefamilies.all.i.tss.ko.tsv --groups uniref90_ko
 humann2_renorm_table -i ./humann2.genefamilies.all.i.tss.ko.tsv -o ./humann2.genefamilies.all.i.tss.renorm.ko.tsv -s y
 
-###
+###########################
 run kraken 10X with both databases to see if there are more reads assigned when including MAGs, account for variability with the 10 runs
+# get the number of classified and unclassified reads for each sample for each run with each database to compare 
+# if adding the Pasolli MAGs to the database increases the number of reads classified in each sample
 
-###
+# run this for both outputs (RefSeqOnly, RefSeqPasolliMAGs). Add .rso to the files that had the RefSeqOnly database
+ls *.output.* > sampleorder.list
+
+touch classifiedreads.counts
+for f in *.output.*; do grep -c "^C" $f >> classifiedreads.counts; done
+touch unclassifiedreads.counts
+for f in *.output.*; do grep -c "^U" $f >> unclassifiedreads.counts; done
+
+# open each file (sampleorder.list, classifiedreads.counts, unclassifiedreads.counts) and give each a header
+# SampleID, Classified, Unclassified, respectively
+
+paste sampleorder.list classifiedreads.counts unclassifiedreads.counts > readclassification_stats.tsv
+
+# Now load these files (readclassification_stats.tsv, readclassification_stats.rso.tsv) into R to compare the number of classified reads. Is it higher when using the database with the Pasolli MAGs?
+
+
+###########################
 To download oral bacteriophage sequences from MG-RAST
 
 wget ftp://ftp.metagenomics.anl.gov/tools/download/mg-download.py
@@ -270,6 +288,8 @@ find /projects1/microbiome_sciences/raw_data/public/abeles2014/ -name '*.gz' -ty
 
 
 find /projects1/microbiome_calculus/Cameroon_plaque/01-data/phage/abeles2014assemblies/SPAdes/*/ -name '*ds.fasta' -type f | rev | cut -d/ -f 2 | rev | cut -d. -f1 | grep -v K | grep -v misc
+
+
 
 
 

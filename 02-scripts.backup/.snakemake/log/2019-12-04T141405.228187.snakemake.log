@@ -1,0 +1,5743 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	715	add_refseq
+	1	build_kraken2_database
+	1	kraken2_build_database
+	717
+
+[Wed Dec  4 14:14:21 2019]
+Job 159: Add RefSeq sequence batch 405 to database
+
+Submitted job 159 with external jobid 'Submitted batch job 16250288'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 611: Add RefSeq sequence batch 218 to database
+
+Submitted job 611 with external jobid 'Submitted batch job 16250289'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 555: Add RefSeq sequence batch 339 to database
+
+Submitted job 555 with external jobid 'Submitted batch job 16250290'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 190: Add RefSeq sequence batch 641 to database
+
+Submitted job 190 with external jobid 'Submitted batch job 16250291'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 243: Add RefSeq sequence batch 173 to database
+
+Submitted job 243 with external jobid 'Submitted batch job 16250292'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 270: Add RefSeq sequence batch 145 to database
+
+Submitted job 270 with external jobid 'Submitted batch job 16250293'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 428: Add RefSeq sequence batch 141 to database
+
+Submitted job 428 with external jobid 'Submitted batch job 16250294'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 624: Add RefSeq sequence batch 564 to database
+
+Submitted job 624 with external jobid 'Submitted batch job 16250295'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 575: Add RefSeq sequence batch 226 to database
+
+Submitted job 575 with external jobid 'Submitted batch job 16250296'.
+
+[Wed Dec  4 14:14:21 2019]
+Job 431: Add RefSeq sequence batch 301 to database
+
+Submitted job 431 with external jobid 'Submitted batch job 16250297'.
+[Wed Dec  4 14:16:21 2019]
+Finished job 624.
+1 of 717 steps (0.14%) done
+
+[Wed Dec  4 14:16:22 2019]
+Job 11: Add RefSeq sequence batch 680 to database
+
+Submitted job 11 with external jobid 'Submitted batch job 16250298'.
+[Wed Dec  4 14:16:32 2019]
+Finished job 575.
+2 of 717 steps (0.28%) done
+
+[Wed Dec  4 14:16:32 2019]
+Job 491: Add RefSeq sequence batch 356 to database
+
+Submitted job 491 with external jobid 'Submitted batch job 16250299'.
+[Wed Dec  4 14:16:43 2019]
+Finished job 555.
+3 of 717 steps (0.42%) done
+
+[Wed Dec  4 14:16:43 2019]
+Job 120: Add RefSeq sequence batch 4 to database
+
+[Wed Dec  4 14:16:43 2019]
+Finished job 190.
+4 of 717 steps (0.56%) done
+Submitted job 120 with external jobid 'Submitted batch job 16250300'.
+
+[Wed Dec  4 14:16:43 2019]
+Job 669: Add RefSeq sequence batch 34 to database
+
+Submitted job 669 with external jobid 'Submitted batch job 16250301'.
+[Wed Dec  4 14:16:54 2019]
+Finished job 611.
+5 of 717 steps (0.70%) done
+
+[Wed Dec  4 14:16:54 2019]
+Job 584: Add RefSeq sequence batch 420 to database
+
+Submitted job 584 with external jobid 'Submitted batch job 16250302'.
+[Wed Dec  4 14:17:05 2019]
+Finished job 159.
+6 of 717 steps (0.84%) done
+
+[Wed Dec  4 14:17:05 2019]
+Job 331: Add RefSeq sequence batch 23 to database
+
+[Wed Dec  4 14:17:05 2019]
+Finished job 243.
+7 of 717 steps (0.98%) done
+Submitted job 331 with external jobid 'Submitted batch job 16250303'.
+[Wed Dec  4 14:17:05 2019]
+Finished job 270.
+8 of 717 steps (1%) done
+
+[Wed Dec  4 14:17:05 2019]
+Job 477: Add RefSeq sequence batch 372 to database
+
+[Wed Dec  4 14:17:05 2019]
+Finished job 428.
+9 of 717 steps (1%) done
+Submitted job 477 with external jobid 'Submitted batch job 16250304'.
+
+[Wed Dec  4 14:17:05 2019]
+Job 456: Add RefSeq sequence batch 493 to database
+
+[Wed Dec  4 14:17:05 2019]
+Finished job 11.
+10 of 717 steps (1%) done
+Submitted job 456 with external jobid 'Submitted batch job 16250305'.
+
+[Wed Dec  4 14:17:05 2019]
+Job 618: Add RefSeq sequence batch 118 to database
+
+Submitted job 618 with external jobid 'Submitted batch job 16250306'.
+
+[Wed Dec  4 14:17:05 2019]
+Job 6: Add RefSeq sequence batch 576 to database
+
+Submitted job 6 with external jobid 'Submitted batch job 16250307'.
+[Wed Dec  4 14:17:16 2019]
+Finished job 431.
+11 of 717 steps (2%) done
+
+[Wed Dec  4 14:17:16 2019]
+Job 523: Add RefSeq sequence batch 444 to database
+
+Submitted job 523 with external jobid 'Submitted batch job 16250308'.
+[Wed Dec  4 14:18:22 2019]
+Finished job 584.
+12 of 717 steps (2%) done
+
+[Wed Dec  4 14:18:22 2019]
+Job 581: Add RefSeq sequence batch 84 to database
+
+Submitted job 581 with external jobid 'Submitted batch job 16250312'.
+[Wed Dec  4 14:18:33 2019]
+Finished job 669.
+13 of 717 steps (2%) done
+
+[Wed Dec  4 14:18:33 2019]
+Job 452: Add RefSeq sequence batch 151 to database
+
+Submitted job 452 with external jobid 'Submitted batch job 16250317'.
+[Wed Dec  4 14:18:55 2019]
+Finished job 331.
+14 of 717 steps (2%) done
+
+[Wed Dec  4 14:18:55 2019]
+Job 247: Add RefSeq sequence batch 532 to database
+
+[Wed Dec  4 14:18:55 2019]
+Finished job 6.
+15 of 717 steps (2%) done
+Submitted job 247 with external jobid 'Submitted batch job 16250322'.
+
+[Wed Dec  4 14:18:55 2019]
+Job 236: Add RefSeq sequence batch 181 to database
+
+Submitted job 236 with external jobid 'Submitted batch job 16250323'.
+[Wed Dec  4 14:19:06 2019]
+Finished job 456.
+16 of 717 steps (2%) done
+
+[Wed Dec  4 14:19:06 2019]
+Job 61: Add RefSeq sequence batch 341 to database
+
+Submitted job 61 with external jobid 'Submitted batch job 16250324'.
+[Wed Dec  4 14:19:17 2019]
+Finished job 523.
+17 of 717 steps (2%) done
+
+[Wed Dec  4 14:19:17 2019]
+Job 260: Add RefSeq sequence batch 589 to database
+
+Submitted job 260 with external jobid 'Submitted batch job 16250325'.
+[Wed Dec  4 14:19:28 2019]
+Finished job 491.
+18 of 717 steps (3%) done
+
+[Wed Dec  4 14:19:28 2019]
+Job 608: Add RefSeq sequence batch 649 to database
+
+Submitted job 608 with external jobid 'Submitted batch job 16250326'.
+[Wed Dec  4 14:19:50 2019]
+Finished job 477.
+19 of 717 steps (3%) done
+
+[Wed Dec  4 14:19:50 2019]
+Job 532: Add RefSeq sequence batch 503 to database
+
+[Wed Dec  4 14:19:50 2019]
+Finished job 120.
+20 of 717 steps (3%) done
+Submitted job 532 with external jobid 'Submitted batch job 16250331'.
+[Wed Dec  4 14:19:50 2019]
+Finished job 618.
+21 of 717 steps (3%) done
+
+[Wed Dec  4 14:19:50 2019]
+Job 612: Add RefSeq sequence batch 266 to database
+
+Submitted job 612 with external jobid 'Submitted batch job 16250332'.
+
+[Wed Dec  4 14:19:50 2019]
+Job 183: Add RefSeq sequence batch 169 to database
+
+Submitted job 183 with external jobid 'Submitted batch job 16250333'.
+[Wed Dec  4 14:20:45 2019]
+Finished job 452.
+22 of 717 steps (3%) done
+
+[Wed Dec  4 14:20:45 2019]
+Job 237: Add RefSeq sequence batch 246 to database
+
+Submitted job 237 with external jobid 'Submitted batch job 16250334'.
+[Wed Dec  4 14:20:56 2019]
+Finished job 581.
+23 of 717 steps (3%) done
+
+[Wed Dec  4 14:20:56 2019]
+Job 45: Add RefSeq sequence batch 53 to database
+
+[Wed Dec  4 14:20:56 2019]
+Finished job 247.
+24 of 717 steps (3%) done
+Submitted job 45 with external jobid 'Submitted batch job 16250336'.
+
+[Wed Dec  4 14:20:56 2019]
+Job 416: Add RefSeq sequence batch 505 to database
+
+Submitted job 416 with external jobid 'Submitted batch job 16250337'.
+[Wed Dec  4 14:21:07 2019]
+Finished job 608.
+25 of 717 steps (3%) done
+
+[Wed Dec  4 14:21:07 2019]
+Job 218: Add RefSeq sequence batch 559 to database
+
+Submitted job 218 with external jobid 'Submitted batch job 16250342'.
+[Wed Dec  4 14:21:18 2019]
+Finished job 236.
+26 of 717 steps (4%) done
+
+[Wed Dec  4 14:21:18 2019]
+Job 550: Add RefSeq sequence batch 95 to database
+
+[Wed Dec  4 14:21:18 2019]
+Finished job 61.
+27 of 717 steps (4%) done
+Submitted job 550 with external jobid 'Submitted batch job 16250343'.
+
+[Wed Dec  4 14:21:18 2019]
+Job 54: Add RefSeq sequence batch 648 to database
+
+Submitted job 54 with external jobid 'Submitted batch job 16250344'.
+[Wed Dec  4 14:21:51 2019]
+Finished job 260.
+28 of 717 steps (4%) done
+
+[Wed Dec  4 14:21:51 2019]
+Job 515: Add RefSeq sequence batch 47 to database
+
+Submitted job 515 with external jobid 'Submitted batch job 16250345'.
+[Wed Dec  4 14:22:13 2019]
+Finished job 532.
+29 of 717 steps (4%) done
+
+[Wed Dec  4 14:22:13 2019]
+Job 151: Add RefSeq sequence batch 379 to database
+
+[Wed Dec  4 14:22:13 2019]
+Finished job 612.
+30 of 717 steps (4%) done
+Submitted job 151 with external jobid 'Submitted batch job 16250350'.
+[Wed Dec  4 14:22:13 2019]
+Finished job 183.
+31 of 717 steps (4%) done
+
+[Wed Dec  4 14:22:13 2019]
+Job 497: Add RefSeq sequence batch 495 to database
+
+Submitted job 497 with external jobid 'Submitted batch job 16250351'.
+
+[Wed Dec  4 14:22:13 2019]
+Job 576: Add RefSeq sequence batch 278 to database
+
+Submitted job 576 with external jobid 'Submitted batch job 16250352'.
+[Wed Dec  4 14:22:24 2019]
+Finished job 515.
+32 of 717 steps (4%) done
+
+[Wed Dec  4 14:22:24 2019]
+Job 18: Add RefSeq sequence batch 22 to database
+
+Submitted job 18 with external jobid 'Submitted batch job 16250353'.
+[Wed Dec  4 14:22:57 2019]
+Finished job 416.
+33 of 717 steps (5%) done
+
+[Wed Dec  4 14:22:57 2019]
+Job 460: Add RefSeq sequence batch 90 to database
+
+Submitted job 460 with external jobid 'Submitted batch job 16250354'.
+[Wed Dec  4 14:23:30 2019]
+Finished job 237.
+34 of 717 steps (5%) done
+
+[Wed Dec  4 14:23:30 2019]
+Job 625: Add RefSeq sequence batch 5 to database
+
+[Wed Dec  4 14:23:30 2019]
+Finished job 45.
+35 of 717 steps (5%) done
+Submitted job 625 with external jobid 'Submitted batch job 16250355'.
+[Wed Dec  4 14:23:30 2019]
+Finished job 218.
+36 of 717 steps (5%) done
+
+[Wed Dec  4 14:23:30 2019]
+Job 357: Add RefSeq sequence batch 554 to database
+
+[Wed Dec  4 14:23:30 2019]
+Finished job 550.
+37 of 717 steps (5%) done
+Submitted job 357 with external jobid 'Submitted batch job 16250356'.
+
+[Wed Dec  4 14:23:30 2019]
+Job 506: Add RefSeq sequence batch 701 to database
+
+Submitted job 506 with external jobid 'Submitted batch job 16250357'.
+
+[Wed Dec  4 14:23:30 2019]
+Job 123: Add RefSeq sequence batch 79 to database
+
+Submitted job 123 with external jobid 'Submitted batch job 16250358'.
+[Wed Dec  4 14:23:41 2019]
+Finished job 54.
+38 of 717 steps (5%) done
+
+[Wed Dec  4 14:23:41 2019]
+Job 282: Add RefSeq sequence batch 533 to database
+
+Submitted job 282 with external jobid 'Submitted batch job 16250363'.
+[Wed Dec  4 14:24:03 2019]
+Finished job 151.
+39 of 717 steps (5%) done
+
+[Wed Dec  4 14:24:03 2019]
+Job 383: Add RefSeq sequence batch 408 to database
+
+Submitted job 383 with external jobid 'Submitted batch job 16250369'.
+[Wed Dec  4 14:24:14 2019]
+Finished job 497.
+40 of 717 steps (6%) done
+
+[Wed Dec  4 14:24:14 2019]
+Job 391: Add RefSeq sequence batch 45 to database
+
+[Wed Dec  4 14:24:14 2019]
+Finished job 576.
+41 of 717 steps (6%) done
+Submitted job 391 with external jobid 'Submitted batch job 16250370'.
+
+[Wed Dec  4 14:24:14 2019]
+Job 289: Add RefSeq sequence batch 601 to database
+
+Submitted job 289 with external jobid 'Submitted batch job 16250371'.
+[Wed Dec  4 14:24:36 2019]
+Finished job 18.
+42 of 717 steps (6%) done
+
+[Wed Dec  4 14:24:36 2019]
+Job 255: Add RefSeq sequence batch 346 to database
+
+Submitted job 255 with external jobid 'Submitted batch job 16250372'.
+[Wed Dec  4 14:25:31 2019]
+Finished job 460.
+43 of 717 steps (6%) done
+
+[Wed Dec  4 14:25:31 2019]
+Job 426: Add RefSeq sequence batch 138 to database
+
+[Wed Dec  4 14:25:31 2019]
+Finished job 357.
+44 of 717 steps (6%) done
+Submitted job 426 with external jobid 'Submitted batch job 16250373'.
+
+[Wed Dec  4 14:25:32 2019]
+Job 516: Add RefSeq sequence batch 44 to database
+
+Submitted job 516 with external jobid 'Submitted batch job 16250374'.
+[Wed Dec  4 14:25:53 2019]
+Finished job 506.
+45 of 717 steps (6%) done
+
+[Wed Dec  4 14:25:53 2019]
+Job 307: Add RefSeq sequence batch 423 to database
+
+[Wed Dec  4 14:25:54 2019]
+Finished job 123.
+46 of 717 steps (6%) done
+Submitted job 307 with external jobid 'Submitted batch job 16250375'.
+
+[Wed Dec  4 14:25:54 2019]
+Job 660: Add RefSeq sequence batch 288 to database
+
+Submitted job 660 with external jobid 'Submitted batch job 16250376'.
+[Wed Dec  4 14:26:27 2019]
+Finished job 625.
+47 of 717 steps (7%) done
+
+[Wed Dec  4 14:26:27 2019]
+Job 708: Add RefSeq sequence batch 442 to database
+
+Submitted job 708 with external jobid 'Submitted batch job 16250377'.
+[Wed Dec  4 14:26:49 2019]
+Finished job 383.
+48 of 717 steps (7%) done
+
+[Wed Dec  4 14:26:49 2019]
+Job 102: Add RefSeq sequence batch 522 to database
+
+[Wed Dec  4 14:26:49 2019]
+Finished job 391.
+49 of 717 steps (7%) done
+Submitted job 102 with external jobid 'Submitted batch job 16250378'.
+[Wed Dec  4 14:26:49 2019]
+Finished job 255.
+50 of 717 steps (7%) done
+
+[Wed Dec  4 14:26:49 2019]
+Job 83: Add RefSeq sequence batch 698 to database
+
+Submitted job 83 with external jobid 'Submitted batch job 16250379'.
+
+[Wed Dec  4 14:26:49 2019]
+Job 714: Add RefSeq sequence batch 652 to database
+
+Submitted job 714 with external jobid 'Submitted batch job 16250380'.
+[Wed Dec  4 14:27:22 2019]
+Finished job 282.
+51 of 717 steps (7%) done
+
+[Wed Dec  4 14:27:22 2019]
+Job 296: Add RefSeq sequence batch 703 to database
+
+[Wed Dec  4 14:27:22 2019]
+Finished job 426.
+52 of 717 steps (7%) done
+Submitted job 296 with external jobid 'Submitted batch job 16250381'.
+[Wed Dec  4 14:27:22 2019]
+Finished job 516.
+53 of 717 steps (7%) done
+
+[Wed Dec  4 14:27:22 2019]
+Job 673: Add RefSeq sequence batch 211 to database
+
+Submitted job 673 with external jobid 'Submitted batch job 16250382'.
+
+[Wed Dec  4 14:27:22 2019]
+Job 689: Add RefSeq sequence batch 186 to database
+
+Submitted job 689 with external jobid 'Submitted batch job 16250383'.
+[Wed Dec  4 14:27:33 2019]
+Finished job 660.
+54 of 717 steps (8%) done
+
+[Wed Dec  4 14:27:33 2019]
+Job 248: Add RefSeq sequence batch 37 to database
+
+Submitted job 248 with external jobid 'Submitted batch job 16250384'.
+[Wed Dec  4 14:27:55 2019]
+Finished job 289.
+55 of 717 steps (8%) done
+
+[Wed Dec  4 14:27:55 2019]
+Job 691: Add RefSeq sequence batch 109 to database
+
+Submitted job 691 with external jobid 'Submitted batch job 16250385'.
+[Wed Dec  4 14:28:28 2019]
+Finished job 708.
+56 of 717 steps (8%) done
+
+[Wed Dec  4 14:28:28 2019]
+Job 271: Add RefSeq sequence batch 424 to database
+
+Submitted job 271 with external jobid 'Submitted batch job 16250386'.
+[Wed Dec  4 14:28:50 2019]
+Finished job 307.
+57 of 717 steps (8%) done
+
+[Wed Dec  4 14:28:50 2019]
+Job 75: Add RefSeq sequence batch 706 to database
+
+Submitted job 75 with external jobid 'Submitted batch job 16250387'.
+[Wed Dec  4 14:29:23 2019]
+Finished job 102.
+58 of 717 steps (8%) done
+
+[Wed Dec  4 14:29:23 2019]
+Job 565: Add RefSeq sequence batch 441 to database
+
+[Wed Dec  4 14:29:23 2019]
+Finished job 248.
+Submitted job 565 with external jobid 'Submitted batch job 16250389'.
+59 of 717 steps (8%) done
+
+[Wed Dec  4 14:29:23 2019]
+Job 152: Add RefSeq sequence batch 571 to database
+
+Submitted job 152 with external jobid 'Submitted batch job 16250390'.
+[Wed Dec  4 14:29:34 2019]
+Finished job 714.
+60 of 717 steps (8%) done
+
+[Wed Dec  4 14:29:34 2019]
+Job 629: Add RefSeq sequence batch 542 to database
+
+[Wed Dec  4 14:29:34 2019]
+Finished job 673.
+61 of 717 steps (9%) done
+Submitted job 629 with external jobid 'Submitted batch job 16250391'.
+
+[Wed Dec  4 14:29:34 2019]
+Job 551: Add RefSeq sequence batch 188 to database
+
+Submitted job 551 with external jobid 'Submitted batch job 16250392'.
+[Wed Dec  4 14:29:45 2019]
+Finished job 83.
+62 of 717 steps (9%) done
+
+[Wed Dec  4 14:29:45 2019]
+Job 347: Add RefSeq sequence batch 498 to database
+
+[Wed Dec  4 14:29:45 2019]
+Finished job 296.
+63 of 717 steps (9%) done
+Submitted job 347 with external jobid 'Submitted batch job 16250393'.
+
+[Wed Dec  4 14:29:45 2019]
+Job 381: Add RefSeq sequence batch 1 to database
+
+Submitted job 381 with external jobid 'Submitted batch job 16250394'.
+[Wed Dec  4 14:30:07 2019]
+Finished job 689.
+64 of 717 steps (9%) done
+
+[Wed Dec  4 14:30:07 2019]
+Job 100: Add RefSeq sequence batch 216 to database
+
+[Wed Dec  4 14:30:07 2019]
+Finished job 691.
+65 of 717 steps (9%) done
+Submitted job 100 with external jobid 'Submitted batch job 16250395'.
+
+[Wed Dec  4 14:30:07 2019]
+Job 59: Add RefSeq sequence batch 251 to database
+
+Submitted job 59 with external jobid 'Submitted batch job 16250396'.
+[Wed Dec  4 14:31:02 2019]
+Finished job 271.
+66 of 717 steps (9%) done
+
+[Wed Dec  4 14:31:02 2019]
+Job 321: Add RefSeq sequence batch 272 to database
+
+Submitted job 321 with external jobid 'Submitted batch job 16250397'.
+[Wed Dec  4 14:31:24 2019]
+Finished job 152.
+67 of 717 steps (9%) done
+
+[Wed Dec  4 14:31:24 2019]
+Job 227: Add RefSeq sequence batch 315 to database
+
+Submitted job 227 with external jobid 'Submitted batch job 16250398'.
+[Wed Dec  4 14:31:35 2019]
+Finished job 629.
+68 of 717 steps (9%) done
+
+[Wed Dec  4 14:31:35 2019]
+Job 313: Add RefSeq sequence batch 10 to database
+
+Submitted job 313 with external jobid 'Submitted batch job 16250399'.
+[Wed Dec  4 14:31:46 2019]
+Finished job 565.
+69 of 717 steps (10%) done
+
+[Wed Dec  4 14:31:46 2019]
+Job 574: Add RefSeq sequence batch 260 to database
+
+[Wed Dec  4 14:31:46 2019]
+Finished job 347.
+70 of 717 steps (10%) done
+Submitted job 574 with external jobid 'Submitted batch job 16250400'.
+
+[Wed Dec  4 14:31:46 2019]
+Job 66: Add RefSeq sequence batch 644 to database
+
+Submitted job 66 with external jobid 'Submitted batch job 16250401'.
+[Wed Dec  4 14:31:57 2019]
+Finished job 75.
+71 of 717 steps (10%) done
+
+[Wed Dec  4 14:31:57 2019]
+Job 387: Add RefSeq sequence batch 98 to database
+
+[Wed Dec  4 14:31:57 2019]
+Finished job 551.
+72 of 717 steps (10%) done
+Submitted job 387 with external jobid 'Submitted batch job 16250402'.
+[Wed Dec  4 14:31:57 2019]
+Finished job 381.
+73 of 717 steps (10%) done
+
+[Wed Dec  4 14:31:57 2019]
+Job 706: Add RefSeq sequence batch 185 to database
+
+Submitted job 706 with external jobid 'Submitted batch job 16250403'.
+
+[Wed Dec  4 14:31:57 2019]
+Job 158: Add RefSeq sequence batch 637 to database
+
+Submitted job 158 with external jobid 'Submitted batch job 16250404'.
+[Wed Dec  4 14:32:30 2019]
+Finished job 100.
+74 of 717 steps (10%) done
+
+[Wed Dec  4 14:32:30 2019]
+Job 610: Add RefSeq sequence batch 207 to database
+
+[Wed Dec  4 14:32:30 2019]
+Finished job 59.
+75 of 717 steps (10%) done
+Submitted job 610 with external jobid 'Submitted batch job 16250405'.
+
+[Wed Dec  4 14:32:30 2019]
+Job 60: Add RefSeq sequence batch 497 to database
+
+Submitted job 60 with external jobid 'Submitted batch job 16250406'.
+[Wed Dec  4 14:33:14 2019]
+Finished job 321.
+76 of 717 steps (11%) done
+
+[Wed Dec  4 14:33:14 2019]
+Job 178: Add RefSeq sequence batch 55 to database
+
+[Wed Dec  4 14:33:14 2019]
+Finished job 66.
+77 of 717 steps (11%) done
+Submitted job 178 with external jobid 'Submitted batch job 16250407'.
+
+[Wed Dec  4 14:33:14 2019]
+Job 474: Add RefSeq sequence batch 114 to database
+
+Submitted job 474 with external jobid 'Submitted batch job 16250408'.
+[Wed Dec  4 14:33:58 2019]
+Finished job 227.
+78 of 717 steps (11%) done
+
+[Wed Dec  4 14:33:58 2019]
+Job 600: Add RefSeq sequence batch 297 to database
+
+Submitted job 600 with external jobid 'Submitted batch job 16250410'.
+[Wed Dec  4 14:34:09 2019]
+Finished job 313.
+79 of 717 steps (11%) done
+
+[Wed Dec  4 14:34:09 2019]
+Job 350: Add RefSeq sequence batch 595 to database
+
+[Wed Dec  4 14:34:09 2019]
+Finished job 574.
+80 of 717 steps (11%) done
+Submitted job 350 with external jobid 'Submitted batch job 16250411'.
+
+[Wed Dec  4 14:34:09 2019]
+Job 396: Add RefSeq sequence batch 398 to database
+
+Submitted job 396 with external jobid 'Submitted batch job 16250412'.
+[Wed Dec  4 14:34:20 2019]
+Finished job 706.
+81 of 717 steps (11%) done
+
+[Wed Dec  4 14:34:20 2019]
+Job 263: Add RefSeq sequence batch 529 to database
+
+Submitted job 263 with external jobid 'Submitted batch job 16250413'.
+[Wed Dec  4 14:34:31 2019]
+Finished job 610.
+82 of 717 steps (11%) done
+
+[Wed Dec  4 14:34:31 2019]
+Job 577: Add RefSeq sequence batch 452 to database
+
+[Wed Dec  4 14:34:31 2019]
+Finished job 60.
+83 of 717 steps (12%) done
+Submitted job 577 with external jobid 'Submitted batch job 16250414'.
+
+[Wed Dec  4 14:34:32 2019]
+Job 423: Add RefSeq sequence batch 229 to database
+
+Submitted job 423 with external jobid 'Submitted batch job 16250415'.
+[Wed Dec  4 14:34:42 2019]
+Finished job 387.
+84 of 717 steps (12%) done
+
+[Wed Dec  4 14:34:42 2019]
+Job 579: Add RefSeq sequence batch 688 to database
+
+Submitted job 579 with external jobid 'Submitted batch job 16250416'.
+[Wed Dec  4 14:35:16 2019]
+Finished job 474.
+85 of 717 steps (12%) done
+
+[Wed Dec  4 14:35:16 2019]
+Job 586: Add RefSeq sequence batch 87 to database
+
+Submitted job 586 with external jobid 'Submitted batch job 16250417'.
+[Wed Dec  4 14:35:27 2019]
+Finished job 158.
+86 of 717 steps (12%) done
+
+[Wed Dec  4 14:35:27 2019]
+Job 427: Add RefSeq sequence batch 640 to database
+
+[Wed Dec  4 14:35:27 2019]
+Finished job 178.
+87 of 717 steps (12%) done
+Submitted job 427 with external jobid 'Submitted batch job 16250418'.
+
+[Wed Dec  4 14:35:27 2019]
+Job 652: Add RefSeq sequence batch 403 to database
+
+Submitted job 652 with external jobid 'Submitted batch job 16250419'.
+[Wed Dec  4 14:35:38 2019]
+Finished job 350.
+88 of 717 steps (12%) done
+
+[Wed Dec  4 14:35:38 2019]
+Job 340: Add RefSeq sequence batch 208 to database
+
+Submitted job 340 with external jobid 'Submitted batch job 16250420'.
+[Wed Dec  4 14:36:00 2019]
+Finished job 600.
+89 of 717 steps (12%) done
+
+[Wed Dec  4 14:36:00 2019]
+Job 415: Add RefSeq sequence batch 214 to database
+
+Submitted job 415 with external jobid 'Submitted batch job 16250421'.
+[Wed Dec  4 14:36:22 2019]
+Finished job 263.
+90 of 717 steps (13%) done
+
+[Wed Dec  4 14:36:22 2019]
+Job 42: Add RefSeq sequence batch 334 to database
+
+Submitted job 42 with external jobid 'Submitted batch job 16250423'.
+[Wed Dec  4 14:37:06 2019]
+Finished job 396.
+91 of 717 steps (13%) done
+
+[Wed Dec  4 14:37:06 2019]
+Job 380: Add RefSeq sequence batch 647 to database
+
+[Wed Dec  4 14:37:06 2019]
+Finished job 577.
+92 of 717 steps (13%) done
+[Wed Dec  4 14:37:06 2019]
+Finished job 423.
+93 of 717 steps (13%) done
+Submitted job 380 with external jobid 'Submitted batch job 16250425'.
+[Wed Dec  4 14:37:06 2019]
+Finished job 579.
+94 of 717 steps (13%) done
+
+[Wed Dec  4 14:37:06 2019]
+Job 414: Add RefSeq sequence batch 127 to database
+
+Submitted job 414 with external jobid 'Submitted batch job 16250426'.
+
+[Wed Dec  4 14:37:06 2019]
+Job 240: Add RefSeq sequence batch 121 to database
+
+Submitted job 240 with external jobid 'Submitted batch job 16250427'.
+
+[Wed Dec  4 14:37:06 2019]
+Job 145: Add RefSeq sequence batch 9 to database
+
+Submitted job 145 with external jobid 'Submitted batch job 16250428'.
+[Wed Dec  4 14:37:28 2019]
+Finished job 427.
+95 of 717 steps (13%) done
+
+[Wed Dec  4 14:37:28 2019]
+Job 141: Add RefSeq sequence batch 13 to database
+
+Submitted job 141 with external jobid 'Submitted batch job 16250429'.
+[Wed Dec  4 14:37:50 2019]
+Finished job 652.
+96 of 717 steps (13%) done
+
+[Wed Dec  4 14:37:50 2019]
+Job 305: Add RefSeq sequence batch 361 to database
+
+Submitted job 305 with external jobid 'Submitted batch job 16250430'.
+[Wed Dec  4 14:38:01 2019]
+Finished job 586.
+97 of 717 steps (14%) done
+
+[Wed Dec  4 14:38:01 2019]
+Job 87: Add RefSeq sequence batch 552 to database
+
+[Wed Dec  4 14:38:01 2019]
+Finished job 340.
+98 of 717 steps (14%) done
+Submitted job 87 with external jobid 'Submitted batch job 16250431'.
+
+[Wed Dec  4 14:38:01 2019]
+Job 246: Add RefSeq sequence batch 381 to database
+
+Submitted job 246 with external jobid 'Submitted batch job 16250432'.
+[Wed Dec  4 14:38:23 2019]
+Finished job 415.
+99 of 717 steps (14%) done
+
+[Wed Dec  4 14:38:23 2019]
+Job 637: Add RefSeq sequence batch 568 to database
+
+Submitted job 637 with external jobid 'Submitted batch job 16250433'.
+[Wed Dec  4 14:38:45 2019]
+Finished job 380.
+100 of 717 steps (14%) done
+
+[Wed Dec  4 14:38:45 2019]
+Job 647: Add RefSeq sequence batch 485 to database
+
+Submitted job 647 with external jobid 'Submitted batch job 16250434'.
+[Wed Dec  4 14:39:18 2019]
+Finished job 42.
+101 of 717 steps (14%) done
+
+[Wed Dec  4 14:39:18 2019]
+Job 412: Add RefSeq sequence batch 557 to database
+
+Submitted job 412 with external jobid 'Submitted batch job 16250435'.
+[Wed Dec  4 14:39:29 2019]
+Finished job 414.
+102 of 717 steps (14%) done
+
+[Wed Dec  4 14:39:29 2019]
+Job 503: Add RefSeq sequence batch 699 to database
+
+[Wed Dec  4 14:39:29 2019]
+Finished job 145.
+103 of 717 steps (14%) done
+Submitted job 503 with external jobid 'Submitted batch job 16250436'.
+
+[Wed Dec  4 14:39:29 2019]
+Job 371: Add RefSeq sequence batch 691 to database
+
+Submitted job 371 with external jobid 'Submitted batch job 16250437'.
+[Wed Dec  4 14:39:40 2019]
+Finished job 240.
+104 of 717 steps (15%) done
+
+[Wed Dec  4 14:39:40 2019]
+Job 475: Add RefSeq sequence batch 327 to database
+
+Submitted job 475 with external jobid 'Submitted batch job 16250438'.
+[Wed Dec  4 14:39:51 2019]
+Finished job 87.
+105 of 717 steps (15%) done
+
+[Wed Dec  4 14:39:51 2019]
+Job 437: Add RefSeq sequence batch 230 to database
+
+Submitted job 437 with external jobid 'Submitted batch job 16250440'.
+[Wed Dec  4 14:40:02 2019]
+Finished job 305.
+106 of 717 steps (15%) done
+
+[Wed Dec  4 14:40:02 2019]
+Job 548: Add RefSeq sequence batch 247 to database
+
+Submitted job 548 with external jobid 'Submitted batch job 16250441'.
+[Wed Dec  4 14:40:13 2019]
+Finished job 141.
+107 of 717 steps (15%) done
+
+[Wed Dec  4 14:40:13 2019]
+Job 20: Add RefSeq sequence batch 431 to database
+
+[Wed Dec  4 14:40:13 2019]
+Finished job 637.
+108 of 717 steps (15%) done
+Submitted job 20 with external jobid 'Submitted batch job 16250442'.
+
+[Wed Dec  4 14:40:13 2019]
+Job 709: Add RefSeq sequence batch 234 to database
+
+Submitted job 709 with external jobid 'Submitted batch job 16250443'.
+[Wed Dec  4 14:40:35 2019]
+Finished job 246.
+109 of 717 steps (15%) done
+
+[Wed Dec  4 14:40:35 2019]
+Job 22: Add RefSeq sequence batch 131 to database
+
+Submitted job 22 with external jobid 'Submitted batch job 16250445'.
+[Wed Dec  4 14:41:08 2019]
+Finished job 412.
+110 of 717 steps (15%) done
+
+[Wed Dec  4 14:41:08 2019]
+Job 370: Add RefSeq sequence batch 690 to database
+
+Submitted job 370 with external jobid 'Submitted batch job 16250447'.
+[Wed Dec  4 14:41:19 2019]
+Finished job 647.
+111 of 717 steps (15%) done
+
+[Wed Dec  4 14:41:19 2019]
+Job 195: Add RefSeq sequence batch 358 to database
+
+Submitted job 195 with external jobid 'Submitted batch job 16250448'.
+[Wed Dec  4 14:41:30 2019]
+Finished job 371.
+112 of 717 steps (16%) done
+
+[Wed Dec  4 14:41:30 2019]
+Job 19: Add RefSeq sequence batch 25 to database
+
+Submitted job 19 with external jobid 'Submitted batch job 16250449'.
+[Wed Dec  4 14:42:03 2019]
+Finished job 503.
+113 of 717 steps (16%) done
+
+[Wed Dec  4 14:42:03 2019]
+Job 337: Add RefSeq sequence batch 117 to database
+
+Submitted job 337 with external jobid 'Submitted batch job 16250450'.
+[Wed Dec  4 14:42:36 2019]
+Finished job 475.
+114 of 717 steps (16%) done
+
+[Wed Dec  4 14:42:36 2019]
+Job 107: Add RefSeq sequence batch 623 to database
+
+[Wed Dec  4 14:42:36 2019]
+Finished job 548.
+115 of 717 steps (16%) done
+Submitted job 107 with external jobid 'Submitted batch job 16250451'.
+
+[Wed Dec  4 14:42:36 2019]
+Job 356: Add RefSeq sequence batch 108 to database
+
+Submitted job 356 with external jobid 'Submitted batch job 16250452'.
+[Wed Dec  4 14:42:47 2019]
+Finished job 20.
+116 of 717 steps (16%) done
+
+[Wed Dec  4 14:42:47 2019]
+Job 405: Add RefSeq sequence batch 671 to database
+
+[Wed Dec  4 14:42:47 2019]
+Finished job 709.
+117 of 717 steps (16%) done
+Submitted job 405 with external jobid 'Submitted batch job 16250453'.
+
+[Wed Dec  4 14:42:47 2019]
+Job 109: Add RefSeq sequence batch 631 to database
+
+Submitted job 109 with external jobid 'Submitted batch job 16250454'.
+[Wed Dec  4 14:43:09 2019]
+Finished job 19.
+118 of 717 steps (16%) done
+
+[Wed Dec  4 14:43:09 2019]
+Job 633: Add RefSeq sequence batch 163 to database
+
+Submitted job 633 with external jobid 'Submitted batch job 16250455'.
+[Wed Dec  4 14:43:20 2019]
+Finished job 370.
+119 of 717 steps (17%) done
+
+[Wed Dec  4 14:43:20 2019]
+Job 599: Add RefSeq sequence batch 518 to database
+
+[Wed Dec  4 14:43:20 2019]
+Finished job 109.
+120 of 717 steps (17%) done
+Submitted job 599 with external jobid 'Submitted batch job 16250456'.
+
+[Wed Dec  4 14:43:20 2019]
+Job 682: Add RefSeq sequence batch 310 to database
+
+Submitted job 682 with external jobid 'Submitted batch job 16250457'.
+[Wed Dec  4 14:43:31 2019]
+Finished job 22.
+121 of 717 steps (17%) done
+
+[Wed Dec  4 14:43:31 2019]
+Job 245: Add RefSeq sequence batch 712 to database
+
+Submitted job 245 with external jobid 'Submitted batch job 16250458'.
+[Wed Dec  4 14:43:53 2019]
+Finished job 437.
+122 of 717 steps (17%) done
+
+[Wed Dec  4 14:43:53 2019]
+Job 446: Add RefSeq sequence batch 269 to database
+
+Submitted job 446 with external jobid 'Submitted batch job 16250459'.
+[Wed Dec  4 14:44:04 2019]
+Finished job 195.
+123 of 717 steps (17%) done
+
+[Wed Dec  4 14:44:05 2019]
+Job 501: Add RefSeq sequence batch 336 to database
+
+Submitted job 501 with external jobid 'Submitted batch job 16250460'.
+[Wed Dec  4 14:44:38 2019]
+Finished job 337.
+124 of 717 steps (17%) done
+
+[Wed Dec  4 14:44:38 2019]
+Job 283: Add RefSeq sequence batch 2 to database
+
+Submitted job 283 with external jobid 'Submitted batch job 16250461'.
+[Wed Dec  4 14:45:11 2019]
+Finished job 107.
+125 of 717 steps (17%) done
+
+[Wed Dec  4 14:45:11 2019]
+Job 568: Add RefSeq sequence batch 449 to database
+
+Submitted job 568 with external jobid 'Submitted batch job 16250462'.
+[Wed Dec  4 14:45:22 2019]
+Finished job 405.
+126 of 717 steps (18%) done
+
+[Wed Dec  4 14:45:22 2019]
+Job 132: Add RefSeq sequence batch 638 to database
+
+[Wed Dec  4 14:45:22 2019]
+Finished job 633.
+127 of 717 steps (18%) done
+Submitted job 132 with external jobid 'Submitted batch job 16250463'.
+
+[Wed Dec  4 14:45:22 2019]
+Job 526: Add RefSeq sequence batch 667 to database
+
+Submitted job 526 with external jobid 'Submitted batch job 16250464'.
+[Wed Dec  4 14:45:33 2019]
+Finished job 356.
+128 of 717 steps (18%) done
+
+[Wed Dec  4 14:45:33 2019]
+Job 86: Add RefSeq sequence batch 107 to database
+
+Submitted job 86 with external jobid 'Submitted batch job 16250465'.
+[Wed Dec  4 14:45:44 2019]
+Finished job 501.
+129 of 717 steps (18%) done
+
+[Wed Dec  4 14:45:44 2019]
+Job 319: Add RefSeq sequence batch 685 to database
+
+Submitted job 319 with external jobid 'Submitted batch job 16250466'.
+[Wed Dec  4 14:46:06 2019]
+Finished job 682.
+130 of 717 steps (18%) done
+
+[Wed Dec  4 14:46:06 2019]
+Job 432: Add RefSeq sequence batch 561 to database
+
+Submitted job 432 with external jobid 'Submitted batch job 16250467'.
+[Wed Dec  4 14:46:17 2019]
+Finished job 599.
+131 of 717 steps (18%) done
+
+[Wed Dec  4 14:46:17 2019]
+Job 593: Add RefSeq sequence batch 366 to database
+
+[Wed Dec  4 14:46:17 2019]
+Finished job 446.
+132 of 717 steps (18%) done
+Submitted job 593 with external jobid 'Submitted batch job 16250468'.
+
+[Wed Dec  4 14:46:17 2019]
+Job 7: Add RefSeq sequence batch 669 to database
+
+Submitted job 7 with external jobid 'Submitted batch job 16250469'.
+[Wed Dec  4 14:46:39 2019]
+Finished job 245.
+133 of 717 steps (19%) done
+
+[Wed Dec  4 14:46:39 2019]
+Job 40: Add RefSeq sequence batch 590 to database
+
+Submitted job 40 with external jobid 'Submitted batch job 16250470'.
+[Wed Dec  4 14:46:50 2019]
+Finished job 283.
+134 of 717 steps (19%) done
+
+[Wed Dec  4 14:46:50 2019]
+Job 160: Add RefSeq sequence batch 164 to database
+
+Submitted job 160 with external jobid 'Submitted batch job 16250471'.
+[Wed Dec  4 14:47:34 2019]
+Finished job 568.
+135 of 717 steps (19%) done
+
+[Wed Dec  4 14:47:34 2019]
+Job 342: Add RefSeq sequence batch 40 to database
+
+Submitted job 342 with external jobid 'Submitted batch job 16250484'.
+[Wed Dec  4 14:47:45 2019]
+Finished job 132.
+136 of 717 steps (19%) done
+
+[Wed Dec  4 14:47:45 2019]
+Job 510: Add RefSeq sequence batch 354 to database
+
+Submitted job 510 with external jobid 'Submitted batch job 16250491'.
+[Wed Dec  4 14:48:18 2019]
+Finished job 86.
+137 of 717 steps (19%) done
+
+[Wed Dec  4 14:48:18 2019]
+Job 153: Add RefSeq sequence batch 103 to database
+
+Submitted job 153 with external jobid 'Submitted batch job 16250509'.
+[Wed Dec  4 14:48:29 2019]
+Finished job 319.
+138 of 717 steps (19%) done
+
+[Wed Dec  4 14:48:29 2019]
+Job 341: Add RefSeq sequence batch 483 to database
+
+Submitted job 341 with external jobid 'Submitted batch job 16250510'.
+[Wed Dec  4 14:48:40 2019]
+Finished job 593.
+139 of 717 steps (19%) done
+
+[Wed Dec  4 14:48:40 2019]
+Job 181: Add RefSeq sequence batch 201 to database
+
+Submitted job 181 with external jobid 'Submitted batch job 16250511'.
+[Wed Dec  4 14:48:51 2019]
+Finished job 432.
+140 of 717 steps (20%) done
+
+[Wed Dec  4 14:48:51 2019]
+Job 299: Add RefSeq sequence batch 475 to database
+
+Submitted job 299 with external jobid 'Submitted batch job 16250512'.
+[Wed Dec  4 14:49:02 2019]
+Finished job 526.
+141 of 717 steps (20%) done
+
+[Wed Dec  4 14:49:02 2019]
+Job 420: Add RefSeq sequence batch 645 to database
+
+Submitted job 420 with external jobid 'Submitted batch job 16250513'.
+[Wed Dec  4 14:49:13 2019]
+Finished job 7.
+142 of 717 steps (20%) done
+
+[Wed Dec  4 14:49:13 2019]
+Job 73: Add RefSeq sequence batch 375 to database
+
+Submitted job 73 with external jobid 'Submitted batch job 16250514'.
+[Wed Dec  4 14:49:24 2019]
+Finished job 160.
+143 of 717 steps (20%) done
+
+[Wed Dec  4 14:49:24 2019]
+Job 447: Add RefSeq sequence batch 383 to database
+
+Submitted job 447 with external jobid 'Submitted batch job 16250515'.
+[Wed Dec  4 14:49:46 2019]
+Finished job 40.
+144 of 717 steps (20%) done
+
+[Wed Dec  4 14:49:46 2019]
+Job 185: Add RefSeq sequence batch 15 to database
+
+Submitted job 185 with external jobid 'Submitted batch job 16250516'.
+[Wed Dec  4 14:50:41 2019]
+Finished job 341.
+145 of 717 steps (20%) done
+
+[Wed Dec  4 14:50:41 2019]
+Job 408: Add RefSeq sequence batch 289 to database
+
+Submitted job 408 with external jobid 'Submitted batch job 16250552'.
+[Wed Dec  4 14:51:03 2019]
+Finished job 153.
+146 of 717 steps (20%) done
+
+[Wed Dec  4 14:51:03 2019]
+Job 583: Add RefSeq sequence batch 74 to database
+
+Submitted job 583 with external jobid 'Submitted batch job 16250555'.
+[Wed Dec  4 14:51:14 2019]
+Finished job 342.
+147 of 717 steps (21%) done
+
+[Wed Dec  4 14:51:14 2019]
+Job 330: Add RefSeq sequence batch 614 to database
+
+[Wed Dec  4 14:51:14 2019]
+Finished job 299.
+148 of 717 steps (21%) done
+Submitted job 330 with external jobid 'Submitted batch job 16250556'.
+
+[Wed Dec  4 14:51:14 2019]
+Job 166: Add RefSeq sequence batch 195 to database
+
+Submitted job 166 with external jobid 'Submitted batch job 16250557'.
+[Wed Dec  4 14:51:25 2019]
+Finished job 510.
+149 of 717 steps (21%) done
+
+[Wed Dec  4 14:51:25 2019]
+Job 481: Add RefSeq sequence batch 102 to database
+
+[Wed Dec  4 14:51:25 2019]
+Finished job 181.
+150 of 717 steps (21%) done
+Submitted job 481 with external jobid 'Submitted batch job 16250558'.
+
+[Wed Dec  4 14:51:25 2019]
+Job 208: Add RefSeq sequence batch 523 to database
+
+Submitted job 208 with external jobid 'Submitted batch job 16250559'.
+[Wed Dec  4 14:51:36 2019]
+Finished job 73.
+151 of 717 steps (21%) done
+
+[Wed Dec  4 14:51:36 2019]
+Job 400: Add RefSeq sequence batch 168 to database
+
+Submitted job 400 with external jobid 'Submitted batch job 16250560'.
+[Wed Dec  4 14:52:09 2019]
+Finished job 447.
+152 of 717 steps (21%) done
+
+[Wed Dec  4 14:52:09 2019]
+Job 403: Add RefSeq sequence batch 599 to database
+
+Submitted job 403 with external jobid 'Submitted batch job 16250561'.
+[Wed Dec  4 14:52:20 2019]
+Finished job 420.
+153 of 717 steps (21%) done
+
+[Wed Dec  4 14:52:20 2019]
+Job 567: Add RefSeq sequence batch 626 to database
+
+Submitted job 567 with external jobid 'Submitted batch job 16250562'.
+[Wed Dec  4 14:52:54 2019]
+Finished job 185.
+154 of 717 steps (21%) done
+
+[Wed Dec  4 14:52:54 2019]
+Job 175: Add RefSeq sequence batch 694 to database
+
+Submitted job 175 with external jobid 'Submitted batch job 16250564'.
+[Wed Dec  4 14:53:05 2019]
+Finished job 567.
+155 of 717 steps (22%) done
+
+[Wed Dec  4 14:53:05 2019]
+Job 176: Add RefSeq sequence batch 317 to database
+
+Submitted job 176 with external jobid 'Submitted batch job 16250565'.
+[Wed Dec  4 14:53:16 2019]
+Finished job 330.
+156 of 717 steps (22%) done
+
+[Wed Dec  4 14:53:16 2019]
+Job 582: Add RefSeq sequence batch 124 to database
+
+Submitted job 582 with external jobid 'Submitted batch job 16250578'.
+[Wed Dec  4 14:53:49 2019]
+Finished job 481.
+157 of 717 steps (22%) done
+
+[Wed Dec  4 14:53:49 2019]
+Job 156: Add RefSeq sequence batch 209 to database
+
+Submitted job 156 with external jobid 'Submitted batch job 16250601'.
+[Wed Dec  4 14:54:00 2019]
+Finished job 583.
+158 of 717 steps (22%) done
+
+[Wed Dec  4 14:54:00 2019]
+Job 462: Add RefSeq sequence batch 325 to database
+
+[Wed Dec  4 14:54:00 2019]
+Finished job 403.
+159 of 717 steps (22%) done
+Submitted job 462 with external jobid 'Submitted batch job 16250602'.
+
+[Wed Dec  4 14:54:00 2019]
+Job 688: Add RefSeq sequence batch 132 to database
+
+Submitted job 688 with external jobid 'Submitted batch job 16250603'.
+[Wed Dec  4 14:54:11 2019]
+Finished job 408.
+160 of 717 steps (22%) done
+
+[Wed Dec  4 14:54:11 2019]
+Job 362: Add RefSeq sequence batch 425 to database
+
+Submitted job 362 with external jobid 'Submitted batch job 16250605'.
+[Wed Dec  4 14:54:22 2019]
+Finished job 166.
+161 of 717 steps (22%) done
+
+[Wed Dec  4 14:54:22 2019]
+Job 76: Add RefSeq sequence batch 406 to database
+
+Submitted job 76 with external jobid 'Submitted batch job 16250606'.
+[Wed Dec  4 14:54:33 2019]
+Finished job 400.
+162 of 717 steps (23%) done
+
+[Wed Dec  4 14:54:33 2019]
+Job 634: Add RefSeq sequence batch 389 to database
+
+Submitted job 634 with external jobid 'Submitted batch job 16250607'.
+[Wed Dec  4 14:55:28 2019]
+Finished job 175.
+163 of 717 steps (23%) done
+
+[Wed Dec  4 14:55:28 2019]
+Job 112: Add RefSeq sequence batch 212 to database
+
+[Wed Dec  4 14:55:28 2019]
+Finished job 176.
+164 of 717 steps (23%) done
+Submitted job 112 with external jobid 'Submitted batch job 16250609'.
+
+[Wed Dec  4 14:55:28 2019]
+Job 642: Add RefSeq sequence batch 174 to database
+
+Submitted job 642 with external jobid 'Submitted batch job 16250610'.
+[Wed Dec  4 14:56:01 2019]
+Finished job 208.
+165 of 717 steps (23%) done
+
+[Wed Dec  4 14:56:01 2019]
+Job 442: Add RefSeq sequence batch 659 to database
+
+[Wed Dec  4 14:56:01 2019]
+Finished job 582.
+166 of 717 steps (23%) done
+Submitted job 442 with external jobid 'Submitted batch job 16250611'.
+[Wed Dec  4 14:56:01 2019]
+Finished job 688.
+167 of 717 steps (23%) done
+
+[Wed Dec  4 14:56:01 2019]
+Job 205: Add RefSeq sequence batch 429 to database
+
+Submitted job 205 with external jobid 'Submitted batch job 16250612'.
+
+[Wed Dec  4 14:56:01 2019]
+Job 441: Add RefSeq sequence batch 643 to database
+
+Submitted job 441 with external jobid 'Submitted batch job 16250613'.
+[Wed Dec  4 14:56:23 2019]
+Finished job 462.
+168 of 717 steps (23%) done
+
+[Wed Dec  4 14:56:23 2019]
+Job 498: Add RefSeq sequence batch 120 to database
+
+Submitted job 498 with external jobid 'Submitted batch job 16250614'.
+[Wed Dec  4 14:56:45 2019]
+Finished job 156.
+169 of 717 steps (24%) done
+
+[Wed Dec  4 14:56:45 2019]
+Job 487: Add RefSeq sequence batch 220 to database
+
+Submitted job 487 with external jobid 'Submitted batch job 16250615'.
+[Wed Dec  4 14:56:56 2019]
+Finished job 362.
+170 of 717 steps (24%) done
+
+[Wed Dec  4 14:56:56 2019]
+Job 379: Add RefSeq sequence batch 377 to database
+
+[Wed Dec  4 14:56:56 2019]
+Finished job 634.
+171 of 717 steps (24%) done
+Submitted job 379 with external jobid 'Submitted batch job 16250616'.
+
+[Wed Dec  4 14:56:56 2019]
+Job 482: Add RefSeq sequence batch 600 to database
+
+Submitted job 482 with external jobid 'Submitted batch job 16250617'.
+[Wed Dec  4 14:57:18 2019]
+Finished job 76.
+172 of 717 steps (24%) done
+
+[Wed Dec  4 14:57:18 2019]
+Job 418: Add RefSeq sequence batch 428 to database
+
+Submitted job 418 with external jobid 'Submitted batch job 16250618'.
+[Wed Dec  4 14:57:51 2019]
+Finished job 112.
+173 of 717 steps (24%) done
+
+[Wed Dec  4 14:57:51 2019]
+Job 168: Add RefSeq sequence batch 133 to database
+
+Submitted job 168 with external jobid 'Submitted batch job 16250619'.
+[Wed Dec  4 14:58:13 2019]
+Finished job 642.
+174 of 717 steps (24%) done
+
+[Wed Dec  4 14:58:13 2019]
+Job 232: Add RefSeq sequence batch 488 to database
+
+Submitted job 232 with external jobid 'Submitted batch job 16250620'.
+[Wed Dec  4 14:58:24 2019]
+Finished job 442.
+175 of 717 steps (24%) done
+
+[Wed Dec  4 14:58:24 2019]
+Job 323: Add RefSeq sequence batch 189 to database
+
+Submitted job 323 with external jobid 'Submitted batch job 16250621'.
+[Wed Dec  4 14:58:35 2019]
+Finished job 205.
+176 of 717 steps (25%) done
+
+[Wed Dec  4 14:58:35 2019]
+Job 518: Add RefSeq sequence batch 580 to database
+
+Submitted job 518 with external jobid 'Submitted batch job 16250622'.
+[Wed Dec  4 14:58:46 2019]
+Finished job 441.
+177 of 717 steps (25%) done
+
+[Wed Dec  4 14:58:46 2019]
+Job 172: Add RefSeq sequence batch 231 to database
+
+[Wed Dec  4 14:58:46 2019]
+Finished job 498.
+178 of 717 steps (25%) done
+Submitted job 172 with external jobid 'Submitted batch job 16250623'.
+
+[Wed Dec  4 14:58:46 2019]
+Job 679: Add RefSeq sequence batch 72 to database
+
+Submitted job 679 with external jobid 'Submitted batch job 16250624'.
+[Wed Dec  4 14:59:19 2019]
+Finished job 379.
+179 of 717 steps (25%) done
+
+[Wed Dec  4 14:59:19 2019]
+Job 429: Add RefSeq sequence batch 309 to database
+
+[Wed Dec  4 14:59:19 2019]
+Finished job 482.
+180 of 717 steps (25%) done
+Submitted job 429 with external jobid 'Submitted batch job 16250626'.
+
+[Wed Dec  4 14:59:19 2019]
+Job 573: Add RefSeq sequence batch 63 to database
+
+Submitted job 573 with external jobid 'Submitted batch job 16250627'.
+[Wed Dec  4 14:59:30 2019]
+Finished job 418.
+181 of 717 steps (25%) done
+
+[Wed Dec  4 14:59:30 2019]
+Job 204: Add RefSeq sequence batch 581 to database
+
+Submitted job 204 with external jobid 'Submitted batch job 16250628'.
+[Wed Dec  4 14:59:52 2019]
+Finished job 487.
+182 of 717 steps (25%) done
+
+[Wed Dec  4 14:59:52 2019]
+Job 692: Add RefSeq sequence batch 520 to database
+
+Submitted job 692 with external jobid 'Submitted batch job 16250629'.
+[Wed Dec  4 15:00:25 2019]
+Finished job 168.
+183 of 717 steps (26%) done
+
+[Wed Dec  4 15:00:25 2019]
+Job 184: Add RefSeq sequence batch 409 to database
+
+[Wed Dec  4 15:00:25 2019]
+Finished job 232.
+184 of 717 steps (26%) done
+Submitted job 184 with external jobid 'Submitted batch job 16250630'.
+
+[Wed Dec  4 15:00:25 2019]
+Job 95: Add RefSeq sequence batch 76 to database
+
+Submitted job 95 with external jobid 'Submitted batch job 16250631'.
+[Wed Dec  4 15:00:47 2019]
+Finished job 679.
+185 of 717 steps (26%) done
+
+[Wed Dec  4 15:00:47 2019]
+Job 78: Add RefSeq sequence batch 249 to database
+
+Submitted job 78 with external jobid 'Submitted batch job 16250632'.
+[Wed Dec  4 15:01:20 2019]
+Finished job 323.
+186 of 717 steps (26%) done
+
+[Wed Dec  4 15:01:20 2019]
+Job 472: Add RefSeq sequence batch 634 to database
+
+Submitted job 472 with external jobid 'Submitted batch job 16250633'.
+[Wed Dec  4 15:01:42 2019]
+Finished job 518.
+187 of 717 steps (26%) done
+
+[Wed Dec  4 15:01:42 2019]
+Job 306: Add RefSeq sequence batch 570 to database
+
+[Wed Dec  4 15:01:42 2019]
+Finished job 172.
+188 of 717 steps (26%) done
+Submitted job 306 with external jobid 'Submitted batch job 16250634'.
+[Wed Dec  4 15:01:42 2019]
+Finished job 573.
+189 of 717 steps (26%) done
+
+[Wed Dec  4 15:01:42 2019]
+Job 177: Add RefSeq sequence batch 6 to database
+
+Submitted job 177 with external jobid 'Submitted batch job 16250635'.
+
+[Wed Dec  4 15:01:42 2019]
+Job 439: Add RefSeq sequence batch 86 to database
+
+Submitted job 439 with external jobid 'Submitted batch job 16250636'.
+[Wed Dec  4 15:02:15 2019]
+Finished job 429.
+190 of 717 steps (26%) done
+
+[Wed Dec  4 15:02:15 2019]
+Job 395: Add RefSeq sequence batch 353 to database
+
+[Wed Dec  4 15:02:15 2019]
+Finished job 204.
+191 of 717 steps (27%) done
+Submitted job 395 with external jobid 'Submitted batch job 16250637'.
+
+[Wed Dec  4 15:02:16 2019]
+Job 598: Add RefSeq sequence batch 359 to database
+
+Submitted job 598 with external jobid 'Submitted batch job 16250638'.
+[Wed Dec  4 15:02:26 2019]
+Finished job 78.
+192 of 717 steps (27%) done
+
+[Wed Dec  4 15:02:26 2019]
+Job 483: Add RefSeq sequence batch 587 to database
+
+Submitted job 483 with external jobid 'Submitted batch job 16250639'.
+[Wed Dec  4 15:02:38 2019]
+Finished job 95.
+193 of 717 steps (27%) done
+
+[Wed Dec  4 15:02:38 2019]
+Job 229: Add RefSeq sequence batch 510 to database
+
+Submitted job 229 with external jobid 'Submitted batch job 16250640'.
+[Wed Dec  4 15:02:48 2019]
+Finished job 692.
+194 of 717 steps (27%) done
+
+[Wed Dec  4 15:02:49 2019]
+Job 335: Add RefSeq sequence batch 50 to database
+
+Submitted job 335 with external jobid 'Submitted batch job 16250641'.
+[Wed Dec  4 15:03:11 2019]
+Finished job 184.
+195 of 717 steps (27%) done
+
+[Wed Dec  4 15:03:11 2019]
+Job 349: Add RefSeq sequence batch 517 to database
+
+Submitted job 349 with external jobid 'Submitted batch job 16250642'.
+[Wed Dec  4 15:03:22 2019]
+Finished job 472.
+196 of 717 steps (27%) done
+
+[Wed Dec  4 15:03:22 2019]
+Job 542: Add RefSeq sequence batch 435 to database
+
+Submitted job 542 with external jobid 'Submitted batch job 16250643'.
+[Wed Dec  4 15:03:33 2019]
+Finished job 306.
+197 of 717 steps (27%) done
+
+[Wed Dec  4 15:03:33 2019]
+Job 508: Add RefSeq sequence batch 66 to database
+
+Submitted job 508 with external jobid 'Submitted batch job 16250644'.
+[Wed Dec  4 15:04:17 2019]
+Finished job 483.
+198 of 717 steps (28%) done
+
+[Wed Dec  4 15:04:17 2019]
+Job 24: Add RefSeq sequence batch 382 to database
+
+[Wed Dec  4 15:04:17 2019]
+Finished job 335.
+199 of 717 steps (28%) done
+Submitted job 24 with external jobid 'Submitted batch job 16250645'.
+
+[Wed Dec  4 15:04:17 2019]
+Job 294: Add RefSeq sequence batch 433 to database
+
+Submitted job 294 with external jobid 'Submitted batch job 16250646'.
+[Wed Dec  4 15:04:28 2019]
+Finished job 439.
+200 of 717 steps (28%) done
+
+[Wed Dec  4 15:04:28 2019]
+Job 552: Add RefSeq sequence batch 282 to database
+
+Submitted job 552 with external jobid 'Submitted batch job 16250647'.
+[Wed Dec  4 15:04:50 2019]
+Finished job 395.
+201 of 717 steps (28%) done
+
+[Wed Dec  4 15:04:50 2019]
+Job 48: Add RefSeq sequence batch 135 to database
+
+Submitted job 48 with external jobid 'Submitted batch job 16250648'.
+[Wed Dec  4 15:05:01 2019]
+Finished job 598.
+202 of 717 steps (28%) done
+
+[Wed Dec  4 15:05:01 2019]
+Job 566: Add RefSeq sequence batch 609 to database
+
+Submitted job 566 with external jobid 'Submitted batch job 16250650'.
+[Wed Dec  4 15:05:12 2019]
+Finished job 177.
+203 of 717 steps (28%) done
+
+[Wed Dec  4 15:05:12 2019]
+Job 645: Add RefSeq sequence batch 228 to database
+
+[Wed Dec  4 15:05:12 2019]
+Finished job 229.
+204 of 717 steps (28%) done
+Submitted job 645 with external jobid 'Submitted batch job 16250651'.
+[Wed Dec  4 15:05:12 2019]
+Finished job 508.
+205 of 717 steps (29%) done
+
+[Wed Dec  4 15:05:12 2019]
+Job 266: Add RefSeq sequence batch 69 to database
+
+Submitted job 266 with external jobid 'Submitted batch job 16250652'.
+
+[Wed Dec  4 15:05:12 2019]
+Job 4: Add RefSeq sequence batch 70 to database
+
+Submitted job 4 with external jobid 'Submitted batch job 16250653'.
+[Wed Dec  4 15:05:45 2019]
+Finished job 542.
+206 of 717 steps (29%) done
+
+[Wed Dec  4 15:05:45 2019]
+Job 252: Add RefSeq sequence batch 242 to database
+
+Submitted job 252 with external jobid 'Submitted batch job 16250657'.
+[Wed Dec  4 15:05:56 2019]
+Finished job 349.
+207 of 717 steps (29%) done
+
+[Wed Dec  4 15:05:56 2019]
+Job 368: Add RefSeq sequence batch 343 to database
+
+Submitted job 368 with external jobid 'Submitted batch job 16250659'.
+[Wed Dec  4 15:06:07 2019]
+Finished job 294.
+208 of 717 steps (29%) done
+
+[Wed Dec  4 15:06:07 2019]
+Job 478: Add RefSeq sequence batch 287 to database
+
+Submitted job 478 with external jobid 'Submitted batch job 16250660'.
+[Wed Dec  4 15:06:29 2019]
+Finished job 24.
+209 of 717 steps (29%) done
+
+[Wed Dec  4 15:06:29 2019]
+Job 615: Add RefSeq sequence batch 190 to database
+
+Submitted job 615 with external jobid 'Submitted batch job 16250661'.
+[Wed Dec  4 15:06:51 2019]
+Finished job 552.
+210 of 717 steps (29%) done
+
+[Wed Dec  4 15:06:51 2019]
+Job 174: Add RefSeq sequence batch 296 to database
+
+Submitted job 174 with external jobid 'Submitted batch job 16250662'.
+[Wed Dec  4 15:07:02 2019]
+Finished job 48.
+211 of 717 steps (29%) done
+
+[Wed Dec  4 15:07:02 2019]
+Job 458: Add RefSeq sequence batch 65 to database
+
+[Wed Dec  4 15:07:02 2019]
+Finished job 566.
+212 of 717 steps (30%) done
+Submitted job 458 with external jobid 'Submitted batch job 16250663'.
+
+[Wed Dec  4 15:07:02 2019]
+Job 493: Add RefSeq sequence batch 30 to database
+
+Submitted job 493 with external jobid 'Submitted batch job 16250664'.
+[Wed Dec  4 15:07:13 2019]
+Finished job 4.
+213 of 717 steps (30%) done
+
+[Wed Dec  4 15:07:13 2019]
+Job 324: Add RefSeq sequence batch 468 to database
+
+Submitted job 324 with external jobid 'Submitted batch job 16250665'.
+[Wed Dec  4 15:07:24 2019]
+Finished job 266.
+214 of 717 steps (30%) done
+
+[Wed Dec  4 15:07:24 2019]
+Job 378: Add RefSeq sequence batch 191 to database
+
+Submitted job 378 with external jobid 'Submitted batch job 16250666'.
+[Wed Dec  4 15:07:46 2019]
+Finished job 368.
+215 of 717 steps (30%) done
+
+[Wed Dec  4 15:07:46 2019]
+Job 314: Add RefSeq sequence batch 222 to database
+
+Submitted job 314 with external jobid 'Submitted batch job 16250667'.
+[Wed Dec  4 15:07:57 2019]
+Finished job 645.
+216 of 717 steps (30%) done
+
+[Wed Dec  4 15:07:57 2019]
+Job 680: Add RefSeq sequence batch 59 to database
+
+Submitted job 680 with external jobid 'Submitted batch job 16250668'.
+[Wed Dec  4 15:08:19 2019]
+Finished job 478.
+217 of 717 steps (30%) done
+
+[Wed Dec  4 15:08:19 2019]
+Job 62: Add RefSeq sequence batch 386 to database
+
+Submitted job 62 with external jobid 'Submitted batch job 16250669'.
+[Wed Dec  4 15:08:52 2019]
+Finished job 615.
+218 of 717 steps (30%) done
+
+[Wed Dec  4 15:08:52 2019]
+Job 69: Add RefSeq sequence batch 338 to database
+
+Submitted job 69 with external jobid 'Submitted batch job 16250684'.
+[Wed Dec  4 15:09:14 2019]
+Finished job 458.
+219 of 717 steps (31%) done
+
+[Wed Dec  4 15:09:14 2019]
+Job 197: Add RefSeq sequence batch 46 to database
+
+Submitted job 197 with external jobid 'Submitted batch job 16250697'.
+[Wed Dec  4 15:09:25 2019]
+Finished job 252.
+220 of 717 steps (31%) done
+
+[Wed Dec  4 15:09:25 2019]
+Job 211: Add RefSeq sequence batch 51 to database
+
+Submitted job 211 with external jobid 'Submitted batch job 16250704'.
+[Wed Dec  4 15:09:36 2019]
+Finished job 174.
+221 of 717 steps (31%) done
+
+[Wed Dec  4 15:09:36 2019]
+Job 221: Add RefSeq sequence batch 556 to database
+
+[Wed Dec  4 15:09:36 2019]
+Finished job 324.
+222 of 717 steps (31%) done
+Submitted job 221 with external jobid 'Submitted batch job 16250720'.
+
+[Wed Dec  4 15:09:36 2019]
+Job 101: Add RefSeq sequence batch 270 to database
+
+Submitted job 101 with external jobid 'Submitted batch job 16250721'.
+[Wed Dec  4 15:09:47 2019]
+Finished job 378.
+223 of 717 steps (31%) done
+
+[Wed Dec  4 15:09:47 2019]
+Job 317: Add RefSeq sequence batch 478 to database
+
+Submitted job 317 with external jobid 'Submitted batch job 16250722'.
+[Wed Dec  4 15:10:09 2019]
+Finished job 197.
+224 of 717 steps (31%) done
+
+[Wed Dec  4 15:10:09 2019]
+Job 68: Add RefSeq sequence batch 710 to database
+
+Submitted job 68 with external jobid 'Submitted batch job 16250724'.
+[Wed Dec  4 15:10:42 2019]
+Finished job 493.
+225 of 717 steps (31%) done
+
+[Wed Dec  4 15:10:42 2019]
+Job 67: Add RefSeq sequence batch 182 to database
+
+[Wed Dec  4 15:10:42 2019]
+Finished job 680.
+226 of 717 steps (32%) done
+Submitted job 67 with external jobid 'Submitted batch job 16250726'.
+
+[Wed Dec  4 15:10:42 2019]
+Job 695: Add RefSeq sequence batch 369 to database
+
+Submitted job 695 with external jobid 'Submitted batch job 16250727'.
+[Wed Dec  4 15:10:53 2019]
+Finished job 314.
+227 of 717 steps (32%) done
+
+[Wed Dec  4 15:10:53 2019]
+Job 304: Add RefSeq sequence batch 170 to database
+
+Submitted job 304 with external jobid 'Submitted batch job 16250728'.
+[Wed Dec  4 15:11:04 2019]
+Finished job 221.
+228 of 717 steps (32%) done
+
+[Wed Dec  4 15:11:04 2019]
+Job 699: Add RefSeq sequence batch 142 to database
+
+Submitted job 699 with external jobid 'Submitted batch job 16250729'.
+[Wed Dec  4 15:11:26 2019]
+Finished job 62.
+229 of 717 steps (32%) done
+
+[Wed Dec  4 15:11:26 2019]
+Job 606: Add RefSeq sequence batch 394 to database
+
+[Wed Dec  4 15:11:26 2019]
+Finished job 69.
+230 of 717 steps (32%) done
+Submitted job 606 with external jobid 'Submitted batch job 16250730'.
+
+[Wed Dec  4 15:11:26 2019]
+Job 433: Add RefSeq sequence batch 171 to database
+
+Submitted job 433 with external jobid 'Submitted batch job 16250731'.
+[Wed Dec  4 15:11:48 2019]
+Finished job 211.
+231 of 717 steps (32%) done
+
+[Wed Dec  4 15:11:48 2019]
+Job 202: Add RefSeq sequence batch 112 to database
+
+Submitted job 202 with external jobid 'Submitted batch job 16250732'.
+[Wed Dec  4 15:12:21 2019]
+Finished job 101.
+232 of 717 steps (32%) done
+
+[Wed Dec  4 15:12:21 2019]
+Job 214: Add RefSeq sequence batch 279 to database
+
+Submitted job 214 with external jobid 'Submitted batch job 16250733'.
+[Wed Dec  4 15:12:32 2019]
+Finished job 317.
+233 of 717 steps (32%) done
+
+[Wed Dec  4 15:12:32 2019]
+Job 685: Add RefSeq sequence batch 134 to database
+
+Submitted job 685 with external jobid 'Submitted batch job 16250734'.
+[Wed Dec  4 15:13:06 2019]
+Finished job 68.
+234 of 717 steps (33%) done
+
+[Wed Dec  4 15:13:06 2019]
+Job 47: Add RefSeq sequence batch 474 to database
+
+Submitted job 47 with external jobid 'Submitted batch job 16250735'.
+[Wed Dec  4 15:13:17 2019]
+Finished job 695.
+235 of 717 steps (33%) done
+
+[Wed Dec  4 15:13:17 2019]
+Job 143: Add RefSeq sequence batch 144 to database
+
+Submitted job 143 with external jobid 'Submitted batch job 16250736'.
+[Wed Dec  4 15:13:28 2019]
+Finished job 67.
+236 of 717 steps (33%) done
+
+[Wed Dec  4 15:13:28 2019]
+Job 609: Add RefSeq sequence batch 240 to database
+
+[Wed Dec  4 15:13:28 2019]
+Finished job 304.
+237 of 717 steps (33%) done
+Submitted job 609 with external jobid 'Submitted batch job 16250737'.
+
+[Wed Dec  4 15:13:28 2019]
+Job 31: Add RefSeq sequence batch 306 to database
+
+Submitted job 31 with external jobid 'Submitted batch job 16250738'.
+[Wed Dec  4 15:13:39 2019]
+Finished job 699.
+238 of 717 steps (33%) done
+
+[Wed Dec  4 15:13:39 2019]
+Job 409: Add RefSeq sequence batch 675 to database
+
+Submitted job 409 with external jobid 'Submitted batch job 16250739'.
+[Wed Dec  4 15:14:12 2019]
+Finished job 433.
+239 of 717 steps (33%) done
+
+[Wed Dec  4 15:14:12 2019]
+Job 641: Add RefSeq sequence batch 284 to database
+
+Submitted job 641 with external jobid 'Submitted batch job 16250740'.
+[Wed Dec  4 15:14:34 2019]
+Finished job 606.
+240 of 717 steps (33%) done
+
+[Wed Dec  4 15:14:34 2019]
+Job 622: Add RefSeq sequence batch 540 to database
+
+Submitted job 622 with external jobid 'Submitted batch job 16250741'.
+[Wed Dec  4 15:14:45 2019]
+Finished job 202.
+241 of 717 steps (34%) done
+
+[Wed Dec  4 15:14:45 2019]
+Job 700: Add RefSeq sequence batch 453 to database
+
+Submitted job 700 with external jobid 'Submitted batch job 16250742'.
+[Wed Dec  4 15:14:56 2019]
+Finished job 214.
+242 of 717 steps (34%) done
+
+[Wed Dec  4 15:14:56 2019]
+Job 451: Add RefSeq sequence batch 613 to database
+
+[Wed Dec  4 15:14:56 2019]
+Finished job 685.
+243 of 717 steps (34%) done
+Submitted job 451 with external jobid 'Submitted batch job 16250743'.
+
+[Wed Dec  4 15:14:56 2019]
+Job 710: Add RefSeq sequence batch 501 to database
+
+Submitted job 710 with external jobid 'Submitted batch job 16250744'.
+[Wed Dec  4 15:15:07 2019]
+Finished job 47.
+244 of 717 steps (34%) done
+
+[Wed Dec  4 15:15:07 2019]
+Job 220: Add RefSeq sequence batch 330 to database
+
+Submitted job 220 with external jobid 'Submitted batch job 16250745'.
+[Wed Dec  4 15:15:18 2019]
+Finished job 31.
+245 of 717 steps (34%) done
+
+[Wed Dec  4 15:15:18 2019]
+Job 290: Add RefSeq sequence batch 175 to database
+
+Submitted job 290 with external jobid 'Submitted batch job 16250746'.
+[Wed Dec  4 15:15:40 2019]
+Finished job 143.
+246 of 717 steps (34%) done
+
+[Wed Dec  4 15:15:40 2019]
+Job 170: Add RefSeq sequence batch 692 to database
+
+Submitted job 170 with external jobid 'Submitted batch job 16250747'.
+[Wed Dec  4 15:16:02 2019]
+Finished job 609.
+247 of 717 steps (34%) done
+
+[Wed Dec  4 15:16:02 2019]
+Job 13: Add RefSeq sequence batch 136 to database
+
+Submitted job 13 with external jobid 'Submitted batch job 16250748'.
+[Wed Dec  4 15:16:35 2019]
+Finished job 409.
+248 of 717 steps (35%) done
+
+[Wed Dec  4 15:16:35 2019]
+Job 206: Add RefSeq sequence batch 411 to database
+
+Submitted job 206 with external jobid 'Submitted batch job 16250749'.
+[Wed Dec  4 15:17:08 2019]
+Finished job 710.
+249 of 717 steps (35%) done
+
+[Wed Dec  4 15:17:08 2019]
+Job 430: Add RefSeq sequence batch 654 to database
+
+[Wed Dec  4 15:17:08 2019]
+Finished job 220.
+250 of 717 steps (35%) done
+Submitted job 430 with external jobid 'Submitted batch job 16250762'.
+
+[Wed Dec  4 15:17:08 2019]
+Job 464: Add RefSeq sequence batch 35 to database
+
+Submitted job 464 with external jobid 'Submitted batch job 16250763'.
+[Wed Dec  4 15:17:30 2019]
+Finished job 641.
+251 of 717 steps (35%) done
+
+[Wed Dec  4 15:17:30 2019]
+Job 300: Add RefSeq sequence batch 24 to database
+
+[Wed Dec  4 15:17:30 2019]
+Finished job 622.
+252 of 717 steps (35%) done
+Submitted job 300 with external jobid 'Submitted batch job 16250785'.
+[Wed Dec  4 15:17:30 2019]
+Finished job 451.
+253 of 717 steps (35%) done
+
+[Wed Dec  4 15:17:30 2019]
+Job 219: Add RefSeq sequence batch 265 to database
+
+Submitted job 219 with external jobid 'Submitted batch job 16250786'.
+
+[Wed Dec  4 15:17:30 2019]
+Job 656: Add RefSeq sequence batch 500 to database
+
+Submitted job 656 with external jobid 'Submitted batch job 16250787'.
+[Wed Dec  4 15:17:52 2019]
+Finished job 290.
+254 of 717 steps (35%) done
+
+[Wed Dec  4 15:17:52 2019]
+Job 55: Add RefSeq sequence batch 697 to database
+
+Submitted job 55 with external jobid 'Submitted batch job 16250789'.
+[Wed Dec  4 15:18:03 2019]
+Finished job 700.
+255 of 717 steps (36%) done
+
+[Wed Dec  4 15:18:03 2019]
+Job 643: Add RefSeq sequence batch 417 to database
+
+Submitted job 643 with external jobid 'Submitted batch job 16250790'.
+[Wed Dec  4 15:18:25 2019]
+Finished job 170.
+256 of 717 steps (36%) done
+
+[Wed Dec  4 15:18:25 2019]
+Job 316: Add RefSeq sequence batch 254 to database
+
+[Wed Dec  4 15:18:25 2019]
+Finished job 13.
+257 of 717 steps (36%) done
+Submitted job 316 with external jobid 'Submitted batch job 16250792'.
+
+[Wed Dec  4 15:18:25 2019]
+Job 82: Add RefSeq sequence batch 363 to database
+
+Submitted job 82 with external jobid 'Submitted batch job 16250793'.
+[Wed Dec  4 15:18:58 2019]
+Finished job 464.
+258 of 717 steps (36%) done
+
+[Wed Dec  4 15:18:58 2019]
+Job 471: Add RefSeq sequence batch 434 to database
+
+Submitted job 471 with external jobid 'Submitted batch job 16250794'.
+[Wed Dec  4 15:19:09 2019]
+Finished job 206.
+259 of 717 steps (36%) done
+
+[Wed Dec  4 15:19:09 2019]
+Job 533: Add RefSeq sequence batch 597 to database
+
+Submitted job 533 with external jobid 'Submitted batch job 16250795'.
+[Wed Dec  4 15:19:31 2019]
+Finished job 300.
+260 of 717 steps (36%) done
+
+[Wed Dec  4 15:19:31 2019]
+Job 345: Add RefSeq sequence batch 693 to database
+
+Submitted job 345 with external jobid 'Submitted batch job 16250796'.
+[Wed Dec  4 15:19:44 2019]
+Finished job 430.
+261 of 717 steps (36%) done
+
+[Wed Dec  4 15:19:44 2019]
+Job 32: Add RefSeq sequence batch 390 to database
+
+[Wed Dec  4 15:19:44 2019]
+Finished job 219.
+262 of 717 steps (37%) done
+Submitted job 32 with external jobid 'Submitted batch job 16250797'.
+
+[Wed Dec  4 15:19:44 2019]
+Job 521: Add RefSeq sequence batch 625 to database
+
+Submitted job 521 with external jobid 'Submitted batch job 16250798'.
+[Wed Dec  4 15:20:28 2019]
+Finished job 656.
+263 of 717 steps (37%) done
+
+[Wed Dec  4 15:20:28 2019]
+Job 554: Add RefSeq sequence batch 227 to database
+
+[Wed Dec  4 15:20:28 2019]
+Finished job 82.
+264 of 717 steps (37%) done
+Submitted job 554 with external jobid 'Submitted batch job 16250799'.
+[Wed Dec  4 15:20:28 2019]
+Finished job 521.
+265 of 717 steps (37%) done
+
+[Wed Dec  4 15:20:28 2019]
+Job 580: Add RefSeq sequence batch 582 to database
+
+Submitted job 580 with external jobid 'Submitted batch job 16250800'.
+
+[Wed Dec  4 15:20:28 2019]
+Job 346: Add RefSeq sequence batch 484 to database
+
+Submitted job 346 with external jobid 'Submitted batch job 16250801'.
+[Wed Dec  4 15:20:39 2019]
+Finished job 55.
+266 of 717 steps (37%) done
+
+[Wed Dec  4 15:20:39 2019]
+Job 179: Add RefSeq sequence batch 410 to database
+
+Submitted job 179 with external jobid 'Submitted batch job 16250802'.
+[Wed Dec  4 15:20:50 2019]
+Finished job 643.
+267 of 717 steps (37%) done
+
+[Wed Dec  4 15:20:50 2019]
+Job 658: Add RefSeq sequence batch 707 to database
+
+Submitted job 658 with external jobid 'Submitted batch job 16250803'.
+[Wed Dec  4 15:21:01 2019]
+Finished job 316.
+268 of 717 steps (37%) done
+
+[Wed Dec  4 15:21:01 2019]
+Job 511: Add RefSeq sequence batch 607 to database
+
+Submitted job 511 with external jobid 'Submitted batch job 16250804'.
+[Wed Dec  4 15:21:35 2019]
+Finished job 533.
+269 of 717 steps (38%) done
+
+[Wed Dec  4 15:21:35 2019]
+Job 564: Add RefSeq sequence batch 277 to database
+
+Submitted job 564 with external jobid 'Submitted batch job 16250816'.
+[Wed Dec  4 15:21:56 2019]
+Finished job 471.
+270 of 717 steps (38%) done
+
+[Wed Dec  4 15:21:56 2019]
+Job 674: Add RefSeq sequence batch 521 to database
+
+[Wed Dec  4 15:21:56 2019]
+Finished job 345.
+271 of 717 steps (38%) done
+Submitted job 674 with external jobid 'Submitted batch job 16250839'.
+
+[Wed Dec  4 15:21:56 2019]
+Job 301: Add RefSeq sequence batch 633 to database
+
+Submitted job 301 with external jobid 'Submitted batch job 16250840'.
+[Wed Dec  4 15:22:29 2019]
+Finished job 32.
+272 of 717 steps (38%) done
+
+[Wed Dec  4 15:22:29 2019]
+Job 571: Add RefSeq sequence batch 128 to database
+
+Submitted job 571 with external jobid 'Submitted batch job 16250842'.
+[Wed Dec  4 15:22:40 2019]
+Finished job 301.
+273 of 717 steps (38%) done
+
+[Wed Dec  4 15:22:40 2019]
+Job 676: Add RefSeq sequence batch 187 to database
+
+Submitted job 676 with external jobid 'Submitted batch job 16250843'.
+[Wed Dec  4 15:23:02 2019]
+Finished job 554.
+274 of 717 steps (38%) done
+
+[Wed Dec  4 15:23:02 2019]
+Job 106: Add RefSeq sequence batch 565 to database
+
+Submitted job 106 with external jobid 'Submitted batch job 16250844'.
+[Wed Dec  4 15:23:13 2019]
+Finished job 179.
+275 of 717 steps (38%) done
+
+[Wed Dec  4 15:23:13 2019]
+Job 8: Add RefSeq sequence batch 48 to database
+
+Submitted job 8 with external jobid 'Submitted batch job 16250845'.
+[Wed Dec  4 15:23:24 2019]
+Finished job 346.
+276 of 717 steps (38%) done
+
+[Wed Dec  4 15:23:24 2019]
+Job 716: Add RefSeq sequence batch 596 to database
+
+Submitted job 716 with external jobid 'Submitted batch job 16250846'.
+[Wed Dec  4 15:23:58 2019]
+Finished job 564.
+277 of 717 steps (39%) done
+
+[Wed Dec  4 15:23:58 2019]
+Job 502: Add RefSeq sequence batch 445 to database
+
+[Wed Dec  4 15:23:58 2019]
+Finished job 8.
+278 of 717 steps (39%) done
+Submitted job 502 with external jobid 'Submitted batch job 16250847'.
+
+[Wed Dec  4 15:23:58 2019]
+Job 37: Add RefSeq sequence batch 162 to database
+
+Submitted job 37 with external jobid 'Submitted batch job 16250848'.
+[Wed Dec  4 15:24:09 2019]
+Finished job 580.
+279 of 717 steps (39%) done
+
+[Wed Dec  4 15:24:09 2019]
+Job 668: Add RefSeq sequence batch 666 to database
+
+[Wed Dec  4 15:24:09 2019]
+Finished job 511.
+280 of 717 steps (39%) done
+Submitted job 668 with external jobid 'Submitted batch job 16250849'.
+
+[Wed Dec  4 15:24:09 2019]
+Job 309: Add RefSeq sequence batch 486 to database
+
+Submitted job 309 with external jobid 'Submitted batch job 16250850'.
+[Wed Dec  4 15:24:42 2019]
+Finished job 658.
+281 of 717 steps (39%) done
+
+[Wed Dec  4 15:24:42 2019]
+Job 320: Add RefSeq sequence batch 258 to database
+
+Submitted job 320 with external jobid 'Submitted batch job 16250851'.
+[Wed Dec  4 15:24:53 2019]
+Finished job 571.
+282 of 717 steps (39%) done
+
+[Wed Dec  4 15:24:53 2019]
+Job 189: Add RefSeq sequence batch 704 to database
+
+Submitted job 189 with external jobid 'Submitted batch job 16250852'.
+[Wed Dec  4 15:25:15 2019]
+Finished job 674.
+283 of 717 steps (39%) done
+
+[Wed Dec  4 15:25:15 2019]
+Job 279: Add RefSeq sequence batch 665 to database
+
+[Wed Dec  4 15:25:15 2019]
+Finished job 106.
+284 of 717 steps (40%) done
+Submitted job 279 with external jobid 'Submitted batch job 16250853'.
+
+[Wed Dec  4 15:25:15 2019]
+Job 164: Add RefSeq sequence batch 362 to database
+
+Submitted job 164 with external jobid 'Submitted batch job 16250854'.
+[Wed Dec  4 15:25:48 2019]
+Finished job 676.
+285 of 717 steps (40%) done
+
+[Wed Dec  4 15:25:48 2019]
+Job 65: Add RefSeq sequence batch 639 to database
+
+[Wed Dec  4 15:25:48 2019]
+Finished job 716.
+286 of 717 steps (40%) done
+Submitted job 65 with external jobid 'Submitted batch job 16250856'.
+
+[Wed Dec  4 15:25:48 2019]
+Job 655: Add RefSeq sequence batch 152 to database
+
+Submitted job 655 with external jobid 'Submitted batch job 16250857'.
+[Wed Dec  4 15:26:10 2019]
+Finished job 502.
+287 of 717 steps (40%) done
+
+[Wed Dec  4 15:26:10 2019]
+Job 604: Add RefSeq sequence batch 321 to database
+
+Submitted job 604 with external jobid 'Submitted batch job 16250858'.
+[Wed Dec  4 15:26:21 2019]
+Finished job 37.
+288 of 717 steps (40%) done
+
+[Wed Dec  4 15:26:21 2019]
+Job 411: Add RefSeq sequence batch 199 to database
+
+[Wed Dec  4 15:26:21 2019]
+Finished job 668.
+289 of 717 steps (40%) done
+[Wed Dec  4 15:26:21 2019]
+Finished job 309.
+Submitted job 411 with external jobid 'Submitted batch job 16250859'.
+290 of 717 steps (40%) done
+
+[Wed Dec  4 15:26:21 2019]
+Job 278: Add RefSeq sequence batch 615 to database
+
+Submitted job 278 with external jobid 'Submitted batch job 16250860'.
+
+[Wed Dec  4 15:26:21 2019]
+Job 325: Add RefSeq sequence batch 39 to database
+
+Submitted job 325 with external jobid 'Submitted batch job 16250861'.
+[Wed Dec  4 15:26:54 2019]
+Finished job 320.
+291 of 717 steps (41%) done
+
+[Wed Dec  4 15:26:54 2019]
+Job 675: Add RefSeq sequence batch 29 to database
+
+Submitted job 675 with external jobid 'Submitted batch job 16250862'.
+[Wed Dec  4 15:27:38 2019]
+Finished job 279.
+292 of 717 steps (41%) done
+
+[Wed Dec  4 15:27:38 2019]
+Job 154: Add RefSeq sequence batch 337 to database
+
+[Wed Dec  4 15:27:38 2019]
+Finished job 164.
+293 of 717 steps (41%) done
+Submitted job 154 with external jobid 'Submitted batch job 16250886'.
+
+[Wed Dec  4 15:27:38 2019]
+Job 473: Add RefSeq sequence batch 494 to database
+
+Submitted job 473 with external jobid 'Submitted batch job 16250887'.
+[Wed Dec  4 15:28:11 2019]
+Finished job 189.
+294 of 717 steps (41%) done
+
+[Wed Dec  4 15:28:11 2019]
+Job 492: Add RefSeq sequence batch 280 to database
+
+[Wed Dec  4 15:28:11 2019]
+Finished job 65.
+295 of 717 steps (41%) done
+Submitted job 492 with external jobid 'Submitted batch job 16250888'.
+[Wed Dec  4 15:28:11 2019]
+Finished job 655.
+296 of 717 steps (41%) done
+
+[Wed Dec  4 15:28:11 2019]
+Job 417: Add RefSeq sequence batch 253 to database
+
+Submitted job 417 with external jobid 'Submitted batch job 16250889'.
+
+[Wed Dec  4 15:28:11 2019]
+Job 12: Add RefSeq sequence batch 94 to database
+
+Submitted job 12 with external jobid 'Submitted batch job 16250890'.
+[Wed Dec  4 15:28:22 2019]
+Finished job 278.
+297 of 717 steps (41%) done
+
+[Wed Dec  4 15:28:22 2019]
+Job 654: Add RefSeq sequence batch 713 to database
+
+Submitted job 654 with external jobid 'Submitted batch job 16250891'.
+[Wed Dec  4 15:28:44 2019]
+Finished job 604.
+298 of 717 steps (42%) done
+
+[Wed Dec  4 15:28:44 2019]
+Job 254: Add RefSeq sequence batch 36 to database
+
+Submitted job 254 with external jobid 'Submitted batch job 16250892'.
+[Wed Dec  4 15:29:17 2019]
+Finished job 411.
+299 of 717 steps (42%) done
+
+[Wed Dec  4 15:29:17 2019]
+Job 126: Add RefSeq sequence batch 562 to database
+
+Submitted job 126 with external jobid 'Submitted batch job 16250893'.
+[Wed Dec  4 15:29:50 2019]
+Finished job 325.
+300 of 717 steps (42%) done
+
+[Wed Dec  4 15:29:50 2019]
+Job 392: Add RefSeq sequence batch 402 to database
+
+[Wed Dec  4 15:29:50 2019]
+Finished job 154.
+301 of 717 steps (42%) done
+Submitted job 392 with external jobid 'Submitted batch job 16250894'.
+[Wed Dec  4 15:29:50 2019]
+Finished job 473.
+302 of 717 steps (42%) done
+
+[Wed Dec  4 15:29:50 2019]
+Job 504: Add RefSeq sequence batch 101 to database
+
+Submitted job 504 with external jobid 'Submitted batch job 16250895'.
+
+[Wed Dec  4 15:29:50 2019]
+Job 455: Add RefSeq sequence batch 624 to database
+
+Submitted job 455 with external jobid 'Submitted batch job 16250896'.
+[Wed Dec  4 15:30:01 2019]
+Finished job 675.
+303 of 717 steps (42%) done
+
+[Wed Dec  4 15:30:01 2019]
+Job 665: Add RefSeq sequence batch 569 to database
+
+Submitted job 665 with external jobid 'Submitted batch job 16250897'.
+[Wed Dec  4 15:30:12 2019]
+Finished job 417.
+304 of 717 steps (42%) done
+
+[Wed Dec  4 15:30:12 2019]
+Job 530: Add RefSeq sequence batch 604 to database
+
+Submitted job 530 with external jobid 'Submitted batch job 16250898'.
+[Wed Dec  4 15:30:45 2019]
+Finished job 254.
+305 of 717 steps (43%) done
+
+[Wed Dec  4 15:30:45 2019]
+Job 435: Add RefSeq sequence batch 314 to database
+
+[Wed Dec  4 15:30:45 2019]
+Finished job 455.
+306 of 717 steps (43%) done
+Submitted job 435 with external jobid 'Submitted batch job 16250911'.
+
+[Wed Dec  4 15:30:45 2019]
+Job 134: Add RefSeq sequence batch 119 to database
+
+Submitted job 134 with external jobid 'Submitted batch job 16250912'.
+[Wed Dec  4 15:31:07 2019]
+Finished job 492.
+307 of 717 steps (43%) done
+
+[Wed Dec  4 15:31:07 2019]
+Job 3: Add RefSeq sequence batch 292 to database
+
+Submitted job 3 with external jobid 'Submitted batch job 16250925'.
+[Wed Dec  4 15:31:18 2019]
+Finished job 654.
+308 of 717 steps (43%) done
+
+[Wed Dec  4 15:31:18 2019]
+Job 139: Add RefSeq sequence batch 206 to database
+
+[Wed Dec  4 15:31:18 2019]
+Finished job 126.
+309 of 717 steps (43%) done
+Submitted job 139 with external jobid 'Submitted batch job 16250932'.
+
+[Wed Dec  4 15:31:18 2019]
+Job 374: Add RefSeq sequence batch 660 to database
+
+Submitted job 374 with external jobid 'Submitted batch job 16250933'.
+[Wed Dec  4 15:32:02 2019]
+Finished job 665.
+310 of 717 steps (43%) done
+
+[Wed Dec  4 15:32:02 2019]
+Job 339: Add RefSeq sequence batch 239 to database
+
+Submitted job 339 with external jobid 'Submitted batch job 16250951'.
+[Wed Dec  4 15:32:13 2019]
+Finished job 12.
+311 of 717 steps (43%) done
+
+[Wed Dec  4 15:32:13 2019]
+Job 57: Add RefSeq sequence batch 526 to database
+
+[Wed Dec  4 15:32:13 2019]
+Finished job 530.
+312 of 717 steps (44%) done
+Submitted job 57 with external jobid 'Submitted batch job 16250952'.
+
+[Wed Dec  4 15:32:13 2019]
+Job 9: Add RefSeq sequence batch 400 to database
+
+Submitted job 9 with external jobid 'Submitted batch job 16250953'.
+[Wed Dec  4 15:32:35 2019]
+Finished job 392.
+313 of 717 steps (44%) done
+
+[Wed Dec  4 15:32:35 2019]
+Job 118: Add RefSeq sequence batch 232 to database
+
+[Wed Dec  4 15:32:35 2019]
+Finished job 504.
+314 of 717 steps (44%) done
+Submitted job 118 with external jobid 'Submitted batch job 16250954'.
+
+[Wed Dec  4 15:32:35 2019]
+Job 298: Add RefSeq sequence batch 661 to database
+
+Submitted job 298 with external jobid 'Submitted batch job 16250955'.
+[Wed Dec  4 15:33:19 2019]
+Finished job 435.
+315 of 717 steps (44%) done
+
+[Wed Dec  4 15:33:19 2019]
+Job 369: Add RefSeq sequence batch 401 to database
+
+Submitted job 369 with external jobid 'Submitted batch job 16250956'.
+[Wed Dec  4 15:33:41 2019]
+Finished job 139.
+316 of 717 steps (44%) done
+
+[Wed Dec  4 15:33:41 2019]
+Job 524: Add RefSeq sequence batch 399 to database
+
+[Wed Dec  4 15:33:41 2019]
+Finished job 374.
+317 of 717 steps (44%) done
+Submitted job 524 with external jobid 'Submitted batch job 16250957'.
+
+[Wed Dec  4 15:33:42 2019]
+Job 681: Add RefSeq sequence batch 316 to database
+
+Submitted job 681 with external jobid 'Submitted batch job 16250958'.
+[Wed Dec  4 15:33:52 2019]
+Finished job 134.
+318 of 717 steps (44%) done
+
+[Wed Dec  4 15:33:52 2019]
+Job 587: Add RefSeq sequence batch 550 to database
+
+[Wed Dec  4 15:33:52 2019]
+Finished job 3.
+319 of 717 steps (44%) done
+Submitted job 587 with external jobid 'Submitted batch job 16250959'.
+
+[Wed Dec  4 15:33:53 2019]
+Job 525: Add RefSeq sequence batch 91 to database
+
+Submitted job 525 with external jobid 'Submitted batch job 16250960'.
+[Wed Dec  4 15:34:37 2019]
+Finished job 339.
+320 of 717 steps (45%) done
+
+[Wed Dec  4 15:34:37 2019]
+Job 661: Add RefSeq sequence batch 574 to database
+
+Submitted job 661 with external jobid 'Submitted batch job 16250962'.
+[Wed Dec  4 15:34:59 2019]
+Finished job 57.
+321 of 717 steps (45%) done
+
+[Wed Dec  4 15:34:59 2019]
+Job 494: Add RefSeq sequence batch 396 to database
+
+[Wed Dec  4 15:34:59 2019]
+Finished job 298.
+322 of 717 steps (45%) done
+Submitted job 494 with external jobid 'Submitted batch job 16250963'.
+
+[Wed Dec  4 15:34:59 2019]
+Job 138: Add RefSeq sequence batch 115 to database
+
+Submitted job 138 with external jobid 'Submitted batch job 16250964'.
+[Wed Dec  4 15:35:10 2019]
+Finished job 9.
+323 of 717 steps (45%) done
+
+[Wed Dec  4 15:35:10 2019]
+Job 250: Add RefSeq sequence batch 167 to database
+
+Submitted job 250 with external jobid 'Submitted batch job 16250965'.
+[Wed Dec  4 15:35:43 2019]
+Finished job 118.
+324 of 717 steps (45%) done
+
+[Wed Dec  4 15:35:43 2019]
+Job 590: Add RefSeq sequence batch 509 to database
+
+Submitted job 590 with external jobid 'Submitted batch job 16250968'.
+[Wed Dec  4 15:36:05 2019]
+Finished job 525.
+325 of 717 steps (45%) done
+
+[Wed Dec  4 15:36:05 2019]
+Job 620: Add RefSeq sequence batch 380 to database
+
+Submitted job 620 with external jobid 'Submitted batch job 16250969'.
+[Wed Dec  4 15:36:16 2019]
+Finished job 681.
+326 of 717 steps (45%) done
+
+[Wed Dec  4 15:36:16 2019]
+Job 407: Add RefSeq sequence batch 31 to database
+
+Submitted job 407 with external jobid 'Submitted batch job 16250970'.
+[Wed Dec  4 15:36:27 2019]
+Finished job 524.
+327 of 717 steps (46%) done
+
+[Wed Dec  4 15:36:27 2019]
+Job 454: Add RefSeq sequence batch 679 to database
+
+Submitted job 454 with external jobid 'Submitted batch job 16250971'.
+[Wed Dec  4 15:36:49 2019]
+Finished job 369.
+328 of 717 steps (46%) done
+
+[Wed Dec  4 15:36:49 2019]
+Job 422: Add RefSeq sequence batch 664 to database
+
+Submitted job 422 with external jobid 'Submitted batch job 16250974'.
+[Wed Dec  4 15:37:00 2019]
+Finished job 587.
+329 of 717 steps (46%) done
+
+[Wed Dec  4 15:37:00 2019]
+Job 275: Add RefSeq sequence batch 33 to database
+
+Submitted job 275 with external jobid 'Submitted batch job 16250976'.
+[Wed Dec  4 15:37:11 2019]
+Finished job 138.
+330 of 717 steps (46%) done
+
+[Wed Dec  4 15:37:11 2019]
+Job 28: Add RefSeq sequence batch 286 to database
+
+Submitted job 28 with external jobid 'Submitted batch job 16250977'.
+[Wed Dec  4 15:37:22 2019]
+Finished job 250.
+331 of 717 steps (46%) done
+
+[Wed Dec  4 15:37:22 2019]
+Job 38: Add RefSeq sequence batch 329 to database
+
+Submitted job 38 with external jobid 'Submitted batch job 16250978'.
+[Wed Dec  4 15:37:33 2019]
+Finished job 661.
+332 of 717 steps (46%) done
+
+[Wed Dec  4 15:37:33 2019]
+Job 29: Add RefSeq sequence batch 149 to database
+
+Submitted job 29 with external jobid 'Submitted batch job 16250979'.
+[Wed Dec  4 15:38:06 2019]
+Finished job 494.
+333 of 717 steps (46%) done
+
+[Wed Dec  4 15:38:06 2019]
+Job 509: Add RefSeq sequence batch 200 to database
+
+Submitted job 509 with external jobid 'Submitted batch job 16251002'.
+[Wed Dec  4 15:38:17 2019]
+Finished job 620.
+334 of 717 steps (47%) done
+
+[Wed Dec  4 15:38:17 2019]
+Job 25: Add RefSeq sequence batch 672 to database
+
+Submitted job 25 with external jobid 'Submitted batch job 16251014'.
+[Wed Dec  4 15:38:28 2019]
+Finished job 454.
+335 of 717 steps (47%) done
+
+[Wed Dec  4 15:38:28 2019]
+Job 261: Add RefSeq sequence batch 217 to database
+
+Submitted job 261 with external jobid 'Submitted batch job 16251015'.
+[Wed Dec  4 15:39:12 2019]
+Finished job 407.
+336 of 717 steps (47%) done
+
+[Wed Dec  4 15:39:12 2019]
+Job 265: Add RefSeq sequence batch 89 to database
+
+[Wed Dec  4 15:39:12 2019]
+Finished job 275.
+337 of 717 steps (47%) done
+Submitted job 265 with external jobid 'Submitted batch job 16251017'.
+
+[Wed Dec  4 15:39:12 2019]
+Job 257: Add RefSeq sequence batch 83 to database
+
+Submitted job 257 with external jobid 'Submitted batch job 16251018'.
+[Wed Dec  4 15:39:23 2019]
+Finished job 590.
+338 of 717 steps (47%) done
+
+[Wed Dec  4 15:39:23 2019]
+Job 53: Add RefSeq sequence batch 243 to database
+
+[Wed Dec  4 15:39:23 2019]
+Finished job 422.
+339 of 717 steps (47%) done
+Submitted job 53 with external jobid 'Submitted batch job 16251020'.
+[Wed Dec  4 15:39:23 2019]
+Finished job 28.
+340 of 717 steps (47%) done
+
+[Wed Dec  4 15:39:23 2019]
+Job 113: Add RefSeq sequence batch 12 to database
+
+Submitted job 113 with external jobid 'Submitted batch job 16251021'.
+
+[Wed Dec  4 15:39:23 2019]
+Job 36: Add RefSeq sequence batch 155 to database
+
+Submitted job 36 with external jobid 'Submitted batch job 16251022'.
+[Wed Dec  4 15:40:18 2019]
+Finished job 38.
+341 of 717 steps (48%) done
+
+[Wed Dec  4 15:40:18 2019]
+Job 287: Add RefSeq sequence batch 447 to database
+
+Submitted job 287 with external jobid 'Submitted batch job 16251024'.
+[Wed Dec  4 15:40:29 2019]
+Finished job 29.
+342 of 717 steps (48%) done
+
+[Wed Dec  4 15:40:29 2019]
+Job 33: Add RefSeq sequence batch 702 to database
+
+Submitted job 33 with external jobid 'Submitted batch job 16251025'.
+[Wed Dec  4 15:40:40 2019]
+Finished job 25.
+343 of 717 steps (48%) done
+
+[Wed Dec  4 15:40:40 2019]
+Job 41: Add RefSeq sequence batch 237 to database
+
+Submitted job 41 with external jobid 'Submitted batch job 16251026'.
+[Wed Dec  4 15:41:02 2019]
+Finished job 509.
+344 of 717 steps (48%) done
+
+[Wed Dec  4 15:41:02 2019]
+Job 562: Add RefSeq sequence batch 28 to database
+
+Submitted job 562 with external jobid 'Submitted batch job 16251027'.
+[Wed Dec  4 15:41:13 2019]
+Finished job 261.
+345 of 717 steps (48%) done
+
+[Wed Dec  4 15:41:13 2019]
+Job 200: Add RefSeq sequence batch 268 to database
+
+Submitted job 200 with external jobid 'Submitted batch job 16251028'.
+[Wed Dec  4 15:41:24 2019]
+Finished job 257.
+346 of 717 steps (48%) done
+
+[Wed Dec  4 15:41:24 2019]
+Job 17: Add RefSeq sequence batch 416 to database
+
+Submitted job 17 with external jobid 'Submitted batch job 16251041'.
+[Wed Dec  4 15:41:35 2019]
+Finished job 53.
+347 of 717 steps (48%) done
+
+[Wed Dec  4 15:41:35 2019]
+Job 196: Add RefSeq sequence batch 303 to database
+
+Submitted job 196 with external jobid 'Submitted batch job 16251048'.
+[Wed Dec  4 15:41:35 2019]
+Finished job 36.
+348 of 717 steps (49%) done
+
+[Wed Dec  4 15:41:35 2019]
+Job 280: Add RefSeq sequence batch 273 to database
+
+Submitted job 280 with external jobid 'Submitted batch job 16251049'.
+[Wed Dec  4 15:41:57 2019]
+Finished job 265.
+349 of 717 steps (49%) done
+
+[Wed Dec  4 15:41:57 2019]
+Job 288: Add RefSeq sequence batch 11 to database
+
+Submitted job 288 with external jobid 'Submitted batch job 16251066'.
+[Wed Dec  4 15:42:08 2019]
+Finished job 113.
+350 of 717 steps (49%) done
+
+[Wed Dec  4 15:42:08 2019]
+Job 226: Add RefSeq sequence batch 111 to database
+
+Submitted job 226 with external jobid 'Submitted batch job 16251068'.
+[Wed Dec  4 15:42:30 2019]
+Finished job 287.
+351 of 717 steps (49%) done
+
+[Wed Dec  4 15:42:30 2019]
+Job 23: Add RefSeq sequence batch 350 to database
+
+Submitted job 23 with external jobid 'Submitted batch job 16251070'.
+[Wed Dec  4 15:42:52 2019]
+Finished job 41.
+352 of 717 steps (49%) done
+
+[Wed Dec  4 15:42:52 2019]
+Job 640: Add RefSeq sequence batch 686 to database
+
+Submitted job 640 with external jobid 'Submitted batch job 16251071'.
+[Wed Dec  4 15:43:36 2019]
+Finished job 562.
+353 of 717 steps (49%) done
+
+[Wed Dec  4 15:43:36 2019]
+Job 267: Add RefSeq sequence batch 351 to database
+
+Submitted job 267 with external jobid 'Submitted batch job 16251085'.
+[Wed Dec  4 15:43:47 2019]
+Finished job 33.
+354 of 717 steps (49%) done
+
+[Wed Dec  4 15:43:47 2019]
+Job 541: Add RefSeq sequence batch 591 to database
+
+Submitted job 541 with external jobid 'Submitted batch job 16251087'.
+[Wed Dec  4 15:43:58 2019]
+Finished job 196.
+355 of 717 steps (50%) done
+
+[Wed Dec  4 15:43:58 2019]
+Job 277: Add RefSeq sequence batch 516 to database
+
+[Wed Dec  4 15:43:58 2019]
+Finished job 17.
+356 of 717 steps (50%) done
+Submitted job 277 with external jobid 'Submitted batch job 16251100'.
+
+[Wed Dec  4 15:43:58 2019]
+Job 687: Add RefSeq sequence batch 52 to database
+
+Submitted job 687 with external jobid 'Submitted batch job 16251101'.
+[Wed Dec  4 15:44:09 2019]
+Finished job 200.
+357 of 717 steps (50%) done
+
+[Wed Dec  4 15:44:09 2019]
+Job 588: Add RefSeq sequence batch 622 to database
+
+[Wed Dec  4 15:44:10 2019]
+Finished job 280.
+358 of 717 steps (50%) done
+Submitted job 588 with external jobid 'Submitted batch job 16251114'.
+
+[Wed Dec  4 15:44:10 2019]
+Job 157: Add RefSeq sequence batch 464 to database
+
+Submitted job 157 with external jobid 'Submitted batch job 16251115'.
+[Wed Dec  4 15:44:43 2019]
+Finished job 226.
+359 of 717 steps (50%) done
+
+[Wed Dec  4 15:44:43 2019]
+Job 169: Add RefSeq sequence batch 460 to database
+
+Submitted job 169 with external jobid 'Submitted batch job 16251129'.
+[Wed Dec  4 15:45:05 2019]
+Finished job 288.
+360 of 717 steps (50%) done
+
+[Wed Dec  4 15:45:05 2019]
+Job 238: Add RefSeq sequence batch 616 to database
+
+Submitted job 238 with external jobid 'Submitted batch job 16251130'.
+[Wed Dec  4 15:45:16 2019]
+Finished job 23.
+361 of 717 steps (50%) done
+
+[Wed Dec  4 15:45:16 2019]
+Job 648: Add RefSeq sequence batch 656 to database
+
+Submitted job 648 with external jobid 'Submitted batch job 16251131'.
+[Wed Dec  4 15:45:27 2019]
+Finished job 640.
+362 of 717 steps (50%) done
+
+[Wed Dec  4 15:45:27 2019]
+Job 79: Add RefSeq sequence batch 298 to database
+
+Submitted job 79 with external jobid 'Submitted batch job 16251132'.
+[Wed Dec  4 15:46:11 2019]
+Finished job 267.
+363 of 717 steps (51%) done
+
+[Wed Dec  4 15:46:11 2019]
+Job 354: Add RefSeq sequence batch 213 to database
+
+[Wed Dec  4 15:46:11 2019]
+Finished job 541.
+364 of 717 steps (51%) done
+Submitted job 354 with external jobid 'Submitted batch job 16251134'.
+[Wed Dec  4 15:46:11 2019]
+Finished job 157.
+365 of 717 steps (51%) done
+
+[Wed Dec  4 15:46:11 2019]
+Job 671: Add RefSeq sequence batch 531 to database
+
+Submitted job 671 with external jobid 'Submitted batch job 16251135'.
+
+[Wed Dec  4 15:46:11 2019]
+Job 269: Add RefSeq sequence batch 606 to database
+
+Submitted job 269 with external jobid 'Submitted batch job 16251136'.
+[Wed Dec  4 15:46:33 2019]
+Finished job 588.
+366 of 717 steps (51%) done
+
+[Wed Dec  4 15:46:33 2019]
+Job 527: Add RefSeq sequence batch 551 to database
+
+Submitted job 527 with external jobid 'Submitted batch job 16251137'.
+[Wed Dec  4 15:46:44 2019]
+Finished job 687.
+367 of 717 steps (51%) done
+
+[Wed Dec  4 15:46:44 2019]
+Job 93: Add RefSeq sequence batch 653 to database
+
+Submitted job 93 with external jobid 'Submitted batch job 16251138'.
+[Wed Dec  4 15:46:55 2019]
+Finished job 277.
+368 of 717 steps (51%) done
+
+[Wed Dec  4 15:46:55 2019]
+Job 514: Add RefSeq sequence batch 481 to database
+
+[Wed Dec  4 15:46:55 2019]
+Finished job 238.
+369 of 717 steps (51%) done
+Submitted job 514 with external jobid 'Submitted batch job 16251151'.
+[Wed Dec  4 15:46:55 2019]
+Finished job 79.
+370 of 717 steps (52%) done
+
+[Wed Dec  4 15:46:55 2019]
+Job 242: Add RefSeq sequence batch 547 to database
+
+Submitted job 242 with external jobid 'Submitted batch job 16251152'.
+
+[Wed Dec  4 15:46:55 2019]
+Job 89: Add RefSeq sequence batch 313 to database
+
+Submitted job 89 with external jobid 'Submitted batch job 16251153'.
+[Wed Dec  4 15:47:39 2019]
+Finished job 648.
+371 of 717 steps (52%) done
+
+[Wed Dec  4 15:47:39 2019]
+Job 2: Add RefSeq sequence batch 275 to database
+
+Submitted job 2 with external jobid 'Submitted batch job 16251177'.
+[Wed Dec  4 15:48:01 2019]
+Finished job 169.
+372 of 717 steps (52%) done
+
+[Wed Dec  4 15:48:01 2019]
+Job 142: Add RefSeq sequence batch 179 to database
+
+Submitted job 142 with external jobid 'Submitted batch job 16251178'.
+[Wed Dec  4 15:48:12 2019]
+Finished job 671.
+373 of 717 steps (52%) done
+
+[Wed Dec  4 15:48:12 2019]
+Job 536: Add RefSeq sequence batch 355 to database
+
+Submitted job 536 with external jobid 'Submitted batch job 16251179'.
+[Wed Dec  4 15:48:34 2019]
+Finished job 354.
+374 of 717 steps (52%) done
+
+[Wed Dec  4 15:48:34 2019]
+Job 570: Add RefSeq sequence batch 682 to database
+
+[Wed Dec  4 15:48:34 2019]
+Finished job 269.
+375 of 717 steps (52%) done
+Submitted job 570 with external jobid 'Submitted batch job 16251181'.
+
+[Wed Dec  4 15:48:34 2019]
+Job 602: Add RefSeq sequence batch 662 to database
+
+Submitted job 602 with external jobid 'Submitted batch job 16251182'.
+[Wed Dec  4 15:48:45 2019]
+Finished job 242.
+376 of 717 steps (52%) done
+
+[Wed Dec  4 15:48:45 2019]
+Job 413: Add RefSeq sequence batch 110 to database
+
+Submitted job 413 with external jobid 'Submitted batch job 16251183'.
+[Wed Dec  4 15:49:07 2019]
+Finished job 514.
+377 of 717 steps (53%) done
+
+[Wed Dec  4 15:49:07 2019]
+Job 630: Add RefSeq sequence batch 58 to database
+
+[Wed Dec  4 15:49:07 2019]
+Finished job 93.
+378 of 717 steps (53%) done
+Submitted job 630 with external jobid 'Submitted batch job 16251185'.
+
+[Wed Dec  4 15:49:07 2019]
+Job 635: Add RefSeq sequence batch 539 to database
+
+Submitted job 635 with external jobid 'Submitted batch job 16251186'.
+[Wed Dec  4 15:49:18 2019]
+Finished job 89.
+379 of 717 steps (53%) done
+
+[Wed Dec  4 15:49:18 2019]
+Job 628: Add RefSeq sequence batch 508 to database
+
+Submitted job 628 with external jobid 'Submitted batch job 16251187'.
+[Wed Dec  4 15:49:29 2019]
+Finished job 527.
+380 of 717 steps (53%) done
+
+[Wed Dec  4 15:49:29 2019]
+Job 453: Add RefSeq sequence batch 593 to database
+
+Submitted job 453 with external jobid 'Submitted batch job 16251188'.
+[Wed Dec  4 15:50:35 2019]
+Finished job 142.
+381 of 717 steps (53%) done
+
+[Wed Dec  4 15:50:35 2019]
+Job 351: Add RefSeq sequence batch 203 to database
+
+Submitted job 351 with external jobid 'Submitted batch job 16251223'.
+[Wed Dec  4 15:50:46 2019]
+Finished job 2.
+382 of 717 steps (53%) done
+
+[Wed Dec  4 15:50:46 2019]
+Job 466: Add RefSeq sequence batch 93 to database
+
+[Wed Dec  4 15:50:46 2019]
+Finished job 602.
+383 of 717 steps (53%) done
+Submitted job 466 with external jobid 'Submitted batch job 16251225'.
+
+[Wed Dec  4 15:50:46 2019]
+Job 445: Add RefSeq sequence batch 515 to database
+
+Submitted job 445 with external jobid 'Submitted batch job 16251226'.
+[Wed Dec  4 15:50:57 2019]
+Finished job 536.
+384 of 717 steps (54%) done
+
+[Wed Dec  4 15:50:57 2019]
+Job 258: Add RefSeq sequence batch 256 to database
+
+Submitted job 258 with external jobid 'Submitted batch job 16251228'.
+[Wed Dec  4 15:51:08 2019]
+Finished job 570.
+385 of 717 steps (54%) done
+
+[Wed Dec  4 15:51:08 2019]
+Job 545: Add RefSeq sequence batch 689 to database
+
+[Wed Dec  4 15:51:08 2019]
+Finished job 635.
+386 of 717 steps (54%) done
+Submitted job 545 with external jobid 'Submitted batch job 16251229'.
+
+[Wed Dec  4 15:51:08 2019]
+Job 663: Add RefSeq sequence batch 165 to database
+
+Submitted job 663 with external jobid 'Submitted batch job 16251230'.
+[Wed Dec  4 15:51:30 2019]
+Finished job 413.
+387 of 717 steps (54%) done
+
+[Wed Dec  4 15:51:30 2019]
+Job 397: Add RefSeq sequence batch 507 to database
+
+Submitted job 397 with external jobid 'Submitted batch job 16251231'.
+[Wed Dec  4 15:51:41 2019]
+Finished job 630.
+388 of 717 steps (54%) done
+
+[Wed Dec  4 15:51:41 2019]
+Job 558: Add RefSeq sequence batch 233 to database
+
+Submitted job 558 with external jobid 'Submitted batch job 16251232'.
+[Wed Dec  4 15:51:52 2019]
+Finished job 453.
+389 of 717 steps (54%) done
+
+[Wed Dec  4 15:51:52 2019]
+Job 281: Add RefSeq sequence batch 349 to database
+
+Submitted job 281 with external jobid 'Submitted batch job 16251233'.
+[Wed Dec  4 15:52:03 2019]
+Finished job 628.
+390 of 717 steps (54%) done
+
+[Wed Dec  4 15:52:03 2019]
+Job 535: Add RefSeq sequence batch 388 to database
+
+Submitted job 535 with external jobid 'Submitted batch job 16251234'.
+[Wed Dec  4 15:52:58 2019]
+Finished job 351.
+391 of 717 steps (55%) done
+
+[Wed Dec  4 15:52:58 2019]
+Job 72: Add RefSeq sequence batch 628 to database
+
+Submitted job 72 with external jobid 'Submitted batch job 16251235'.
+[Wed Dec  4 15:53:09 2019]
+Finished job 545.
+392 of 717 steps (55%) done
+
+[Wed Dec  4 15:53:09 2019]
+Job 235: Add RefSeq sequence batch 407 to database
+
+Submitted job 235 with external jobid 'Submitted batch job 16251236'.
+[Wed Dec  4 15:53:32 2019]
+Finished job 663.
+393 of 717 steps (55%) done
+
+[Wed Dec  4 15:53:32 2019]
+Job 360: Add RefSeq sequence batch 61 to database
+
+[Wed Dec  4 15:53:32 2019]
+Finished job 72.
+394 of 717 steps (55%) done
+Submitted job 360 with external jobid 'Submitted batch job 16251237'.
+
+[Wed Dec  4 15:53:32 2019]
+Job 163: Add RefSeq sequence batch 252 to database
+
+Submitted job 163 with external jobid 'Submitted batch job 16251238'.
+[Wed Dec  4 15:53:43 2019]
+Finished job 445.
+395 of 717 steps (55%) done
+
+[Wed Dec  4 15:53:43 2019]
+Job 50: Add RefSeq sequence batch 347 to database
+
+Submitted job 50 with external jobid 'Submitted batch job 16251239'.
+[Wed Dec  4 15:54:05 2019]
+Finished job 258.
+396 of 717 steps (55%) done
+
+[Wed Dec  4 15:54:05 2019]
+Job 389: Add RefSeq sequence batch 194 to database
+
+Submitted job 389 with external jobid 'Submitted batch job 16251240'.
+[Wed Dec  4 15:54:16 2019]
+Finished job 558.
+397 of 717 steps (55%) done
+
+[Wed Dec  4 15:54:16 2019]
+Job 49: Add RefSeq sequence batch 64 to database
+
+[Wed Dec  4 15:54:16 2019]
+Finished job 535.
+398 of 717 steps (56%) done
+Submitted job 49 with external jobid 'Submitted batch job 16251241'.
+
+[Wed Dec  4 15:54:16 2019]
+Job 192: Add RefSeq sequence batch 198 to database
+
+Submitted job 192 with external jobid 'Submitted batch job 16251242'.
+[Wed Dec  4 15:54:27 2019]
+Finished job 397.
+399 of 717 steps (56%) done
+
+[Wed Dec  4 15:54:27 2019]
+Job 268: Add RefSeq sequence batch 603 to database
+
+Submitted job 268 with external jobid 'Submitted batch job 16251243'.
+[Wed Dec  4 15:54:38 2019]
+Finished job 466.
+400 of 717 steps (56%) done
+
+[Wed Dec  4 15:54:38 2019]
+Job 117: Add RefSeq sequence batch 491 to database
+
+[Wed Dec  4 15:54:38 2019]
+Finished job 281.
+401 of 717 steps (56%) done
+Submitted job 117 with external jobid 'Submitted batch job 16251244'.
+
+[Wed Dec  4 15:54:38 2019]
+Job 359: Add RefSeq sequence batch 454 to database
+
+Submitted job 359 with external jobid 'Submitted batch job 16251245'.
+[Wed Dec  4 15:55:33 2019]
+Finished job 235.
+402 of 717 steps (56%) done
+
+[Wed Dec  4 15:55:33 2019]
+Job 450: Add RefSeq sequence batch 365 to database
+
+Submitted job 450 with external jobid 'Submitted batch job 16251247'.
+[Wed Dec  4 15:55:44 2019]
+Finished job 360.
+403 of 717 steps (56%) done
+
+[Wed Dec  4 15:55:44 2019]
+Job 653: Add RefSeq sequence batch 224 to database
+
+Submitted job 653 with external jobid 'Submitted batch job 16251248'.
+[Wed Dec  4 15:56:06 2019]
+Finished job 163.
+404 of 717 steps (56%) done
+
+[Wed Dec  4 15:56:06 2019]
+Job 556: Add RefSeq sequence batch 340 to database
+
+Submitted job 556 with external jobid 'Submitted batch job 16251250'.
+[Wed Dec  4 15:56:28 2019]
+Finished job 50.
+405 of 717 steps (56%) done
+
+[Wed Dec  4 15:56:28 2019]
+Job 131: Add RefSeq sequence batch 116 to database
+
+Submitted job 131 with external jobid 'Submitted batch job 16251251'.
+[Wed Dec  4 15:56:39 2019]
+Finished job 389.
+406 of 717 steps (57%) done
+
+[Wed Dec  4 15:56:39 2019]
+Job 285: Add RefSeq sequence batch 21 to database
+
+[Wed Dec  4 15:56:39 2019]
+Finished job 49.
+407 of 717 steps (57%) done
+Submitted job 285 with external jobid 'Submitted batch job 16251267'.
+
+[Wed Dec  4 15:56:39 2019]
+Job 553: Add RefSeq sequence batch 391 to database
+
+Submitted job 553 with external jobid 'Submitted batch job 16251269'.
+[Wed Dec  4 15:56:50 2019]
+Finished job 192.
+408 of 717 steps (57%) done
+
+[Wed Dec  4 15:56:50 2019]
+Job 146: Add RefSeq sequence batch 176 to database
+
+Submitted job 146 with external jobid 'Submitted batch job 16251284'.
+[Wed Dec  4 15:57:23 2019]
+Finished job 268.
+409 of 717 steps (57%) done
+
+[Wed Dec  4 15:57:23 2019]
+Job 64: Add RefSeq sequence batch 611 to database
+
+[Wed Dec  4 15:57:23 2019]
+Finished job 117.
+410 of 717 steps (57%) done
+Submitted job 64 with external jobid 'Submitted batch job 16251285'.
+[Wed Dec  4 15:57:23 2019]
+Finished job 359.
+411 of 717 steps (57%) done
+
+[Wed Dec  4 15:57:23 2019]
+Job 490: Add RefSeq sequence batch 197 to database
+
+Submitted job 490 with external jobid 'Submitted batch job 16251286'.
+
+[Wed Dec  4 15:57:23 2019]
+Job 104: Add RefSeq sequence batch 322 to database
+
+Submitted job 104 with external jobid 'Submitted batch job 16251287'.
+[Wed Dec  4 15:58:18 2019]
+Finished job 653.
+412 of 717 steps (57%) done
+
+[Wed Dec  4 15:58:18 2019]
+Job 46: Add RefSeq sequence batch 384 to database
+
+[Wed Dec  4 15:58:18 2019]
+Finished job 556.
+413 of 717 steps (58%) done
+Submitted job 46 with external jobid 'Submitted batch job 16251300'.
+
+[Wed Dec  4 15:58:18 2019]
+Job 329: Add RefSeq sequence batch 326 to database
+
+Submitted job 329 with external jobid 'Submitted batch job 16251301'.
+[Wed Dec  4 15:59:02 2019]
+Finished job 131.
+414 of 717 steps (58%) done
+
+[Wed Dec  4 15:59:02 2019]
+Job 110: Add RefSeq sequence batch 60 to database
+
+Submitted job 110 with external jobid 'Submitted batch job 16251302'.
+[Wed Dec  4 15:59:13 2019]
+Finished job 450.
+415 of 717 steps (58%) done
+
+[Wed Dec  4 15:59:13 2019]
+Job 124: Add RefSeq sequence batch 617 to database
+
+[Wed Dec  4 15:59:13 2019]
+Finished job 553.
+416 of 717 steps (58%) done
+Submitted job 124 with external jobid 'Submitted batch job 16251303'.
+
+[Wed Dec  4 15:59:13 2019]
+Job 91: Add RefSeq sequence batch 97 to database
+
+Submitted job 91 with external jobid 'Submitted batch job 16251304'.
+[Wed Dec  4 15:59:24 2019]
+Finished job 285.
+417 of 717 steps (58%) done
+
+[Wed Dec  4 15:59:24 2019]
+Job 147: Add RefSeq sequence batch 395 to database
+
+Submitted job 147 with external jobid 'Submitted batch job 16251305'.
+[Wed Dec  4 15:59:57 2019]
+Finished job 146.
+418 of 717 steps (58%) done
+
+[Wed Dec  4 15:59:57 2019]
+Job 617: Add RefSeq sequence batch 311 to database
+
+Submitted job 617 with external jobid 'Submitted batch job 16251306'.
+[Wed Dec  4 16:02:31 2019]
+Finished job 490.
+419 of 717 steps (58%) done
+
+[Wed Dec  4 16:02:31 2019]
+Job 16: Add RefSeq sequence batch 236 to database
+
+Submitted job 16 with external jobid 'Submitted batch job 16251310'.
+[Wed Dec  4 16:02:42 2019]
+Finished job 64.
+420 of 717 steps (59%) done
+
+[Wed Dec  4 16:02:42 2019]
+Job 74: Add RefSeq sequence batch 17 to database
+
+Submitted job 74 with external jobid 'Submitted batch job 16251311'.
+[Wed Dec  4 16:02:53 2019]
+Finished job 104.
+421 of 717 steps (59%) done
+
+[Wed Dec  4 16:02:53 2019]
+Job 547: Add RefSeq sequence batch 238 to database
+
+Submitted job 547 with external jobid 'Submitted batch job 16251312'.
+[Wed Dec  4 16:05:06 2019]
+Finished job 110.
+422 of 717 steps (59%) done
+
+[Wed Dec  4 16:05:06 2019]
+Job 352: Add RefSeq sequence batch 651 to database
+
+Submitted job 352 with external jobid 'Submitted batch job 16251316'.
+[Wed Dec  4 16:05:50 2019]
+Finished job 124.
+423 of 717 steps (59%) done
+
+[Wed Dec  4 16:05:50 2019]
+Job 619: Add RefSeq sequence batch 422 to database
+
+Submitted job 619 with external jobid 'Submitted batch job 16251317'.
+[Wed Dec  4 16:06:01 2019]
+Finished job 329.
+424 of 717 steps (59%) done
+
+[Wed Dec  4 16:06:01 2019]
+Job 713: Add RefSeq sequence batch 161 to database
+
+Submitted job 713 with external jobid 'Submitted batch job 16251318'.
+[Wed Dec  4 16:06:23 2019]
+Finished job 46.
+425 of 717 steps (59%) done
+
+[Wed Dec  4 16:06:23 2019]
+Job 543: Add RefSeq sequence batch 646 to database
+
+Submitted job 543 with external jobid 'Submitted batch job 16251319'.
+[Wed Dec  4 16:08:35 2019]
+Finished job 91.
+426 of 717 steps (59%) done
+
+[Wed Dec  4 16:08:35 2019]
+Job 308: Add RefSeq sequence batch 157 to database
+
+[Wed Dec  4 16:08:35 2019]
+Finished job 16.
+427 of 717 steps (60%) done
+Submitted job 308 with external jobid 'Submitted batch job 16251321'.
+
+[Wed Dec  4 16:08:35 2019]
+Job 589: Add RefSeq sequence batch 376 to database
+
+Submitted job 589 with external jobid 'Submitted batch job 16251322'.
+[Wed Dec  4 16:09:19 2019]
+Finished job 147.
+428 of 717 steps (60%) done
+
+[Wed Dec  4 16:09:19 2019]
+Job 424: Add RefSeq sequence batch 156 to database
+
+Submitted job 424 with external jobid 'Submitted batch job 16251323'.
+[Wed Dec  4 16:09:19 2019]
+Finished job 617.
+429 of 717 steps (60%) done
+
+[Wed Dec  4 16:09:19 2019]
+Job 225: Add RefSeq sequence batch 99 to database
+
+Submitted job 225 with external jobid 'Submitted batch job 16251324'.
+[Wed Dec  4 16:11:20 2019]
+Finished job 74.
+430 of 717 steps (60%) done
+
+[Wed Dec  4 16:11:20 2019]
+Job 223: Add RefSeq sequence batch 588 to database
+
+Submitted job 223 with external jobid 'Submitted batch job 16251339'.
+[Wed Dec  4 16:12:04 2019]
+Finished job 619.
+431 of 717 steps (60%) done
+
+[Wed Dec  4 16:12:04 2019]
+Job 312: Add RefSeq sequence batch 67 to database
+
+Submitted job 312 with external jobid 'Submitted batch job 16251340'.
+[Wed Dec  4 16:12:15 2019]
+Finished job 547.
+432 of 717 steps (60%) done
+
+[Wed Dec  4 16:12:15 2019]
+Job 479: Add RefSeq sequence batch 709 to database
+
+[Wed Dec  4 16:12:15 2019]
+Finished job 352.
+433 of 717 steps (60%) done
+Submitted job 479 with external jobid 'Submitted batch job 16251341'.
+
+[Wed Dec  4 16:12:15 2019]
+Job 677: Add RefSeq sequence batch 219 to database
+
+Submitted job 677 with external jobid 'Submitted batch job 16251342'.
+[Wed Dec  4 16:14:05 2019]
+Finished job 543.
+434 of 717 steps (61%) done
+
+[Wed Dec  4 16:14:05 2019]
+Job 659: Add RefSeq sequence batch 472 to database
+
+Submitted job 659 with external jobid 'Submitted batch job 16251344'.
+[Wed Dec  4 16:14:38 2019]
+Finished job 713.
+435 of 717 steps (61%) done
+
+[Wed Dec  4 16:14:39 2019]
+Job 461: Add RefSeq sequence batch 684 to database
+
+Submitted job 461 with external jobid 'Submitted batch job 16251345'.
+[Wed Dec  4 16:15:12 2019]
+Finished job 589.
+436 of 717 steps (61%) done
+
+[Wed Dec  4 16:15:12 2019]
+Job 513: Add RefSeq sequence batch 241 to database
+
+Submitted job 513 with external jobid 'Submitted batch job 16251346'.
+[Wed Dec  4 16:16:07 2019]
+Finished job 308.
+437 of 717 steps (61%) done
+
+[Wed Dec  4 16:16:07 2019]
+Job 231: Add RefSeq sequence batch 471 to database
+
+Submitted job 231 with external jobid 'Submitted batch job 16251347'.
+[Wed Dec  4 16:18:41 2019]
+Finished job 223.
+438 of 717 steps (61%) done
+
+[Wed Dec  4 16:18:41 2019]
+Job 496: Add RefSeq sequence batch 73 to database
+
+Submitted job 496 with external jobid 'Submitted batch job 16251350'.
+[Wed Dec  4 16:19:03 2019]
+Finished job 225.
+439 of 717 steps (61%) done
+
+[Wed Dec  4 16:19:03 2019]
+Job 207: Add RefSeq sequence batch 502 to database
+
+Submitted job 207 with external jobid 'Submitted batch job 16251351'.
+[Wed Dec  4 16:19:25 2019]
+Finished job 424.
+440 of 717 steps (61%) done
+
+[Wed Dec  4 16:19:25 2019]
+Job 98: Add RefSeq sequence batch 538 to database
+
+Submitted job 98 with external jobid 'Submitted batch job 16251352'.
+[Wed Dec  4 16:48:25 2019]
+Finished job 312.
+441 of 717 steps (62%) done
+
+[Wed Dec  4 16:48:25 2019]
+Job 591: Add RefSeq sequence batch 54 to database
+
+Submitted job 591 with external jobid 'Submitted batch job 16251360'.
+[Wed Dec  4 16:48:36 2019]
+Finished job 677.
+442 of 717 steps (62%) done
+
+[Wed Dec  4 16:48:36 2019]
+Job 644: Add RefSeq sequence batch 578 to database
+
+Submitted job 644 with external jobid 'Submitted batch job 16251361'.
+[Wed Dec  4 16:49:20 2019]
+Finished job 479.
+443 of 717 steps (62%) done
+
+[Wed Dec  4 16:49:20 2019]
+Job 626: Add RefSeq sequence batch 323 to database
+
+Submitted job 626 with external jobid 'Submitted batch job 16251362'.
+[Wed Dec  4 16:51:54 2019]
+Finished job 513.
+444 of 717 steps (62%) done
+
+[Wed Dec  4 16:51:54 2019]
+Job 328: Add RefSeq sequence batch 608 to database
+
+Submitted job 328 with external jobid 'Submitted batch job 16251363'.
+[Wed Dec  4 16:52:05 2019]
+Finished job 659.
+445 of 717 steps (62%) done
+
+[Wed Dec  4 16:52:05 2019]
+Job 30: Add RefSeq sequence batch 137 to database
+
+[Wed Dec  4 16:52:05 2019]
+Finished job 231.
+446 of 717 steps (62%) done
+Submitted job 30 with external jobid 'Submitted batch job 16251364'.
+
+[Wed Dec  4 16:52:05 2019]
+Job 404: Add RefSeq sequence batch 577 to database
+
+Submitted job 404 with external jobid 'Submitted batch job 16251365'.
+[Wed Dec  4 16:53:33 2019]
+Finished job 461.
+447 of 717 steps (62%) done
+
+[Wed Dec  4 16:53:33 2019]
+Job 203: Add RefSeq sequence batch 159 to database
+
+Submitted job 203 with external jobid 'Submitted batch job 16251366'.
+[Wed Dec  4 16:55:45 2019]
+Finished job 207.
+448 of 717 steps (62%) done
+
+[Wed Dec  4 16:55:45 2019]
+Job 517: Add RefSeq sequence batch 555 to database
+
+Submitted job 517 with external jobid 'Submitted batch job 16251367'.
+[Wed Dec  4 16:56:18 2019]
+Finished job 98.
+449 of 717 steps (63%) done
+
+[Wed Dec  4 16:56:18 2019]
+Job 512: Add RefSeq sequence batch 583 to database
+
+Submitted job 512 with external jobid 'Submitted batch job 16251368'.
+[Wed Dec  4 16:56:29 2019]
+Finished job 591.
+450 of 717 steps (63%) done
+
+[Wed Dec  4 16:56:29 2019]
+Job 149: Add RefSeq sequence batch 579 to database
+
+Submitted job 149 with external jobid 'Submitted batch job 16251369'.
+[Wed Dec  4 16:56:52 2019]
+Finished job 496.
+451 of 717 steps (63%) done
+
+[Wed Dec  4 16:56:52 2019]
+Job 186: Add RefSeq sequence batch 192 to database
+
+Submitted job 186 with external jobid 'Submitted batch job 16251370'.
+[Wed Dec  4 16:59:37 2019]
+Finished job 644.
+452 of 717 steps (63%) done
+
+[Wed Dec  4 16:59:37 2019]
+Job 631: Add RefSeq sequence batch 378 to database
+
+Submitted job 631 with external jobid 'Submitted batch job 16251371'.
+[Wed Dec  4 16:59:59 2019]
+Finished job 328.
+453 of 717 steps (63%) done
+
+[Wed Dec  4 16:59:59 2019]
+Job 444: Add RefSeq sequence batch 566 to database
+
+Submitted job 444 with external jobid 'Submitted batch job 16251372'.
+[Wed Dec  4 17:00:10 2019]
+Finished job 626.
+454 of 717 steps (63%) done
+
+[Wed Dec  4 17:00:10 2019]
+Job 224: Add RefSeq sequence batch 285 to database
+
+[Wed Dec  4 17:00:10 2019]
+Finished job 30.
+455 of 717 steps (63%) done
+Submitted job 224 with external jobid 'Submitted batch job 16251373'.
+
+[Wed Dec  4 17:00:10 2019]
+Job 122: Add RefSeq sequence batch 543 to database
+
+Submitted job 122 with external jobid 'Submitted batch job 16251374'.
+[Wed Dec  4 17:02:55 2019]
+Finished job 404.
+456 of 717 steps (64%) done
+
+[Wed Dec  4 17:02:55 2019]
+Job 539: Add RefSeq sequence batch 281 to database
+
+[Wed Dec  4 17:02:55 2019]
+Finished job 517.
+457 of 717 steps (64%) done
+Submitted job 539 with external jobid 'Submitted batch job 16251375'.
+
+[Wed Dec  4 17:02:55 2019]
+Job 276: Add RefSeq sequence batch 677 to database
+
+Submitted job 276 with external jobid 'Submitted batch job 16251376'.
+[Wed Dec  4 17:03:28 2019]
+Finished job 203.
+458 of 717 steps (64%) done
+
+[Wed Dec  4 17:03:28 2019]
+Job 165: Add RefSeq sequence batch 602 to database
+
+Submitted job 165 with external jobid 'Submitted batch job 16251377'.
+[Wed Dec  4 17:04:23 2019]
+Finished job 512.
+459 of 717 steps (64%) done
+
+[Wed Dec  4 17:04:23 2019]
+Job 702: Add RefSeq sequence batch 458 to database
+
+Submitted job 702 with external jobid 'Submitted batch job 16251378'.
+[Wed Dec  4 17:06:24 2019]
+Finished job 444.
+460 of 717 steps (64%) done
+
+[Wed Dec  4 17:06:24 2019]
+Job 52: Add RefSeq sequence batch 312 to database
+
+Submitted job 52 with external jobid 'Submitted batch job 16251381'.
+[Wed Dec  4 17:07:08 2019]
+Finished job 149.
+461 of 717 steps (64%) done
+
+[Wed Dec  4 17:07:08 2019]
+Job 332: Add RefSeq sequence batch 126 to database
+
+Submitted job 332 with external jobid 'Submitted batch job 16251383'.
+[Wed Dec  4 17:08:03 2019]
+Finished job 631.
+462 of 717 steps (64%) done
+
+[Wed Dec  4 17:08:03 2019]
+Job 377: Add RefSeq sequence batch 573 to database
+
+Submitted job 377 with external jobid 'Submitted batch job 16251384'.
+[Wed Dec  4 17:08:25 2019]
+Finished job 186.
+463 of 717 steps (65%) done
+
+[Wed Dec  4 17:08:25 2019]
+Job 384: Add RefSeq sequence batch 143 to database
+
+Submitted job 384 with external jobid 'Submitted batch job 16251385'.
+[Wed Dec  4 17:11:33 2019]
+Finished job 224.
+464 of 717 steps (65%) done
+
+[Wed Dec  4 17:11:33 2019]
+Job 148: Add RefSeq sequence batch 632 to database
+
+[Wed Dec  4 17:11:33 2019]
+Finished job 122.
+465 of 717 steps (65%) done
+[Wed Dec  4 17:11:33 2019]
+Finished job 539.
+466 of 717 steps (65%) done
+Submitted job 148 with external jobid 'Submitted batch job 16251387'.
+
+[Wed Dec  4 17:11:33 2019]
+Job 103: Add RefSeq sequence batch 436 to database
+
+Submitted job 103 with external jobid 'Submitted batch job 16251388'.
+
+[Wed Dec  4 17:11:33 2019]
+Job 322: Add RefSeq sequence batch 700 to database
+
+Submitted job 322 with external jobid 'Submitted batch job 16251389'.
+[Wed Dec  4 17:12:28 2019]
+Finished job 276.
+467 of 717 steps (65%) done
+
+[Wed Dec  4 17:12:28 2019]
+Job 77: Add RefSeq sequence batch 193 to database
+
+Submitted job 77 with external jobid 'Submitted batch job 16251390'.
+[Wed Dec  4 17:15:35 2019]
+Finished job 702.
+468 of 717 steps (65%) done
+
+[Wed Dec  4 17:15:35 2019]
+Job 364: Add RefSeq sequence batch 305 to database
+
+Submitted job 364 with external jobid 'Submitted batch job 16251391'.
+[Wed Dec  4 17:15:46 2019]
+Finished job 165.
+469 of 717 steps (65%) done
+
+[Wed Dec  4 17:15:46 2019]
+Job 495: Add RefSeq sequence batch 7 to database
+
+[Wed Dec  4 17:15:46 2019]
+Finished job 52.
+470 of 717 steps (66%) done
+Submitted job 495 with external jobid 'Submitted batch job 16251392'.
+
+[Wed Dec  4 17:15:46 2019]
+Job 670: Add RefSeq sequence batch 180 to database
+
+Submitted job 670 with external jobid 'Submitted batch job 16251393'.
+[Wed Dec  4 17:16:52 2019]
+Finished job 148.
+471 of 717 steps (66%) done
+
+[Wed Dec  4 17:16:52 2019]
+Job 26: Add RefSeq sequence batch 504 to database
+
+Submitted job 26 with external jobid 'Submitted batch job 16251394'.
+[Wed Dec  4 17:18:09 2019]
+Finished job 384.
+472 of 717 steps (66%) done
+
+[Wed Dec  4 17:18:09 2019]
+Job 343: Add RefSeq sequence batch 642 to database
+
+Submitted job 343 with external jobid 'Submitted batch job 16251397'.
+[Wed Dec  4 17:18:42 2019]
+Finished job 332.
+473 of 717 steps (66%) done
+
+[Wed Dec  4 17:18:42 2019]
+Job 485: Add RefSeq sequence batch 673 to database
+
+Submitted job 485 with external jobid 'Submitted batch job 16251398'.
+[Wed Dec  4 17:19:04 2019]
+Finished job 377.
+474 of 717 steps (66%) done
+
+[Wed Dec  4 17:19:04 2019]
+Job 228: Add RefSeq sequence batch 38 to database
+
+Submitted job 228 with external jobid 'Submitted batch job 16251400'.
+[Wed Dec  4 17:21:27 2019]
+Finished job 77.
+475 of 717 steps (66%) done
+
+[Wed Dec  4 17:21:27 2019]
+Job 572: Add RefSeq sequence batch 456 to database
+
+Submitted job 572 with external jobid 'Submitted batch job 16251405'.
+[Wed Dec  4 17:21:49 2019]
+Finished job 103.
+476 of 717 steps (66%) done
+
+[Wed Dec  4 17:21:50 2019]
+Job 215: Add RefSeq sequence batch 335 to database
+
+Submitted job 215 with external jobid 'Submitted batch job 16251406'.
+[Wed Dec  4 17:22:12 2019]
+Finished job 322.
+477 of 717 steps (67%) done
+
+[Wed Dec  4 17:22:12 2019]
+Job 701: Add RefSeq sequence batch 318 to database
+
+[Wed Dec  4 17:22:12 2019]
+Finished job 364.
+Submitted job 701 with external jobid 'Submitted batch job 16251407'.
+478 of 717 steps (67%) done
+
+[Wed Dec  4 17:22:12 2019]
+Job 399: Add RefSeq sequence batch 544 to database
+
+Submitted job 399 with external jobid 'Submitted batch job 16251408'.
+[Wed Dec  4 17:24:02 2019]
+Finished job 670.
+479 of 717 steps (67%) done
+
+[Wed Dec  4 17:24:02 2019]
+Job 715: Add RefSeq sequence batch 514 to database
+
+Submitted job 715 with external jobid 'Submitted batch job 16251410'.
+[Wed Dec  4 17:24:24 2019]
+Finished job 495.
+480 of 717 steps (67%) done
+
+[Wed Dec  4 17:24:24 2019]
+Job 272: Add RefSeq sequence batch 43 to database
+
+Submitted job 272 with external jobid 'Submitted batch job 16251411'.
+[Wed Dec  4 17:24:46 2019]
+Finished job 26.
+481 of 717 steps (67%) done
+
+[Wed Dec  4 17:24:46 2019]
+Job 601: Add RefSeq sequence batch 140 to database
+
+Submitted job 601 with external jobid 'Submitted batch job 16251412'.
+[Wed Dec  4 17:25:19 2019]
+Finished job 343.
+482 of 717 steps (67%) done
+
+[Wed Dec  4 17:25:19 2019]
+Job 686: Add RefSeq sequence batch 215 to database
+
+Submitted job 686 with external jobid 'Submitted batch job 16251414'.
+[Wed Dec  4 17:25:41 2019]
+Finished job 485.
+483 of 717 steps (67%) done
+
+[Wed Dec  4 17:25:41 2019]
+Job 398: Add RefSeq sequence batch 307 to database
+
+Submitted job 398 with external jobid 'Submitted batch job 16251416'.
+[Wed Dec  4 17:27:31 2019]
+Finished job 228.
+484 of 717 steps (68%) done
+
+[Wed Dec  4 17:27:31 2019]
+Job 34: Add RefSeq sequence batch 387 to database
+
+Submitted job 34 with external jobid 'Submitted batch job 16251418'.
+[Wed Dec  4 17:31:22 2019]
+Finished job 215.
+485 of 717 steps (68%) done
+
+[Wed Dec  4 17:31:22 2019]
+Job 438: Add RefSeq sequence batch 319 to database
+
+Submitted job 438 with external jobid 'Submitted batch job 16251423'.
+[Wed Dec  4 17:31:44 2019]
+Finished job 572.
+486 of 717 steps (68%) done
+
+[Wed Dec  4 17:31:44 2019]
+Job 531: Add RefSeq sequence batch 32 to database
+
+Submitted job 531 with external jobid 'Submitted batch job 16251424'.
+[Wed Dec  4 17:31:55 2019]
+Finished job 701.
+487 of 717 steps (68%) done
+
+[Wed Dec  4 17:31:55 2019]
+Job 244: Add RefSeq sequence batch 432 to database
+
+Submitted job 244 with external jobid 'Submitted batch job 16251425'.
+[Wed Dec  4 17:34:41 2019]
+Finished job 399.
+488 of 717 steps (68%) done
+
+[Wed Dec  4 17:34:41 2019]
+Job 173: Add RefSeq sequence batch 205 to database
+
+Submitted job 173 with external jobid 'Submitted batch job 16251430'.
+[Wed Dec  4 17:36:20 2019]
+Finished job 272.
+489 of 717 steps (68%) done
+
+[Wed Dec  4 17:36:20 2019]
+Job 694: Add RefSeq sequence batch 81 to database
+
+Submitted job 694 with external jobid 'Submitted batch job 16251432'.
+[Wed Dec  4 17:36:53 2019]
+Finished job 715.
+490 of 717 steps (68%) done
+
+[Wed Dec  4 17:36:53 2019]
+Job 507: Add RefSeq sequence batch 105 to database
+
+[Wed Dec  4 17:36:53 2019]
+Finished job 601.
+491 of 717 steps (68%) done
+Submitted job 507 with external jobid 'Submitted batch job 16251433'.
+
+[Wed Dec  4 17:36:53 2019]
+Job 465: Add RefSeq sequence batch 293 to database
+
+Submitted job 465 with external jobid 'Submitted batch job 16251434'.
+[Wed Dec  4 17:37:26 2019]
+Finished job 398.
+492 of 717 steps (69%) done
+
+[Wed Dec  4 17:37:26 2019]
+Job 361: Add RefSeq sequence batch 14 to database
+
+[Wed Dec  4 17:37:26 2019]
+Finished job 34.
+493 of 717 steps (69%) done
+Submitted job 361 with external jobid 'Submitted batch job 16251436'.
+
+[Wed Dec  4 17:37:26 2019]
+Job 520: Add RefSeq sequence batch 513 to database
+
+Submitted job 520 with external jobid 'Submitted batch job 16251437'.
+[Wed Dec  4 17:38:32 2019]
+Finished job 686.
+494 of 717 steps (69%) done
+
+[Wed Dec  4 17:38:32 2019]
+Job 43: Add RefSeq sequence batch 80 to database
+
+Submitted job 43 with external jobid 'Submitted batch job 16251439'.
+[Wed Dec  4 17:41:06 2019]
+Finished job 438.
+495 of 717 steps (69%) done
+
+[Wed Dec  4 17:41:06 2019]
+Job 595: Add RefSeq sequence batch 235 to database
+
+Submitted job 595 with external jobid 'Submitted batch job 16251443'.
+[Wed Dec  4 17:41:17 2019]
+Finished job 531.
+496 of 717 steps (69%) done
+
+[Wed Dec  4 17:41:17 2019]
+Job 293: Add RefSeq sequence batch 204 to database
+
+Submitted job 293 with external jobid 'Submitted batch job 16251444'.
+[Wed Dec  4 17:41:28 2019]
+Finished job 244.
+497 of 717 steps (69%) done
+
+[Wed Dec  4 17:41:28 2019]
+Job 338: Add RefSeq sequence batch 82 to database
+
+Submitted job 338 with external jobid 'Submitted batch job 16251445'.
+[Wed Dec  4 18:22:35 2019]
+Finished job 173.
+498 of 717 steps (69%) done
+
+[Wed Dec  4 18:22:35 2019]
+Job 607: Add RefSeq sequence batch 619 to database
+
+Submitted job 607 with external jobid 'Submitted batch job 16251453'.
+[Wed Dec  4 18:39:06 2019]
+Finished job 694.
+499 of 717 steps (70%) done
+
+[Wed Dec  4 18:39:06 2019]
+Job 684: Add RefSeq sequence batch 696 to database
+
+[Wed Dec  4 18:39:06 2019]
+Finished job 520.
+500 of 717 steps (70%) done
+Submitted job 684 with external jobid 'Submitted batch job 16251461'.
+
+[Wed Dec  4 18:39:06 2019]
+Job 603: Add RefSeq sequence batch 681 to database
+
+Submitted job 603 with external jobid 'Submitted batch job 16251462'.
+[Wed Dec  4 18:39:17 2019]
+Finished job 507.
+501 of 717 steps (70%) done
+
+[Wed Dec  4 18:39:17 2019]
+Job 388: Add RefSeq sequence batch 371 to database
+
+Submitted job 388 with external jobid 'Submitted batch job 16251463'.
+[Wed Dec  4 18:39:28 2019]
+Finished job 465.
+502 of 717 steps (70%) done
+
+[Wed Dec  4 18:39:28 2019]
+Job 488: Add RefSeq sequence batch 479 to database
+
+Submitted job 488 with external jobid 'Submitted batch job 16251464'.
+[Wed Dec  4 18:40:23 2019]
+Finished job 361.
+503 of 717 steps (70%) done
+
+[Wed Dec  4 18:40:23 2019]
+Job 63: Add RefSeq sequence batch 480 to database
+
+Submitted job 63 with external jobid 'Submitted batch job 16251465'.
+[Wed Dec  4 18:41:18 2019]
+Finished job 43.
+504 of 717 steps (70%) done
+
+[Wed Dec  4 18:41:18 2019]
+Job 434: Add RefSeq sequence batch 594 to database
+
+Submitted job 434 with external jobid 'Submitted batch job 16251466'.
+[Wed Dec  4 18:44:03 2019]
+Finished job 338.
+505 of 717 steps (70%) done
+
+[Wed Dec  4 18:44:03 2019]
+Job 463: Add RefSeq sequence batch 18 to database
+
+Submitted job 463 with external jobid 'Submitted batch job 16251471'.
+[Wed Dec  4 18:44:14 2019]
+Finished job 595.
+506 of 717 steps (71%) done
+
+[Wed Dec  4 18:44:14 2019]
+Job 253: Add RefSeq sequence batch 448 to database
+
+Submitted job 253 with external jobid 'Submitted batch job 16251472'.
+[Wed Dec  4 18:44:25 2019]
+Finished job 293.
+507 of 717 steps (71%) done
+
+[Wed Dec  4 18:44:25 2019]
+Job 39: Add RefSeq sequence batch 512 to database
+
+Submitted job 39 with external jobid 'Submitted batch job 16251473'.
+[Wed Dec  4 18:46:15 2019]
+Finished job 607.
+508 of 717 steps (71%) done
+
+[Wed Dec  4 18:46:15 2019]
+Job 666: Add RefSeq sequence batch 374 to database
+
+Submitted job 666 with external jobid 'Submitted batch job 16251475'.
+[Wed Dec  4 18:56:43 2019]
+Finished job 684.
+509 of 717 steps (71%) done
+
+[Wed Dec  4 18:56:43 2019]
+Job 657: Add RefSeq sequence batch 668 to database
+
+Submitted job 657 with external jobid 'Submitted batch job 16251483'.
+[Wed Dec  4 18:57:05 2019]
+Finished job 603.
+510 of 717 steps (71%) done
+
+[Wed Dec  4 18:57:05 2019]
+Job 440: Add RefSeq sequence batch 77 to database
+
+Submitted job 440 with external jobid 'Submitted batch job 16251484'.
+[Wed Dec  4 18:57:16 2019]
+Finished job 488.
+511 of 717 steps (71%) done
+
+[Wed Dec  4 18:57:16 2019]
+Job 649: Add RefSeq sequence batch 166 to database
+
+[Wed Dec  4 18:57:16 2019]
+Finished job 434.
+512 of 717 steps (71%) done
+Submitted job 649 with external jobid 'Submitted batch job 16251485'.
+
+[Wed Dec  4 18:57:16 2019]
+Job 712: Add RefSeq sequence batch 629 to database
+
+Submitted job 712 with external jobid 'Submitted batch job 16251486'.
+[Wed Dec  4 18:57:27 2019]
+Finished job 388.
+513 of 717 steps (72%) done
+
+[Wed Dec  4 18:57:27 2019]
+Job 284: Add RefSeq sequence batch 546 to database
+
+[Wed Dec  4 18:57:27 2019]
+Finished job 63.
+514 of 717 steps (72%) done
+Submitted job 284 with external jobid 'Submitted batch job 16251487'.
+
+[Wed Dec  4 18:57:27 2019]
+Job 171: Add RefSeq sequence batch 620 to database
+
+Submitted job 171 with external jobid 'Submitted batch job 16251488'.
+[Wed Dec  4 18:58:44 2019]
+Finished job 463.
+515 of 717 steps (72%) done
+
+[Wed Dec  4 18:58:44 2019]
+Job 333: Add RefSeq sequence batch 437 to database
+
+Submitted job 333 with external jobid 'Submitted batch job 16251489'.
+[Wed Dec  4 18:59:17 2019]
+Finished job 39.
+516 of 717 steps (72%) done
+
+[Wed Dec  4 18:59:17 2019]
+Job 358: Add RefSeq sequence batch 708 to database
+
+Submitted job 358 with external jobid 'Submitted batch job 16251490'.
+[Wed Dec  4 18:59:39 2019]
+Finished job 253.
+517 of 717 steps (72%) done
+
+[Wed Dec  4 18:59:39 2019]
+Job 213: Add RefSeq sequence batch 459 to database
+
+Submitted job 213 with external jobid 'Submitted batch job 16251491'.
+[Wed Dec  4 19:00:34 2019]
+Finished job 666.
+518 of 717 steps (72%) done
+
+[Wed Dec  4 19:00:34 2019]
+Job 108: Add RefSeq sequence batch 62 to database
+
+Submitted job 108 with external jobid 'Submitted batch job 16251492'.
+[Wed Dec  4 19:14:20 2019]
+Finished job 712.
+519 of 717 steps (72%) done
+
+[Wed Dec  4 19:14:20 2019]
+Job 311: Add RefSeq sequence batch 250 to database
+
+Submitted job 311 with external jobid 'Submitted batch job 16251503'.
+[Wed Dec  4 19:14:53 2019]
+Finished job 440.
+520 of 717 steps (73%) done
+
+[Wed Dec  4 19:14:53 2019]
+Job 21: Add RefSeq sequence batch 357 to database
+
+Submitted job 21 with external jobid 'Submitted batch job 16251504'.
+[Wed Dec  4 19:15:37 2019]
+Finished job 649.
+521 of 717 steps (73%) done
+
+[Wed Dec  4 19:15:37 2019]
+Job 128: Add RefSeq sequence batch 630 to database
+
+Submitted job 128 with external jobid 'Submitted batch job 16251505'.
+[Wed Dec  4 19:16:10 2019]
+Finished job 171.
+522 of 717 steps (73%) done
+
+[Wed Dec  4 19:16:10 2019]
+Job 375: Add RefSeq sequence batch 20 to database
+
+Submitted job 375 with external jobid 'Submitted batch job 16251507'.
+[Wed Dec  4 19:16:21 2019]
+Finished job 657.
+523 of 717 steps (73%) done
+
+[Wed Dec  4 19:16:21 2019]
+Job 198: Add RefSeq sequence batch 534 to database
+
+[Wed Dec  4 19:16:21 2019]
+Finished job 284.
+524 of 717 steps (73%) done
+Submitted job 198 with external jobid 'Submitted batch job 16251508'.
+
+[Wed Dec  4 19:16:21 2019]
+Job 489: Add RefSeq sequence batch 457 to database
+
+Submitted job 489 with external jobid 'Submitted batch job 16251509'.
+[Wed Dec  4 19:17:16 2019]
+Finished job 333.
+525 of 717 steps (73%) done
+
+[Wed Dec  4 19:17:16 2019]
+Job 449: Add RefSeq sequence batch 130 to database
+
+[Wed Dec  4 19:17:16 2019]
+Finished job 358.
+526 of 717 steps (73%) done
+Submitted job 449 with external jobid 'Submitted batch job 16251511'.
+
+[Wed Dec  4 19:17:16 2019]
+Job 15: Add RefSeq sequence batch 331 to database
+
+Submitted job 15 with external jobid 'Submitted batch job 16251512'.
+[Wed Dec  4 19:18:00 2019]
+Finished job 108.
+527 of 717 steps (74%) done
+
+[Wed Dec  4 19:18:00 2019]
+Job 130: Add RefSeq sequence batch 567 to database
+
+Submitted job 130 with external jobid 'Submitted batch job 16251513'.
+[Wed Dec  4 19:18:11 2019]
+Finished job 213.
+528 of 717 steps (74%) done
+
+[Wed Dec  4 19:18:11 2019]
+Job 326: Add RefSeq sequence batch 122 to database
+
+Submitted job 326 with external jobid 'Submitted batch job 16251514'.
+[Wed Dec  4 19:43:52 2019]
+Finished job 128.
+529 of 717 steps (74%) done
+
+[Wed Dec  4 19:43:52 2019]
+Job 505: Add RefSeq sequence batch 404 to database
+
+Submitted job 505 with external jobid 'Submitted batch job 16251523'.
+[Wed Dec  4 19:45:31 2019]
+Finished job 21.
+530 of 717 steps (74%) done
+
+[Wed Dec  4 19:45:31 2019]
+Job 274: Add RefSeq sequence batch 113 to database
+
+[Wed Dec  4 19:45:31 2019]
+Finished job 375.
+531 of 717 steps (74%) done
+Submitted job 274 with external jobid 'Submitted batch job 16251524'.
+
+[Wed Dec  4 19:45:32 2019]
+Job 199: Add RefSeq sequence batch 598 to database
+
+Submitted job 199 with external jobid 'Submitted batch job 16251525'.
+[Wed Dec  4 19:45:42 2019]
+Finished job 311.
+532 of 717 steps (74%) done
+
+[Wed Dec  4 19:45:42 2019]
+Job 650: Add RefSeq sequence batch 16 to database
+
+Submitted job 650 with external jobid 'Submitted batch job 16251527'.
+[Wed Dec  4 19:48:06 2019]
+Finished job 198.
+533 of 717 steps (74%) done
+
+[Wed Dec  4 19:48:06 2019]
+Job 386: Add RefSeq sequence batch 264 to database
+
+Submitted job 386 with external jobid 'Submitted batch job 16251528'.
+[Wed Dec  4 19:48:39 2019]
+Finished job 489.
+534 of 717 steps (74%) done
+
+[Wed Dec  4 19:48:39 2019]
+Job 262: Add RefSeq sequence batch 657 to database
+
+Submitted job 262 with external jobid 'Submitted batch job 16251529'.
+[Wed Dec  4 19:59:06 2019]
+Finished job 15.
+535 of 717 steps (75%) done
+
+[Wed Dec  4 19:59:06 2019]
+Job 664: Add RefSeq sequence batch 635 to database
+
+Submitted job 664 with external jobid 'Submitted batch job 16251536'.
+[Wed Dec  4 19:59:28 2019]
+Finished job 449.
+536 of 717 steps (75%) done
+
+[Wed Dec  4 19:59:28 2019]
+Job 419: Add RefSeq sequence batch 177 to database
+
+Submitted job 419 with external jobid 'Submitted batch job 16251537'.
+[Wed Dec  4 19:59:50 2019]
+Finished job 130.
+537 of 717 steps (75%) done
+
+[Wed Dec  4 19:59:50 2019]
+Job 135: Add RefSeq sequence batch 221 to database
+
+[Wed Dec  4 19:59:51 2019]
+Finished job 326.
+538 of 717 steps (75%) done
+Submitted job 135 with external jobid 'Submitted batch job 16251538'.
+
+[Wed Dec  4 19:59:51 2019]
+Job 27: Add RefSeq sequence batch 57 to database
+
+Submitted job 27 with external jobid 'Submitted batch job 16251539'.
+[Wed Dec  4 20:02:03 2019]
+Finished job 505.
+539 of 717 steps (75%) done
+
+[Wed Dec  4 20:02:03 2019]
+Job 90: Add RefSeq sequence batch 511 to database
+
+Submitted job 90 with external jobid 'Submitted batch job 16251542'.
+[Wed Dec  4 20:02:36 2019]
+Finished job 274.
+540 of 717 steps (75%) done
+
+[Wed Dec  4 20:02:36 2019]
+Job 161: Add RefSeq sequence batch 148 to database
+
+Submitted job 161 with external jobid 'Submitted batch job 16251544'.
+[Wed Dec  4 20:02:47 2019]
+Finished job 386.
+541 of 717 steps (75%) done
+
+[Wed Dec  4 20:02:47 2019]
+Job 210: Add RefSeq sequence batch 300 to database
+
+Submitted job 210 with external jobid 'Submitted batch job 16251545'.
+[Wed Dec  4 20:03:09 2019]
+Finished job 650.
+542 of 717 steps (76%) done
+
+[Wed Dec  4 20:03:09 2019]
+Job 249: Add RefSeq sequence batch 202 to database
+
+Submitted job 249 with external jobid 'Submitted batch job 16251546'.
+[Wed Dec  4 20:03:20 2019]
+Finished job 199.
+543 of 717 steps (76%) done
+
+[Wed Dec  4 20:03:20 2019]
+Job 594: Add RefSeq sequence batch 592 to database
+
+Submitted job 594 with external jobid 'Submitted batch job 16251547'.
+[Wed Dec  4 20:04:15 2019]
+Finished job 262.
+544 of 717 steps (76%) done
+
+[Wed Dec  4 20:04:15 2019]
+Job 672: Add RefSeq sequence batch 545 to database
+
+Submitted job 672 with external jobid 'Submitted batch job 16251549'.
+[Wed Dec  4 20:06:49 2019]
+Finished job 664.
+545 of 717 steps (76%) done
+
+[Wed Dec  4 20:06:49 2019]
+Job 519: Add RefSeq sequence batch 467 to database
+
+[Wed Dec  4 20:06:49 2019]
+Finished job 419.
+546 of 717 steps (76%) done
+Submitted job 519 with external jobid 'Submitted batch job 16251550'.
+[Wed Dec  4 20:06:49 2019]
+Finished job 135.
+547 of 717 steps (76%) done
+
+[Wed Dec  4 20:06:49 2019]
+Job 563: Add RefSeq sequence batch 683 to database
+
+[Wed Dec  4 20:06:49 2019]
+Finished job 27.
+548 of 717 steps (76%) done
+Submitted job 563 with external jobid 'Submitted batch job 16251551'.
+
+[Wed Dec  4 20:06:49 2019]
+Job 182: Add RefSeq sequence batch 123 to database
+
+Submitted job 182 with external jobid 'Submitted batch job 16251552'.
+
+[Wed Dec  4 20:06:49 2019]
+Job 96: Add RefSeq sequence batch 294 to database
+
+Submitted job 96 with external jobid 'Submitted batch job 16251553'.
+[Wed Dec  4 20:17:28 2019]
+Finished job 161.
+549 of 717 steps (77%) done
+
+[Wed Dec  4 20:17:28 2019]
+Job 585: Add RefSeq sequence batch 482 to database
+
+[Wed Dec  4 20:17:28 2019]
+Finished job 210.
+550 of 717 steps (77%) done
+[Wed Dec  4 20:17:28 2019]
+Finished job 249.
+551 of 717 steps (77%) done
+Submitted job 585 with external jobid 'Submitted batch job 16251559'.
+
+[Wed Dec  4 20:17:28 2019]
+Job 256: Add RefSeq sequence batch 295 to database
+
+Submitted job 256 with external jobid 'Submitted batch job 16251560'.
+
+[Wed Dec  4 20:17:28 2019]
+Job 614: Add RefSeq sequence batch 465 to database
+
+Submitted job 614 with external jobid 'Submitted batch job 16251561'.
+[Wed Dec  4 20:18:01 2019]
+Finished job 90.
+552 of 717 steps (77%) done
+
+[Wed Dec  4 20:18:01 2019]
+Job 557: Add RefSeq sequence batch 106 to database
+
+Submitted job 557 with external jobid 'Submitted batch job 16251562'.
+[Wed Dec  4 20:19:51 2019]
+Finished job 672.
+553 of 717 steps (77%) done
+
+[Wed Dec  4 20:19:51 2019]
+Job 222: Add RefSeq sequence batch 439 to database
+
+Submitted job 222 with external jobid 'Submitted batch job 16251566'.
+[Wed Dec  4 20:20:13 2019]
+Finished job 519.
+554 of 717 steps (77%) done
+
+[Wed Dec  4 20:20:13 2019]
+Job 410: Add RefSeq sequence batch 49 to database
+
+Submitted job 410 with external jobid 'Submitted batch job 16251567'.
+[Wed Dec  4 20:20:24 2019]
+Finished job 594.
+555 of 717 steps (77%) done
+
+[Wed Dec  4 20:20:24 2019]
+Job 394: Add RefSeq sequence batch 183 to database
+
+Submitted job 394 with external jobid 'Submitted batch job 16251568'.
+[Wed Dec  4 20:21:52 2019]
+Finished job 182.
+556 of 717 steps (78%) done
+
+[Wed Dec  4 20:21:52 2019]
+Job 421: Add RefSeq sequence batch 695 to database
+
+Submitted job 421 with external jobid 'Submitted batch job 16251569'.
+[Wed Dec  4 20:22:14 2019]
+Finished job 563.
+557 of 717 steps (78%) done
+
+[Wed Dec  4 20:22:14 2019]
+Job 201: Add RefSeq sequence batch 438 to database
+
+Submitted job 201 with external jobid 'Submitted batch job 16251570'.
+[Wed Dec  4 20:22:25 2019]
+Finished job 96.
+558 of 717 steps (78%) done
+
+[Wed Dec  4 20:22:25 2019]
+Job 348: Add RefSeq sequence batch 154 to database
+
+Submitted job 348 with external jobid 'Submitted batch job 16251571'.
+[Wed Dec  4 20:29:57 2019]
+Finished job 585.
+559 of 717 steps (78%) done
+
+[Wed Dec  4 20:29:57 2019]
+Job 373: Add RefSeq sequence batch 549 to database
+
+Submitted job 373 with external jobid 'Submitted batch job 16251576'.
+[Wed Dec  4 20:30:08 2019]
+Finished job 614.
+560 of 717 steps (78%) done
+
+[Wed Dec  4 20:30:08 2019]
+Job 697: Add RefSeq sequence batch 419 to database
+
+Submitted job 697 with external jobid 'Submitted batch job 16251577'.
+[Wed Dec  4 20:30:19 2019]
+Finished job 256.
+561 of 717 steps (78%) done
+
+[Wed Dec  4 20:30:19 2019]
+Job 116: Add RefSeq sequence batch 290 to database
+
+[Wed Dec  4 20:30:19 2019]
+Finished job 557.
+562 of 717 steps (78%) done
+Submitted job 116 with external jobid 'Submitted batch job 16251578'.
+
+[Wed Dec  4 20:30:19 2019]
+Job 344: Add RefSeq sequence batch 548 to database
+
+Submitted job 344 with external jobid 'Submitted batch job 16251579'.
+[Wed Dec  4 20:36:11 2019]
+Finished job 410.
+563 of 717 steps (79%) done
+
+[Wed Dec  4 20:36:11 2019]
+Job 476: Add RefSeq sequence batch 714 to database
+
+Submitted job 476 with external jobid 'Submitted batch job 16251582'.
+[Wed Dec  4 20:37:39 2019]
+Finished job 373.
+564 of 717 steps (79%) done
+
+[Wed Dec  4 20:37:39 2019]
+Job 193: Add RefSeq sequence batch 146 to database
+
+[Wed Dec  4 20:37:39 2019]
+Finished job 344.
+565 of 717 steps (79%) done
+Submitted job 193 with external jobid 'Submitted batch job 16251584'.
+
+[Wed Dec  4 20:37:39 2019]
+Job 443: Add RefSeq sequence batch 172 to database
+
+Submitted job 443 with external jobid 'Submitted batch job 16251585'.
+[Wed Dec  4 20:37:50 2019]
+Finished job 348.
+566 of 717 steps (79%) done
+
+[Wed Dec  4 20:37:50 2019]
+Job 355: Add RefSeq sequence batch 196 to database
+
+Submitted job 355 with external jobid 'Submitted batch job 16251587'.
+[Wed Dec  4 20:38:01 2019]
+Finished job 421.
+567 of 717 steps (79%) done
+
+[Wed Dec  4 20:38:01 2019]
+Job 81: Add RefSeq sequence batch 308 to database
+
+Submitted job 81 with external jobid 'Submitted batch job 16251588'.
+[Wed Dec  4 20:38:12 2019]
+Finished job 116.
+568 of 717 steps (79%) done
+
+[Wed Dec  4 20:38:12 2019]
+Job 376: Add RefSeq sequence batch 705 to database
+
+Submitted job 376 with external jobid 'Submitted batch job 16251589'.
+[Wed Dec  4 20:38:23 2019]
+Finished job 394.
+569 of 717 steps (79%) done
+
+[Wed Dec  4 20:38:23 2019]
+Job 10: Add RefSeq sequence batch 248 to database
+
+[Wed Dec  4 20:38:23 2019]
+Finished job 201.
+570 of 717 steps (79%) done
+Submitted job 10 with external jobid 'Submitted batch job 16251590'.
+[Wed Dec  4 20:38:23 2019]
+Finished job 476.
+571 of 717 steps (80%) done
+
+[Wed Dec  4 20:38:23 2019]
+Job 459: Add RefSeq sequence batch 259 to database
+
+Submitted job 459 with external jobid 'Submitted batch job 16251591'.
+
+[Wed Dec  4 20:38:23 2019]
+Job 140: Add RefSeq sequence batch 553 to database
+
+Submitted job 140 with external jobid 'Submitted batch job 16251592'.
+[Wed Dec  4 20:38:34 2019]
+Finished job 222.
+572 of 717 steps (80%) done
+
+[Wed Dec  4 20:38:34 2019]
+Job 233: Add RefSeq sequence batch 271 to database
+
+Submitted job 233 with external jobid 'Submitted batch job 16251593'.
+[Wed Dec  4 20:38:45 2019]
+Finished job 697.
+573 of 717 steps (80%) done
+
+[Wed Dec  4 20:38:45 2019]
+Job 528: Add RefSeq sequence batch 367 to database
+
+Submitted job 528 with external jobid 'Submitted batch job 16251594'.
+[Wed Dec  4 20:39:51 2019]
+Finished job 443.
+574 of 717 steps (80%) done
+
+[Wed Dec  4 20:39:51 2019]
+Job 646: Add RefSeq sequence batch 451 to database
+
+Submitted job 646 with external jobid 'Submitted batch job 16251595'.
+[Wed Dec  4 20:40:35 2019]
+Finished job 81.
+575 of 717 steps (80%) done
+
+[Wed Dec  4 20:40:35 2019]
+Job 114: Add RefSeq sequence batch 223 to database
+
+Submitted job 114 with external jobid 'Submitted batch job 16251599'.
+[Wed Dec  4 20:40:46 2019]
+Finished job 376.
+576 of 717 steps (80%) done
+
+[Wed Dec  4 20:40:46 2019]
+Job 605: Add RefSeq sequence batch 584 to database
+
+Submitted job 605 with external jobid 'Submitted batch job 16251600'.
+[Wed Dec  4 20:41:19 2019]
+Finished job 193.
+577 of 717 steps (80%) done
+
+[Wed Dec  4 20:41:19 2019]
+Job 92: Add RefSeq sequence batch 348 to database
+
+[Wed Dec  4 20:41:19 2019]
+Finished job 355.
+578 of 717 steps (81%) done
+Submitted job 92 with external jobid 'Submitted batch job 16251601'.
+[Wed Dec  4 20:41:19 2019]
+Finished job 140.
+579 of 717 steps (81%) done
+
+[Wed Dec  4 20:41:19 2019]
+Job 58: Add RefSeq sequence batch 257 to database
+
+[Wed Dec  4 20:41:20 2019]
+Finished job 233.
+580 of 717 steps (81%) done
+Submitted job 58 with external jobid 'Submitted batch job 16251602'.
+
+[Wed Dec  4 20:41:20 2019]
+Job 241: Add RefSeq sequence batch 370 to database
+
+[Wed Dec  4 20:41:20 2019]
+Finished job 528.
+581 of 717 steps (81%) done
+Submitted job 241 with external jobid 'Submitted batch job 16251603'.
+
+[Wed Dec  4 20:41:20 2019]
+Job 336: Add RefSeq sequence batch 462 to database
+
+Submitted job 336 with external jobid 'Submitted batch job 16251604'.
+
+[Wed Dec  4 20:41:20 2019]
+Job 561: Add RefSeq sequence batch 670 to database
+
+Submitted job 561 with external jobid 'Submitted batch job 16251605'.
+[Wed Dec  4 20:41:30 2019]
+Finished job 459.
+582 of 717 steps (81%) done
+
+[Wed Dec  4 20:41:30 2019]
+Job 297: Add RefSeq sequence batch 427 to database
+
+Submitted job 297 with external jobid 'Submitted batch job 16251606'.
+[Wed Dec  4 20:41:41 2019]
+Finished job 10.
+583 of 717 steps (81%) done
+
+[Wed Dec  4 20:41:41 2019]
+Job 180: Add RefSeq sequence batch 421 to database
+
+Submitted job 180 with external jobid 'Submitted batch job 16251607'.
+[Wed Dec  4 20:42:25 2019]
+Finished job 646.
+584 of 717 steps (81%) done
+
+[Wed Dec  4 20:42:26 2019]
+Job 711: Add RefSeq sequence batch 263 to database
+
+Submitted job 711 with external jobid 'Submitted batch job 16251610'.
+[Wed Dec  4 20:43:10 2019]
+Finished job 605.
+585 of 717 steps (82%) done
+
+[Wed Dec  4 20:43:10 2019]
+Job 121: Add RefSeq sequence batch 537 to database
+
+Submitted job 121 with external jobid 'Submitted batch job 16251611'.
+[Wed Dec  4 20:43:32 2019]
+Finished job 114.
+586 of 717 steps (82%) done
+
+[Wed Dec  4 20:43:32 2019]
+Job 546: Add RefSeq sequence batch 563 to database
+
+Submitted job 546 with external jobid 'Submitted batch job 16251612'.
+[Wed Dec  4 20:43:54 2019]
+Finished job 92.
+587 of 717 steps (82%) done
+
+[Wed Dec  4 20:43:54 2019]
+Job 125: Add RefSeq sequence batch 184 to database
+
+[Wed Dec  4 20:43:54 2019]
+Finished job 336.
+588 of 717 steps (82%) done
+Submitted job 125 with external jobid 'Submitted batch job 16251613'.
+[Wed Dec  4 20:43:54 2019]
+Finished job 561.
+589 of 717 steps (82%) done
+
+[Wed Dec  4 20:43:54 2019]
+Job 286: Add RefSeq sequence batch 612 to database
+
+Submitted job 286 with external jobid 'Submitted batch job 16251614'.
+
+[Wed Dec  4 20:43:54 2019]
+Job 291: Add RefSeq sequence batch 477 to database
+
+Submitted job 291 with external jobid 'Submitted batch job 16251615'.
+[Wed Dec  4 20:44:16 2019]
+Finished job 58.
+590 of 717 steps (82%) done
+
+[Wed Dec  4 20:44:16 2019]
+Job 540: Add RefSeq sequence batch 519 to database
+
+Submitted job 540 with external jobid 'Submitted batch job 16251616'.
+[Wed Dec  4 20:44:38 2019]
+Finished job 241.
+591 of 717 steps (82%) done
+
+[Wed Dec  4 20:44:38 2019]
+Job 467: Add RefSeq sequence batch 524 to database
+
+[Wed Dec  4 20:44:38 2019]
+Finished job 711.
+592 of 717 steps (83%) done
+Submitted job 467 with external jobid 'Submitted batch job 16251617'.
+
+[Wed Dec  4 20:44:38 2019]
+Job 544: Add RefSeq sequence batch 450 to database
+
+Submitted job 544 with external jobid 'Submitted batch job 16251618'.
+[Wed Dec  4 20:45:00 2019]
+Finished job 297.
+593 of 717 steps (83%) done
+
+[Wed Dec  4 20:45:00 2019]
+Job 529: Add RefSeq sequence batch 489 to database
+
+Submitted job 529 with external jobid 'Submitted batch job 16251619'.
+[Wed Dec  4 20:45:11 2019]
+Finished job 121.
+594 of 717 steps (83%) done
+
+[Wed Dec  4 20:45:11 2019]
+Job 5: Add RefSeq sequence batch 496 to database
+
+Submitted job 5 with external jobid 'Submitted batch job 16251620'.
+[Wed Dec  4 20:45:22 2019]
+Finished job 180.
+595 of 717 steps (83%) done
+
+[Wed Dec  4 20:45:22 2019]
+Job 621: Add RefSeq sequence batch 104 to database
+
+Submitted job 621 with external jobid 'Submitted batch job 16251621'.
+[Wed Dec  4 20:46:39 2019]
+Finished job 544.
+596 of 717 steps (83%) done
+
+[Wed Dec  4 20:46:39 2019]
+Job 71: Add RefSeq sequence batch 687 to database
+
+Submitted job 71 with external jobid 'Submitted batch job 16251625'.
+[Wed Dec  4 20:47:12 2019]
+Finished job 125.
+597 of 717 steps (83%) done
+
+[Wed Dec  4 20:47:12 2019]
+Job 623: Add RefSeq sequence batch 385 to database
+
+[Wed Dec  4 20:47:12 2019]
+Finished job 546.
+598 of 717 steps (83%) done
+Submitted job 623 with external jobid 'Submitted batch job 16251626'.
+[Wed Dec  4 20:47:12 2019]
+Finished job 5.
+599 of 717 steps (84%) done
+
+[Wed Dec  4 20:47:12 2019]
+Job 133: Add RefSeq sequence batch 426 to database
+
+Submitted job 133 with external jobid 'Submitted batch job 16251627'.
+
+[Wed Dec  4 20:47:12 2019]
+Job 327: Add RefSeq sequence batch 324 to database
+
+Submitted job 327 with external jobid 'Submitted batch job 16251628'.
+[Wed Dec  4 20:47:23 2019]
+Finished job 291.
+600 of 717 steps (84%) done
+
+[Wed Dec  4 20:47:23 2019]
+Job 212: Add RefSeq sequence batch 320 to database
+
+Submitted job 212 with external jobid 'Submitted batch job 16251629'.
+[Wed Dec  4 20:47:34 2019]
+Finished job 540.
+601 of 717 steps (84%) done
+
+[Wed Dec  4 20:47:34 2019]
+Job 137: Add RefSeq sequence batch 160 to database
+
+Submitted job 137 with external jobid 'Submitted batch job 16251630'.
+[Wed Dec  4 20:47:56 2019]
+Finished job 286.
+602 of 717 steps (84%) done
+
+[Wed Dec  4 20:47:56 2019]
+Job 44: Add RefSeq sequence batch 558 to database
+
+[Wed Dec  4 20:47:56 2019]
+Finished job 467.
+Submitted job 44 with external jobid 'Submitted batch job 16251631'.
+603 of 717 steps (84%) done
+[Wed Dec  4 20:47:56 2019]
+Finished job 529.
+604 of 717 steps (84%) done
+
+[Wed Dec  4 20:47:56 2019]
+Job 651: Add RefSeq sequence batch 125 to database
+
+Submitted job 651 with external jobid 'Submitted batch job 16251632'.
+
+[Wed Dec  4 20:47:56 2019]
+Job 97: Add RefSeq sequence batch 150 to database
+
+Submitted job 97 with external jobid 'Submitted batch job 16251633'.
+[Wed Dec  4 20:48:29 2019]
+Finished job 621.
+605 of 717 steps (84%) done
+
+[Wed Dec  4 20:48:29 2019]
+Job 155: Add RefSeq sequence batch 461 to database
+
+Submitted job 155 with external jobid 'Submitted batch job 16251634'.
+[Wed Dec  4 20:49:13 2019]
+Finished job 71.
+606 of 717 steps (85%) done
+
+[Wed Dec  4 20:49:13 2019]
+Job 35: Add RefSeq sequence batch 283 to database
+
+Submitted job 35 with external jobid 'Submitted batch job 16251636'.
+[Wed Dec  4 20:49:35 2019]
+Finished job 44.
+607 of 717 steps (85%) done
+
+[Wed Dec  4 20:49:35 2019]
+Job 534: Add RefSeq sequence batch 605 to database
+
+Submitted job 534 with external jobid 'Submitted batch job 16251638'.
+[Wed Dec  4 20:49:46 2019]
+Finished job 327.
+608 of 717 steps (85%) done
+
+[Wed Dec  4 20:49:46 2019]
+Job 194: Add RefSeq sequence batch 536 to database
+
+Submitted job 194 with external jobid 'Submitted batch job 16251639'.
+[Wed Dec  4 20:50:08 2019]
+Finished job 212.
+609 of 717 steps (85%) done
+
+[Wed Dec  4 20:50:08 2019]
+Job 115: Add RefSeq sequence batch 262 to database
+
+Submitted job 115 with external jobid 'Submitted batch job 16251640'.
+[Wed Dec  4 20:50:19 2019]
+Finished job 133.
+610 of 717 steps (85%) done
+
+[Wed Dec  4 20:50:19 2019]
+Job 292: Add RefSeq sequence batch 585 to database
+
+Submitted job 292 with external jobid 'Submitted batch job 16251643'.
+[Wed Dec  4 20:50:41 2019]
+Finished job 623.
+611 of 717 steps (85%) done
+
+[Wed Dec  4 20:50:41 2019]
+Job 678: Add RefSeq sequence batch 499 to database
+
+[Wed Dec  4 20:50:41 2019]
+Finished job 137.
+612 of 717 steps (85%) done
+Submitted job 678 with external jobid 'Submitted batch job 16251644'.
+
+[Wed Dec  4 20:50:41 2019]
+Job 70: Add RefSeq sequence batch 364 to database
+
+Submitted job 70 with external jobid 'Submitted batch job 16251645'.
+[Wed Dec  4 20:50:52 2019]
+Finished job 651.
+613 of 717 steps (85%) done
+
+[Wed Dec  4 20:50:52 2019]
+Job 486: Add RefSeq sequence batch 446 to database
+
+Submitted job 486 with external jobid 'Submitted batch job 16251646'.
+[Wed Dec  4 20:51:14 2019]
+Finished job 97.
+614 of 717 steps (86%) done
+
+[Wed Dec  4 20:51:14 2019]
+Job 365: Add RefSeq sequence batch 412 to database
+
+Submitted job 365 with external jobid 'Submitted batch job 16251647'.
+[Wed Dec  4 20:51:36 2019]
+Finished job 155.
+615 of 717 steps (86%) done
+
+[Wed Dec  4 20:51:36 2019]
+Job 80: Add RefSeq sequence batch 27 to database
+
+[Wed Dec  4 20:51:36 2019]
+Finished job 35.
+616 of 717 steps (86%) done
+Submitted job 80 with external jobid 'Submitted batch job 16251648'.
+
+[Wed Dec  4 20:51:36 2019]
+Job 560: Add RefSeq sequence batch 621 to database
+
+Submitted job 560 with external jobid 'Submitted batch job 16251649'.
+[Wed Dec  4 20:51:58 2019]
+Finished job 194.
+617 of 717 steps (86%) done
+
+[Wed Dec  4 20:51:58 2019]
+Job 667: Add RefSeq sequence batch 487 to database
+
+Submitted job 667 with external jobid 'Submitted batch job 16251650'.
+[Wed Dec  4 20:52:20 2019]
+Finished job 115.
+618 of 717 steps (86%) done
+
+[Wed Dec  4 20:52:20 2019]
+Job 295: Add RefSeq sequence batch 92 to database
+
+Submitted job 295 with external jobid 'Submitted batch job 16251651'.
+[Wed Dec  4 20:52:42 2019]
+Finished job 534.
+619 of 717 steps (86%) done
+
+[Wed Dec  4 20:52:42 2019]
+Job 705: Add RefSeq sequence batch 244 to database
+
+Submitted job 705 with external jobid 'Submitted batch job 16251653'.
+[Wed Dec  4 20:52:53 2019]
+Finished job 292.
+620 of 717 steps (86%) done
+
+[Wed Dec  4 20:52:53 2019]
+Job 484: Add RefSeq sequence batch 267 to database
+
+Submitted job 484 with external jobid 'Submitted batch job 16251656'.
+[Wed Dec  4 20:53:27 2019]
+Finished job 678.
+621 of 717 steps (87%) done
+
+[Wed Dec  4 20:53:27 2019]
+Job 632: Add RefSeq sequence batch 302 to database
+
+[Wed Dec  4 20:53:27 2019]
+Finished job 486.
+622 of 717 steps (87%) done
+Submitted job 632 with external jobid 'Submitted batch job 16251657'.
+
+[Wed Dec  4 20:53:27 2019]
+Job 127: Add RefSeq sequence batch 342 to database
+
+Submitted job 127 with external jobid 'Submitted batch job 16251658'.
+[Wed Dec  4 20:53:49 2019]
+Finished job 560.
+623 of 717 steps (87%) done
+
+[Wed Dec  4 20:53:49 2019]
+Job 538: Add RefSeq sequence batch 261 to database
+
+Submitted job 538 with external jobid 'Submitted batch job 16251659'.
+[Wed Dec  4 20:54:00 2019]
+Finished job 80.
+624 of 717 steps (87%) done
+
+[Wed Dec  4 20:54:00 2019]
+Job 315: Add RefSeq sequence batch 3 to database
+
+Submitted job 315 with external jobid 'Submitted batch job 16251660'.
+[Wed Dec  4 20:54:22 2019]
+Finished job 365.
+625 of 717 steps (87%) done
+
+[Wed Dec  4 20:54:22 2019]
+Job 144: Add RefSeq sequence batch 225 to database
+
+[Wed Dec  4 20:54:22 2019]
+Finished job 667.
+626 of 717 steps (87%) done
+Submitted job 144 with external jobid 'Submitted batch job 16251661'.
+
+[Wed Dec  4 20:54:22 2019]
+Job 318: Add RefSeq sequence batch 541 to database
+
+Submitted job 318 with external jobid 'Submitted batch job 16251662'.
+[Wed Dec  4 20:54:33 2019]
+Finished job 70.
+627 of 717 steps (87%) done
+
+[Wed Dec  4 20:54:33 2019]
+Job 187: Add RefSeq sequence batch 0 to database
+
+Submitted job 187 with external jobid 'Submitted batch job 16251664'.
+[Wed Dec  4 20:55:39 2019]
+Finished job 295.
+628 of 717 steps (88%) done
+
+[Wed Dec  4 20:55:39 2019]
+Job 366: Add RefSeq sequence batch 470 to database
+
+[Wed Dec  4 20:55:39 2019]
+Finished job 127.
+629 of 717 steps (88%) done
+Submitted job 366 with external jobid 'Submitted batch job 16251665'.
+[Wed Dec  4 20:55:39 2019]
+Finished job 538.
+630 of 717 steps (88%) done
+
+[Wed Dec  4 20:55:39 2019]
+Job 367: Add RefSeq sequence batch 527 to database
+
+Submitted job 367 with external jobid 'Submitted batch job 16251666'.
+
+[Wed Dec  4 20:55:39 2019]
+Job 596: Add RefSeq sequence batch 255 to database
+
+Submitted job 596 with external jobid 'Submitted batch job 16251667'.
+[Wed Dec  4 20:55:50 2019]
+Finished job 484.
+631 of 717 steps (88%) done
+
+[Wed Dec  4 20:55:50 2019]
+Job 480: Add RefSeq sequence batch 56 to database
+
+Submitted job 480 with external jobid 'Submitted batch job 16251668'.
+[Wed Dec  4 20:56:23 2019]
+Finished job 632.
+632 of 717 steps (88%) done
+
+[Wed Dec  4 20:56:23 2019]
+Job 382: Add RefSeq sequence batch 535 to database
+
+Submitted job 382 with external jobid 'Submitted batch job 16251669'.
+[Wed Dec  4 20:56:34 2019]
+Finished job 318.
+633 of 717 steps (88%) done
+
+[Wed Dec  4 20:56:34 2019]
+Job 302: Add RefSeq sequence batch 473 to database
+
+Submitted job 302 with external jobid 'Submitted batch job 16251670'.
+[Wed Dec  4 20:57:07 2019]
+Finished job 144.
+634 of 717 steps (88%) done
+
+[Wed Dec  4 20:57:07 2019]
+Job 363: Add RefSeq sequence batch 466 to database
+
+Submitted job 363 with external jobid 'Submitted batch job 16251671'.
+[Wed Dec  4 20:57:29 2019]
+Finished job 705.
+635 of 717 steps (89%) done
+
+[Wed Dec  4 20:57:29 2019]
+Job 217: Add RefSeq sequence batch 414 to database
+
+Submitted job 217 with external jobid 'Submitted batch job 16251672'.
+[Wed Dec  4 20:57:40 2019]
+Finished job 315.
+636 of 717 steps (89%) done
+
+[Wed Dec  4 20:57:40 2019]
+Job 216: Add RefSeq sequence batch 525 to database
+
+Submitted job 216 with external jobid 'Submitted batch job 16251674'.
+[Wed Dec  4 20:58:02 2019]
+Finished job 596.
+637 of 717 steps (89%) done
+
+[Wed Dec  4 20:58:02 2019]
+Job 638: Add RefSeq sequence batch 575 to database
+
+Submitted job 638 with external jobid 'Submitted batch job 16251675'.
+[Wed Dec  4 20:58:13 2019]
+Finished job 366.
+638 of 717 steps (89%) done
+
+[Wed Dec  4 20:58:13 2019]
+Job 230: Add RefSeq sequence batch 618 to database
+
+Submitted job 230 with external jobid 'Submitted batch job 16251676'.
+[Wed Dec  4 20:58:35 2019]
+Finished job 302.
+639 of 717 steps (89%) done
+
+[Wed Dec  4 20:58:35 2019]
+Job 167: Add RefSeq sequence batch 19 to database
+
+Submitted job 167 with external jobid 'Submitted batch job 16251678'.
+[Wed Dec  4 20:58:46 2019]
+Finished job 187.
+640 of 717 steps (89%) done
+
+[Wed Dec  4 20:58:46 2019]
+Job 390: Add RefSeq sequence batch 663 to database
+
+Submitted job 390 with external jobid 'Submitted batch job 16251679'.
+[Wed Dec  4 20:58:57 2019]
+Finished job 367.
+641 of 717 steps (89%) done
+
+[Wed Dec  4 20:58:57 2019]
+Job 111: Add RefSeq sequence batch 71 to database
+
+[Wed Dec  4 20:58:57 2019]
+Finished job 480.
+642 of 717 steps (90%) done
+Submitted job 111 with external jobid 'Submitted batch job 16251680'.
+
+[Wed Dec  4 20:58:57 2019]
+Job 99: Add RefSeq sequence batch 636 to database
+
+Submitted job 99 with external jobid 'Submitted batch job 16251681'.
+[Wed Dec  4 20:59:19 2019]
+Finished job 382.
+643 of 717 steps (90%) done
+
+[Wed Dec  4 20:59:19 2019]
+Job 616: Add RefSeq sequence batch 430 to database
+
+Submitted job 616 with external jobid 'Submitted batch job 16251682'.
+[Wed Dec  4 21:00:03 2019]
+Finished job 363.
+644 of 717 steps (90%) done
+
+[Wed Dec  4 21:00:03 2019]
+Job 94: Add RefSeq sequence batch 129 to database
+
+[Wed Dec  4 21:00:03 2019]
+Finished job 638.
+645 of 717 steps (90%) done
+Submitted job 94 with external jobid 'Submitted batch job 16251683'.
+
+[Wed Dec  4 21:00:03 2019]
+Job 500: Add RefSeq sequence batch 463 to database
+
+Submitted job 500 with external jobid 'Submitted batch job 16251684'.
+[Wed Dec  4 21:00:47 2019]
+Finished job 217.
+646 of 717 steps (90%) done
+
+[Wed Dec  4 21:00:47 2019]
+Job 425: Add RefSeq sequence batch 655 to database
+
+[Wed Dec  4 21:00:47 2019]
+Finished job 230.
+Submitted job 425 with external jobid 'Submitted batch job 16251686'.
+647 of 717 steps (90%) done
+
+[Wed Dec  4 21:00:47 2019]
+Job 84: Add RefSeq sequence batch 440 to database
+
+Submitted job 84 with external jobid 'Submitted batch job 16251687'.
+[Wed Dec  4 21:00:58 2019]
+Finished job 216.
+648 of 717 steps (90%) done
+
+[Wed Dec  4 21:00:58 2019]
+Job 627: Add RefSeq sequence batch 344 to database
+
+Submitted job 627 with external jobid 'Submitted batch job 16251688'.
+[Wed Dec  4 21:01:09 2019]
+Finished job 390.
+649 of 717 steps (91%) done
+
+[Wed Dec  4 21:01:09 2019]
+Job 693: Add RefSeq sequence batch 418 to database
+
+Submitted job 693 with external jobid 'Submitted batch job 16251690'.
+[Wed Dec  4 21:01:42 2019]
+Finished job 167.
+650 of 717 steps (91%) done
+
+[Wed Dec  4 21:01:42 2019]
+Job 662: Add RefSeq sequence batch 397 to database
+
+[Wed Dec  4 21:01:42 2019]
+Finished job 616.
+651 of 717 steps (91%) done
+Submitted job 662 with external jobid 'Submitted batch job 16251691'.
+
+[Wed Dec  4 21:01:42 2019]
+Job 310: Add RefSeq sequence batch 650 to database
+
+Submitted job 310 with external jobid 'Submitted batch job 16251692'.
+[Wed Dec  4 21:01:54 2019]
+Finished job 111.
+652 of 717 steps (91%) done
+
+[Wed Dec  4 21:01:54 2019]
+Job 234: Add RefSeq sequence batch 26 to database
+
+[Wed Dec  4 21:01:54 2019]
+Finished job 99.
+653 of 717 steps (91%) done
+Submitted job 234 with external jobid 'Submitted batch job 16251693'.
+
+[Wed Dec  4 21:01:54 2019]
+Job 698: Add RefSeq sequence batch 492 to database
+
+Submitted job 698 with external jobid 'Submitted batch job 16251694'.
+[Wed Dec  4 21:02:16 2019]
+Finished job 500.
+654 of 717 steps (91%) done
+
+[Wed Dec  4 21:02:16 2019]
+Job 88: Add RefSeq sequence batch 392 to database
+
+Submitted job 88 with external jobid 'Submitted batch job 16251695'.
+[Wed Dec  4 21:02:49 2019]
+Finished job 94.
+655 of 717 steps (91%) done
+
+[Wed Dec  4 21:02:49 2019]
+Job 468: Add RefSeq sequence batch 586 to database
+
+Submitted job 468 with external jobid 'Submitted batch job 16251697'.
+[Wed Dec  4 21:03:44 2019]
+Finished job 84.
+656 of 717 steps (91%) done
+
+[Wed Dec  4 21:03:44 2019]
+Job 469: Add RefSeq sequence batch 658 to database
+
+[Wed Dec  4 21:03:44 2019]
+Finished job 693.
+657 of 717 steps (92%) done
+Submitted job 469 with external jobid 'Submitted batch job 16251699'.
+
+[Wed Dec  4 21:03:44 2019]
+Job 105: Add RefSeq sequence batch 210 to database
+
+Submitted job 105 with external jobid 'Submitted batch job 16251700'.
+[Wed Dec  4 21:04:06 2019]
+Finished job 425.
+658 of 717 steps (92%) done
+
+[Wed Dec  4 21:04:06 2019]
+Job 436: Add RefSeq sequence batch 469 to database
+
+[Wed Dec  4 21:04:06 2019]
+Finished job 627.
+659 of 717 steps (92%) done
+Submitted job 436 with external jobid 'Submitted batch job 16251701'.
+[Wed Dec  4 21:04:06 2019]
+Finished job 234.
+660 of 717 steps (92%) done
+
+[Wed Dec  4 21:04:06 2019]
+Job 51: Add RefSeq sequence batch 674 to database
+
+Submitted job 51 with external jobid 'Submitted batch job 16251702'.
+
+[Wed Dec  4 21:04:06 2019]
+Job 303: Add RefSeq sequence batch 528 to database
+
+Submitted job 303 with external jobid 'Submitted batch job 16251703'.
+[Wed Dec  4 21:04:50 2019]
+Finished job 310.
+661 of 717 steps (92%) done
+
+[Wed Dec  4 21:04:50 2019]
+Job 592: Add RefSeq sequence batch 572 to database
+
+[Wed Dec  4 21:04:50 2019]
+Finished job 88.
+662 of 717 steps (92%) done
+Submitted job 592 with external jobid 'Submitted batch job 16251704'.
+
+[Wed Dec  4 21:04:50 2019]
+Job 690: Add RefSeq sequence batch 291 to database
+
+Submitted job 690 with external jobid 'Submitted batch job 16251705'.
+[Wed Dec  4 21:05:12 2019]
+Finished job 468.
+663 of 717 steps (92%) done
+
+[Wed Dec  4 21:05:12 2019]
+Job 448: Add RefSeq sequence batch 274 to database
+
+Submitted job 448 with external jobid 'Submitted batch job 16251706'.
+[Wed Dec  4 21:05:23 2019]
+Finished job 698.
+664 of 717 steps (93%) done
+
+[Wed Dec  4 21:05:23 2019]
+Job 372: Add RefSeq sequence batch 415 to database
+
+Submitted job 372 with external jobid 'Submitted batch job 16251707'.
+[Wed Dec  4 21:05:34 2019]
+Finished job 662.
+665 of 717 steps (93%) done
+
+[Wed Dec  4 21:05:34 2019]
+Job 696: Add RefSeq sequence batch 373 to database
+
+Submitted job 696 with external jobid 'Submitted batch job 16251708'.
+[Wed Dec  4 21:05:56 2019]
+Finished job 105.
+666 of 717 steps (93%) done
+
+[Wed Dec  4 21:05:56 2019]
+Job 259: Add RefSeq sequence batch 506 to database
+
+Submitted job 259 with external jobid 'Submitted batch job 16251709'.
+[Wed Dec  4 21:06:40 2019]
+Finished job 436.
+667 of 717 steps (93%) done
+
+[Wed Dec  4 21:06:40 2019]
+Job 393: Add RefSeq sequence batch 96 to database
+
+Submitted job 393 with external jobid 'Submitted batch job 16251710'.
+[Wed Dec  4 21:07:02 2019]
+Finished job 469.
+668 of 717 steps (93%) done
+
+[Wed Dec  4 21:07:02 2019]
+Job 402: Add RefSeq sequence batch 360 to database
+
+[Wed Dec  4 21:07:02 2019]
+Finished job 51.
+669 of 717 steps (93%) done
+Submitted job 402 with external jobid 'Submitted batch job 16251712'.
+[Wed Dec  4 21:07:02 2019]
+Finished job 592.
+670 of 717 steps (93%) done
+
+[Wed Dec  4 21:07:02 2019]
+Job 401: Add RefSeq sequence batch 42 to database
+
+Submitted job 401 with external jobid 'Submitted batch job 16251713'.
+
+[Wed Dec  4 21:07:02 2019]
+Job 470: Add RefSeq sequence batch 345 to database
+
+Submitted job 470 with external jobid 'Submitted batch job 16251714'.
+[Wed Dec  4 21:07:24 2019]
+Finished job 690.
+671 of 717 steps (94%) done
+
+[Wed Dec  4 21:07:24 2019]
+Job 636: Add RefSeq sequence batch 560 to database
+
+Submitted job 636 with external jobid 'Submitted batch job 16251715'.
+[Wed Dec  4 21:07:46 2019]
+Finished job 448.
+672 of 717 steps (94%) done
+
+[Wed Dec  4 21:07:46 2019]
+Job 597: Add RefSeq sequence batch 333 to database
+
+Submitted job 597 with external jobid 'Submitted batch job 16251717'.
+[Wed Dec  4 21:08:08 2019]
+Finished job 303.
+673 of 717 steps (94%) done
+
+[Wed Dec  4 21:08:08 2019]
+Job 613: Add RefSeq sequence batch 75 to database
+
+Submitted job 613 with external jobid 'Submitted batch job 16251718'.
+[Wed Dec  4 21:08:19 2019]
+Finished job 259.
+674 of 717 steps (94%) done
+
+[Wed Dec  4 21:08:19 2019]
+Job 251: Add RefSeq sequence batch 304 to database
+
+Submitted job 251 with external jobid 'Submitted batch job 16251719'.
+[Wed Dec  4 21:08:30 2019]
+Finished job 696.
+675 of 717 steps (94%) done
+
+[Wed Dec  4 21:08:30 2019]
+Job 537: Add RefSeq sequence batch 41 to database
+
+Submitted job 537 with external jobid 'Submitted batch job 16251720'.
+[Wed Dec  4 21:08:41 2019]
+Finished job 372.
+676 of 717 steps (94%) done
+
+[Wed Dec  4 21:08:41 2019]
+Job 273: Add RefSeq sequence batch 178 to database
+
+Submitted job 273 with external jobid 'Submitted batch job 16251721'.
+[Wed Dec  4 21:09:25 2019]
+Finished job 393.
+677 of 717 steps (94%) done
+
+[Wed Dec  4 21:09:25 2019]
+Job 522: Add RefSeq sequence batch 276 to database
+
+Submitted job 522 with external jobid 'Submitted batch job 16251722'.
+[Wed Dec  4 21:09:36 2019]
+Finished job 402.
+678 of 717 steps (95%) done
+
+[Wed Dec  4 21:09:36 2019]
+Job 136: Add RefSeq sequence batch 88 to database
+
+[Wed Dec  4 21:09:36 2019]
+Finished job 470.
+679 of 717 steps (95%) done
+Submitted job 136 with external jobid 'Submitted batch job 16251723'.
+[Wed Dec  4 21:09:36 2019]
+Finished job 636.
+680 of 717 steps (95%) done
+
+[Wed Dec  4 21:09:36 2019]
+Job 704: Add RefSeq sequence batch 147 to database
+
+Submitted job 704 with external jobid 'Submitted batch job 16251724'.
+
+[Wed Dec  4 21:09:36 2019]
+Job 188: Add RefSeq sequence batch 443 to database
+
+Submitted job 188 with external jobid 'Submitted batch job 16251725'.
+[Wed Dec  4 21:10:42 2019]
+Finished job 251.
+681 of 717 steps (95%) done
+
+[Wed Dec  4 21:10:42 2019]
+Job 639: Add RefSeq sequence batch 676 to database
+
+Submitted job 639 with external jobid 'Submitted batch job 16251726'.
+[Wed Dec  4 21:10:53 2019]
+Finished job 613.
+682 of 717 steps (95%) done
+
+[Wed Dec  4 21:10:53 2019]
+Job 119: Add RefSeq sequence batch 78 to database
+
+Submitted job 119 with external jobid 'Submitted batch job 16251727'.
+[Wed Dec  4 21:11:26 2019]
+Finished job 597.
+683 of 717 steps (95%) done
+
+[Wed Dec  4 21:11:26 2019]
+Job 191: Add RefSeq sequence batch 627 to database
+
+Submitted job 191 with external jobid 'Submitted batch job 16251728'.
+[Wed Dec  4 21:11:37 2019]
+Finished job 188.
+684 of 717 steps (95%) done
+
+[Wed Dec  4 21:11:37 2019]
+Job 209: Add RefSeq sequence batch 245 to database
+
+Submitted job 209 with external jobid 'Submitted batch job 16251729'.
+[Wed Dec  4 21:11:48 2019]
+Finished job 273.
+685 of 717 steps (96%) done
+
+[Wed Dec  4 21:11:48 2019]
+Job 549: Add RefSeq sequence batch 476 to database
+
+Submitted job 549 with external jobid 'Submitted batch job 16251730'.
+[Wed Dec  4 21:12:21 2019]
+Finished job 401.
+686 of 717 steps (96%) done
+
+[Wed Dec  4 21:12:21 2019]
+Job 150: Add RefSeq sequence batch 139 to database
+
+[Wed Dec  4 21:12:21 2019]
+Finished job 191.
+687 of 717 steps (96%) done
+Submitted job 150 with external jobid 'Submitted batch job 16251731'.
+
+[Wed Dec  4 21:12:21 2019]
+Job 499: Add RefSeq sequence batch 610 to database
+
+Submitted job 499 with external jobid 'Submitted batch job 16251732'.
+[Wed Dec  4 21:12:32 2019]
+Finished job 704.
+688 of 717 steps (96%) done
+
+[Wed Dec  4 21:12:32 2019]
+Job 85: Add RefSeq sequence batch 85 to database
+
+Submitted job 85 with external jobid 'Submitted batch job 16251733'.
+[Wed Dec  4 21:12:43 2019]
+Finished job 522.
+689 of 717 steps (96%) done
+
+[Wed Dec  4 21:12:43 2019]
+Job 569: Add RefSeq sequence batch 490 to database
+
+Submitted job 569 with external jobid 'Submitted batch job 16251734'.
+[Wed Dec  4 21:13:38 2019]
+Finished job 209.
+690 of 717 steps (96%) done
+
+[Wed Dec  4 21:13:38 2019]
+Job 703: Add RefSeq sequence batch 158 to database
+
+Submitted job 703 with external jobid 'Submitted batch job 16251735'.
+[Wed Dec  4 21:13:49 2019]
+Finished job 136.
+691 of 717 steps (96%) done
+
+[Wed Dec  4 21:13:49 2019]
+Job 162: Add RefSeq sequence batch 711 to database
+
+[Wed Dec  4 21:13:50 2019]
+Finished job 639.
+692 of 717 steps (97%) done
+Submitted job 162 with external jobid 'Submitted batch job 16251736'.
+
+[Wed Dec  4 21:13:50 2019]
+Job 239: Add RefSeq sequence batch 8 to database
+
+Submitted job 239 with external jobid 'Submitted batch job 16251737'.
+[Wed Dec  4 21:14:01 2019]
+Finished job 537.
+693 of 717 steps (97%) done
+
+[Wed Dec  4 21:14:01 2019]
+Job 334: Add RefSeq sequence batch 68 to database
+
+[Wed Dec  4 21:14:01 2019]
+Finished job 119.
+694 of 717 steps (97%) done
+Submitted job 334 with external jobid 'Submitted batch job 16251738'.
+
+[Wed Dec  4 21:14:01 2019]
+Job 707: Add RefSeq sequence batch 100 to database
+
+Submitted job 707 with external jobid 'Submitted batch job 16251739'.
+[Wed Dec  4 21:14:23 2019]
+Finished job 549.
+695 of 717 steps (97%) done
+
+[Wed Dec  4 21:14:23 2019]
+Job 56: Add RefSeq sequence batch 352 to database
+
+Submitted job 56 with external jobid 'Submitted batch job 16251741'.
+[Wed Dec  4 21:15:07 2019]
+Finished job 499.
+696 of 717 steps (97%) done
+
+[Wed Dec  4 21:15:07 2019]
+Job 14: Add RefSeq sequence batch 455 to database
+
+Submitted job 14 with external jobid 'Submitted batch job 16251742'.
+[Wed Dec  4 21:15:18 2019]
+Finished job 569.
+697 of 717 steps (97%) done
+
+[Wed Dec  4 21:15:18 2019]
+Job 264: Add RefSeq sequence batch 368 to database
+
+Submitted job 264 with external jobid 'Submitted batch job 16251743'.
+[Wed Dec  4 21:15:40 2019]
+Finished job 150.
+698 of 717 steps (97%) done
+
+[Wed Dec  4 21:15:40 2019]
+Job 129: Add RefSeq sequence batch 299 to database
+
+Submitted job 129 with external jobid 'Submitted batch job 16251744'.
+[Wed Dec  4 21:15:40 2019]
+Finished job 239.
+699 of 717 steps (97%) done
+
+[Wed Dec  4 21:15:40 2019]
+Job 457: Add RefSeq sequence batch 332 to database
+
+Submitted job 457 with external jobid 'Submitted batch job 16251745'.
+[Wed Dec  4 21:15:51 2019]
+Finished job 703.
+700 of 717 steps (98%) done
+
+[Wed Dec  4 21:15:51 2019]
+Job 385: Add RefSeq sequence batch 413 to database
+
+Submitted job 385 with external jobid 'Submitted batch job 16251746'.
+[Wed Dec  4 21:16:02 2019]
+Finished job 85.
+701 of 717 steps (98%) done
+
+[Wed Dec  4 21:16:02 2019]
+Job 578: Add RefSeq sequence batch 393 to database
+
+Submitted job 578 with external jobid 'Submitted batch job 16251747'.
+[Wed Dec  4 21:17:30 2019]
+Finished job 334.
+702 of 717 steps (98%) done
+
+[Wed Dec  4 21:17:30 2019]
+Job 683: Add RefSeq sequence batch 328 to database
+
+[Wed Dec  4 21:17:30 2019]
+Finished job 707.
+703 of 717 steps (98%) done
+Submitted job 683 with external jobid 'Submitted batch job 16251749'.
+[Wed Dec  4 21:17:30 2019]
+Finished job 56.
+704 of 717 steps (98%) done
+
+[Wed Dec  4 21:17:30 2019]
+Job 559: Add RefSeq sequence batch 678 to database
+
+Submitted job 559 with external jobid 'Submitted batch job 16251750'.
+
+[Wed Dec  4 21:17:30 2019]
+Job 353: Add RefSeq sequence batch 153 to database
+
+Submitted job 353 with external jobid 'Submitted batch job 16251751'.
+[Wed Dec  4 21:18:03 2019]
+Finished job 162.
+705 of 717 steps (98%) done
+
+[Wed Dec  4 21:18:03 2019]
+Job 406: Add RefSeq sequence batch 530 to database
+
+[Wed Dec  4 21:18:03 2019]
+Finished job 457.
+706 of 717 steps (98%) done
+Submitted job 406 with external jobid 'Submitted batch job 16251752'.
+[Wed Dec  4 21:18:14 2019]
+Finished job 578.
+707 of 717 steps (99%) done
+[Wed Dec  4 21:18:24 2019]
+Finished job 385.
+708 of 717 steps (99%) done
+[Wed Dec  4 21:18:44 2019]
+Finished job 129.
+709 of 717 steps (99%) done
+[Wed Dec  4 21:18:44 2019]
+Finished job 14.
+710 of 717 steps (99%) done
+[Wed Dec  4 21:18:44 2019]
+Finished job 264.
+711 of 717 steps (99%) done
+[Wed Dec  4 21:20:24 2019]
+Finished job 683.
+712 of 717 steps (99%) done
+[Wed Dec  4 21:20:34 2019]
+Finished job 559.
+713 of 717 steps (99%) done
+[Wed Dec  4 21:20:54 2019]
+Finished job 353.
+714 of 717 steps (100%) done
+[Wed Dec  4 21:21:14 2019]
+Finished job 406.
+715 of 717 steps (100%) done
+
+[Wed Dec  4 21:21:21 2019]
+Job 1: Kraken2 build database
+
+Submitted job 1 with external jobid 'Submitted batch job 16251757'.
+[Fri Dec  6 20:07:30 2019]
+Error in rule kraken2_build_database:
+    jobid: 1
+    output: /projects1/microbiome_sciences/reference_databases/refseq20191017/kraken2_db/RefSeq1910/hash.k2d
+    cluster_jobid: Submitted batch job 16251757
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/.snakemake/log/2019-12-04T141405.228187.snakemake.log

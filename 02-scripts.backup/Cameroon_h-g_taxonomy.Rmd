@@ -842,7 +842,7 @@ Let's do a quick and not at all enough data filtering so we can run a quick PCA 
 malt_species_unfiltered <- malt_species %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-contains("10M")) %>%
+                                         # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
@@ -873,7 +873,7 @@ plot_pca_titles(malt_species_unfiltered, "PC3", "PC2", "Env", "Env", 3)
 malt_species_filtered <- malt_species %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-contains("10M")) %>%
+                                         # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
@@ -900,7 +900,7 @@ plot_pca_titles(malt_species_filtered, "PC3", "PC2", "Env", "Env", 3)
 malt_species.decontam_unfilt <- malt_species.decontam %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-contains("10M")) %>%
+                                         # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
@@ -925,7 +925,7 @@ plot_pca_titles(malt_species.decontam_unfilt, "PC3", "PC2", "Env", "Env", 3)
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-contains("10M")) %>%
+                                         # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -1069,7 +1069,7 @@ plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Env", "Env", 3)
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-starts_with("EXB")) %>%
                                          select(-starts_with("LIB")) %>%
-                                         select(-contains("10M")) %>%
+                                         # select(-contains("10M")) %>%
                                          # select(-one_of(fullSRR)) %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%

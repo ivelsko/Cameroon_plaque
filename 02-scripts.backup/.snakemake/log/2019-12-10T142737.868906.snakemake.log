@@ -1,0 +1,16 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	1	kraken2_build_database
+	1
+
+[Tue Dec 10 14:27:39 2019]
+Job 0: Kraken2 build database
+
+Submitted job 0 with external jobid 'Submitted batch job 16276472'.
+[Tue Dec 10 20:41:10 2019]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/.snakemake/log/2019-12-10T142737.868906.snakemake.log

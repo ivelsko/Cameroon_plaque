@@ -1,0 +1,62 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	715	add_refseq
+	1	build_kraken2_database
+	1	kraken2_build_database
+	717
+
+[Wed Dec  4 14:10:03 2019]
+Job 460: Add RefSeq sequence batch 458 to database
+
+Submitted job 460 with external jobid 'Submitted batch job 16250277'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 543: Add RefSeq sequence batch 541 to database
+
+Submitted job 543 with external jobid 'Submitted batch job 16250278'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 507: Add RefSeq sequence batch 505 to database
+
+Submitted job 507 with external jobid 'Submitted batch job 16250279'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 186: Add RefSeq sequence batch 184 to database
+
+Submitted job 186 with external jobid 'Submitted batch job 16250280'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 405: Add RefSeq sequence batch 403 to database
+
+Submitted job 405 with external jobid 'Submitted batch job 16250281'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 187: Add RefSeq sequence batch 185 to database
+
+Submitted job 187 with external jobid 'Submitted batch job 16250282'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 25: Add RefSeq sequence batch 23 to database
+
+Submitted job 25 with external jobid 'Submitted batch job 16250283'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 46: Add RefSeq sequence batch 44 to database
+
+Submitted job 46 with external jobid 'Submitted batch job 16250284'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 117: Add RefSeq sequence batch 115 to database
+
+Submitted job 117 with external jobid 'Submitted batch job 16250285'.
+
+[Wed Dec  4 14:10:03 2019]
+Job 19: Add RefSeq sequence batch 17 to database
+
+Submitted job 19 with external jobid 'Submitted batch job 16250286'.
+Terminating processes on user request, this might take some time.
+Will exit after finishing currently running jobs.
+Cancelling snakemake on user request.

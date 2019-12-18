@@ -1,0 +1,8 @@
+PermissionError in line 14 of /Users/velsko/projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/aadder.Snakefile:
+[Errno 13] Permission denied: '/projects1'
+  File "/Users/velsko/projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/aadder.Snakefile", line 14, in <module>
+  File "/Users/velsko/bin/miniconda3/lib/python3.7/os.py", line 211, in makedirs
+  File "/Users/velsko/bin/miniconda3/lib/python3.7/os.py", line 211, in makedirs
+  File "/Users/velsko/bin/miniconda3/lib/python3.7/os.py", line 211, in makedirs
+  File "/Users/velsko/bin/miniconda3/lib/python3.7/os.py", line 211, in makedirs
+  File "/Users/velsko/bin/miniconda3/lib/python3.7/os.py", line 221, in makedirs

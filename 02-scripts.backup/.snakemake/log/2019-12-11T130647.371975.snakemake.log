@@ -1,0 +1,18 @@
+Building DAG of jobs...
+Job counts:
+	count	jobs
+	1	all
+	162	blast_2_rma6_kegg
+	1	build_aadder_db
+	162	run_aadder
+	326
+
+[Wed Dec 11 13:06:47 2019]
+Job 325: Build AADDER database with most recent file
+
+
+[Wed Dec 11 13:06:47 2019]
+Job 318: Run AADDER
+
+RuleException in line 57 of /projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/aadder.Snakefile:
+'Params' object has no attribute 'dir'

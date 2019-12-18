@@ -18,7 +18,7 @@ sbatch \
 -a2t /projects1/malt/databases/acc2tax/nucl_acc2tax-Nov2018.abin \
 -v"
 
-#--wrap="/projects1/users/fellows/bin.backup/megan6/tools/blast2rma \
+#--wrap="/projects1/users/velsko/bin/megan/tools/blast2rma \
 #--format SAM \
 #-i /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/output/*out.gz \
 #-o /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/rma6/ \

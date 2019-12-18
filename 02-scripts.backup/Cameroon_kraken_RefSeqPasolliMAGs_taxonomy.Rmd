@@ -1,0 +1,160 @@
+---
+title: "Cameroon plaque taxonomy analysis - Kraken RefSeq database w/ & w/o Pasolli MAGs"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(plyr)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+Load data files 
+```{r load_original_data, eval = F}
+
+mpa_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqOnly/", pattern = ".+report.+", full.names = T)
+rsmp_mpa_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T)
+
+
+rso_reports <- map_dfr(mpa_report_list, function(fn) {
+  fread(fn, skip = 1, col.names = c("Taxon", "Count")) %>%
+  mutate(SampleID = basename(fn))
+})
+
+rso_reports$SampleID <- gsub(".A0101.report",".A0101_10M.report", rso_reports$SampleID)
+rso_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub(".kraken","", rso_reports$SampleID)
+
+rso_reports <- rso_reports %>%
+  select(SampleID, Taxon, Count) %>%
+  spread(SampleID, Count, fill = 0) # fill in NAs with 0 for calculations later
+
+fwrite(rso_reports, file = "./00-documentation.backup/kraken_rso_reports.tsv", quote = F, sep = "\t")
+
+rsmp_reports <- map_dfr(rsmp_mpa_report_list, function(fn) {
+  fread(fn, skip = 1, col.names = c("Taxon", "Count")) %>%
+  mutate(SampleID = basename(fn))
+})
+
+rsmp_reports$SampleID <- gsub(".A0101.report",".A0101_10M.report", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub(".kraken","", rsmp_reports$SampleID)
+
+rsmp_reports <- rsmp_reports %>%
+  select(SampleID, Taxon, Count) %>%
+  spread(SampleID, Count, fill = 0) # fill in NAs with 0 for calculations later
+
+fwrite(rsmp_reports, file = "./00-documentation.backup/kraken_rsmp_reports.tsv", quote = F, sep = "\t")
+
+
+```
+
+```{r load_data_table}
+rso_reports <- fread("./00-documentation.backup/kraken_rso_reports.tsv")
+rsmp_reports <- fread("./00-documentation.backup/kraken_rsmp_reports.tsv")
+
+rso_reports_species <- rso_reports %>%
+  filter(str_detect(Taxon, "s__")) %>%
+  gather("SampleID","Count", 2:ncol(.)) %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+
+rsmp_reports_species <- rsmp_reports %>%
+  filter(str_detect(Taxon, "s__")) %>%
+  gather("SampleID","Count", 2:ncol(.)) %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  mutate(Database = "rspm") %>%
+  select(Taxon, SampleID, Run, Database, Count)
+
+rso_reports_domain <- rso_reports %>%
+  filter(!str_detect(Taxon, "p__|c__|o__|f__|g__|s__")) 
+%>%
+  unique(Taxon)
+
+```
+
+```{r species_differences}
+
+db_species_compare <- rso_reports_species %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  group_by(SampleID, Taxon) %>%
+  summarize(Sample_avg = mean(Count)) %>%
+  mutate(Database = "rso") %>%
+  select(Taxon, SampleID, Database, Sample_avg) %>%
+    bind_rows(., rsmp_reports_species %>%
+                  group_by(SampleID, Taxon) %>%
+                  summarize(Sample_avg = mean(Count)) %>%
+                  mutate(Database = "rspm") %>%
+                  select(Taxon, SampleID, Database, Sample_avg)) %>%
+  group_by(Database, Taxon) %>%
+  summarize(Total_counts = sum(Sample_avg)) %>%
+  spread(Database, Total_counts) %>%
+  select(Taxon, rso, rspm) %>%
+  mutate(Read_difference = rspm - rso, 
+         Fold_difference = log2(rspm/rso)) %>%
+  arrange(desc(Read_difference))
+
+```
+
+
+```{r}
+db_species_compare_short <- db_species_compare %>%
+  filter(rso >=100, rspm >= 100)
+
+db_species_compare_phage <- db_species_compare %>%
+  filter(str_detect(Taxon, "phage")) %>%
+  filter(!str_detect(Taxon, "Bacteria"))
+
+```
+
+```{r mag_info}
+# this is where the Pasolli MAG info is: 
+# /projects1/microbiome_calculus/Cameroon_plaque/00-documentation.backup/Pasolli2019_SGBinfo.csv
+# maybe parse this?
+
+
+mag_info <- fread("00-documentation.backup/Pasolli2019_SGBinfo.csv")
+mag_info <- as_tibble(mag_info)
+mag_info %>% filter(str_detect(closestTaxLevel, "Corynebacterium")) %>% select(-estTaxonomy) %>% arrange(closestTaxLevel) %>% print(., n = 59)
+```
+
+```{r}
+table_temp <- fread("./04-analysis/kraken/output/RefSeqPasolliMAGs/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz.output.1.kraken")
+
+table_temp1 <- table_temp %>%
+  filter(V3 == 0, V1 != "U")
+```
+
+
+
+
+
+
+

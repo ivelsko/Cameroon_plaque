@@ -1,0 +1,158 @@
+---
+title: "Cameroon plaque stats analysis - Kraken RefSeq database w/ & w/o Pasolli MAGs"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+Load data files 
+```{r load_data}
+rso_readstats <- fread("./04-analysis/kraken/output/RefSeqOnly/readclassification_stats.rso.tsv")
+rspm_readstats <- fread("./04-analysis/kraken/output/RefSeqPasolliMAGs/readclassification_stats.tsv")
+
+# shorten sample names
+rso_readstats$SampleID <- gsub(".A0101.output",".A0101_10M.output", rso_readstats$SampleID)
+rso_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
+rso_readstats$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rso_readstats$SampleID)
+rso_readstats$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
+rso_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
+rso_readstats$SampleID <- gsub(".kraken","", rso_readstats$SampleID)
+
+rspm_readstats$SampleID <- gsub(".A0101.output",".A0101_10M.output", rspm_readstats$SampleID)
+rspm_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
+rspm_readstats$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rspm_readstats$SampleID)
+rspm_readstats$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
+rspm_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
+rspm_readstats$SampleID <- gsub(".kraken","", rspm_readstats$SampleID)
+
+# split the names into new columns
+rso_readstats <- rso_readstats %>% 
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.output\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+rspm_readstats <- rspm_readstats %>% 
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.output\\.") %>%
+  mutate(Database = "rspm") %>%
+  select(SampleID,Run,Database,Classified,Unclassified)
+
+# merge the tables into 1
+kraken_readstats <- bind_rows(rso_readstats,rspm_readstats)
+
+# load the metadata file
+metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  mutate(Description = fct_relevel(Description, "HunterGatherer", "HMP_supPlaque", "HMP_subPlaque",
+                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
+                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Industrial",
+                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP","HMP10M"),
+         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
+         Village = fct_relevel(Village, "202","204","205","203","206","HMP","HMP10M","JAE","JAE10M",
+                               "ExtractionGauze","ExtractionBlank","LibraryBlank"))
+
+
+# merge data and metadata
+kraken_readstats <- kraken_readstats %>%
+  mutate(Percent_classified = Classified/(Classified+Unclassified)*100) %>%
+  inner_join(., metadata %>%
+               select(SampleID,Env,Description,Ethnic_Group,Market_economy,Age_group,Sex,Tooth_site,Type,Village))
+
+```
+
+```{r colors_shapes_peachpear}
+# lacroix_palette("PeachPear", n = 8, type = "continuous")
+# "#FF3200" "#EF8158" "#E9BD8E" "#CBDDA7" "#38BCAD" "#0B91B5" "#065FA3" "#172869"
+
+Village_colors <- c(`202` = "#FF3200", `204` = "#EF8158", `205` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
+                    HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                     ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Village_shapes <- c(`202` = 15, `203` = 16, `204` = 17,`205` = 18, `206` = 25, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                    ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", HMP = "#969696", HMP10M = "#d9d9d9", JAE10M = "#ffeda0", JAE = "#feb24c",
+                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                         ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Market_economy_colors <- c(logging_road = "#FF3200", forrest_camp = "#172869", farming = "#82CDAA", Industrial = "#969696",
+                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, HMP = 7, HMP10M = 9, Industrial = 15,
+                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
+                      HMP = "#969696", HMP10M = "#d9d9d9",
+                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, HMP = 7, HMP10M = 9,
+                      ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  HMP = 7, HMP10M = 9,
+                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Database_colors <- c(rso = "#172869", rspm = "#FF3200")
+ 
+```
+
+```{r plot_data}
+kraken_readstats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  ggplot(., aes(x = Village, y = Percent_classified, fill = Database)) +
+    geom_boxplot() +
+    geom_jitter(size = 0.5, alpha = 0.5) +
+    scale_fill_manual(values = Database_colors) +
+    theme_minimal() +
+    xlab("Village") +
+    ylab("Percent of reads classified")
+
+
+```
+
+```{r stats}
+
+wilcox_p <- kraken_readstats %>%
+group_by(Village) %>%
+summarise(pvalue = pairwise.wilcox.test(Classified, Database, p.adjust.method = "fdr")$p.value)
+
+```
+

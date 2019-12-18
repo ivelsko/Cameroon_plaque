@@ -1,0 +1,15 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	1	kraken2_build_database
+	1
+
+[Tue Dec 10 11:29:04 2019]
+Job 0: Kraken2 build database
+
+Submitted job 0 with external jobid 'Submitted batch job 16276313'.
+Terminating processes on user request, this might take some time.
+Will exit after finishing currently running jobs.
+Cancelling snakemake on user request.

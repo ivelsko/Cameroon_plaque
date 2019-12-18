@@ -1,0 +1,25 @@
+{
+    "__default__" :
+    {
+        "mem" : 2000,
+        "time" : "0-2:00",
+        "partition" : "short",
+        "out" : "/projects1/users/velsko/snakemake_tmp/slurm.%j.out",
+        "err" : "/projects1/users/velsko/snakemake_tmp/slurm.%j.err"
+    },
+
+    "kraken2_build_database" :
+    {
+        "mem" : 1800000,
+        "partition" : "supercruncher",
+        "time" : "2-0:00"
+    },
+
+    "kraken2_minikraken2" :
+    {
+        "mem" : 1800000,
+        "partition" : "supercruncher",
+        "time" : "2-0:00"
+    },
+}
+
