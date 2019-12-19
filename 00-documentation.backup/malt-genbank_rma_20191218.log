@@ -1,0 +1,520 @@
+MaltRun - Aligns sequences using MALT (MEGAN alignment tool)
+Options:
+Mode:
+	--mode: BlastN
+	--alignmentType: SemiGlobal
+Input:
+	--inFile: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646030.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646031.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646032.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646033.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646038.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646039.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646040.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646041.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646042.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646043.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646044.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646045.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646046.fastq.truncated.prefixed.gz /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646047.fastq.truncated.prefixed.gz
+	--index: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11
+Output:
+	--output: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom
+	--includeUnaligned: false
+	--alignments: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom
+	--format: SAM
+	--gzipAlignments: true
+	--samSoftClip: true
+	--sparseSAM: false
+Performance:
+	--numThreads: 112
+	--memoryMode: load
+	--maxTables: 0
+	--replicateQueryCache: false
+Filter:
+	--minBitScore: 50.0
+	--maxExpected: 1.0
+	--minPercentIdentity: 85.0
+	--maxAlignmentsPerQuery: 100
+	--maxAlignmentsPerRef: 1
+BlastN parameters:
+	--matchScore: 2
+	--mismatchScore: -3
+	--setLambda: 0.625
+	--setK: 0.41
+DNA query parameters:
+	--forwardOnly: false
+	--reverseOnly: false
+LCA parameters:
+	--topPercent: 1.0
+	--minSupportPercent: 0.01
+	--minSupport: 0
+	--minPercentIdentityLCA: 0.0
+	--useMinPercentIdentityFilterLCA: false
+	--weightedLCA: false
+	--magnitudes: false
+Heuristics:
+	--maxSeedsPerFrame: 100
+	--maxSeedsPerRef: 20
+	--seedShift: 1
+Banded alignment parameters:
+	--gapOpen: 7
+	--gapExtend: 3
+	--band: 4
+Other:
+	--replicateQueryCacheBits: 20
+	--xPart: false
+	--verbose: true
+Version   MALT (version 0.4.0, built 6 Sep 2017)
+Copyright (C) 2017 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.
+--- LOADING ---:
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/ref.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (0.3s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/ref.db
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (1206.4s)
+100% (0.0s)
+Number of sequences:    1,780,321
+Number of letters:130,589,137,643
+LOADING table (0) ...
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/index0.idx
+Reference sequence type: DNA
+Index was built using stepSize=2
+100% (0.0s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/table0.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (69.6s)
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/table0.db
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (1639.9s)
+Table size: 65,022,892,631
+Loading ncbi.map: 1,601,128
+Loading ncbi.tre: 1,601,131
+Reading file: /projects1/malt/databases/indexed/index040/refseq-bac-arch-homo-2018_11/taxonomy.idx
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% (0.1s)
+--- ALIGNING ---:
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646030.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.rma6
+10% 20% 30% 40% 100% (658.6s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.blastn-tmp974548.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.rma6
+Loading MEGAN File: SRR1646030.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          754,298
+With hits:             754,298 
+Alignments:         23,801,919
+Assig. Taxonomy:       753,769
+MinSupport set to: 75
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,330
+Binning reads: Writing classification tables
+Numb. Tax. classes:        414
+Binning reads: Syncing
+Class. Taxonomy:           414
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.blastn.sam.gz
+100% (1.2s)
+Copying from temporary file:
+100% (176.4s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646030.fastq.truncated.blastn-tmp974548.sam.gz
+Num. of queries:    1277654
+Aligned queries:     754298
+Num. alignments:   23801919
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646031.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.rma6
+10% 20% 30% 100% (881.2s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.blastn-tmp628261.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.rma6
+Loading MEGAN File: SRR1646031.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        2,486,693
+With hits:           2,486,693 
+Alignments:         60,809,782
+Assig. Taxonomy:     2,471,832
+MinSupport set to: 248
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,727
+Binning reads: Writing classification tables
+Numb. Tax. classes:        497
+Binning reads: Syncing
+Class. Taxonomy:           497
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.blastn.sam.gz
+100% (1.6s)
+Copying from temporary file:
+100% (549.2s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646031.fastq.truncated.blastn-tmp628261.sam.gz
+Num. of queries:    3936781
+Aligned queries:    2486693
+Num. alignments:   60809782
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646032.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.rma6
+10% 20% 30% 100% (56.3s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.blastn-tmp385147.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.rma6
+Loading MEGAN File: SRR1646032.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:           99,720
+With hits:              99,720 
+Alignments:          2,837,582
+Assig. Taxonomy:        99,674
+MinSupport set to: 9
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       1,028
+Binning reads: Writing classification tables
+Numb. Tax. classes:        445
+Binning reads: Syncing
+Class. Taxonomy:           445
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.blastn.sam.gz
+100% (0.3s)
+Copying from temporary file:
+100% (22.4s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646032.fastq.truncated.blastn-tmp385147.sam.gz
+Num. of queries:     163723
+Aligned queries:      99720
+Num. alignments:    2837582
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646033.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.rma6
+10% 20% 30% 100% (254.0s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.blastn-tmp572932.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.rma6
+Loading MEGAN File: SRR1646033.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          677,431
+With hits:             677,431 
+Alignments:         19,102,498
+Assig. Taxonomy:       676,834
+MinSupport set to: 67
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       3,193
+Binning reads: Writing classification tables
+Numb. Tax. classes:        481
+Binning reads: Syncing
+Class. Taxonomy:           481
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.blastn.sam.gz
+100% (1.2s)
+Copying from temporary file:
+100% (152.4s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646033.fastq.truncated.blastn-tmp572932.sam.gz
+Num. of queries:    1191865
+Aligned queries:     677431
+Num. alignments:   19102498
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646038.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.rma6
+10% 20% 30% 100% (650.4s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.blastn-tmp656116.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.rma6
+Loading MEGAN File: SRR1646038.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        1,546,094
+With hits:           1,546,094 
+Alignments:         54,466,902
+Assig. Taxonomy:     1,545,647
+MinSupport set to: 154
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,897
+Binning reads: Writing classification tables
+Numb. Tax. classes:        421
+Binning reads: Syncing
+Class. Taxonomy:           421
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.blastn.sam.gz
+10% 100% (1.5s)
+Copying from temporary file:
+100% (431.5s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646038.fastq.truncated.blastn-tmp656116.sam.gz
+Num. of queries:    1861231
+Aligned queries:    1546094
+Num. alignments:   54466902
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646039.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.rma6
+10% 20% 30% 100% (239.9s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.blastn-tmp262154.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.rma6
+Loading MEGAN File: SRR1646039.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          814,129
+With hits:             814,129 
+Alignments:         17,436,787
+Assig. Taxonomy:       812,852
+MinSupport set to: 81
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,822
+Binning reads: Writing classification tables
+Numb. Tax. classes:        509
+Binning reads: Syncing
+Class. Taxonomy:           509
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.blastn.sam.gz
+100% (1.2s)
+Copying from temporary file:
+100% (143.9s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646039.fastq.truncated.blastn-tmp262154.sam.gz
+Num. of queries:    1038055
+Aligned queries:     814129
+Num. alignments:   17436787
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646040.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.rma6
+10% 20% 30% 40% 100% (710.2s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.blastn-tmp718183.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.rma6
+Loading MEGAN File: SRR1646040.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:        1,964,359
+With hits:           1,964,359 
+Alignments:         52,642,473
+Assig. Taxonomy:     1,961,591
+MinSupport set to: 196
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       5,141
+Binning reads: Writing classification tables
+Numb. Tax. classes:        509
+Binning reads: Syncing
+Class. Taxonomy:           509
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.blastn.sam.gz
+100% (1.6s)
+Copying from temporary file:
+100% (435.8s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646040.fastq.truncated.blastn-tmp718183.sam.gz
+Num. of queries:    3215172
+Aligned queries:    1964359
+Num. alignments:   52642473
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646041.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.rma6
+10% 20% 30% 100% (4.8s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.blastn-tmp759691.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.rma6
+Loading MEGAN File: SRR1646041.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:           11,732
+With hits:              11,732 
+Alignments:            334,057
+Assig. Taxonomy:        11,723
+MinSupport set to: 1
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:           0
+Binning reads: Writing classification tables
+Numb. Tax. classes:        547
+Binning reads: Syncing
+Class. Taxonomy:           547
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.blastn.sam.gz
+100% (0.2s)
+Copying from temporary file:
+100% (2.5s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646041.fastq.truncated.blastn-tmp759691.sam.gz
+Num. of queries:      18049
+Aligned queries:      11732
+Num. alignments:     334057
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646042.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.rma6
+10% 20% 30% 100% (326.1s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.blastn-tmp786450.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.rma6
+Loading MEGAN File: SRR1646042.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          788,567
+With hits:             788,567 
+Alignments:         23,888,930
+Assig. Taxonomy:       788,215
+MinSupport set to: 78
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,982
+Binning reads: Writing classification tables
+Numb. Tax. classes:        416
+Binning reads: Syncing
+Class. Taxonomy:           416
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.blastn.sam.gz
+100% (1.1s)
+Copying from temporary file:
+100% (199.8s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646042.fastq.truncated.blastn-tmp786450.sam.gz
+Num. of queries:    1369141
+Aligned queries:     788567
+Num. alignments:   23888930
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646043.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.rma6
+10% 20% 30% 100% (180.5s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.blastn-tmp67148.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.rma6
+Loading MEGAN File: SRR1646043.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          610,364
+With hits:             610,364 
+Alignments:         13,257,773
+Assig. Taxonomy:       609,561
+MinSupport set to: 61
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,874
+Binning reads: Writing classification tables
+Numb. Tax. classes:        512
+Binning reads: Syncing
+Class. Taxonomy:           512
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.blastn.sam.gz
+10% 100% (1.2s)
+Copying from temporary file:
+100% (107.5s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646043.fastq.truncated.blastn-tmp67148.sam.gz
+Num. of queries:     850091
+Aligned queries:     610364
+Num. alignments:   13257773
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646044.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.rma6
+10% 20% 30% 100% (210.0s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.blastn-tmp84408.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.rma6
+Loading MEGAN File: SRR1646044.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          527,456
+With hits:             527,456 
+Alignments:         15,478,419
+Assig. Taxonomy:       526,794
+MinSupport set to: 52
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,540
+Binning reads: Writing classification tables
+Numb. Tax. classes:        519
+Binning reads: Syncing
+Class. Taxonomy:           519
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.blastn.sam.gz
+100% (1.6s)
+Copying from temporary file:
+100% (131.0s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646044.fastq.truncated.blastn-tmp84408.sam.gz
+Num. of queries:     810124
+Aligned queries:     527456
+Num. alignments:   15478419
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646045.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.rma6
+10% 20% 30% 100% (39.7s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.blastn-tmp990031.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.rma6
+Loading MEGAN File: SRR1646045.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:           96,232
+With hits:              96,232 
+Alignments:          2,652,916
+Assig. Taxonomy:        95,993
+MinSupport set to: 9
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       1,044
+Binning reads: Writing classification tables
+Numb. Tax. classes:        544
+Binning reads: Syncing
+Class. Taxonomy:           544
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.blastn.sam.gz
+100% (0.3s)
+Copying from temporary file:
+100% (23.2s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646045.fastq.truncated.blastn-tmp990031.sam.gz
+Num. of queries:     147418
+Aligned queries:      96232
+Num. alignments:    2652916
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646046.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.rma6
+10% 20% 30% 100% (347.2s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.blastn-tmp103798.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.rma6
+Loading MEGAN File: SRR1646046.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          990,572
+With hits:             990,572 
+Alignments:         25,537,129
+Assig. Taxonomy:       984,843
+MinSupport set to: 99
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       4,188
+Binning reads: Writing classification tables
+Numb. Tax. classes:        476
+Binning reads: Syncing
+Class. Taxonomy:           476
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.blastn.sam.gz
+10% 100% (1.5s)
+Copying from temporary file:
+100% (218.3s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646046.fastq.truncated.blastn-tmp103798.sam.gz
+Num. of queries:    1403244
+Aligned queries:     990572
+Num. alignments:   25537129
++++++ Aligning file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_yanomami/SRR1646047.fastq.truncated.prefixed.gz
+Starting file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.rma6
+10% 20% 30% 100% (178.7s)
+Alignments written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.blastn-tmp599123.sam.gz
+Finishing file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.rma6
+Loading MEGAN File: SRR1646047.fastq.truncated.rma6
+Binning reads: Initializing...
+Initializing binning...
+Using 'Naive LCA' algorithm (80.0 %) for binning: Taxonomy
+Binning reads...
+Binning reads: Analyzing alignments
+Total reads:          413,551
+With hits:             413,551 
+Alignments:         14,902,104
+Assig. Taxonomy:       413,349
+MinSupport set to: 41
+Binning reads: Applying min-support & disabled filter to Taxonomy...
+Min-supp. changes:       2,244
+Binning reads: Writing classification tables
+Numb. Tax. classes:        387
+Binning reads: Syncing
+Class. Taxonomy:           387
+Analysis written to file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.rma6
+Prepending @SQ lines to SAM file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.blastn.sam.gz
+100% (0.9s)
+Copying from temporary file:
+100% (109.0s)
+Deleted temporary file: /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/RefSeqCustom/SRR1646047.fastq.truncated.blastn-tmp599123.sam.gz
+Num. of queries:     566322
+Aligned queries:     413551
+Num. alignments:   14902104
+Number of input files:         14
+Total num. of queries:   17848870
+Total aligned queries:   11781198
+Total num. alignments:  327149271
+Total time:  23514s
+Peak memory: 798.5 of 1688.9G

@@ -4,7 +4,7 @@
 #SBATCH --mem 64000
 #SBATCH -t 0-48:00
 #SBATCH --partition=medium
-#SBATCH --array=0-161%5
+#SBATCH --array=0-175%5
 #SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.humann2.out
 #SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.humann2.err
 #SBATCH --mail-type=FAIL,ARRAY_TASKS

@@ -1,3 +1,4 @@
+SampleID	Queries	Aligned
 ../04-analysis/malt/RefSeqCustom/JAE006.A0101_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.rma6	Num. of queries:   10000000	Aligned queries:    8647832
 ../04-analysis/malt/RefSeqCustom/JAE006.A0101_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6	Num. of queries:   87902455	Aligned queries:   76004991
 ../04-analysis/malt/RefSeqCustom/JAE007.A0101_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.rma6	Num. of queries:   10000000	Aligned queries:    8854429
