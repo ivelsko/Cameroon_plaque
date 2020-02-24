@@ -4,7 +4,7 @@
 #SBATCH --mem 64000
 #SBATCH -t 0-48:00
 #SBATCH --partition=medium
-#SBATCH --array=0-175%5
+#SBATCH --array=0-13%5
 #SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.humann2.out
 #SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.humann2.err
 #SBATCH --mail-type=FAIL,ARRAY_TASKS
@@ -12,7 +12,7 @@
 #SBATCH --mail-use=velsko@shh.mpg.de
 #SBATCH -J "CMC_humann2"
 
-SAMPLES=($(find /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/humann2/input -name '*.gz'  | rev | cut -d/ -f 1 | rev))
+SAMPLES=($(find /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/humann2/input -name 'SRR164*.gz'  | rev | cut -d/ -f 1 | rev))
 SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 
 humann2 \

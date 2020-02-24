@@ -22,16 +22,12 @@ library(cowplot)
 opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 ```
 
-Set the working directory of the notebook to the parent directory of the 
-notebook itself.  
-
 ```{r setup}
 knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
-Load data files 
-```{r load_original_data, eval = F}
-
+```{r load_mpa_format_data, eval = F}
+# load the mpa-style report files
 mpa_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqOnly/", pattern = ".+report.+", full.names = T)
 rsmp_mpa_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T)
 
@@ -75,64 +71,399 @@ fwrite(rsmp_reports, file = "./00-documentation.backup/kraken_rsmp_reports.tsv",
 
 ```
 
-```{r load_data_table}
-rso_reports <- fread("./00-documentation.backup/kraken_rso_reports.tsv")
-rsmp_reports <- fread("./00-documentation.backup/kraken_rsmp_reports.tsv")
+```{r load_standard_report_data, eval = F}
+# run this only once and then in the future read in the files that were saved, in the section below
 
-rso_reports_species <- rso_reports %>%
+# load the standard format output tables
+rso_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqOnly/", pattern = ".+report.+", full.names = T)
+rsmp_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T)
+
+rso_reports <- map_dfr(rso_report_list, function(fn) {
+  fread(fn, col.names = c("Percent", "Number_rooted", "Number_direct","Rank","NCBItaxID","SciName"), sep = "\t") %>%
+  mutate(SampleID = basename(fn))
+})
+
+# mpa_short_list <- head(list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T), n = 3L)
+
+#rso_reports$SciName <- gsub(" ","", rso_reports$SciName)
+rso_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rso_reports$SampleID)
+rso_reports$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_001","", rso_reports$SampleID)
+
+fwrite(rso_reports, file = "./00-documentation.backup/kraken_standard_rso_reports.tsv", quote = F, sep = "\t")
+
+rso_reports %>% filter(str_detect(Rank, "U|R|D"))
+
+
+rsmp_reports <- map_dfr(rsmp_report_list, function(fn) {
+  fread(fn, col.names = c("Percent", "Number_rooted", "Number_direct","Rank","NCBItaxID","SciName"), sep = "\t") %>%
+  mutate(SampleID = basename(fn))
+})
+
+#rsmp_reports$SciName <- gsub(" ","", rsmp_reports$SciName)
+rsmp_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_001","", rsmp_reports$SampleID)
+
+fwrite(rsmp_reports, file = "./00-documentation.backup/kraken_standard_rsmp_reports.tsv", quote = F, sep = "\t")
+
+```
+
+
+```{r load_data_table, eval = F}
+rso_mpa_reports <- fread("./00-documentation.backup/kraken_rso_reports.tsv")
+rsmp_mpa_reports <- fread("./00-documentation.backup/kraken_rsmp_reports.tsv")
+
+# this is for the mpa-style reports
+rso_mpa_reports_species <- rso_mpa_reports %>%
   filter(str_detect(Taxon, "s__")) %>%
   gather("SampleID","Count", 2:ncol(.)) %>%
   separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
   separate(col = "Run", into =c("Run","Database"), sep = "\\.")
 
 
-rsmp_reports_species <- rsmp_reports %>%
+rsmp_mpa_reports_species <- rsmp_mpa_reports %>%
   filter(str_detect(Taxon, "s__")) %>%
   gather("SampleID","Count", 2:ncol(.)) %>%
   separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
   mutate(Database = "rspm") %>%
   select(Taxon, SampleID, Run, Database, Count)
 
-rso_reports_domain <- rso_reports %>%
-  filter(!str_detect(Taxon, "p__|c__|o__|f__|g__|s__")) 
-%>%
-  unique(Taxon)
+# rso_reports_domain <- rso_reports %>%
+#   filter(!str_detect(Taxon, "p__|c__|o__|f__|g__|s__")) %>%
+#   unique(Taxon)
 
 ```
 
-```{r species_differences}
 
-db_species_compare <- rso_reports_species %>%
+```{r load_data_table}
+# this takes several minutes, they're large files
+rso_reports <- fread("./00-documentation.backup/kraken_standard_rso_reports.tsv")
+rso_reports$SampleID <- gsub(".kraken","", rso_reports$SampleID)
+
+rsmp_reports <- fread("./00-documentation.backup/kraken_standard_rsmp_reports.tsv")
+rsmp_reports$SampleID <- gsub(".kraken","", rsmp_reports$SampleID)
+
+rso_reports <- rso_reports %>% as_tibble() %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+
+rsmp_reports <- rsmp_reports %>% as_tibble() %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+```
+
+```{r species_differences_mpa, eval = F}
+
+db_mpa_species_compare <- rso_mpa_reports_species %>%
   filter(str_detect(SampleID, "CMC")) %>%
   group_by(SampleID, Taxon) %>%
   summarize(Sample_avg = mean(Count)) %>%
-  mutate(Database = "rso") %>%
+  mutate(Database = "RefSeqOnly") %>%
   select(Taxon, SampleID, Database, Sample_avg) %>%
-    bind_rows(., rsmp_reports_species %>%
+    bind_rows(., rsmp_mpa_reports_species %>%
                   group_by(SampleID, Taxon) %>%
                   summarize(Sample_avg = mean(Count)) %>%
-                  mutate(Database = "rspm") %>%
+                  mutate(Database = "RefSeqPasolliMAGs") %>%
                   select(Taxon, SampleID, Database, Sample_avg)) %>%
   group_by(Database, Taxon) %>%
   summarize(Total_counts = sum(Sample_avg)) %>%
   spread(Database, Total_counts) %>%
-  select(Taxon, rso, rspm) %>%
-  mutate(Read_difference = rspm - rso, 
-         Fold_difference = log2(rspm/rso)) %>%
+  select(Taxon, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
   arrange(desc(Read_difference))
+
+```
+
+
+```{r taxon_differences}
+
+db_phylum_compare <- rso_reports %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "P")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "P")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
+db_genus_compare <- rso_reports %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "G")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "G")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
+db_species_compare <- rso_reports %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "S")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "S")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
 
 ```
 
 
 ```{r}
 db_species_compare_short <- db_species_compare %>%
-  filter(rso >=100, rspm >= 100)
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
+
+db_genus_compare_short <- db_genus_compare %>%
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
+
+db_phylum_compare_short <- db_phylum_compare %>%
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
 
 db_species_compare_phage <- db_species_compare %>%
-  filter(str_detect(Taxon, "phage")) %>%
-  filter(!str_detect(Taxon, "Bacteria"))
+  filter(str_detect(SciName, "phage")) %>%
+  filter(!str_detect(SciName, "Bacteria"))
 
 ```
+
+```{r}
+taxonomy_list <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
+
+
+rso_reports_tax <- rso_reports %>%
+  full_join(., taxonomy_list, by = "SciName")
+
+rsmp_reports_tax <- rsmp_reports %>%
+  full_join(., taxonomy_list, by = "SciName")
+
+taxonomy_na <- rso_reports_tax %>%
+  bind_rows(., rsmp_reports_tax) %>%
+  filter(is.na(Taxonomy)) %>%
+  arrange(SciName) %>%
+  select(Rank, NCBItaxID, SciName) %>%
+  unique()
+
+
+rsmp_reports_tax_mod <- rsmp_reports %>%
+  mutate(SciNameFull = SciName) %>%
+  rename(SciNameSplit = SciName) %>%
+  select(Percent, Number_rooted, Number_direct, Rank, NCBItaxID, SciNameFull, SampleID, Run, Database, SciNameSplit) %>%
+  mutate(SciNameSplit = str_replace(SciNameSplit, " sp\\. ", "_sp\\._")) %>%
+  separate(col = "SciNameSplit", into = c("genus","species","strain"), sep = " ") %>%
+  filter(str_detect(SciNameFull, "Pseudomonas sp\\."))
+
+
+
+
+
+
+rso_reports_tax_mod <- rso_reports %>%
+  mutate(SciNameFull = SciName) %>%
+  rename(SciNameSplit = SciName) %>%
+  mutate(SciNameSplit = str_replace(SciNameSplit, " sp\\. ", "_sp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, "oral taxon ", "oral_taxon_"),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "Candidatus ", "Candidatus_"),
+         SciNameSplit = str_replace(SciNameSplit, " bacterium ", "_bacterium_"),
+         SciNameSplit = str_replace(SciNameSplit, " phage ", "_phage_"),
+         SciNameSplit = str_replace(SciNameSplit, "incertae sedis", ""),
+         SciNameSplit = str_replace(SciNameSplit, " sensu stricto", ""),
+         SciNameSplit = str_replace(SciNameSplit, " = ", "_=_"),
+         SciNameSplit = str_replace(SciNameSplit, " genomosp\\. ", "_genomosp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, " archaeon ", "_archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, " virus ", "_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "axon 44", "axon44"),
+         SciNameSplit = str_replace(SciNameSplit, "archaeon ", "archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "Clostridiales Family", "Clostridiales_Family"),
+         SciNameSplit = str_replace(SciNameSplit, "Muribaculaceae ", "Muribaculaceae_"),
+         SciNameSplit = str_replace(SciNameSplit, "Arthrobacter virus ", "Arthrobacter_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "alpha proteobacterium", "alpha_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "beta proteobacterium", "beta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "gamma proteobacterium", "gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "delta proteobacterium", "delta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Bacillus virus", "Bacillus_virus"),
+         SciNameSplit = str_replace(SciNameSplit, "Group II \\'CF-1\\'", "Group_II_\\'CF-1\\'"),
+         SciNameSplit = str_replace(SciNameSplit, "[Scytonema hofmanni]_UTEX ", "[Scytonema_hofmanni]_UTEX_"),
+         SciNameSplit = str_replace(SciNameSplit, "marine gamma proteobacterium", "marine_gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Paramecium bursaria Chlorella ", "Paramecium_bursaria_Chlorella_"),
+         SciNameSplit = str_replace(SciNameSplit, "filamentous cyanobacterium CCP", "filamentous_cyanobacterium_CCP"),
+         SciNameSplit = str_replace(SciNameSplit, "Legionella endosymbiont of Polyplax serrata", "Legionella_endosymbiont_of_Polyplax_serrata"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont of unidentified scaly snail isolate Monju", "endosymbiont_of_unidentified_scaly_snail_isolate_Monju"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont GvMRE of Glomus versiforme", "endosymbiont_GvMRE_of_Glomus_versiforme"),
+         SciNameSplit = str_replace(SciNameSplit, "unclassified ", "")) %>%
+  select(Percent, Number_rooted, Number_direct, Rank, NCBItaxID, SciNameFull, SampleID, Run, Database, SciNameSplit) %>%
+  separate(col = "SciNameSplit", into = c("genus","species","strain"), sep = " ", convert = TRUE) %>%
+  select(-strain) %>%
+  mutate(species = replace_na(species, "lll")) %>%
+  unite(SciNameShort, genus, species, sep = " ") %>%
+  mutate(SciNameShort = str_replace(SciNameShort, "_sp\\._", " sp\\. "),
+         SciNameShort = str_replace(SciNameShort,  "oral_taxon_", "oral taxon "),
+         SciNameShort = str_replace(SciNameShort,  "Candidatus_", "Candidatus "),
+         SciNameShort = str_replace(SciNameShort,  "_bacterium_", " bacterium "),
+         SciNameShort = str_replace(SciNameShort, "_=_", " = "),
+         SciNameShort = str_replace(SciNameShort, "_genomosp\\._", " genomosp\\. "),
+         SciNameShort = str_replace(SciNameShort, "_archaeon_", " archaeon "),
+         SciNameShort = str_replace(SciNameShort, "archaeon_", "archaeon "),
+         SciNameShort = str_replace(SciNameShort, "_virus_", " virus "),
+         SciNameShort = str_replace(SciNameShort, "axon44", "axon 44"),
+         SciNameShort = str_replace(SciNameShort, "taxon 44", "Taxon 44"),
+         SciNameShort = str_replace(SciNameShort, "Clostridiales_Family", "Clostridiales Family"),
+         SciNameShort = str_replace(SciNameShort, "Muribaculaceae_", "Muribaculaceae "),
+         SciNameShort = str_replace(SciNameShort, "Arthrobacter_virus_", "Arthrobacter virus "),
+         SciNameShort = str_replace(SciNameShort, "alpha_proteobacterium", "alpha proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "beta_proteobacterium", "beta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "gamma_proteobacterium", "gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "delta_proteobacterium", "delta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Bacillus_virus", "Bacillus virus"),
+         SciNameShort = str_replace(SciNameShort, "Group_II_\\'CF-1\\'", "Group II \\'CF-1\\'"),
+         SciNameShort = str_replace(SciNameShort, "[Scytonema_hofmanni]_UTEX_", "[Scytonema hofmanni]_UTEX "),
+         SciNameShort = str_replace(SciNameShort, "marine_gamma_proteobacterium", "marine gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Paramecium_bursaria_Chlorella_", "Paramecium bursaria Chlorella "),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "Legionella_endosymbiont_of_Polyplax_serrata", "Legionella endosymbiont of Polyplax serrata"),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_of_unidentified_scaly_snail_isolate_Monju", "endosymbiont of unidentified scaly snail isolate Monju"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_GvMRE_of_Glomus_versiforme", "endosymbiont GvMRE of Glomus versiforme"),
+         SciNameShort = str_replace(SciNameShort, "_phage_", " phage "),
+         SciNameShort = str_replace(SciNameShort, " str\\.", ""),
+         SciNameShort = str_replace(SciNameShort,  " lll", "")) %>%
+  rename(SciName = SciNameShort)%>%
+  full_join(., taxonomy_list, by = "SciName")
+
+rsmp_reports_tax_mod <- rsmp_reports %>%
+  mutate(SciNameFull = SciName) %>%
+  rename(SciNameSplit = SciName) %>%
+  mutate(SciNameSplit = str_replace(SciNameSplit, " sp\\. ", "_sp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, "oral taxon ", "oral_taxon_"),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "Candidatus ", "Candidatus_"),
+         SciNameSplit = str_replace(SciNameSplit, " bacterium ", "_bacterium_"),
+         SciNameSplit = str_replace(SciNameSplit, " phage ", "_phage_"),
+         SciNameSplit = str_replace(SciNameSplit, "incertae sedis", ""),
+         SciNameSplit = str_replace(SciNameSplit, " sensu stricto", ""),
+         SciNameSplit = str_replace(SciNameSplit, " = ", "_=_"),
+         SciNameSplit = str_replace(SciNameSplit, " genomosp\\. ", "_genomosp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, " archaeon ", "_archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "axon 44", "axon44"),
+         SciNameSplit = str_replace(SciNameSplit, " virus ", "_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "archaeon ", "archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "Clostridiales Family", "Clostridiales_Family"),
+         SciNameSplit = str_replace(SciNameSplit, "Muribaculaceae ", "Muribaculaceae_"),
+         SciNameSplit = str_replace(SciNameSplit, "Arthrobacter virus ", "Arthrobacter_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "alpha proteobacterium", "alpha_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "beta proteobacterium", "beta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "gamma proteobacterium", "gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "delta proteobacterium", "delta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Bacillus virus", "Bacillus_virus"),
+         SciNameSplit = str_replace(SciNameSplit, "Group II \\'CF-1\\'", "Group_II_\\'CF-1\\'"),
+         SciNameSplit = str_replace(SciNameSplit, "[Scytonema hofmanni]_UTEX ", "[Scytonema_hofmanni]_UTEX_"),
+         SciNameSplit = str_replace(SciNameSplit, "marine gamma proteobacterium", "marine_gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Paramecium bursaria Chlorella ", "Paramecium_bursaria_Chlorella_"),
+         SciNameSplit = str_replace(SciNameSplit, "filamentous cyanobacterium CCP", "filamentous_cyanobacterium_CCP"),
+         SciNameSplit = str_replace(SciNameSplit, "Legionella endosymbiont of Polyplax serrata", "Legionella_endosymbiont_of_Polyplax_serrata"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont of unidentified scaly snail isolate Monju", "endosymbiont_of_unidentified_scaly_snail_isolate_Monju"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont GvMRE of Glomus versiforme", "endosymbiont_GvMRE_of_Glomus_versiforme"),
+         SciNameSplit = str_replace(SciNameSplit, "unclassified ", "")) %>%
+  select(Percent, Number_rooted, Number_direct, Rank, NCBItaxID, SciNameFull, SampleID, Run, Database, SciNameSplit) %>%
+  separate(col = "SciNameSplit", into = c("genus","species","strain"), sep = " ", convert = TRUE) %>%
+  select(-strain) %>%
+  mutate(species = replace_na(species, "lll")) %>%
+  unite(SciNameShort, genus, species, sep = " ") %>%
+  mutate(SciNameShort = str_replace(SciNameShort, "_sp\\._", " sp\\. "),
+         SciNameShort = str_replace(SciNameShort,  "oral_taxon_", "oral taxon "),
+         SciNameShort = str_replace(SciNameShort,  "Candidatus_", "Candidatus "),
+         SciNameShort = str_replace(SciNameShort,  "_bacterium_", " bacterium "),
+         SciNameShort = str_replace(SciNameShort, "_=_", " = "),
+         SciNameShort = str_replace(SciNameShort, "_genomosp\\._", " genomosp\\. "),
+         SciNameShort = str_replace(SciNameShort, "_archaeon_", " archaeon "),
+         SciNameShort = str_replace(SciNameShort, "archaeon_", "archaeon "),
+         SciNameShort = str_replace(SciNameShort, "_virus_", " virus "),
+         SciNameShort = str_replace(SciNameShort, "axon44", "axon 44"),
+         SciNameShort = str_replace(SciNameShort, "taxon 44", "Taxon 44"),
+         SciNameShort = str_replace(SciNameShort, "Clostridiales_Family", "Clostridiales Family"),
+         SciNameShort = str_replace(SciNameShort, "Muribaculaceae_", "Muribaculaceae "),
+         SciNameShort = str_replace(SciNameShort, "Arthrobacter_virus_", "Arthrobacter virus "),
+         SciNameShort = str_replace(SciNameShort, "alpha_proteobacterium", "alpha proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "beta_proteobacterium", "beta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "gamma_proteobacterium", "gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "delta_proteobacterium", "delta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Bacillus_virus", "Bacillus virus"),
+         SciNameShort = str_replace(SciNameShort, "Group_II_\\'CF-1\\'", "Group II \\'CF-1\\'"),
+         SciNameShort = str_replace(SciNameShort, "[Scytonema_hofmanni]_UTEX_", "[Scytonema hofmanni]_UTEX "),
+         SciNameShort = str_replace(SciNameShort, "marine_gamma_proteobacterium", "marine gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Paramecium_bursaria_Chlorella_", "Paramecium bursaria Chlorella "),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "Legionella_endosymbiont_of_Polyplax_serrata", "Legionella endosymbiont of Polyplax serrata"),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_of_unidentified_scaly_snail_isolate_Monju", "endosymbiont of unidentified scaly snail isolate Monju"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_GvMRE_of_Glomus_versiforme", "endosymbiont GvMRE of Glomus versiforme"),
+         SciNameShort = str_replace(SciNameShort, " str\\.", ""),
+         SciNameShort = str_replace(SciNameShort, "_phage_", " phage "),
+         SciNameShort = str_replace(SciNameShort,  " lll", "")) %>%
+  rename(SciName = SciNameShort)%>%
+  full_join(., taxonomy_list, by = "SciName")
+
+taxonomy_na_mod <- rso_reports_tax_mod %>%
+  bind_rows(., rsmp_reports_tax_mod) %>%
+  filter(is.na(Taxonomy)) %>%
+  arrange(SciName) %>%
+  select(Rank, NCBItaxID, SciNameFull, SciName) %>%
+  unique()
+
+fwrite(taxonomy_na_mod, file = "./00-documentation.backup/taxonomy_na.tsv", quote = F, sep = "\t")
+
+```
+
+
 
 ```{r mag_info}
 # this is where the Pasolli MAG info is: 
@@ -143,9 +474,65 @@ db_species_compare_phage <- db_species_compare %>%
 mag_info <- fread("00-documentation.backup/Pasolli2019_SGBinfo.csv")
 mag_info <- as_tibble(mag_info)
 mag_info %>% filter(str_detect(closestTaxLevel, "Corynebacterium")) %>% select(-estTaxonomy) %>% arrange(closestTaxLevel) %>% print(., n = 59)
+
+# total counts at each level
+mag_info %>%
+  group_by(estTaxLevel) %>%
+  count()
+
+# counts of each entry at the specified levels
+mag_info %>%
+  filter(estTaxLevel == "Other") %>%
+  select(closestTaxLevel) %>%
+  mutate(phylum = sapply(closestTaxLevel, function(f) {
+                                  unlist(str_split(f, "\\|"))[2]
+                           })) %>%
+  filter(!str_detect(phylum, "c__|o__|f__|g__|s__")) %>%
+  count(phylum) %>%
+  arrange(desc(n)) 
+# %>%
+#   summarize(total = sum(n))
+
+mag_info %>%
+  filter(estTaxLevel == "Family") %>%
+  select(closestTaxLevel) %>%
+  mutate(family = sapply(closestTaxLevel, function(f) {
+                                  unlist(str_split(f, "\\|"))[5]
+                           })) %>%
+  filter(!str_detect(family, "p__|c__|o__|g__|s__")) %>%
+  count(family) %>%
+  arrange(desc(n)) 
+# %>%
+#   summarize(total = sum(n))
+
+mag_info %>%
+  filter(estTaxLevel == "Genus") %>%
+  select(closestTaxLevel) %>%
+  mutate(genus = sapply(closestTaxLevel, function(f) {
+                                  unlist(str_split(f, "\\|"))[6]
+                           })) %>%
+  filter(!str_detect(genus, "p__|c__|o__|f__|s__")) %>%
+  count(genus) %>%
+  arrange(desc(n)) 
+# %>%
+#   summarize(total = sum(n))
+
+mag_info %>%
+  filter(estTaxLevel == "Species") %>%
+  select(closestTaxLevel) %>%
+  mutate(species = sapply(closestTaxLevel, function(f) {
+                                  unlist(str_split(f, "\\|"))[7]
+                           })) %>%
+  filter(!str_detect(species, "p__|c__|o__|f__|g__")) %>%
+  count(species) %>%
+  arrange(desc(n)) 
+# %>%
+#   summarize(total = sum(n))
+
+
 ```
 
-```{r}
+```{r, eval = F}
 table_temp <- fread("./04-analysis/kraken/output/RefSeqPasolliMAGs/SRR514329_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz.output.1.kraken")
 
 table_temp1 <- table_temp %>%

@@ -1,0 +1,13 @@
+nextflow run nf-core/mag \
+--reads '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/input/*.R{1,2}.fastq.gz' \
+-profile shh \
+--kraken2_db 'ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz'  \
+--outdir '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output' \
+-name 'cmc_assembly' \
+-w '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output/work'
+
+
+--kraken2_db '/projects1/microbiome_sciences/reference_databases/refseq20191017_Pasolli2019/kraken2_db/for_nf-core-mag/MiniKraken_RefSeq1910PlusPasolliSGBs.tar.gz'  \
+
+--kraken2_db 'ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz'  \
+

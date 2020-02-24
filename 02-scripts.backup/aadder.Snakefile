@@ -45,7 +45,7 @@ rule build_aadder_db:
     threads: 112
     shell:
         """
-        /projects1/users/velsko/bin/megan/tools/aadder-build \
+        /projects1/users/velsko/bin/megan_6_18_5/tools/aadder-build \
         -igff {params.gffpath} \
         -d  {params.outdir} \
         -a2t {params.acc2tax} \
@@ -70,7 +70,7 @@ rule run_aadder:
     threads: 112
     shell:
         """
-        /projects1/users/velsko/bin/megan/tools/aadder-run \
+        /projects1/users/velsko/bin/megan/tools_6_18_5/aadder-run \
         -i {params.sam} \
         -d {params.dbdir} \
         -o {params.outdir} \
@@ -98,7 +98,7 @@ rule blast_2_rma6_kegg:
     threads: 112
     shell:
         """
-        /projects1/users/velsko/bin/megan/tools/blast2rma \
+        /projects1/users/velsko/bin/megan_6_18_5/tools/blast2rma \
         --format SAM \
         -i {input} \
         -o {params.outdir} \
@@ -127,7 +127,7 @@ rule blast_2_rma6_seed:
         dir = ""
     shell:
         """
-        /projects1/users/velsko/bin/megan/tools/blast2rma \
+        /projects1/users/velsko/bin/megan_6_18_5/tools/blast2rma \
         --format SAM \
         -i /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/output/Oct2019db/*out.gz \
         -o /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/rma6/July2019KEGG \

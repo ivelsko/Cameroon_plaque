@@ -3,12 +3,12 @@
 #SBATCH -c 8
 #SBATCH --mem=100000
 #SBATCH --partition=medium
-#SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.kraken.5.rso.out
-#SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.kraken.5.rso.err
+#SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.kraken.3.rso.out
+#SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.kraken.3.rso.err
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=time_limit
 #SBATCH --mail-use=velsko@shh.mpg.de
-#SBATCH --array=0-162%4
+#SBATCH --array=0-176%8
 #SBATCH -J "kraken"
 
 SAMPLES=( $(find /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/input-temp/ -name '*.gz' | rev | cut -d/ -f 1 | rev))
@@ -18,10 +18,11 @@ SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 --db /projects1/microbiome_sciences/reference_databases/refseq20191017/kraken2_db/MiniKraken_RefSeq1910 \
 --threads 8 \
 --gzip-compressed \
---output /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/$(basename "$SAMPLENAME" _S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz).output.5.rso.kraken \
---report /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/$(basename "$SAMPLENAME" _S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz).report.5.rso.kraken \
---use-mpa-style \
+--output /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/$(basename "$SAMPLENAME" .fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz).output.3.rso.kraken \
+--report /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/$(basename "$SAMPLENAME" .fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz).report.3.rso.kraken \
 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/input-temp/"${SAMPLENAME}"
 
 # use the database below for RefSeqCustom plus Pasolli MAGs:
-#/projects1/microbiome_sciences/reference_databases/refseq20191017_Pasolli2019/kraken2_db/MiniKraken_RefSeq1910PlusPasolliSGBs \
+# /projects1/microbiome_sciences/reference_databases/refseq20191017_Pasolli2019/kraken2_db/MiniKraken_RefSeq1910PlusPasolliSGBs \
+# use the database below for RefSeqCustom Only (no Pasolli MAGs):
+# /projects1/microbiome_sciences/reference_databases/refseq20191017/kraken2_db/MiniKraken_RefSeq1910 \
