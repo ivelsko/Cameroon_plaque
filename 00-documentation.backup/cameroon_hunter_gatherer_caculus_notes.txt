@@ -213,6 +213,7 @@ pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-te
 rename 's/_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz/.10M/' *_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz
 rename 's/_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz/.10M/' *_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
 rename 's/_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz//' *_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
+rename 's/.fastq.truncated.prefixed.gz//' *.fastq.truncated.prefixed.gz
 
 
 mkdir genefamilies pathabundance pathcoverage
@@ -226,7 +227,7 @@ humann2_join_tables -i genefamilies -o humann2.genefamilies.all.tsv
 humann2_renorm_table -i humann2.genefamilies.all.tsv -o humann2.genefamilies.all.tss.tsv -s y
 
 humann2_join_tables -i pathabundance -o humann2.pathabundance.all.tsv
-humann2_renorm_table -i pathabundance.all.tsv -o humann2.pathabundance.all.tss.tsv -s n
+humann2_renorm_table -i humann2.pathabundance.all.tsv -o humann2.pathabundance.all.tss.tsv -s n
 
 humann2_join_tables -i pathcoverage -o humann2.pathcoverage.all.tsv
 humann2_renorm_table -i humann2.pathcoverage.all.tsv -o humann2.pathcoverage.all.tss.tsv -s n
@@ -235,32 +236,87 @@ mkdir genefamilies/renormed
 for f in ./genefamilies/*.tsv; do humann2_renorm_table -i $f -o ./genefamilies/renormed/$(basename $f .tsv).tss.tsv; done
 
 # download databases for regrouping entries
-humann2_databases --download utility_mapping full ~/bin/humann2_regroup_databases
+humann2_databases --download utility_mapping full /projects1/users/velsko/bin/humann2_regroup_databases
 
 humann2_join_tables -i ./genefamilies/renormed -o ./humann2.genefamilies.all.i.tss.tsv
 humann2_regroup_table --input humann2.genefamilies.all.i.tss.tsv --output ./humann2.genefamilies.all.i.tss.ko.tsv --groups uniref90_ko
 humann2_renorm_table -i ./humann2.genefamilies.all.i.tss.ko.tsv -o ./humann2.genefamilies.all.i.tss.renorm.ko.tsv -s y
 
+# To determine the # of reads that were aligned (or rather unaligned) by HUMAnN2
+# working dir /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/humann2/input
+ls *.gz > samples.list
+touch samples.lines
+for f in *.gz; do zcat $f | wc -l >> samples.lines; done
+# add a header to each file (SampleID, Lines)
+paste samples.list samples.lines > ../../../05-results.backup/sample_lines.tsv 
+# check that these numbers, divided by 4, are the same as those in the metadata file column Individual_Seq_Depth_NonHuman
+# if they are, use that metadata column for the R analyses, otherwise figure out why that column is wrong and fix it to match these. Use it with the correct numbers
+
+cd ../logfiles/
+touch files.names unaligned.pcts
+for f in *.out; do grep "Creating output" $f | sed 's/Creating\ output\ directory\:\ \/projects1\/microbiome_calculus\/Cameroon_plaque\/04-analysis\/humann2\/output\///g' >> files.names; done
+for f in *.out; do grep "Unaligned reads after translated alignment:" $f | sed 's/Unaligned\ reads\ after\ translated\ alignment\://g' | sed 's/\ \%//g' >> unaligned.pcts; done
+# add a header to each file (SampleID, UnalignedPct)
+paste files.names unaligned.pcts > ../../../05-results.backup/humann2_alignment_stats.tsv
+
+
 ###########################
-run kraken 10X with both databases to see if there are more reads assigned when including MAGs, account for variability with the 10 runs
+run kraken 5X with both databases to see if there are more reads assigned when including MAGs, account for variability with the 5 runs
 # get the number of classified and unclassified reads for each sample for each run with each database to compare 
 # if adding the Pasolli MAGs to the database increases the number of reads classified in each sample
 
-# run this for both outputs (RefSeqOnly, RefSeqPasolliMAGs). Add .rso to the files that had the RefSeqOnly database
-ls *.output.* > sampleorder.list
+# **Note** there was no difference in the number of reads assigned in each sample between the 5 runs, so when running again use only 3 runs
 
-touch classifiedreads.counts
-for f in *.output.*; do grep -c "^C" $f >> classifiedreads.counts; done
-touch unclassifiedreads.counts
-for f in *.output.*; do grep -c "^U" $f >> unclassifiedreads.counts; done
+# the MetaPhlAn2-type output may be too difficult to work with, so re-run with 3 runs each using the standard output format
+
+# **Note** there is a problem with Kraken2, where it will call reads classified 'C' but have them at rank '0'
+# in the report file then, the number of unclassified + root reads doesn't equal the total. The missing reads are those above. 
+# These reads are not included in the report file, but are included in the output file. Apparently the developers are aware of the problem and working on it
+
+# run this for both outputs (RefSeqOnly, RefSeqPasolliMAGs). Add .rso to the files that had the RefSeqOnly database
+ls *.output.* > sampleorder.rso.list
+ls *.output.* > sampleorder.rspm.list
+
+touch classifiedreads.rso.counts
+for f in *.output.*; do grep -c "^C" $f >> classifiedreads.rso.counts; done
+touch unclassifiedreads.rso.counts
+for f in *.output.*; do grep -c "^U" $f >> unclassifiedreads.rso.counts; done
 
 # open each file (sampleorder.list, classifiedreads.counts, unclassifiedreads.counts) and give each a header
 # SampleID, Classified, Unclassified, respectively
 
-paste sampleorder.list classifiedreads.counts unclassifiedreads.counts > readclassification_stats.tsv
+paste sampleorder.rspm.list classifiedreads.rspm.counts unclassifiedreads.rspm.counts > readclassification_stats.rspm.tsv
+paste sampleorder.rso.list classifiedreads.rso.counts unclassifiedreads.rso.counts > readclassification_stats.rso.tsv
+cp readclassification_stats.rspm.tsv /projects1/microbiome_calculus/Cameroon_plaque/05-results.backup/readclassification_stats.rspm.tsv
+cp readclassification_stats.rso.tsv /projects1/microbiome_calculus/Cameroon_plaque/05-results.backup/readclassification_stats.rso.tsv
 
 # Now load these files (readclassification_stats.tsv, readclassification_stats.rso.tsv) into R to compare the number of classified reads. Is it higher when using the database with the Pasolli MAGs?
 
+# to get taxonomy for the standard report files:
+# in /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/mpa_output/RefSeqOnly/no_header
+# in /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/mpa_output/RefSeqPasolliMAGs/no_header
+
+touch taxonomy.list
+for f in *.old
+do
+awk -F"\t" '{print $1}' $f >> taxonomy.list
+done
+sort taxonomy.list | uniq > taxonomy.list.uniq
+
+
+touch taxonomy.list
+for f in *.old
+do
+awk -F"\t" '{print $1}' $f >> taxonomy.list
+done
+sort taxonomy.list | uniq > taxonomy.list.uniq
+
+awk -F"\|" '{print $NF}' taxonomy.list.uniq | sed 's/d__//g' | sed 's/p__//g' | sed 's/c__//g' | sed 's/o__//g' | sed 's/f__//g' | sed 's/g__//g' | sed 's/s__//g' | paste - taxonomy.list.uniq > taxonomy.list.uniq.split
+cat /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/mpa_output/RefSeqPasolliMAGs/no_header/taxonomy.list.uniq.split /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/mpa_output/RefSeqOnly/no_header/taxonomy.list.uniq.split | sort | uniq > /projects1/microbiome_calculus/Cameroon_plaque/00-documentation.backup/taxonomy.list.uniq.split
+
+# open file and add column names SciName and Taxonomy
+
+# open taxonomy_na.tsv and add in the appropriate taxonomy
 
 ###########################
 To download oral bacteriophage sequences from MG-RAST
@@ -301,13 +357,92 @@ find /projects1/microbiome_sciences/raw_data/public/abeles2014/ -name '*.gz' -ty
 
 find /projects1/microbiome_calculus/Cameroon_plaque/01-data/phage/abeles2014assemblies/SPAdes/*/ -name '*ds.fasta' -type f | rev | cut -d/ -f 2 | rev | cut -d. -f1 | grep -v K | grep -v misc
 
+########################################################
+
+# assemble the data
+
+nextflow run nf-core/mag \
+--reads '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/input/*.R{1,2}.fastq.gz' \
+-profile shh \
+--kraken2_db 'ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz'  \
+--outdir '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output' \
+-name 'cmc_assembly' \
+-w '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output/work'
+
+# this is the database Alex made, but it doesn't work with this pipeline
+# --kraken2_db '/projects1/microbiome_sciences/reference_databases/refseq20191017_Pasolli2019/kraken2_db/for_nf-core-mag/MiniKraken_RefSeq1910PlusPasolliSGBs.tar.gz'  \
 
 
+# to resume a stalled run after deleting files
+nextflow run nf-core/mag --reads '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/input/*.R{1,2}.fastq.gz' -profile shh --kraken2_db 'ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz'  --outdir '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output' -w '/projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output/work' -resume cmc_assembly
 
 
+ERROR ~ Error executing process > 'quast (MEGAHIT-LIB050.A0105.SG1.1)'
+
+Caused by:
+  Process `quast (MEGAHIT-LIB050.A0105.SG1.1)` terminated with an error exit status (4)
+
+Command executed:
+
+  metaquast.py --threads "1" --rna-finding --max-ref-number 0 -l "MEGAHIT-LIB050.A0105.SG1.1" "LIB050.A0105.SG1.1.contigs.fa" -o "LIB050.A0105.SG1.1_QC"
+
+Command exit status:
+  4
+
+Command output:
+  /opt/conda/envs/nf-core-mag-1.0.0/lib/python3.6/site-packages/quast-5.0.2-py3.6.egg-info/scripts/metaquast.py --threads 1 --rna-finding --max-ref-number 0 -l MEGAHIT-LIB050.A0105.SG1.1 LIB050.A0105.
+SG1.1.contigs.fa -o LIB050.A0105.SG1.1_QC
+
+  Version: 5.0.2
+
+  System information:
+    OS: Linux-4.4.0-38-generic-x86_64-with-debian-9.9 (linux_64)                                                                                                                              [23/12529]
+    Python version: 3.6.7
+    CPUs number: 64
+
+  Started: 2020-02-19 13:07:10
+
+  Logging to LIB050.A0105.SG1.1_QC/metaquast.log
+
+  Contigs:
+    Pre-processing...
+  WARNING: Skipping MEGAHIT-LIB050.A0105.SG1.1 because it doesn't contain contigs >= 0 bp.
 
 
+  ERROR! None of the assembly files contains correct contigs. Please, provide different files or decrease --min-contig threshold.
 
+Command wrapper:
+  /opt/conda/envs/nf-core-mag-1.0.0/lib/python3.6/site-packages/quast-5.0.2-py3.6.egg-info/scripts/metaquast.py --threads 1 --rna-finding --max-ref-number 0 -l MEGAHIT-LIB050.A0105.SG1.1 LIB050.A0105.
+SG1.1.contigs.fa -o LIB050.A0105.SG1.1_QC
+
+  Version: 5.0.2
+    System information:                                                                                                                                                                          [2/12529]
+    OS: Linux-4.4.0-38-generic-x86_64-with-debian-9.9 (linux_64)
+    Python version: 3.6.7
+    CPUs number: 64
+
+  Started: 2020-02-19 13:07:10
+
+  Logging to LIB050.A0105.SG1.1_QC/metaquast.log
+
+  Contigs:
+    Pre-processing...
+  WARNING: Skipping MEGAHIT-LIB050.A0105.SG1.1 because it doesn't contain contigs >= 0 bp.
+
+
+  ERROR! None of the assembly files contains correct contigs. Please, provide different files or decrease --min-contig threshold.
+
+Work dir:
+  /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/assembly/output/work/3f/ff67506920c98fbed4f39ec6eda583
+
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`
+ -- Check '.nextflow.log' file for details
+
+########################################################
+
+snakemake -s aadder.Snakefile --cluster-config aadder-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j 1 # -n # for a test run
+
+snakemake -s strepSRRP_gene_align_cluster.Snakefile --cluster-config decipher-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j -n # for a test run
 
 
 
