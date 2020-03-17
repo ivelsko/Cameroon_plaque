@@ -273,7 +273,7 @@ db_species_compare_phage <- db_species_compare %>%
 
 ```
 
-```{r}
+```{r taxonomy_na, eval = F}
 taxonomy_list <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
 
 
@@ -459,7 +459,7 @@ taxonomy_na_mod <- rso_reports_tax_mod %>%
   select(Rank, NCBItaxID, SciNameFull, SciName) %>%
   unique()
 
-fwrite(taxonomy_na_mod, file = "./00-documentation.backup/taxonomy_na.tsv", quote = F, sep = "\t")
+# fwrite(taxonomy_na_mod, file = "./00-documentation.backup/taxonomy_na.tsv", quote = F, sep = "\t")
 
 ```
 
