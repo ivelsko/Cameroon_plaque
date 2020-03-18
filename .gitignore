@@ -3,3 +3,12 @@
 01-data/
 03-preprocessing/
 04-analysis/
+02-scripts.backup/.nextflow.log
+02-scripts.backup/.nextflow.log.1
+02-scripts.backup/.nextflow.log.2
+02-scripts.backup/.nextflow.log.3
+02-scripts.backup/.nextflow.log.4
+02-scripts.backup/.nextflow/
+02-scripts.backup/.snakemake/
+02-scripts.backup/.Rhistory
+02-scripts.backup/.DS_Store
