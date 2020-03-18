@@ -54,7 +54,7 @@ colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extract
 colnames(malt_genus) <- gsub(".fastq.truncated","", colnames(malt_genus))
 
 # remove human and unassigned reads
-malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo sapiens"))
+malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo"))
 malt_genus <- malt_genus %>% filter(!str_detect(Species, "Not assigned"))
 # get rid of the extra column at the begining
 malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
@@ -668,7 +668,7 @@ ggplot(contam.comb.genus, aes(x=p)) +
 ```
 
 We'll use the prevalence method, because this doesn't include known oral taxa in the contaminant list (frequency method does), and it picks up a lot more than the combined method does (but is that important if we cut off the tail of low-abundance taxa (say <0.01% abundance) anyway?). But which cut-off to use? How does changing the cut-off affect the tail of low-abundance taxa?
-List out the pathways that are considered contaminants, to be removed from the table prior to all analyses. Then remove them from the table to make the decontaminated input table for analysis.
+List out the pathways that are considered contaminants, to be removed from the table prior to all analyses. Then remove them from the table to make the decontaminated input table for analysis. *Note that the genus list includes Actinomyces, and this needs to be removed from the list b/c Actinomyces are a well known oral genus*
 ```{r contaminants}
 contaminants_species <- cont_prev_species_list %>% rownames_to_column("Species") %>% select(Species)
 malt_species.decontam <- malt_species %>%
@@ -678,7 +678,7 @@ malt_species.decontam <- malt_species %>%
 # write.table(malt_species, "05-results.backup/malt_species.tsv", sep="\t", quote=F, row.names = F)
 # write.table(contaminants_species, "05-results.backup/malt_contaminants_species.tsv", sep="\t", quote=F, row.names = F)
 
-contaminants_genus <- cont_prev_genus_list %>% rownames_to_column("Species") %>% select(Species)
+contaminants_genus <- cont_prev_genus_list %>% rownames_to_column("Species") %>% select(Species) %>% filter(Species != "Actinomyces")
 malt_genus.decontam <- malt_genus %>%
   anti_join(., contaminants_genus)
 

@@ -64,7 +64,7 @@ colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extract
 colnames(malt_genus) <- gsub(".fastq.truncated","", colnames(malt_genus))
 
 # remove human and unassigned reads
-malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo sapiens"))
+malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo"))
 malt_genus <- malt_genus %>% filter(!str_detect(Species, "Not assigned"))
 # get rid of the extra column at the begining
 malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)

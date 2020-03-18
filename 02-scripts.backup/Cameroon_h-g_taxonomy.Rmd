@@ -83,7 +83,7 @@ colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extract
 colnames(malt_genus) <- gsub(".fastq.truncated","", colnames(malt_genus))
 
 # remove human and unassigned reads
-malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo sapiens"))
+malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo"))
 malt_genus <- malt_genus %>% filter(!str_detect(Species, "Not assigned"))
 # get rid of the extra column at the begining
 malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
@@ -981,6 +981,22 @@ pandoc.table(malt_species_decontam_filtered_biplot_323$plot_env$neg_10 %>% arran
 
 
 ```
+There are some clear biological differences in the taxa with highest loadings in
+each component, positive and negative. In PC1, the positive loading taxa are all
+anaerobic, while the negative loading taxa are all *Neisseria* plus 1 *Rothia*, wich
+are aerobic. *Really need to see which HMP samples are supragingival and which*
+*are subgingival.* All Yanomami buccal swab samples have negative PC2 values, and
+it makes sense that *Neisseria* and other aerobic taxa characterize this
+direction, as they are more abundant on buccal epithelia. In PC2, the positive
+loading taxa are anaerobic, later colonizers, which corresponds with the
+calculus samples that plot in positice PC2 values. The PC2 negative loading taxa
+are a mix of aerobes, facultative anaerobes, and anaerobes, characteristic of a
+younger biofilm community such as found in plaque compared to calculus. In PC3,
+the positive loading taxa are mostly *Neisseria*, with one *Strep* & one *Rothia*,
+while the negative loading taxa are mostly *Rothia*, with 2 *Actinomyces.* Both of
+these groups are mostly aerobic, but suggests that *Rothia* are more predominant
+in plaque than *Neisseria*, while *Neisseria* are more predominant in buccal swabs.
+
 
 ```{r biplot_samples_species_no_yanomami}
 # remove the Yanomami samples from the input table
@@ -1064,6 +1080,19 @@ pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_323$plot_env$neg_1
              caption = "PC3 negative loadings")
 
 ```
+When we look only at samples from tooth surfaces, we still see some biological
+differences between the taxa in the different PCs with positive and negative
+loadings. In PC1, the positive loading taxa are 9 *Niesseria* and 1 *Rothia*,
+suggesting these samples are less mature biofilms, or are exposed to higher
+oxygen tension. The negative loading taxa are a mix of anaerobic species,
+suggesting they are more mature or exposed to lower oxygen tension. *Does this*
+*separation correspond to the separation of anterior/posterior tooth sites?* In
+PC2 positive loadings there is a mix of aerobic and anaerobic taxa, with more
+*Rothia/Veillonella* than the others, while the negative loading taxa are mostly
+late colonizer, anaerobic taxa. This distinction corresponds to the separation
+of plaque in positive values and calculus in negative values. In PC3, the
+positive loading taxa are a mix of aerobic and anaerobic taxa, while the
+negative loading taxa are also a mix, but *Neisseria* make up 6 of the 10.
 
 
 What is the relationship of Cameroon plaque samples to eachother without any
@@ -1250,6 +1279,18 @@ pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_323$plot_env$neg_1
              caption = "PC3 negative loadings")
 
 ```
+In PC1, the positive loading taxa are mostly anaerobic taxa, while the negative
+loading taxa are a mix of aerobic and facultative taxa. This corresonds to the
+separation of samples by posterior (positive values) and anterior (negative
+values) tooth sites. In PC2, the positive loading taxa are largely aerobic, 8
+*Rothia*, while the negative loading taxa are mostly anaerobic. In PC3, the
+positive loading taxa are 8 aerobic *Rothia* in positive PC2 values and
+anaerobic(?) *[Eubacterium]* and *Thermoplasmatales* (archaeon), while the
+negative loading taxa are a mix of facultative anaerobes and anaerobes that can
+be found in early biofilms (*Streptococcus*, *Porphyromonas*). The split in PC3
+positive taxa corresonds with the taxa loading in PC2 (aerobic in positive,
+anaerobic in negative).
+
 
 ## Genus-level analyses
 
@@ -1411,6 +1452,25 @@ pandoc.table(malt_genus.decontam_filtered_biplot_323$plot_env$neg_10 %>% arrange
              caption = "PC3 negative loadings")
 
 ```
+Loadings of genera show a similar pattern to what we saw with species. In PC1,
+the positive loading taxa are mostly anaerobic, while the negative loading taxa
+are a mix of aerobic and anaerobic. There is some overlap in the genera between
+species and genus loadings for positive values, but not all species are also
+represented at the genus level. Negative value genera include *Neisseria* and
+relatives *Eikenella*, *Haemophilus*, *Kingella*, and *Aggregatibacter.* In PC2,
+the postive loading taxa are mostly later colonizer anaerobes, while the
+negative loading taxa are mix of aerobes and facultative anaerobes. This
+corresponds with the separation of calculus in positive PC2 values (more mature
+community) and plaque on negative values (less mature community). There is
+almost no overlap of species and genera in PC2 loadings. In PC3, the positive
+loading taxa are mostly later colonizing anaerobes, while the negative loading
+taxa are unusual, rare, or poorly characterized in the oral biofilm. There is no
+overlap in the species and genera in PC3 loadings. The Yanomami samples again
+separate from JAE and CMC along PC3, but overlap with HMP. However, they
+separate from HMP along PC2. It is unexpected that none of the genera with PC3
+positive loadings are the aerobic taxa that characterized this direction in the
+species analysis.
+
 
 ```{r biplot_samples_genus_no_yanomami}
 
@@ -1495,6 +1555,8 @@ pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_323$plot_env$neg_10 
              caption = "PC3 negative loadings")
 
 ```
+When excluding Yanomami samples, the patterns of taxa characterizing sample group separation are still less clear at the genus level than they are at the species level. In PC1, the positive loading taxa are mostly later colonizing anaerobes, while the positive loading taxa are more aerobic and facultative anaerobic genera. The taxa characterizing this direction corresond with the HMP plaque plotting in negative PC1 values, which would have a less mature biofilm community. In PC2, the positive loading taxa are mostly later colonizing anaerobes, which corresponds with the JAE calculus samples plotting in this part of the graph. The negative loading taxa are a mix of aaerobic and facultative taxa, which corresponds with the HMP plaque samples plotting in this part of the graph. In PC3, the positive loading taxa are unusual, rare, or poorly characterized in the oral biofilm, while the negative loading taxa are also unusual, rare, or poorly characterized in the oral biofilm.
+
 
 What is the relationship of Cameroon plaque samples to eachother without any
 other sample types? Do they cluster by any of the metadata categories?
