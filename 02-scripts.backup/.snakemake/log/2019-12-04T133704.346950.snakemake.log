@@ -1,3 +1,0 @@
-NameError in line 31 of /projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/kraken_refseq_only.Snakefile:
-name 'REFSEQGENOMEIDS' is not defined
-  File "/projects1/microbiome_calculus/Cameroon_plaque/02-scripts.backup/kraken_refseq_only.Snakefile", line 31, in <module>
