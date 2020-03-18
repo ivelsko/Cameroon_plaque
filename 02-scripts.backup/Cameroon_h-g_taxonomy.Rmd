@@ -1184,11 +1184,11 @@ malt_species.decontam_filtered_cmc.euc.pcoavectors <- malt_species.decontam_filt
 malt_species.decontam_filtered_cmc.euc.vecmet <- inner_join(malt_species.decontam_filtered_cmc.euc.pcoavectors, metadata, by = "SampleID")
 
 malt_species.decontam_filtered_cmc.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Sex)) +
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 3) +
   scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Sex_shapes) +
-  # stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
   theme_minimal(base_size = 7) +
   ggtitle("Tooth site")
 
@@ -1458,18 +1458,18 @@ are a mix of aerobic and anaerobic. There is some overlap in the genera between
 species and genus loadings for positive values, but not all species are also
 represented at the genus level. Negative value genera include *Neisseria* and
 relatives *Eikenella*, *Haemophilus*, *Kingella*, and *Aggregatibacter.* In PC2,
-the postive loading taxa are mostly later colonizer anaerobes, while the
-negative loading taxa are mix of aerobes and facultative anaerobes. This
-corresponds with the separation of calculus in positive PC2 values (more mature
-community) and plaque on negative values (less mature community). There is
-almost no overlap of species and genera in PC2 loadings. In PC3, the positive
-loading taxa are mostly later colonizing anaerobes, while the negative loading
-taxa are unusual, rare, or poorly characterized in the oral biofilm. There is no
-overlap in the species and genera in PC3 loadings. The Yanomami samples again
-separate from JAE and CMC along PC3, but overlap with HMP. However, they
-separate from HMP along PC2. It is unexpected that none of the genera with PC3
-positive loadings are the aerobic taxa that characterized this direction in the
-species analysis.
+the postive loading taxa are a mix of early colonizer aerobes and later
+colonizer anaerobes, while the negative loading taxa are mostly later colinizer
+anaerobes. This corresponds with the separation of plaque in positive PC2 values
+(less mature community) and calculus on negative values (more mature community).
+There is almost no overlap of species and genera in PC2 loadings. In PC3, the
+positive loading taxa are unusual, rare, or poorly characterized in the oral
+biofilm, while the negative loading taxa are mostly later colonizing anaerobes.
+There is no overlap in the species and genera in PC3 loadings. The Yanomami
+samples again separate from JAE and CMC along PC3, but overlap with HMP.
+However, they separate from HMP along PC2. It is unexpected that none of the
+genera with PC3 positive loadings are the aerobic taxa that characterized this
+direction in the species analysis.
 
 
 ```{r biplot_samples_genus_no_yanomami}
@@ -1555,7 +1555,21 @@ pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_323$plot_env$neg_10 
              caption = "PC3 negative loadings")
 
 ```
-When excluding Yanomami samples, the patterns of taxa characterizing sample group separation are still less clear at the genus level than they are at the species level. In PC1, the positive loading taxa are mostly later colonizing anaerobes, while the positive loading taxa are more aerobic and facultative anaerobic genera. The taxa characterizing this direction corresond with the HMP plaque plotting in negative PC1 values, which would have a less mature biofilm community. In PC2, the positive loading taxa are mostly later colonizing anaerobes, which corresponds with the JAE calculus samples plotting in this part of the graph. The negative loading taxa are a mix of aaerobic and facultative taxa, which corresponds with the HMP plaque samples plotting in this part of the graph. In PC3, the positive loading taxa are unusual, rare, or poorly characterized in the oral biofilm, while the negative loading taxa are also unusual, rare, or poorly characterized in the oral biofilm.
+When excluding Yanomami samples, the patterns of taxa characterizing sample
+group separation are still less clear at the genus level than they are at the
+species level. In PC1, the positive loading taxa are mostly later colonizing
+anaerobes, while the negative loading taxa are more aerobic and facultative
+anaerobic genera. The taxa characterizing this direction corresond with the HMP
+plaque samples, which would have a less mature biofilm community, mostly
+plotting in negative PC1 values. In PC2, the positive loading taxa are mostly
+later colonizing anaerobes, which corresponds with the JAE calculus samples
+plotting in this part of the graph. The negative loading taxa are a mix of
+aerobic and facultative taxa, which corresponds with the HMP plaque samples
+plotting in this part of the graph. In PC3, the positive loading taxa are
+unusual, rare, or poorly characterized in the oral biofilm, while the negative
+loading taxa are mostly later colonizer, anaerobes. Several calculus samples
+plot far in PC3 positive values, which suggests that there are some unusual,
+poorly characterized taxa in calculus that are not seen in plaque.
 
 
 What is the relationship of Cameroon plaque samples to eachother without any
@@ -1746,8 +1760,16 @@ pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_323$plot_env$neg_10 
              caption = "PC3 negative loadings")
 
 ```
-
-
+Based on genus profiles, the Cameroon plaque samples separate by tooth site,
+just like they do with the species profile. In PC1, the positive and negative
+loading taxa are anaerobes or facultative anaerobes.This is in contrast to the
+species that separated PC1 positive and negative loadings being distinguished by
+different oxygen tolerance. In PC2, the positive loading taxa are mostly later
+colonizing anaerobes, while the negative loading taxa are a mix of early
+colonizing aerobes and facultative anaerobes. In PC3, the positive loading taxa
+are mostly late colonizing anaerobes, while the negative loading taxa are a mix
+of early colonizing aerobes and unusual, rare, or poorly characterized in the
+oral biofilm.
 
 
 
