@@ -1197,6 +1197,61 @@ adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Age_
 
 ```
 
+```{r metadata_betadisper}
+metadata_cmc <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata_cmc <- metadata_cmc %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(!SampleID %in% outliers) %>%
+  filter(Description == "HunterGatherer") %>%
+  select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
+  as_tibble() %>%
+  mutate(Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime"),
+         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming"),
+         Sex = fct_relevel(Sex, "Male","Female"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior"),
+         Village = fct_relevel(Village, "202","205","204","203","206"))
+
+```
+
+
+```{r betadisper_cmc_species, eval = F}
+
+groups <- metadata_cmc %>%
+  select(Market_economy) %>%
+  pull()
+
+## Calculate multivariate dispersions
+mod <- betadisper(malt_species.decontam_filtered_cmc.euc, groups, bias.adjust =TRUE)
+mod
+
+## Perform test
+anova(mod)
+
+## Permutation test for F
+permutest(mod, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+(mod.HSD <- TukeyHSD(mod))
+plot(mod.HSD)
+
+## Plot the groups and distances to centroids on the
+## first two PCoA axes
+plot(mod)
+
+## with data ellipses instead of hulls
+plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+
+## can also specify which axes to plot, ordering respected
+plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(mod)
+
+
+```
+
 
 ```{r biplots_cmc_species}
 
