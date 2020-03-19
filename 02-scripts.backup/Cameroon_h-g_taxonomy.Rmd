@@ -12,7 +12,6 @@ output:
 
 ```{r load_libraries, echo = F, message = F}
 library(knitr)
-library(decontam)
 library(data.table)
 library(psych)
 library(ape)
@@ -93,6 +92,7 @@ metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.
 metadata <- metadata %>%
   rename(SampleID = `#SampleID`)  %>%
   as_tibble() %>%
+  mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial")) %>%
   mutate(Description = fct_relevel(Description, "HunterGatherer", "Yanomami", "HMP_supPlaque", "HMP_subPlaque",
                                    "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
                                    "ExtractionGauze","ExtractionBlank","LibraryBlank"),
@@ -178,7 +178,7 @@ Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 7, H
 
 Market_economy_colors <- c(logging_road = "#FF3200", forrest_camp = "#172869", farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, Yanomami = 14, HMP = 7, HMP10M = 9, Industrial = 15,
+Market_economy_shapes <- c(logging_road = 19, forrest_camp = 17, farming = 18, Yanomami = 14, Industrial = 15,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
@@ -495,8 +495,7 @@ malt_species_raw = malt_species_raw+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.malt_species_pca <- tune.pca(malt_species_raw, logratio = 'CLR')
-tune.malt_species_pca
+tune.pca(malt_species_raw, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
 malt_species.pca <- mixOmics::pca(malt_species_raw, ncomp = 3, logratio = 'CLR')
@@ -608,8 +607,7 @@ malt_species_unfiltered = malt_species_unfiltered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.species_pca <- tune.pca(malt_species_unfiltered, logratio = 'CLR')
-tune.species_pca
+tune.pca(malt_species_unfiltered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_species_unfiltered, "PC1", "PC2", "Description", "Env", 3)
@@ -640,8 +638,7 @@ malt_species_filtered = malt_species_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.species_pca <- tune.pca(malt_species_filtered, logratio = 'CLR')
-tune.species_pca
+tune.pca(malt_species_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_species_filtered, "PC1", "PC2", "Description", "Env", 3)
@@ -666,8 +663,7 @@ malt_species.decontam_unfilt = malt_species.decontam_unfilt+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.species.decontam_pca <- tune.pca(malt_species.decontam_unfilt, logratio = 'CLR')
-tune.species.decontam_pca
+tune.pca(malt_species.decontam_unfilt, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_species.decontam_unfilt, "PC1", "PC2", "Description", "Env", 3)
@@ -692,8 +688,7 @@ malt_species.decontam_filtered = malt_species.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, logratio = 'CLR')
-tune.species.decontam_filtered_pca
+tune.pca(malt_species.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Description", "Env", 3)
@@ -727,8 +722,7 @@ malt_genus_unfiltered = malt_genus_unfiltered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus_pca <- tune.pca(malt_genus_unfiltered, logratio = 'CLR')
-tune.nt_genus_pca
+tune.pca(malt_genus_unfiltered, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
 nt_genus.pca <- mixOmics::pca(malt_genus_unfiltered, ncomp = 3, logratio = 'CLR')
@@ -757,8 +751,7 @@ malt_genus_filtered = malt_genus_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus_pca <- tune.pca(malt_genus_filtered, logratio = 'CLR')
-tune.nt_genus_pca
+tune.pca(malt_genus_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_genus_filtered, "PC1", "PC2", "Description", "Env", 3)
@@ -788,8 +781,7 @@ malt_genus.decontam_unfiltered = malt_genus.decontam_unfiltered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus.decontam_pca <- tune.pca(malt_genus.decontam_unfiltered, logratio = 'CLR')
-tune.nt_genus.decontam_pca
+tune.pca(malt_genus.decontam_unfiltered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_genus.decontam_unfiltered, "PC1", "PC2", "Description", "Env", 3)
@@ -815,8 +807,7 @@ malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus.decontam_pca <- tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
-tune.nt_genus.decontam_pca
+tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Description", "Env", 3)
@@ -852,8 +843,7 @@ malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblank
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_species_pca <- tune.pca(malt_species.decontam_filtered_noblanks, logratio = 'CLR')
-tune.nt_species_pca
+tune.pca(malt_species.decontam_filtered_noblanks, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
@@ -1102,9 +1092,13 @@ metadata_noblanks <- metadata_noblanks %>%
   filter(!SampleID %in% outliers) %>%
   filter(!str_detect(SampleID, "SRR16460|EXB|LIB|10M")) %>%
   as_tibble() %>%
+  mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial"),
+         Market_economy = str_replace(Market_economy, "logging_road","Logging road"),
+         Market_economy = str_replace(Market_economy, "forrest_camp","Forrest camp"),
+         Market_economy = str_replace(Market_economy, "farming","Farming"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","JAE"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","JAE"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Industrial"),
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Industrial"),
          Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
          Sex = fct_relevel(Sex, "Male","Female","HMP"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP"),
@@ -1112,6 +1106,7 @@ metadata_noblanks <- metadata_noblanks %>%
 
 ```
 
+Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_noblanks_noyanomami_species}
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
 
@@ -1138,9 +1133,10 @@ malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
 # Sex can't be run b/c for JAE012 sex is unknown, and is NA
 adonis(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ Tooth_site + Ethnic_Group + Age_group + Market_economy + Village, malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet, perm=999)
 
-
 ```
 
+
+Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_noblanks_species, eval = F}
 groups <- metadata_noblanks %>%
   select(Ethnic_Group) %>%
@@ -1203,8 +1199,7 @@ malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_species_pca <- tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
-tune.nt_species_pca
+tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
@@ -1253,7 +1248,7 @@ pca_malt_species_pc1pc2
 #        dpi = 300)
 ```
 
-
+Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_cmc_species}
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
 
@@ -1277,7 +1272,7 @@ malt_species.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, malt_species.decontam_filtered_cmc.euc.vecmet, perm=999)
+adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Market_economy + Sex + Village + Age_group, malt_species.decontam_filtered_cmc.euc.vecmet, perm=999)
 
 ```
 
@@ -1289,16 +1284,19 @@ metadata_cmc <- metadata_cmc %>%
   filter(Description == "HunterGatherer") %>%
   select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
   as_tibble() %>%
+  mutate(Market_economy = str_replace(Market_economy, "logging_road","Logging road"),
+         Market_economy = str_replace(Market_economy, "forrest_camp","Forrest camp"),
+         Market_economy = str_replace(Market_economy, "farming","Farming")) %>%
   mutate(Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+"),
          Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming"),
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming"),
          Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior"),
          Village = fct_relevel(Village, "202","205","204","203","206"))
 
 ```
 
-
+Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_cmc_species, eval = F}
 
 groups <- metadata_cmc %>%
@@ -1326,6 +1324,7 @@ plot(mod)
 ## with data ellipses instead of hulls
 plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+
 
 ## can also specify which axes to plot, ordering respected
 plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
@@ -1457,8 +1456,7 @@ malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus_pca <- tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
-tune.nt_genus_pca
+tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
@@ -1710,6 +1708,74 @@ loading taxa are mostly later colonizer, anaerobes. Several calculus samples
 plot far in PC3 positive values, which suggests that there are some unusual,
 poorly characterized taxa in calculus that are not seen in plaque.
 
+Run a permanova with function adonis to test if the clusters are significantly different.
+```{r adonis_noblanks_noyanomami_genus}
+# use the CLR-transformed matrix from the mixOmics PCA in the last section
+
+# Euclidean distance
+malt_genus.decontam_filtered_noblanks_noyanomami.euc <- vegdist(malt_genus.decontam_filtered_noblanks_noyanomami.pca$X, method = "euclidean", na.rm = T)
+malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoa <- ape::pcoa(malt_genus.decontam_filtered_noblanks_noyanomami.euc)
+
+malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- as.data.frame(malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoa$vectors)
+malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet <- inner_join(malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors, metadata, by = "SampleID")
+
+malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Ethnic_Group, shape = Ethnic_Group)) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = Ethnic_Group_colors) +
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  stat_ellipse(aes(colour = Ethnic_Group, group = Ethnic_Group)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+# Sex can't be run b/c for JAE012 sex is unknown, and is NA
+adonis(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Tooth_site + Ethnic_Group + Age_group + Market_economy + Village, malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet, perm=999)
+
+
+```
+
+Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
+```{r betadisper_noblanks_genus, eval = F}
+groups <- metadata_noblanks %>%
+  select(Ethnic_Group) %>%
+  pull()
+
+## Calculate multivariate dispersions
+mod <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups, bias.adjust =TRUE)
+mod
+
+## Perform test
+anova(mod)
+
+## Permutation test for F
+permutest(mod, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+(mod.HSD <- TukeyHSD(mod))
+plot(mod.HSD)
+
+## Plot the groups and distances to centroids on the
+## first two PCoA axes
+plot(mod)
+
+## with data ellipses instead of hulls
+plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+
+## can also specify which axes to plot, ordering respected
+plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(mod)
+
+
+```
+
+
 
 What is the relationship of Cameroon plaque samples to eachother without any
 other sample types? Do they cluster by any of the metadata categories?
@@ -1735,8 +1801,7 @@ malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.nt_genus_pca <- tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
-tune.nt_genus_pca
+tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
