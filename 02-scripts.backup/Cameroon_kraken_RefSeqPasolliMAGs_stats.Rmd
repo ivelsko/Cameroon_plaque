@@ -99,7 +99,7 @@ metadata <- metadata %>%
          Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
          Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
          Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
@@ -150,9 +150,9 @@ Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CD
 Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, `10-18` = 14, HMP = 7, HMP10M = 9,
                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-Sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+Sex_colors <- c(Female = "#FF3200", Male = "#172869",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")

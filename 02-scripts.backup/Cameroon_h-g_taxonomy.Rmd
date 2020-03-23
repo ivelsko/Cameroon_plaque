@@ -103,7 +103,7 @@ metadata <- metadata %>%
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
          Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
          Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
@@ -188,14 +188,19 @@ Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CD
 Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, `10-18` = 14, HMP = 7, HMP10M = 9,
                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
-Sex_colors <- c(Female = "#FF3200", Male = "#172869", HMP = "#969696", HMP10M = "#d9d9d9",
+Sex_colors <- c(Female = "#FF3200", Male = "#172869",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Sex_shapes <- c(Female = 19, Male = 17,  HMP = 7, HMP10M = 9,ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  Buccal_mucosa = 14, HMP = 7, HMP10M = 9,
                        ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+
+Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
+                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
+                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 
 ```
 
@@ -1049,7 +1054,7 @@ metadata_noblanks <- metadata_noblanks %>%
          Industry = fct_relevel(Industry, "Non-industrial","Industrial"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Industrial"),
          Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
-         Sex = fct_relevel(Sex, "Male","Female","HMP"),
+         Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP"),
          Village = fct_relevel(Village, "202","205","204","203","206","HMP","JAE")) %>%
   select(SampleID, Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village)
@@ -1071,13 +1076,13 @@ malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- malt_speci
 malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet <- inner_join(malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors, metadata, by = "SampleID")
 
 malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Market_economy, shape = Market_economy)) +
+  ggplot(., aes(Axis.1, Axis.2, colour = Industry, shape = Industry)) +
   geom_point(size = 3) +
-  scale_colour_manual(values = Market_economy_colors) +
-  scale_shape_manual(values = Market_economy_shapes) +
-  stat_ellipse(aes(colour = Market_economy, group = Market_economy)) +
+  scale_colour_manual(values = Industry_colors) +
+  scale_shape_manual(values = Industry_shapes) +
+  stat_ellipse(aes(colour = Industry, group = Industry)) +
   theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
+  ggtitle("Industry")
 
 # test for difference between different metadata categories 
 # Sex can't be run b/c for JAE012 sex is unknown, and is NA
@@ -1088,37 +1093,90 @@ adonis(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_noblanks_noyanomami_species}
-groups <- metadata_noblanks %>%
-  select(Ethnic_Group) %>%
+# Test the 3 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+# Ok, sometimes Village is not significantly different, it fluxuates around 0.05. Maybe better to leave it out as not significant
+
+# Tooth site
+groups_tooth_site <- metadata_noblanks %>%
+  select(Tooth_site) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-mod <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups, bias.adjust =TRUE)
-mod
+toothsite_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_tooth_site, bias.adjust =TRUE)
+toothsite_betadisper_noblanks_noyanomami
 
 ## Perform test
-anova(mod)
+anova(toothsite_betadisper_noblanks_noyanomami)
 
 ## Permutation test for F
-permutest(mod, pairwise = TRUE, permutations = 99)
+permutest(toothsite_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(mod))
-plot(mod.HSD)
+toothsite_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(toothsite_betadisper_noblanks_noyanomami)
+plot(toothsite_betadisper_noblanks_noyanomami.HSD)
 
 ## Plot the groups and distances to centroids on the
 ## first two PCoA axes
-plot(mod)
-
 ## with data ellipses instead of hulls
-plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+plot(toothsite_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## can also specify which axes to plot, ordering respected
-plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+# plot(toothsite_betadisper_noblanks_noyanomami, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(mod)
+boxplot(toothsite_betadisper_noblanks_noyanomami)
+
+
+# Industry
+groups_industry <- metadata_noblanks %>%
+  select(Industry) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+industry_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_industry, bias.adjust =TRUE)
+industry_betadisper_noblanks_noyanomami
+
+## Perform test
+anova(industry_betadisper_noblanks_noyanomami)
+
+## Permutation test for F
+permutest(industry_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+industry_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(industry_betadisper_noblanks_noyanomami)
+plot(industry_betadisper_noblanks_noyanomami.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(industry_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(industry_betadisper_noblanks_noyanomami)
+
+
+# Village
+groups_village <- metadata_noblanks %>%
+  select(Village) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+village_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_noblanks_noyanomami
+
+## Perform test
+anova(village_betadisper_noblanks_noyanomami)
+
+## Permutation test for F
+permutest(village_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+village_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(village_betadisper_noblanks_noyanomami)
+plot(village_betadisper_noblanks_noyanomami.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(village_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(village_betadisper_noblanks_noyanomami)
 
 
 ```
@@ -1153,24 +1211,24 @@ tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Village", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Village", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Sex", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Sex", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Age_group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Age_group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Market_economy", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Market_economy", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Tooth_site", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Tooth_site", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
 
 
 # by Individual sequencing depth
@@ -1197,6 +1255,24 @@ pca_malt_species_pc1pc2
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 ```
+
+```{r metadata_betadisper_cmc}
+# Need special metadata that has only the categories of CMC samples, b/c of issues w/ extra factors from removed groups
+metadata_cmc <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata_cmc <- metadata_cmc %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(!SampleID %in% outliers) %>%
+  filter(Description == "HunterGatherer") %>%
+  select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
+  as_tibble() %>%
+  mutate(Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime"),
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming"),
+         Sex = fct_relevel(Sex, "Male","Female"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior"),
+         Village = fct_relevel(Village, "202","205","204","203","206"))
+```
+
 
 Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_cmc_species}
@@ -1226,57 +1302,93 @@ adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Mark
 
 ```
 
-```{r metadata_betadisper_cmc}
-metadata_cmc <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-metadata_cmc <- metadata_cmc %>%
-  rename(SampleID = `#SampleID`) %>%
-  filter(!SampleID %in% outliers) %>%
-  filter(Description == "HunterGatherer") %>%
-  select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
-  as_tibble() %>%
-  mutate(Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+"),
-         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime"),
-         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming"),
-         Sex = fct_relevel(Sex, "Male","Female"),
-         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior"),
-         Village = fct_relevel(Village, "202","205","204","203","206"))
-```
-
 Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_cmc_species}
+# Test the 4 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+# Ok, sometimes Sex is not significantly different, it fluxuates around 0.05. Maybe better to leave it out as not significant
 
-groups <- metadata_cmc %>%
-  select(Market_economy) %>%
+# Tooth site
+groups_tooth_site <- metadata_cmc %>%
+  select(Tooth_site) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-mod <- betadisper(malt_species.decontam_filtered_cmc.euc, groups, bias.adjust =TRUE)
-mod
+toothsite_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_tooth_site, bias.adjust =TRUE)
+toothsite_betadisper_cmc
 
 ## Perform test
-anova(mod)
+anova(toothsite_betadisper_cmc)
 
 ## Permutation test for F
-permutest(mod, pairwise = TRUE, permutations = 99)
+permutest(toothsite_betadisper_cmc, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(mod))
-plot(mod.HSD)
+toothsite_betadisper_cmc.HSD <- TukeyHSD(toothsite_betadisper_cmc)
+plot(toothsite_betadisper_cmc.HSD)
 
 ## Plot the groups and distances to centroids on the
 ## first two PCoA axes
-plot(mod)
-
 ## with data ellipses instead of hulls
-plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
-
+plot(toothsite_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## can also specify which axes to plot, ordering respected
-plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+# plot(toothsite_betadisper_cmc, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(mod)
+boxplot(toothsite_betadisper_cmc)
+
+
+# Market economy
+groups_market_economy <- metadata_cmc %>%
+  select(Market_economy) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+market_economy_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_market_economy, bias.adjust =TRUE)
+market_economy_betadisper_cmc
+
+## Perform test
+anova(market_economy_betadisper_cmc)
+
+## Permutation test for F
+permutest(market_economy_betadisper_cmc, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+market_economy_betadisper_cmc.HSD <- TukeyHSD(market_economy_betadisper_cmc)
+plot(market_economy_betadisper_cmc.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(market_economy_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(market_economy_betadisper_cmc)
+
+
+# Village
+groups_village <- metadata_cmc %>%
+  select(Village) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+village_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_cmc
+
+## Perform test
+anova(village_betadisper_cmc)
+
+## Permutation test for F
+permutest(village_betadisper_cmc, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+village_betadisper_cmc.HSD <- TukeyHSD(village_betadisper_cmc)
+plot(village_betadisper_cmc.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(village_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(village_betadisper_cmc)
+
 
 
 ```
@@ -1406,24 +1518,24 @@ tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Ethnic_Group", "Village", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Ethnic_Group", "Village", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Ethnic_Group", "Sex", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Ethnic_Group", "Sex", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Ethnic_Group", "Age_group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Ethnic_Group", "Age_group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Ethnic_Group", "Market_economy", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Ethnic_Group", "Market_economy", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Ethnic_Group", "Tooth_site", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Ethnic_Group", "Tooth_site", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
 
 
 # by Individual sequencing depth
@@ -1669,11 +1781,11 @@ malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- malt_genus.d
 malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet <- inner_join(malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors, metadata, by = "SampleID")
 
 malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Ethnic_Group, shape = Ethnic_Group)) +
+  ggplot(., aes(Axis.1, Axis.2, colour = Industry, shape = Industry)) +
   geom_point(size = 3) +
-  scale_colour_manual(values = Ethnic_Group_colors) +
-  scale_shape_manual(values = Ethnic_Group_shapes) +
-  stat_ellipse(aes(colour = Ethnic_Group, group = Ethnic_Group)) +
+  scale_colour_manual(values = Industry_colors) +
+  scale_shape_manual(values = Industry_shapes) +
+  stat_ellipse(aes(colour = Industry, group = Industry)) +
   theme_minimal(base_size = 7) +
   ggtitle("Tooth site")
 
@@ -1685,38 +1797,63 @@ adonis(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth_s
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_noblanks_noyanomami_genus}
-groups <- metadata_noblanks %>%
-  select(Ethnic_Group) %>%
+# Test the 2 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+
+# Tooth site
+groups_tooth_site <- metadata_noblanks %>%
+  select(Tooth_site) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-mod <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups, bias.adjust =TRUE)
-mod
+toothsite_betadisper_noblanks_noyanomami_genus <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups_tooth_site, bias.adjust =TRUE)
+toothsite_betadisper_noblanks_noyanomami_genus
 
 ## Perform test
-anova(mod)
+anova(toothsite_betadisper_noblanks_noyanomami_genus)
 
 ## Permutation test for F
-permutest(mod, pairwise = TRUE, permutations = 99)
+permutest(toothsite_betadisper_noblanks_noyanomami_genus, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(mod))
-plot(mod.HSD)
+toothsite_betadisper_noblanks_noyanomami_genus.HSD <- TukeyHSD(toothsite_betadisper_noblanks_noyanomami_genus)
+plot(toothsite_betadisper_noblanks_noyanomami_genus.HSD)
 
 ## Plot the groups and distances to centroids on the
 ## first two PCoA axes
-plot(mod)
-
 ## with data ellipses instead of hulls
-plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+plot(toothsite_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## can also specify which axes to plot, ordering respected
-plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+# plot(toothsite_betadisper_noblanks_noyanomami_genus, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(mod)
+boxplot(toothsite_betadisper_noblanks_noyanomami_genus)
 
+
+# Industry
+groups_industry <- metadata_noblanks %>%
+  select(Industry) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+industry_betadisper_noblanks_noyanomami_genus <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups_industry, bias.adjust =TRUE)
+industry_betadisper_noblanks_noyanomami_genus
+
+## Perform test
+anova(industry_betadisper_noblanks_noyanomami_genus)
+
+## Permutation test for F
+permutest(industry_betadisper_noblanks_noyanomami_genus, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+industry_betadisper_noblanks_noyanomami_genus.HSD <- TukeyHSD(industry_betadisper_noblanks_noyanomami_genus)
+plot(industry_betadisper_noblanks_noyanomami_genus.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(industry_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(industry_betadisper_noblanks_noyanomami_genus)
 
 ```
 
@@ -1750,24 +1887,24 @@ tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Village", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Village", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Sex", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Sex", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Age_group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Age_group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Market_economy", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Market_economy", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Ethnic_Group", "Tooth_site", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Ethnic_Group", "Tooth_site", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
 
 
 # by Individual sequencing depth
@@ -1828,37 +1965,90 @@ adonis(malt_genus.decontam_filtered_cmc.euc ~ Tooth_site  + Ethnic_Group + Age_g
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_cmc_genus}
-groups <- metadata_cmc %>%
-  select(Ethnic_Group) %>%
+# Test the 3 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+
+# Tooth site
+groups_tooth_site <- metadata_cmc %>%
+  select(Tooth_site) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-mod <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups, bias.adjust =TRUE)
-mod
+toothsite_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_tooth_site, bias.adjust =TRUE)
+toothsite_betadisper_cmc_genus
 
 ## Perform test
-anova(mod)
+anova(toothsite_betadisper_cmc_genus)
 
 ## Permutation test for F
-permutest(mod, pairwise = TRUE, permutations = 99)
+permutest(toothsite_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(mod))
-plot(mod.HSD)
+toothsite_betadisper_cmc_genus.HSD <- TukeyHSD(toothsite_betadisper_cmc_genus)
+plot(toothsite_betadisper_cmc_genus.HSD)
 
 ## Plot the groups and distances to centroids on the
 ## first two PCoA axes
-plot(mod)
-
 ## with data ellipses instead of hulls
-plot(mod, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-plot(mod, ellipse = TRUE, hull = FALSE, conf = 0.90) # 90% data ellipse
+plot(toothsite_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## can also specify which axes to plot, ordering respected
-plot(mod, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+# plot(toothsite_betadisper_cmc_genus, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(mod)
+boxplot(toothsite_betadisper_cmc_genus)
+
+
+# Sex
+groups_sex <- metadata_cmc %>%
+  select(Sex) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+sex_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_sex, bias.adjust =TRUE)
+sex_betadisper_cmc_genus
+
+## Perform test
+anova(sex_betadisper_cmc_genus)
+
+## Permutation test for F
+permutest(sex_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+sex_betadisper_cmc_genus.HSD <- TukeyHSD(sex_betadisper_cmc_genus)
+plot(sex_betadisper_cmc_genus.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(sex_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(sex_betadisper_cmc_genus)
+
+
+# Village
+groups_village <- metadata_cmc %>%
+  select(Village) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+village_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_cmc_genus
+
+## Perform test
+anova(village_betadisper_cmc_genus)
+
+## Permutation test for F
+permutest(village_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+village_betadisper_cmc_genus.HSD <- TukeyHSD(village_betadisper_cmc_genus)
+plot(village_betadisper_cmc_genus.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(village_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(village_betadisper_cmc_genus)
+
 
 
 ```
