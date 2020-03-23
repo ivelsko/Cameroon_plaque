@@ -89,7 +89,8 @@ metadata <- metadata %>%
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
          Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
          Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
-                               "ExtractionGauze","ExtractionBlank","LibraryBlank"))
+                               "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Industry = fct_relevel(Industry, "Non-industrial","Industrial"))
 
 fullSRR <- metadata %>%
   select(SampleID) %>%
@@ -323,16 +324,15 @@ metadata_noblanks <- metadata_original %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
   as_tibble() %>%
   mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial"),
-         Market_economy = str_replace(Market_economy, "logging_road","Logging road"),
-         Market_economy = str_replace(Market_economy, "forrest_camp","Forrest camp"),
-         Market_economy = str_replace(Market_economy, "farming","Farming"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Yanomami","HMP","JAE"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","JAE"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami","Industrial"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP"),
          Sex = fct_relevel(Sex, "Male","Female","HMP"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP"),
-         Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","JAE"))
+         Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","JAE"),
+         Industry = fct_relevel(Industry, "Non-industrial","Industrial")) %>%
+  select(SampleID, Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village)
 
 metadata_noblanks_noyanomami <- metadata_original %>%
   rename(SampleID = `#SampleID`)  %>%
@@ -340,16 +340,15 @@ metadata_noblanks_noyanomami <- metadata_original %>%
   filter(!str_detect(SampleID, "SRR16460|EXB|LIB|10M")) %>%
   as_tibble() %>%
   mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial"),
-         Market_economy = str_replace(Market_economy, "logging_road","Logging road"),
-         Market_economy = str_replace(Market_economy, "forrest_camp","Forrest camp"),
-         Market_economy = str_replace(Market_economy, "farming","Farming"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","JAE"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","JAE"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Industrial"),
          Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
          Sex = fct_relevel(Sex, "Male","Female","HMP"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP"),
-         Village = fct_relevel(Village, "202","205","204","203","206","HMP","JAE"))
+         Village = fct_relevel(Village, "202","205","204","203","206","HMP","JAE"),
+         Industry = fct_relevel(Industry, "Non-industrial","Industrial")) %>%
+  select(SampleID, Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village)
 
 metadata_cmc <- metadata_original %>%
   rename(SampleID = `#SampleID`) %>%
@@ -357,9 +356,6 @@ metadata_cmc <- metadata_original %>%
   filter(Description == "HunterGatherer") %>%
   select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
   as_tibble() %>%
-  mutate(Market_economy = str_replace(Market_economy, "logging_road","Logging road"),
-         Market_economy = str_replace(Market_economy, "forrest_camp","Forrest camp"),
-         Market_economy = str_replace(Market_economy, "farming","Farming")) %>%
   mutate(Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+"),
          Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming"),
