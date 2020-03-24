@@ -608,7 +608,7 @@ malt_species_decontam_filtered_noblanks.plsda$loadings$X %>%
 ```{r fa_species_decontam_noblanks}
 # fa.parallel(malt_species.decontam_filtered_noblanks, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 5, rotate = "varimax", fm = "minres") # fm = "ols"
+malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 6, rotate = "varimax", fm = "minres") # fm = "ols"
 print(malt_species.decontam_filtered_noblanks.fa)
 # print(malt_species.decontam_filtered_noblanks.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_noblanks.fa,sort=TRUE)
@@ -679,7 +679,7 @@ malt_species.decontam_filtered_noblanks_lda_table <- malt_species.decontam_filte
 
 malt_species.decontam_filtered_noblanks_lda <- lda(Ethnic_Group ~ ., malt_species.decontam_filtered_noblanks_lda_table)
 # malt_species.decontam_filtered_noblanks_lda # show results
-
+malt_species.decontam_filtered_noblanks_lda
 plot(malt_species.decontam_filtered_noblanks_lda, dimen = 2)
 
 lda.data <- cbind(malt_species.decontam_filtered_noblanks_lda_table, predict(malt_species.decontam_filtered_noblanks_lda)$x)
@@ -698,7 +698,7 @@ ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
 
 Now without Yanomami samples
 ```{r fa_species_decontam_noblanks_noyanomami}
-malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 5, rotate = "varimax", fm = "minres") # fm = "ols"
+malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 7, rotate = "varimax", fm = "minres") # fm = "ols"
 print(malt_species.decontam_filtered_noblanks_noyanomami.fa)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa,sort=TRUE)
@@ -730,16 +730,16 @@ malt_species.decontam_filtered_noblanks_noyanomami.fa.df <- malt_species.deconta
          MR21 = as.character(MR21),
          MR31 = as.character(MR31),
          MR41 = as.character(MR41),
-         MR51 = as.character(MR51)) %>%
+         MR61 = as.character(MR61)) %>%
   mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
          MR21 = replace(MR21, MR21 != "0", "MR2"),
          MR31 = replace(MR31, MR31 != "0", "MR3"),
          MR41 = replace(MR41, MR41 != "0", "MR4"),
-         MR51 = replace(MR51, MR51 != "0", "MR5")) %>%
+         MR61 = replace(MR61, MR61 != "0", "MR6")) %>%
   select(Species,everything(.)) %>%
   gather("Group","Residual", 7:ncol(.)) %>%
   filter(Residual != "0") %>%
-  select(Residual, Species, MR1, MR2, MR4, MR3, MR5)
+  select(Residual, Species, MR1, MR2, MR4, MR3, MR6)
 
 head(malt_species.decontam_filtered_noblanks_noyanomami.fa.df)
 
@@ -789,7 +789,7 @@ Now only CMC samples
 ```{r fa_species_decontam_cmc}
 # fa.parallel(malt_species.decontam_filtered_cmc, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 5, rotate = "varimax", fm = "minres") # fm = "ols"
+malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 6, rotate = "varimax", fm = "minres") # fm = "ols"
 print(malt_species.decontam_filtered_cmc.fa)
 # print(malt_species.decontam_filtered_cmc.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_cmc.fa,sort=TRUE)
@@ -818,15 +818,15 @@ malt_species.decontam_filtered_cmc.fa.df <- malt_species.decontam_filtered_cmc.f
   as_tibble(.) %>%
   bind_cols(., graphinfo) %>%
   mutate(MR11 = as.character(MR11),
-         MR21 = as.character(MR21),
-         MR31 = as.character(MR31)) %>%
+         MR31 = as.character(MR31),
+         MR21 = as.character(MR21)) %>%
   mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
-         MR21 = replace(MR21, MR21 != "0", "MR2"),
-         MR31 = replace(MR31, MR31 != "0", "MR3")) %>%
+         MR31 = replace(MR21, MR31 != "0", "MR3"),
+         MR21 = replace(MR31, MR21 != "0", "MR2")) %>%
   select(Species,everything(.)) %>%
   gather("Group","Residual", 5:ncol(.)) %>%
   filter(Residual != "0") %>%
-  select(Residual, Species, MR1, MR2, MR3)
+  select(Residual, Species, MR1, MR3, MR2)
 
 head(malt_species.decontam_filtered_cmc.fa.df)
 
@@ -838,7 +838,7 @@ head(malt_species.decontam_filtered_cmc.fa.df)
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1","MR3","MR2")) %>%
   pull(Species)
 
 # sub-sample the species table for only those species
