@@ -161,46 +161,62 @@ Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `20
                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Village_shapes <- c(`202` = 15, `203` = 16, `205` = 17,`204` = 18, `206` = 25, Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                     ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Village_size <- c(`202` = 4.5, `203` = 4, `205` = 4,`204` = 6, `206` = 4, Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
+                    ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", Yanomami = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9", 
                          JAE10M = "#ffeda0", JAE = "#feb24c",ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                          ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Ethnic_Group_size <- c(Baka = 4, Nzime = 4,  Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
+                         ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
                         HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 7, HMP_subPlaque = 7, HMP10M_supPlaque = 9, 
-                        HMP10M_subPlaque = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 10, HMP_subPlaque = 13, HMP10M_supPlaque = 10, 
+                        HMP10M_subPlaque = 13, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_subPlaque = 4, HMP10M_supPlaque = 4, 
+                        HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#172869", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, Industrial = 15,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
+                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
                       `10-18` = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, `10-18` = 14, HMP = 7, HMP10M = 9,
                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
+                      ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Sex_colors <- c(Female = "#FF3200", Male = "#172869",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_size <- c(Female = 4, Male = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  Buccal_mucosa = 14, HMP = 7, HMP10M = 9,
                        ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Tooth_site_size <- c(Anterior = 4, Posterior = 4,  Buccal_mucosa = 4, HMP = 4, HMP10M = 4,
+                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Industry_size <- c(`Non-industrial` = 4, Industrial = 4,
+                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 ```
 
@@ -317,9 +333,10 @@ plot_pca_names <- function(df, pc1, pc2, metadata_group) {
 
 
 # plot PCA with colored dots and the title including the # of species or genera
-plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, ncomps) {
+plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, ncomps) {
     metadata_group_colors <- get(paste(color_group, "_colors", sep = ""))
     metadata_group_shapes <- get(paste(shape_group, "_shapes", sep = ""))
+    metadata_group_size <- get(paste(size_group, "_size", sep = ""))
 
     pca.list <- mixOmics::pca(df, ncomp = ncomps, logratio = 'CLR')
 
@@ -332,6 +349,7 @@ plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, ncomps) {
     
     color_group = df_X[[color_group]]
     shape_group = df_X[[shape_group]]
+    size_group = df_X[[size_group]]
    
                        if (pc1 == 'PC1') {
                            pc1 <- df_X$PC1
@@ -367,10 +385,11 @@ plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, ncomps) {
                      spread(SampleID, Counts) %>%
                      count
     
-    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = color_group, shape = shape_group)) +
-                        geom_point(size = 4) +
+    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = color_group, shape = shape_group, size = size_group)) +
+                        geom_point() +
                         scale_colour_manual(values = metadata_group_colors) +
                         scale_shape_manual(values = metadata_group_shapes) +
+                        scale_size_manual(values = metadata_group_size) +
                         # stat_ellipse() +
                         xlab(paste(xaxis, " - ", exp_var_pc1)) +
                         ylab(paste(yaxis, " - ", exp_var_pc2)) +
@@ -380,7 +399,6 @@ plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, ncomps) {
 
     return(pca_plot)
 }
-
 
 ```
 
@@ -566,8 +584,8 @@ malt_species_unfiltered = malt_species_unfiltered+1
 tune.pca(malt_species_unfiltered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species_unfiltered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_species_unfiltered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_species_unfiltered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species_unfiltered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 
 # ggsave("05-results.backup/pca_species_unfiltered_pc1pc2.pdf", plot = pca_species_unfiltered_pc1pc2, device = "pdf",
@@ -597,8 +615,8 @@ malt_species_filtered = malt_species_filtered+1
 tune.pca(malt_species_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species_filtered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_species_filtered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_species_filtered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species_filtered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 
 # decontaminated only
@@ -622,8 +640,8 @@ malt_species.decontam_unfilt = malt_species.decontam_unfilt+1
 tune.pca(malt_species.decontam_unfilt, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_unfilt, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_species.decontam_unfilt, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_species.decontam_unfilt, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species.decontam_unfilt, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 # decontaminated and filtered
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -647,8 +665,8 @@ malt_species.decontam_filtered = malt_species.decontam_filtered+1
 tune.pca(malt_species.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 ```
 The 10M read subsampled HMP and JAE samples behave similarly to their equivalent
@@ -684,8 +702,8 @@ tune.pca(malt_genus_unfiltered, logratio = 'CLR')
 nt_genus.pca <- mixOmics::pca(malt_genus_unfiltered, ncomp = 3, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_genus_unfiltered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_genus_unfiltered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_genus_unfiltered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_genus_unfiltered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 
 # filtered only
@@ -710,8 +728,8 @@ malt_genus_filtered = malt_genus_filtered+1
 tune.pca(malt_genus_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_genus_filtered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_genus_filtered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_genus_filtered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_genus_filtered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 
 # ggsave("05-results.backup/pca_nt_genus_pc1pc2.pdf", plot = pca_nt_genus_pc1pc2, device = "pdf",
@@ -740,8 +758,8 @@ malt_genus.decontam_unfiltered = malt_genus.decontam_unfiltered+1
 tune.pca(malt_genus.decontam_unfiltered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_genus.decontam_unfiltered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_genus.decontam_unfiltered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_genus.decontam_unfiltered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_genus.decontam_unfiltered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 
 # decontaminated and filtered
@@ -766,8 +784,8 @@ malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Description", "Env", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Description", "Env", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Description", "Env", "Env", 3)
 
 ```
 The 10M read subsampled HMP and JAE samples behave similarly to their equivalent
@@ -803,25 +821,28 @@ tune.pca(malt_species.decontam_filtered_noblanks, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Ethnic_Group", "Village", 3)
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Ethnic_Group", "Village", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Ethnic_Group", "Sex", 3)
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Ethnic_Group", "Sex", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Ethnic_Group", "Age_group", 3)
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Ethnic_Group", "Age_group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Ethnic_Group", "Market_economy", 3)
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Ethnic_Group", "Market_economy", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Ethnic_Group", "Tooth_site", 3)
-plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Ethnic_Group", "Tooth_site", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
+# by Description (do HMP supragingival and HMP subgingival plaque samples separate?)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Description", "Description", "Description", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Description", "Description", "Description", 3)
 
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
@@ -837,9 +858,11 @@ malt_species_decontam_filtered_noblanks.pca.varmet <- inner_join(malt_species_de
 
 pca_malt_species_pc1pc2 <- ggplot(malt_species_decontam_filtered_noblanks.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
   geom_point(size = 4) +
-  xlab(paste("PC1 - ", round(malt_species_decontam_filtered_noblanks.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(malt_species_decontam_filtered_noblanks.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  xlab(paste("PC1 - ", 100*(round(malt_species_decontam_filtered_noblanks.pca$explained_variance[1], 2)), "%", sep = "")) +
+  ylab(paste("PC2 - ", 100*(round(malt_species_decontam_filtered_noblanks.pca$explained_variance[2], 2)), "%", sep = "")) +
+  theme_minimal(base_size = 14) +
+  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
 
 pca_malt_species_pc1pc2
 
@@ -1091,7 +1114,9 @@ adonis(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth
 ```
 
 
-Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
+Then run betadisper to see if the groups with significant differences in
+clustering have different dispersion ("tight" vs. "loose" clustering of groups)
+- is one group more variable than the other(s)?
 ```{r betadisper_noblanks_noyanomami_species}
 # Test the 3 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
 # Ok, sometimes Village is not significantly different, it fluxuates around 0.05. Maybe better to leave it out as not significant
@@ -1211,25 +1236,28 @@ tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
+# by Description (do the HMP supragingival plaque and HMP subgingival plaque samples separate?)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Description", "Description", 3)
+plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Description", "Description", 3)
 
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
@@ -1245,9 +1273,11 @@ malt_species.decontam_filtered_cmc.pca.varmet <- inner_join(malt_species.deconta
 
 pca_malt_species_pc1pc2 <- ggplot(malt_species.decontam_filtered_cmc.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
   geom_point(size = 4) +
-  xlab(paste("PC1 - ", round(malt_species.decontam_filtered_cmc.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(malt_species.decontam_filtered_cmc.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  xlab(paste("PC1 - ", 100*(round(malt_species.decontam_filtered_cmc.pca$explained_variance[1], 2)), "%", sep = "")) +
+  ylab(paste("PC2 - ", 100*(round(malt_species.decontam_filtered_cmc.pca$explained_variance[2], 2))< "%", sep = "")) +
+  theme_minimal(base_size = 14) +
+  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
 
 pca_malt_species_pc1pc2
 
@@ -1302,7 +1332,9 @@ adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Mark
 
 ```
 
-Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
+Then run betadisper to see if the groups with significant differences in
+clustering have different dispersion ("tight" vs. "loose" clustering of groups)
+- is one group more variable than the other(s)?
 ```{r betadisper_cmc_species}
 # Test the 4 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
 # Ok, sometimes Sex is not significantly different, it fluxuates around 0.05. Maybe better to leave it out as not significant
@@ -1518,24 +1550,28 @@ tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Description (do HMP supragingial and HMP subgingival plaque separate?)
+plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Description", "Description", "Description", 3)
+plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Description", "Description", "Description", 3)
 
 
 # by Individual sequencing depth
@@ -1552,11 +1588,11 @@ malt_genus.decontam_filtered.pca.varmet <- inner_join(malt_genus.decontam_filter
 
 pca_malt_genus_pc1pc2 <- ggplot(malt_genus.decontam_filtered.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
   geom_point(size = 4) +
-  # scale_colour_manual(values = common_colors) +
-  # scale_shape_manual(values = village_shapes) +
-  xlab(paste("PC1 - ", round(malt_genus.decontam_filtered.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(malt_genus.decontam_filtered.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  xlab(paste("PC1 - ", 100*(round(malt_genus.decontam_filtered.pca$explained_variance[1], 2)), "%", sep = "")) +
+  ylab(paste("PC2 - ", 100*(round(malt_genus.decontam_filtered.pca$explained_variance[2], 2)), "%", sep = "")) +
+  theme_minimal(base_size = 14) +
+  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
 
 pca_malt_genus_pc1pc2
 
@@ -1564,6 +1600,7 @@ pca_malt_genus_pc1pc2
 # ggsave("05-results.backup/pca_malt_genus_pc1pc2.pdf", plot = pca_malt_genus_pc1pc2, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
+
 
 ```
 Just like we saw in the species PCA plots, the CMC samples span a similar
@@ -1577,7 +1614,11 @@ more similar to the HMP plaque samples than they did at the species level. In
 PC3, the Yanomami samples are clearly separated from JAE calculus and CMC plaque
 samples, yet overlap with HMP samples. They still separate from HMP along PC2.
 Perhaps buccal swab profiles are more simlar to plaque samples at the genus
-level than the species level. *Are those HMP samples supragingival plaque??*  
+level than the species level. Those HMP samples that overlap with Yanomami
+buccal swabs along PC3 are actually subgingival plaque, not supragingival
+plaque. I would expect supragingival plaque, because buccal swab samples have
+higher proportions of aerobes, which we expect in supragingival plaque samples
+compared to subgingival plaque.
 
 
 Now we will look at the genera that have strongest loadings in PC1, PC2, and
@@ -1887,25 +1928,28 @@ tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Sex
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Age group
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Market economy
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
 
 # by Tooth site
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
+# by Description (do the HMP supragingival plaque and HMP subgingival plaque samples separate?)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Description", "Description", 3)
+plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Description", "Description", 3)
 
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
@@ -1921,11 +1965,11 @@ malt_genus.decontam_filtered_cmc.pca.varmet <- inner_join(malt_genus.decontam_fi
 
 pca_malt_genus_pc1pc2 <- ggplot(malt_genus.decontam_filtered_cmc.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
   geom_point(size = 4) +
-  # scale_colour_manual(values = common_colors) +
-  # scale_shape_manual(values = village_shapes) +
-  xlab(paste("PC1 - ", round(malt_genus.decontam_filtered_cmc.pca$explained_variance[1], 2), sep = "")) +
-  ylab(paste("PC2 - ", round(malt_genus.decontam_filtered_cmc.pca$explained_variance[2], 2), sep = "")) +
-  theme_minimal(base_size = 14) 
+  scale_shape_manual(values = Description_shapes) +
+  xlab(paste("PC1 - ", 100*(round(malt_genus.decontam_filtered_cmc.pca$explained_variance[1], 2)), "%", sep = "")) +
+  ylab(paste("PC2 - ", 100*(round(malt_genus.decontam_filtered_cmc.pca$explained_variance[2], 2)), "%", sep = "")) +
+  theme_minimal(base_size = 14) +
+  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
 
 pca_malt_genus_pc1pc2
 
