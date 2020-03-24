@@ -176,7 +176,7 @@ Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3",
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
+Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#969696", HMP_subPlaque = "#969696", # HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
                         HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 10, HMP_subPlaque = 13, HMP10M_supPlaque = 10, 
@@ -953,18 +953,21 @@ pandoc.table(malt_species_decontam_filtered_biplot_323$plot_env$neg_10 %>% arran
 There are some clear biological differences in the taxa with highest loadings in
 each component, positive and negative. In PC1, the positive loading taxa are all
 anaerobic, while the negative loading taxa are all *Neisseria* plus 1 *Rothia*, wich
-are aerobic. *Really need to see which HMP samples are supragingival and which*
-*are subgingival.* All Yanomami buccal swab samples have negative PC2 values, and
-it makes sense that *Neisseria* and other aerobic taxa characterize this
-direction, as they are more abundant on buccal epithelia. In PC2, the positive
-loading taxa are anaerobic, later colonizers, which corresponds with the
-calculus samples that plot in positice PC2 values. The PC2 negative loading taxa
-are a mix of aerobes, facultative anaerobes, and anaerobes, characteristic of a
-younger biofilm community such as found in plaque compared to calculus. In PC3,
-the positive loading taxa are mostly *Neisseria*, with one *Strep* & one *Rothia*,
-while the negative loading taxa are mostly *Rothia*, with 2 *Actinomyces.* Both of
-these groups are mostly aerobic, but suggests that *Rothia* are more predominant
-in plaque than *Neisseria*, while *Neisseria* are more predominant in buccal swabs.
+are aerobic. The HMP samples that fall farther to the left are mostly
+supragingival plaque, which is consistent with the aerobic species driving
+separation this direction. Supragingival plaque samples have higher levels of
+aerobes than subgingival plaque samples. All Yanomami buccal swab samples have
+negative PC2 values, and it makes sense that *Neisseria* and other aerobic taxa
+characterize this direction, as they are more abundant on buccal epithelia. In
+PC2, the positive loading taxa are anaerobic, later colonizers, which
+corresponds with the calculus samples that plot in positice PC2 values. The PC2
+negative loading taxa are a mix of aerobes, facultative anaerobes, and
+anaerobes, characteristic of a younger biofilm community such as found in plaque
+compared to calculus. In PC3, the positive loading taxa are mostly *Neisseria*,
+with one *Strep* & one *Rothia*, while the negative loading taxa are mostly
+*Rothia*, with 2 *Actinomyces.* Both of these groups are mostly aerobic, but
+suggests that *Rothia* are more predominant in plaque than *Neisseria*, while
+*Neisseria* are more predominant in buccal swabs.
 
 
 ```{r biplot_noblanks_noyanomami_species}
@@ -991,7 +994,15 @@ malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filte
 # perform PCA
 malt_species.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
 
+# First plot by Description (do HMP supragingival and HMP subgingival plaque samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Description", "Description", "Description", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC3", "PC2", "Description", "Description", "Description", 3)
 
+# Then plot by Tooth_site (do anterior teeth and posterior teeth samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+# Now plot biplots, and make tables of the top 10 species in each loading
 malt_species_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1)
 malt_species_decontam_filtered_noyanomami_biplot_121
 
@@ -1054,14 +1065,24 @@ differences between the taxa in the different PCs with positive and negative
 loadings. In PC1, the positive loading taxa are 9 *Niesseria* and 1 *Rothia*,
 suggesting these samples are less mature biofilms, or are exposed to higher
 oxygen tension. The negative loading taxa are a mix of anaerobic species,
-suggesting they are more mature or exposed to lower oxygen tension. *Does this*
-*separation correspond to the separation of anterior/posterior tooth sites?* In
-PC2 positive loadings there is a mix of aerobic and anaerobic taxa, with more
+suggesting they are more mature or exposed to lower oxygen tension. The CMC
+samples separate along PC1 by tooth site, anterior to the right (positive
+loadings) and posterior to the left (negative loadings), which corresponds with
+the species loading in these directions. The HMP samples also separate this way,
+with the supragingival plaque samples plotting farther to the right (more
+positive) and subgingival plaque samples plotting more to the left (less
+positive), which also corresponds with the species that load in positive and
+negative values.
+
+In PC2 positive loadings there is a mix of aerobic and anaerobic taxa, with more
 *Rothia/Veillonella* than the others, while the negative loading taxa are mostly
 late colonizer, anaerobic taxa. This distinction corresponds to the separation
-of plaque in positive values and calculus in negative values. In PC3, the
-positive loading taxa are a mix of aerobic and anaerobic taxa, while the
-negative loading taxa are also a mix, but *Neisseria* make up 6 of the 10.
+of plaque in positive values and calculus in negative values. The CMC samples
+also sort of separate by tooth site along PC2, when viewed in PC2/PC3 figures.
+The anterior samples plot in more positive values and the posterior samples plot
+in more negative values, corresponding with the species that drive plotting. In
+PC3, the positive loading taxa are a mix of aerobic and anaerobic taxa, while
+the negative loading taxa are also a mix, but *Neisseria* make up 6 of the 10.
 
 ```{r metadata_betadisper_noblanks}
 
@@ -1254,10 +1275,6 @@ plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Market_econom
 # by Tooth site
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Description (do the HMP supragingival plaque and HMP subgingival plaque samples separate?)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Description", "Description", 3)
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Description", "Description", 3)
 
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
@@ -1705,10 +1722,13 @@ There is no overlap in the species and genera in PC3 loadings. The Yanomami
 samples again separate from JAE and CMC along PC3, but overlap with HMP.
 However, they separate from HMP along PC2. It is unexpected that none of the
 genera with PC3 positive loadings are the aerobic taxa that characterized this
-direction in the species analysis.
+direction in the species analysis, however the HMP samples that pull this way
+are all subgingival samples, not supragingival samples, so the main taxa
+characterizing the highly aerotolerant community are not the ones pushing this
+way.
 
 
-```{r biplot_samples_genus_no_yanomami}
+```{r biplot_samples_no_yanomami_genus}
 
 # remove the Yanomami samples from the input table
 malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
@@ -1733,7 +1753,16 @@ malt_genus.decontam_filtered_noblanks_noyanomami = malt_genus.decontam_filtered_
 # perform PCA
 malt_genus.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
 
+# First plot by Description (do HMP supragingival and HMP subgingival plaque samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Description", "Description", "Description", 3)
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC3", "PC2", "Description", "Description", "Description", 3)
 
+# Then plot by Tooth_site (do anterior teeth and posterior teeth samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+
+# Now plot biplots, and make tables of the top 10 species in each loading
 malt_genus_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_genus.decontam_filtered_noblanks_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1)
 malt_genus_decontam_filtered_noyanomami_biplot_121
 
@@ -1797,15 +1826,24 @@ species level. In PC1, the positive loading taxa are mostly later colonizing
 anaerobes, while the negative loading taxa are more aerobic and facultative
 anaerobic genera. The taxa characterizing this direction corresond with the HMP
 plaque samples, which would have a less mature biofilm community, mostly
-plotting in negative PC1 values. In PC2, the positive loading taxa are mostly
-later colonizing anaerobes, which corresponds with the JAE calculus samples
-plotting in this part of the graph. The negative loading taxa are a mix of
-aerobic and facultative taxa, which corresponds with the HMP plaque samples
-plotting in this part of the graph. In PC3, the positive loading taxa are
-unusual, rare, or poorly characterized in the oral biofilm, while the negative
-loading taxa are mostly later colonizer, anaerobes. Several calculus samples
-plot far in PC3 positive values, which suggests that there are some unusual,
-poorly characterized taxa in calculus that are not seen in plaque.
+plotting in negative PC1 values. The HMP samples furtheset to the left are
+supragingival plaque, while the ones to the right are subgingival plaque. The
+CMC samples do appeaer to separate by tooth site along PC1, with anterior
+samples clustering to the left, and posterior samples clustering to the right,
+however the JAE samples don't really follow that pattern. This also corresponds
+with the genera loading in negative values as more aerotolerant and genera
+loading in positive values more anaerobic.
+
+In PC2, the positive loading taxa are mostly later colonizing anaerobes, which
+corresponds with the JAE calculus samples plotting in this part of the graph.
+The negative loading taxa are a mix of aerobic and facultative taxa, which
+corresponds with the HMP plaque samples plotting in this part of the graph. In
+PC3, the positive loading taxa are unusual, rare, or poorly characterized in the
+oral biofilm, while the negative loading taxa are mostly later colonizer,
+anaerobes. Several calculus samples plot far in PC3 positive values, which
+suggests that there are some unusual, poorly characterized taxa in calculus that
+are not seen in plaque. In PC3 the CMC samples again separate out a bit by
+anterior (negative values)/posterior (posterior values) tooth site.
 
 Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_noblanks_noyanomami_genus}
@@ -1947,10 +1985,6 @@ plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Market_economy"
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
-# by Description (do the HMP supragingival plaque and HMP subgingival plaque samples separate?)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Description", "Description", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Tooth_site", "Description", "Description", 3)
-
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
 malt_genus.decontam_filtered_cmc.pca <- mixOmics::pca(malt_genus.decontam_filtered_cmc, ncomp = 3, logratio = 'CLR')
@@ -1965,7 +1999,7 @@ malt_genus.decontam_filtered_cmc.pca.varmet <- inner_join(malt_genus.decontam_fi
 
 pca_malt_genus_pc1pc2 <- ggplot(malt_genus.decontam_filtered_cmc.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
   geom_point(size = 4) +
-  scale_shape_manual(values = Description_shapes) +
+  scale_shape_manual(values = Ethnic_Group_shapes) +
   xlab(paste("PC1 - ", 100*(round(malt_genus.decontam_filtered_cmc.pca$explained_variance[1], 2)), "%", sep = "")) +
   ylab(paste("PC2 - ", 100*(round(malt_genus.decontam_filtered_cmc.pca$explained_variance[2], 2)), "%", sep = "")) +
   theme_minimal(base_size = 14) +
