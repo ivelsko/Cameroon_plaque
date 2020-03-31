@@ -13,7 +13,9 @@ output:
 library(knitr)
 library(data.table)
 library(vegan)
+library(compositions)
 library(janitor)
+library(ggheatmap)
 library(tidyverse)
 library(gplots)
 library(cowplot)
@@ -451,13 +453,11 @@ In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these
 
 ## Heatmaps
 Now make a heatmap of the top 50 most abundant species and genera (as an arbitrary cut-off)
-```{r heatmaps, eval = F}
-malt_species.decontam_top50 <- malt_species.decontam %>%
+```{r heatmaps}
+# select the top 50 most abundant species for all samples (CMC, JAE, HMP)
+malt_species.decontam_top50_all <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         # select(-contains("SRR")) %>%
-                                         select(-contains("10M")) %>%
-                                         select(-contains("EXB")) %>%
-                                         select(-contains("LIB")) %>%
+                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
                                          top_n(50, Percent) %>%
@@ -465,28 +465,169 @@ malt_species.decontam_top50 <- malt_species.decontam %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
 
-rownames(malt_species.decontam_top50) <- malt_species.decontam_top50$SampleID
-malt_species.decontam_top50 <- malt_species.decontam_top50 %>% select(-SampleID)
+rownames(malt_species.decontam_top50_all) <- malt_species.decontam_top50_all$SampleID
+malt_species.decontam_top50_all <- malt_species.decontam_top50_all %>% select(-SampleID)
 
 # CLR-transform the matrix for plotting the heatmap
-malt_species.decontam_top50_clr = malt_species.decontam_top50+1
-#malt_species.decontam_top50_clr <- as.matrix(logratio.transfo(malt_species.decontam_top50_clr, logratio = "CLR"))
-malt_species.decontam_top50_clr <- clr(malt_species.decontam_top50_clr)
-malt_species.decontam_top50_clr <- as.matrix(malt_species.decontam_top50_clr)
+malt_species.decontam_top50_all_clr = malt_species.decontam_top50_all+1
+malt_species.decontam_top50_all_clr <- clr(malt_species.decontam_top50_all_clr)
+malt_species.decontam_top50_all_clr <- as.matrix(malt_species.decontam_top50_all_clr)
+malt_species.decontam_top50_all_clr_long <- malt_species.decontam_top50_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR", 2:ncol(.))
+  
+
+heatmap_base <- ggplot(malt_species.decontam_top50_all_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
 
 
-malt_species.decontam_top50_clr.heatmap <- heatmap.2(malt_species.decontam_top50_clr, Colv = T, Rowv = T, dendrogram = "both",
-         trace = "none", col = viridis_pal(),
-         margins = c(8,6), srtCol = 30, cexCol = 0.6, cexRow = 0.5,
-          key = T, keysize = 0.8, main = "50 most abundant species")
-
-
-malt_genus.decontam_top50 <- malt_genus.decontam %>%
+# select the top 50 most abundant species for CMC samples
+malt_species.decontam_top50_cmc <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         # select(-contains("SRR")) %>%
-                                         select(-contains("10M")) %>%
-                                         select(-contains("EXB")) %>%
-                                         select(-contains("LIB")) %>%
+                                         select(-matches("SRR|10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         top_n(50, Percent) %>%
+                                         select(-one_of("Sum_species.decontam","Percent")) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_species.decontam_top50_cmc) <- malt_species.decontam_top50_cmc$SampleID
+malt_species.decontam_top50_cmc <- malt_species.decontam_top50_cmc %>% select(-SampleID)
+
+# also save the species as a vector
+malt_species.decontam_top50_cmcV <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR|10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         top_n(50, Percent) %>%
+                                         select(-one_of("Sum_species.decontam","Percent")) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(SampleID,Counts) %>%
+                                         select(Species) %>%
+                                         mutate(CMC = 1)
+
+
+# CLR-transform the matrix for plotting the heatmap
+malt_species.decontam_top50_cmc_clr = malt_species.decontam_top50_cmc+1
+malt_species.decontam_top50_cmc_clr <- clr(malt_species.decontam_top50_cmc_clr)
+malt_species.decontam_top50_cmc_clr <- as.matrix(malt_species.decontam_top50_cmc_clr)
+malt_species.decontam_top50_cmc_clr_long <- malt_species.decontam_top50_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR", 2:ncol(.))
+  
+# make a heat map for just the CMC samples (get the sample order to be by village!!!)
+heatmap_base <- ggplot(malt_species.decontam_top50_cmc_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
+
+# select the top 50 most abundant species for HMP samples
+malt_species.decontam_top50_hmpV <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("CMC|SRR164|JAE|10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         top_n(50, Percent) %>%
+                                         select(-one_of("Sum_species.decontam","Percent")) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(SampleID,Counts) %>%
+                                         select(Species) %>%
+                                         mutate(HMP = 1)
+
+# select the top 50 most abundant species for JAE samples
+malt_species.decontam_top50_jaeV <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("CMC|SRR|10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         top_n(50, Percent) %>%
+                                         select(-one_of("Sum_species.decontam","Percent")) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(SampleID,Counts) %>%
+                                         select(Species) %>%
+                                         mutate(JAE = 1)
+
+
+# Now select only those species (top 50 of CMC, HMP, JAE) out of the table to create a new matrix
+malt_species.decontam_top50_each <- malt_species.decontam_top50_cmcV %>%
+  bind_rows(., malt_species.decontam_top50_hmpV) %>%
+  bind_rows(., malt_species.decontam_top50_jaeV) %>%
+  unique()
+
+# 77 of 150 species are left after unique() - how many species are in the top 50 of all 3 (26)? of JAE and HMP (the same 26)? of CMC and JAE (46)? of CMC and HMP (27)?
+all3 <- malt_species.decontam_top50_cmcV %>%
+  full_join(., malt_species.decontam_top50_jaeV) %>%
+  full_join(., malt_species.decontam_top50_hmpV) %>%
+  replace(is.na(.), 0) %>%
+  adorn_totals(where = "col")
+
+
+all3 <- malt_species.decontam_top50_cmcV %>%
+  inner_join(., malt_species.decontam_top50_hmpV) %>%
+  inner_join(., malt_species.decontam_top50_jaeV) 
+
+jaehmp <- malt_species.decontam_top50_hmpV %>%
+  inner_join(., malt_species.decontam_top50_jaeV)
+
+cmcjae <- malt_species.decontam_top50_cmcV %>%
+  inner_join(., malt_species.decontam_top50_jaeV)
+
+cmchmp <- malt_species.decontam_top50_cmcV %>%
+  inner_join(., malt_species.decontam_top50_hmpV)
+
+cmc_unique <- malt_species.decontam_top50_cmcV %>%
+  anti_join(., malt_species.decontam_top50_hmpV) %>%
+  anti_join(., malt_species.decontam_top50_jaeV)
+
+
+
+
+# CLR-transform the matrix for plotting the heatmap
+malt_species.decontam_top50_each_clr = malt_species.decontam_top50_each+1
+malt_species.decontam_top50_each_clr <- clr(malt_species.decontam_top50_each_clr)
+malt_species.decontam_top50_each_clr <- as.matrix(malt_species.decontam_top50_each_clr)
+malt_species.decontam_top50_each_clr_long <- malt_species.decontam_top50_each_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR", 2:ncol(.))
+  
+
+heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
+
+
+
+
+# select the top 50 most abundant genera for all samples (CMC, JAE, HMP)
+malt_genus.decontam_top50_all <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
                                          adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
                                          top_n(50, Percent) %>%
@@ -494,24 +635,77 @@ malt_genus.decontam_top50 <- malt_genus.decontam %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
 
-rownames(malt_genus.decontam_top50) <- malt_genus.decontam_top50$SampleID
-malt_genus.decontam_top50 <- malt_genus.decontam_top50 %>% select(-SampleID)
+rownames(malt_genus.decontam_top50_all) <- malt_genus.decontam_top50_all$SampleID
+malt_genus.decontam_top50_all <- malt_genus.decontam_top50_all %>% select(-SampleID)
 
 # CLR-transform the matrix for plotting the heatmap
-malt_genus.decontam_top50_clr = malt_genus.decontam_top50+1
-#malt_genus.decontam_top50_clr <- as.matrix(logratio.transfo(malt_genus.decontam_top50_clr, logratio = "CLR"))
-malt_genus.decontam_top50_clr <- clr(malt_genus.decontam_top50_clr)
-malt_genus.decontam_top50_clr <- as.matrix(malt_genus.decontam_top50_clr)
+malt_genus.decontam_top50_all_clr = malt_genus.decontam_top50_all+1
+malt_genus.decontam_top50_all_clr <- clr(malt_genus.decontam_top50_all_clr)
+malt_genus.decontam_top50_all_clr <- as.matrix(malt_genus.decontam_top50_all_clr)
+malt_genus.decontam_top50_all_clr_long <- malt_genus.decontam_top50_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Genus","CLR", 2:ncol(.))
 
 
-malt_genus.decontam_top50_clr.heatmap <- heatmap.2(malt_genus.decontam_top50_clr, Colv = T, Rowv = T, dendrogram = "both",
-         trace = "none", col = viridis_pal(),
-         margins = c(8,6), srtCol = 30, cexCol = 0.6, cexRow = 0.5,
-          key = T, keysize = 0.8, main = "50 most abundant genus")
+heatmap_base <- ggplot(malt_species.decontam_top50_all_clr_long, aes(SampleID, Genus, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
 
 ```
 
 
+```{r heatmap_from_james, eval = F}
+
+data_heatmap <- otu_matrix_pseudo_clr %>%  
+  as_tibble(rownames = "Individual") %>%
+  gather(Taxon, CLR, 2:ncol(.)) %>%
+  left_join(raw_metadata) %>%
+  left_join(common_colours_tbl) %>%
+  mutate(Individual = factor(Individual, levels = list_individual), 
+         Taxon = factor(Taxon, levels = list_taxa)) %>%
+  arrange(Individual) %>%
+  mutate(Host_Common = as_factor(Host_Common),
+         Colour = as_factor(Colour))
+
+vector_colour <- data_heatmap %>% 
+  dplyr::select(Individual, Colour) %>% 
+  unique %>% 
+  pull(Colour) %>% 
+  as.character()
+
+heatmap_base <- ggplot(data_heatmap, aes(Taxon, Individual, fill = CLR)) +
+  geom_tile() +
+  ggtitle(paste("Centered Log Ratio Transformed Heatmap at", tax_level ,"level"), subtitle = paste0("Database: ", db, 
+                                                                   ". Sources: ", sources, 
+                                                                   ". Controls: ", controls, 
+                                                                   ". Bad Samples: ", bad_samples,
+                                                                   ". Min Support: ", minsupp_threshold,
+                                                                   ". \nZero replacement: ", zero_trans,
+                                                                   ". Min. Prevalence (Inds): ", prevalence_filter,
+                                                                   ". Individual clustering: ", best_method,
+                                                                   ". Taxon clustering: ", best_method_tax)) +
+  #scale_fill_viridis_c() +
+  scale_fill_distiller(palette = "Spectral") +
+  scale_colour_manual(values = NA) +
+  scale_x_discrete(position = "top") +
+  theme_minimal(base_family = "Roboto", base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = -0.001),
+        axis.text.y = element_text(colour = vector_colour),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+# if colour sample labels wanted theme(element_text(colour = vector_colour))
+
+
+```
 
 
 
