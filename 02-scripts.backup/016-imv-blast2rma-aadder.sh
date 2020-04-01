@@ -20,8 +20,8 @@ sbatch \
 
 #--wrap="/projects1/users/fellows/bin.backup/megan6/tools/blast2rma \
 #--format SAM \
-#-i /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/output/*out.gz \
-#-o /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/rma6/ \
+#-i /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/output/Nov2018acc/*out.gz \
+#-o /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/aadder/rma6/May2015XXSEED/ \
 #-a2seed /projects1/malt/databases/acc2seed/acc2seed-May2015XX.abin \
 #-a2t /projects1/malt/databases/acc2tax/nucl_acc2tax-Nov2018.abin \
 #-v"

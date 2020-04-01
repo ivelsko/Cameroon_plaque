@@ -81,10 +81,10 @@ Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `6
 Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Sex_colors <- c(Female = "#FF3200", Male = "#172869",
+Sex_colors <- c(Female = "#FF3200", Male = "#172869",Unknown = "#bdbdbd",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Sex_size <- c(Female = 4, Male = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+Sex_shapes <- c(Female = 19, Male = 17, Unknown = 16, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_size <- c(Female = 4, Male = 4, Unknown = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -146,10 +146,10 @@ metadata <- metadata %>%
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Yanomami",
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female"),
+         Sex = fct_relevel(Sex, "Male","Female", "ExtractionGauze","ExtractionBlank","LibraryBlank","Unknown"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
          Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
          Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
@@ -177,9 +177,10 @@ fullJAE <- metadata %>%
 # making the input table for PCA?
 
 # plotting PCA with colored dots
-plot_pca <- function(df, pc1, pc2, metadata_group) {
-    metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
-    metadata_group_shapes <- get(paste(metadata_group, "_shapes", sep = ""))
+plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
+    metadata_group_colors <- get(paste(color_group, "_colors", sep = ""))
+    metadata_group_shapes <- get(paste(shape_group, "_shapes", sep = ""))
+    metadata_group_size <- get(paste(size_group, "_size", sep = ""))
 
     exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
     df_X <- df$variates$X %>%
@@ -188,7 +189,9 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
               inner_join(metadata %>%
                            select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
     
-    metadata_group = df_X[[metadata_group]]
+    color_group = df_X[[color_group]]
+    shape_group = df_X[[shape_group]]
+    size_group = df_X[[size_group]]
                       
                        if (pc1 == 'PC1') {
                            pc1 <- df_X$PC1
@@ -218,10 +221,11 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
                            yaxis <- c("PC3")
                        }
 
-    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = metadata_group, shape = metadata_group)) +
-                        geom_point(size = 3) +
+    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = color_group, shape = shape_group, size = size_group)) +
+                        geom_point() +
                         scale_colour_manual(values = metadata_group_colors) +
                         scale_shape_manual(values = metadata_group_shapes) +
+                        scale_size_manual(values = metadata_group_size) +
                         # stat_ellipse() +
                         xlab(paste(xaxis, " - ", exp_var_pc1)) +
                         ylab(paste(yaxis, " - ", exp_var_pc2)) +
@@ -402,8 +406,8 @@ Before we proceed with looking at differences in abundance of different enzymes,
 let's compare the how many reads were identified by HUMAnN2 for each sample
 type. With the first step we'll read in the default HUMAnN2 output table with
 all UniRef90 assignments. We'll select out just the rows with no species
-assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per
-kilobase* for the initial output, so we'll be calculating the percent of total
+assignemtns so we can calculate total assignments. HUMAnN2 uses *reads per*
+*kilobase* for the initial output, so we'll be calculating the percent of total
 assigned/mapped reads per kilobase (RPK). Then write out the file with just the
 unmapped and total reads assigned so we never have to load this huge file again.
 This has to be done with a table for which the samples were renormed
@@ -466,7 +470,7 @@ tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
 humann2_path_allsamples.pca <- pca(humann2_path_mat, ncomp = 4, logratio = 'CLR')
 
 # plot the PCA
-pca_test_plot <- plot_pca(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group")
+pca_test_plot <- plot_pca(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_test_plot
 
 pca_test_plot_names <- plot_pca_names(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group")
@@ -503,7 +507,7 @@ tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
 humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
 ```
@@ -561,23 +565,25 @@ tune.humann2_path_pca <- tune.pca(humann2_path_noblanks_mat, logratio = 'CLR')
 humann2_path_noblanks.pca <- pca(humann2_path_noblanks_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
-plot_pca(humann2_path_noblanks.pca, "PC3", "PC2", "Ethnic_Group")
+plot_pca(humann2_path_noblanks.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-pca_AG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 pca_AG_plot
 
-pca_ME_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 pca_ME_plot
 
-pca_S_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Sex")
+
+### there's still a problem with this one
+pca_S_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
 
-pca_TS_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Village")
+pca_V_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
 ```
@@ -638,25 +644,25 @@ tune.humann2_path_pca <- tune.pca(humann2_path_cmc_mat, logratio = 'CLR')
 humann2_path_cmc.pca <- pca(humann2_path_cmc_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
-pca_AG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 pca_AG_plot
 
-pca_ME_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 pca_ME_plot
 
-pca_S_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Sex")
+pca_S_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
 
-pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC3", "PC2", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village")
+pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
 
@@ -826,7 +832,7 @@ tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
 humann2_KO_allsamples.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_test_plot <- plot_pca(humann2_KO_allsamples.pca, "PC1", "PC2", "Ethnic_Group")
+pca_test_plot <- plot_pca(humann2_KO_allsamples.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_test_plot
 # pca_test_plot <- plot_pca(humann2_KO_allsamples.pca, "PC1", "PC3", "Ethnic_Group")
 # pca_test_plot
@@ -861,7 +867,7 @@ tune.humann2_path_pca <- tune.pca(humann2_KO_noblanks_mat, logratio = 'CLR')
 humann2_KO_noblanks.pca <- pca(humann2_KO_noblanks_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
 ```
@@ -896,22 +902,22 @@ tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
 humann2_KO_noblanks.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
-pca_AG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 pca_AG_plot
 
-pca_ME_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 pca_ME_plot
 
-pca_S_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Sex")
+pca_S_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
 
-pca_TS_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Village")
+pca_V_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
 ```
@@ -947,22 +953,22 @@ tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
 humann2_KO_cmc.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group")
+pca_EG_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
-pca_AG_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Age_group")
+pca_AG_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 pca_AG_plot
 
-pca_ME_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Market_economy")
+pca_ME_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 pca_ME_plot
 
-pca_S_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Sex")
+pca_S_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
 
-pca_TS_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village")
+pca_V_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
 ```

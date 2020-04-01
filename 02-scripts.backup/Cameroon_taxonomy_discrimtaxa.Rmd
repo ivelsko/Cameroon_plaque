@@ -1,5 +1,5 @@
 ---
-title: "Cameroon hunter-gatherer calculus/plaque MALT beta diversity"
+title: "Cameroon hunter-gatherer calculus/plaque MALT discriminant taxa"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output:
@@ -82,7 +82,7 @@ metadata <- metadata %>%
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Yanomami",
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
          Sex = fct_relevel(Sex, "Male","Female"),
