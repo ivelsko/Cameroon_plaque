@@ -1,0 +1,406 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque MALT differentially abundant taxa"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+
+malt_species <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_species_bacteria_archaea.txt")
+malt_genus <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_genus_bacteria_archaea.txt")
+
+# clean the file names
+malt_species <- rename(malt_species, Species = `#Datasets`)
+colnames(malt_species) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
+colnames(malt_species) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
+colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_species))
+colnames(malt_species) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_species))
+colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
+colnames(malt_species) <- gsub(".fastq.truncated","", colnames(malt_species))
+
+
+# remove human and unassigned reads
+malt_species <- malt_species %>% filter(!str_detect(Species, "Homo sapiens"))
+malt_species <- malt_species %>% filter(!str_detect(Species, "Not assigned"))
+# get rid of the extra column
+malt_species <- malt_species %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+
+malt_genus <- rename(malt_genus, Species = `#Datasets`)
+colnames(malt_genus) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
+colnames(malt_genus) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
+colnames(malt_genus) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_genus))
+colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_genus))
+colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
+colnames(malt_genus) <- gsub(".fastq.truncated","", colnames(malt_genus))
+
+# remove human and unassigned reads
+malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo"))
+malt_genus <- malt_genus %>% filter(!str_detect(Species, "Not assigned"))
+# get rid of the extra column at the begining
+malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+
+# load the metadata file
+metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- metadata %>%
+  rename(Sample.ID = `#SampleID`)  %>%
+  as_tibble() %>%
+  mutate(Description = fct_relevel(Description, "HunterGatherer", "Yanomami", "HMP_supPlaque", "HMP_subPlaque",
+                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
+                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Yanomami","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
+                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Yanomami",
+                                      "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
+         Sex = fct_relevel(Sex, "Male","Female"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
+         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
+         Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
+                               "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Industry = fct_relevel(Industry, "Non-industrial","Industrial"))
+
+fullSRR <- metadata %>%
+  select(SampleID) %>%
+  filter(str_detect(SampleID, "SRR")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull
+```
+
+
+```{r colors_shapes_peachpear}
+# lacroix_palette("PeachPear", n = 8, type = "continuous")
+# "#FF3200" "#EF8158" "#E9BD8E" "#CBDDA7" "#38BCAD" "#0B91B5" "#065FA3" "#172869"
+
+Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
+                    Yanomami = "#C70E7B", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                     ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Village_shapes <- c(`202` = 15, `203` = 16, `205` = 17,`204` = 18, `206` = 25, Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                    ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Village_size <- c(`202` = 4.5, `203` = 4, `205` = 4,`204` = 6, `206` = 4, Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
+                    ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", Yanomami = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9", 
+                         JAE10M = "#ffeda0", JAE = "#feb24c",ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
+                         ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Ethnic_Group_size <- c(Baka = 4, Nzime = 4,  Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
+                         ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#969696", HMP_subPlaque = "#969696", # HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
+                        HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 10, HMP_subPlaque = 13, HMP10M_supPlaque = 10, 
+                        HMP10M_subPlaque = 13, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_subPlaque = 4, HMP10M_supPlaque = 4, 
+                        HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#172869", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
+                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, Industrial = 15,
+                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
+                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
+                      `10-18` = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
+                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, `10-18` = 14, HMP = 7, HMP10M = 9,
+                      ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
+                      ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Sex_colors <- c(Female = "#FF3200", Male = "#172869",
+                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_size <- c(Female = 4, Male = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
+                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  Buccal_mucosa = 14, HMP = 7, HMP10M = 9,
+                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Tooth_site_size <- c(Anterior = 4, Posterior = 4,  Buccal_mucosa = 4, HMP = 4, HMP10M = 4,
+                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
+                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
+                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Industry_size <- c(`Non-industrial` = 4, Industrial = 4,
+                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+```
+
+List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+Read in the contaminant list from `Cameroon_taxonomy_decontam.Rmd` and remove them from the taxonomy table. 
+```{r contaminants}
+
+contaminants_species <- fread("05-results.backup/malt_contaminants_species.tsv", header = T, sep = "\t")
+contaminants_genus <- fread("05-results.backup/malt_contaminants_genus.tsv")
+
+malt_species.decontam <- malt_species %>%
+  anti_join(., contaminants_species)
+
+malt_genus.decontam <- malt_genus %>%
+  anti_join(., contaminants_genus)
+
+
+```
+
+```{r input_tables}
+# species, no blanks 
+malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-contains("10M")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species") %>%
+                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
+
+malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblanks %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
+
+# perform PCA to get a clr-transformed species table
+malt_species.decontam_filtered_noblanks.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_species.decontam_filtered_noblanks_clr <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks.pca$X)
+
+
+# species, no blanks, no Yanomami
+malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-contains("10M")) %>%
+                                         select(-starts_with("SRR16460")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species") %>%
+                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami) <- malt_species.decontam_filtered_noblanks_noyanomami$SampleID
+
+malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filtered_noblanks_noyanomami+1
+
+# perform PCA to get a clr-transformed species table
+malt_species.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_species.decontam_filtered_noblanks_noyanomami_clr <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks_noyanomami.pca$X)
+
+# species, CMC samples only
+malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-starts_with("SRR")) %>%
+                                         select(-starts_with("JAE")) %>%
+                                         select(-contains("10M")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species") %>%
+                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
+
+malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
+
+# perform PCA to get a clr-transformed species table
+malt_species.decontam_filtered_cmc.pca <- mixOmics::pca(malt_species.decontam_filtered_cmc, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_species.decontam_filtered_cmc_clr <- as.data.frame.matrix(malt_species.decontam_filtered_cmc.pca$X)
+
+
+# genus, no blanks
+malt_genus.decontam_filtered <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-contains("10M")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus") %>%
+                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+                                         filter(Percent > 0.01) %>%
+                                         select(-one_of(c("Sum_genus","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
+
+malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
+
+malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
+
+# perform PCA to get a clr-transformed species table
+malt_genus.decontam_filtered.pca <- mixOmics::pca(malt_genus.decontam_filtered, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_genus.decontam_filtered_clr <- as.data.frame.matrix(malt_genus.decontam_filtered.pca$X)
+
+
+# genus, no blanks, no Yanomami
+malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-contains("10M")) %>%
+                                         # select(-one_of(fullSRR)) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus") %>%
+                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+                                         filter(Percent > 0.01) %>%
+                                         select(-one_of(c("Sum_genus","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus.decontam_filtered_noyanomami) <- malt_genus.decontam_filtered_noyanomami$SampleID
+
+malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam_filtered_noyanomami %>% select(-SampleID)
+
+malt_genus.decontam_filtered_noyanomami = malt_genus.decontam_filtered_noyanomami+1
+
+# perform PCA to get a clr-transformed species table
+malt_genus.decontam_filtered_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noyanomami, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_genus.decontam_filtered_noyanomami_clr <- as.data.frame.matrix(malt_genus.decontam_filtered_noyanomami.pca$X)
+
+
+# genus, CMC samples only
+malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-starts_with("EXB")) %>%
+                                         select(-starts_with("LIB")) %>%
+                                         select(-starts_with("SRR")) %>%
+                                         select(-starts_with("JAE")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus") %>%
+                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
+
+malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(-SampleID)
+
+malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
+
+# perform PCA to get a clr-transformed species table
+malt_genus.decontam_filtered_cmc.pca <- mixOmics::pca(malt_genus.decontam_filtered_cmc, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+malt_genus.decontam_filtered_cmc_clr <- as.data.frame.matrix(malt_genus.decontam_filtered_cmc.pca$X)
+
+
+```
+
+```{r ancom_script, eval = F}
+# source the ancom script to be able to use it here
+source("./02-scripts.backup/ancom.R")
+
+```
+
+```{r}
+# this converts the rownames to a column with the necessary heder for ANCOM, removes the rownames, then puts them back in from the column with the appropriate header
+malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
+# sets the OTU names as the column headers of the input matrix
+OTU.name = colnames(malt_species.decontam_filtered_noblanks_clr)
+# something about setting the rowname variable to the appropriate format for ANCOM again
+malt_species.decontam_filtered_noblanks_clr_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_clr_test), as.matrix(malt_species.decontam_filtered_noblanks_clr_test), row.names = NULL)
+# this puts back column names that got distorted by the step above
+colnames(malt_species.decontam_filtered_noblanks_clr_test)=c("Sample.ID", OTU.name)
+# unnecessary, makes sure the data is a data.frame (but it already is)
+malt_species.decontam_filtered_noblanks_clr_test=as.data.frame(malt_species.decontam_filtered_noblanks_clr_test)
+
+```
+
+```{r}
+malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_clr_test, Vardat = metadata, adjusted = F, repeated = F,
+                                                                main.var = "Tooth_site", adj.formula = NULL, sig = 0.05, prev.cut = 0.90)
+```
+
+
+
+From Zandra's R notebook:
+Prepare data:
+```{r, eval = F}
+metadata_z <- read_excel("~/Dropbox (MPI SHH)/1-Methods_Dental Arcade/3-Results/DA_metadata.xlsx")
+colnames(metadata_z)[1] <- "Sample.ID"
+metadata_z$Sample.ID <- gsub("01.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam", "", metadata_z$Sample.ID)
+
+otu_table <- read.delim("~/Dropbox (MPI SHH)/1-Methods_Dental Arcade/3-Results/MALT/malt_refseq_species_decontam_20191203.txt")
+colnames(otu_table) <- gsub("01.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam", "", colnames(otu_table))
+# Transpose dataframe
+otu_table_t <- otu_table %>%
+   gather("Sample.ID", "count", 2:77) %>%
+   spread(X.Datasets, count)
+
+# I don't really know what this part is doing, but it's necessary to make the test work
+otu_table_t <- otu_table_t %>% remove_rownames %>% column_to_rownames(var="Sample.ID")
+OTU.name=colnames(otu_table_t)
+otu_table_t=data.frame(Sample.ID=rownames(otu_table_t), 
+                         as.matrix(otu_table_t), row.names = NULL)
+# colnames(otu_table_t)=c("Sample.ID", OTU.name)
+# otu_table_t=as.data.frame(otu_table_t)
+```
+
+Running ANCOM with a mixed effects model:
+```{r, eval = F}
+# Note: this took about 10 minutes to run for species and 3 minutes for genus
+res.W=ANCOM.main(OTUdat=otu_table_t, Vardat=metadata_z, adjusted=F, repeated=T,
+                 main.var="Weight_class", adj.formula=NULL, repeat.var="Individual", longitudinal=T,
+                 random.formula="~1|Individual", multcorr=2, sig=0.05, prev.cut=0.90)
+
+res.ANCOM=res.W$W.taxa
+
+write.table(res.ANCOM, "U:/Dental_arcade/ANCOM/ancom_species_weightclass_mixedeffects_BH_20200113.txt")
+```
