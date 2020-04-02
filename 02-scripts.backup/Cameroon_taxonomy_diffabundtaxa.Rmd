@@ -67,29 +67,9 @@ malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata <- metadata %>%
   rename(Sample.ID = `#SampleID`)  %>%
-  as_tibble() %>%
-  mutate(Description = fct_relevel(Description, "HunterGatherer", "Yanomami", "HMP_supPlaque", "HMP_subPlaque",
-                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
-                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Yanomami","HMP","HMP10M","JAE","JAE10M",
-                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
-                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Market_economy = fct_relevel(Market_economy, "logging_road","forrest_camp","farming","Yanomami",
-                                      "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female"),
-         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
-         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
-         Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
-                               "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Industry = fct_relevel(Industry, "Non-industrial","Industrial"))
+  as_data_frame() %>%
+  select(`Sample.ID`, Description, Industry, Age_group, Env, Ethnic_Group, Market_economy, Sex, Tooth_site, Village)
 
-fullSRR <- metadata %>%
-  select(SampleID) %>%
-  filter(str_detect(SampleID, "SRR")) %>%
-  filter(!str_detect(SampleID, "10M")) %>%
-  pull
 ```
 
 
@@ -140,10 +120,10 @@ Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `6
 Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Sex_colors <- c(Female = "#FF3200", Male = "#172869",
+Sex_colors <- c(Female = "#FF3200", Male = "#172869", Unknown = "#bdbdbd",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Sex_size <- c(Female = 4, Male = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+Sex_shapes <- c(Female = 19, Male = 17, Unknown = 16, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Sex_size <- c(Female = 4, Male = 4, Unknown = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -349,30 +329,83 @@ source("./02-scripts.backup/ancom.R")
 
 ```
 
-```{r}
-# this converts the rownames to a column with the necessary heder for ANCOM, removes the rownames, then puts them back in from the column with the appropriate header
-malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
-# sets the OTU names as the column headers of the input matrix
-OTU.name = colnames(malt_species.decontam_filtered_noblanks_clr)
-# something about setting the rowname variable to the appropriate format for ANCOM again
-malt_species.decontam_filtered_noblanks_clr_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_clr_test), as.matrix(malt_species.decontam_filtered_noblanks_clr_test), row.names = NULL)
-# this puts back column names that got distorted by the step above
-colnames(malt_species.decontam_filtered_noblanks_clr_test)=c("Sample.ID", OTU.name)
-# unnecessary, makes sure the data is a data.frame (but it already is)
-malt_species.decontam_filtered_noblanks_clr_test=as.data.frame(malt_species.decontam_filtered_noblanks_clr_test)
+Update the metadata to include only the same samples as in the OTU table
+```{r metadata_ancom}
+metadata_new <- metadata %>%
+  # filter(`Sample.ID` %in% outliers) %>% 
+  filter(!str_detect(`Sample.ID`, outliersF)) %>%
+  filter(!str_detect(`Sample.ID`, "EXB")) %>% 
+  filter(!str_detect(`Sample.ID`, "LIB")) %>% 
+  filter(!str_detect(`Sample.ID`, "10M"))
 
 ```
 
-```{r}
-malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_clr_test, Vardat = metadata, adjusted = F, repeated = F,
-                                                                main.var = "Tooth_site", adj.formula = NULL, sig = 0.05, prev.cut = 0.90)
+
+Try this on a table that isn't CLR-transformed
+```{r input_tables_ancom}
+# this converts the rownames to a column with the necessary heder for ANCOM, removes the rownames, then puts them back in from the column with the appropriate header
+malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
+
+# sets the OTU.name variable as the column headers of the input matrix. Don't need this b/c it puts spaces back and won't run
+OTU.name = colnames(malt_species.decontam_filtered_noblanks_clr)
+
+# something about setting the rowname variable to the appropriate format for ANCOM again
+malt_species.decontam_filtered_noblanks_clr_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_clr_test), as.matrix(malt_species.decontam_filtered_noblanks_clr_test), row.names = NULL)
+
+# # this puts back column names that got distorted by the step above, but they have spaces and won't run
+# colnames(malt_species.decontam_filtered_noblanks_clr_test)=c("Sample.ID", OTU.name)
+
+# # unnecessary, makes sure the data is a data.frame (but it already is)
+# malt_species.decontam_filtered_noblanks_clr_test=as.data.frame(malt_species.decontam_filtered_noblanks_clr_test)
+
+
+
+# this uses the table that was used as input for the CLR transformation, but is not yet transformed. It does have a pseudocount of 1 added to all cells
+# this will work in ancom below
+malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_noblanks %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
+OTU.name = colnames(malt_species.decontam_filtered_noblanks)
+malt_species.decontam_filtered_noblanks_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_test), as.matrix(malt_species.decontam_filtered_noblanks_test), row.names = NULL)
+
+```
+
+```{r input_tables_tidyverse}
+# this should do the same as above but using fewer steps - except it keeps the spaces in names, which have to be removed
+malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>%
+  rownames_to_column("Sample.ID")
+
+
+# trying to run this one in the next gives: Error in data.pair[, 1] : incorrect number of dimensions
+malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_noblanks %>%
+  rownames_to_column("Sample.ID") %>%
+  gather("Species", "Counts", 2:ncol(.)) %>%
+  mutate(Species = str_replace_all(Species, " ", "_")) %>%
+  mutate(Species = str_replace_all(Species, "\\.", "")) %>%
+  mutate(Species = str_replace_all(Species, "\\[", "")) %>%
+  mutate(Species = str_replace_all(Species, "\\]", "")) %>%
+  spread(Species, Counts)
+
+
+```
+
+
+```{r run_ancom}
+malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_clr_test, Vardat = metadata_new, 
+                                                                adjusted = F, repeated = F, main.var = "Village", adj.formula = NULL, repeat.var = "Village", 
+                                                                longitudinal = T, random.formula = "~1|Village", multcorr=2, sig = 0.05, prev.cut = 0.90)
+
+malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_test, Vardat = metadata_new, 
+                                                                adjusted = F, repeated = F, main.var = "Village", adj.formula = NULL, repeat.var = "Village", 
+                                                                longitudinal = T, random.formula = "~1|Village", multcorr=2, sig = 0.05, prev.cut = 0.90)
+
+# both of these give: Error in `[.data.frame`(data.pair, , 1) : undefined columns selected
+
 ```
 
 
 
 From Zandra's R notebook:
 Prepare data:
-```{r, eval = F}
+```{r zandra_data_prep, eval = F}
 metadata_z <- read_excel("~/Dropbox (MPI SHH)/1-Methods_Dental Arcade/3-Results/DA_metadata.xlsx")
 colnames(metadata_z)[1] <- "Sample.ID"
 metadata_z$Sample.ID <- gsub("01.SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam", "", metadata_z$Sample.ID)
@@ -394,7 +427,7 @@ otu_table_t=data.frame(Sample.ID=rownames(otu_table_t),
 ```
 
 Running ANCOM with a mixed effects model:
-```{r, eval = F}
+```{r zandra_run_ancom, eval = F}
 # Note: this took about 10 minutes to run for species and 3 minutes for genus
 res.W=ANCOM.main(OTUdat=otu_table_t, Vardat=metadata_z, adjusted=F, repeated=T,
                  main.var="Weight_class", adj.formula=NULL, repeat.var="Individual", longitudinal=T,
@@ -404,3 +437,5 @@ res.ANCOM=res.W$W.taxa
 
 write.table(res.ANCOM, "U:/Dental_arcade/ANCOM/ancom_species_weightclass_mixedeffects_BH_20200113.txt")
 ```
+
+
