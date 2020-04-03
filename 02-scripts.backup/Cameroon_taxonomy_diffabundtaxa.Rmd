@@ -186,11 +186,6 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblan
 
 malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
 
-# perform PCA to get a clr-transformed species table
-malt_species.decontam_filtered_noblanks.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_species.decontam_filtered_noblanks_clr <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks.pca$X)
-
 
 # species, no blanks, no Yanomami
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
@@ -212,10 +207,6 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam_filt
 
 malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filtered_noblanks_noyanomami+1
 
-# perform PCA to get a clr-transformed species table
-malt_species.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_species.decontam_filtered_noblanks_noyanomami_clr <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks_noyanomami.pca$X)
 
 # species, CMC samples only
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
@@ -238,11 +229,6 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% sel
 
 malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
 
-# perform PCA to get a clr-transformed species table
-malt_species.decontam_filtered_cmc.pca <- mixOmics::pca(malt_species.decontam_filtered_cmc, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_species.decontam_filtered_cmc_clr <- as.data.frame.matrix(malt_species.decontam_filtered_cmc.pca$X)
-
 
 # genus, no blanks
 malt_genus.decontam_filtered <- malt_genus.decontam %>%
@@ -262,11 +248,6 @@ rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
 malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
 
 malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
-
-# perform PCA to get a clr-transformed species table
-malt_genus.decontam_filtered.pca <- mixOmics::pca(malt_genus.decontam_filtered, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_genus.decontam_filtered_clr <- as.data.frame.matrix(malt_genus.decontam_filtered.pca$X)
 
 
 # genus, no blanks, no Yanomami
@@ -289,11 +270,6 @@ malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam_filtered_noyanoma
 
 malt_genus.decontam_filtered_noyanomami = malt_genus.decontam_filtered_noyanomami+1
 
-# perform PCA to get a clr-transformed species table
-malt_genus.decontam_filtered_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noyanomami, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_genus.decontam_filtered_noyanomami_clr <- as.data.frame.matrix(malt_genus.decontam_filtered_noyanomami.pca$X)
-
 
 # genus, CMC samples only
 malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
@@ -315,12 +291,6 @@ malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(
 
 malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
 
-# perform PCA to get a clr-transformed species table
-malt_genus.decontam_filtered_cmc.pca <- mixOmics::pca(malt_genus.decontam_filtered_cmc, ncomp = 3, logratio = 'CLR')
-# save the clr-transformed species table
-malt_genus.decontam_filtered_cmc_clr <- as.data.frame.matrix(malt_genus.decontam_filtered_cmc.pca$X)
-
-
 ```
 
 ```{r ancom_script, eval = F}
@@ -341,16 +311,16 @@ metadata_new <- metadata %>%
 ```
 
 
-Try this on a table that isn't CLR-transformed
 ```{r input_tables_ancom}
+# this works
 # this converts the rownames to a column with the necessary heder for ANCOM, removes the rownames, then puts them back in from the column with the appropriate header
-malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
+malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_noblanks %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
 
 # sets the OTU.name variable as the column headers of the input matrix. Don't need this b/c it puts spaces back and won't run
-OTU.name = colnames(malt_species.decontam_filtered_noblanks_clr)
+OTU.name = colnames(malt_species.decontam_filtered_noblanks)
 
 # something about setting the rowname variable to the appropriate format for ANCOM again
-malt_species.decontam_filtered_noblanks_clr_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_clr_test), as.matrix(malt_species.decontam_filtered_noblanks_clr_test), row.names = NULL)
+malt_species.decontam_filtered_noblanks_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_test), as.matrix(malt_species.decontam_filtered_noblanks_test), row.names = NULL)
 
 # # this puts back column names that got distorted by the step above, but they have spaces and won't run
 # colnames(malt_species.decontam_filtered_noblanks_clr_test)=c("Sample.ID", OTU.name)
@@ -360,18 +330,12 @@ malt_species.decontam_filtered_noblanks_clr_test <- data.frame(Sample.ID=rowname
 
 
 
-# this uses the table that was used as input for the CLR transformation, but is not yet transformed. It does have a pseudocount of 1 added to all cells
-# this will work in ancom below
-malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_noblanks %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
-OTU.name = colnames(malt_species.decontam_filtered_noblanks)
-malt_species.decontam_filtered_noblanks_test <- data.frame(Sample.ID=rownames(malt_species.decontam_filtered_noblanks_test), as.matrix(malt_species.decontam_filtered_noblanks_test), row.names = NULL)
-
 ```
 
 ```{r input_tables_tidyverse}
 # this should do the same as above but using fewer steps - except it keeps the spaces in names, which have to be removed
 malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>%
-  rownames_to_column("Sample.ID")
+  rownames_to_column("Sample.ID") 
 
 
 # trying to run this one in the next gives: Error in data.pair[, 1] : incorrect number of dimensions
@@ -380,8 +344,8 @@ malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_n
   gather("Species", "Counts", 2:ncol(.)) %>%
   mutate(Species = str_replace_all(Species, " ", "_")) %>%
   mutate(Species = str_replace_all(Species, "\\.", "")) %>%
-  mutate(Species = str_replace_all(Species, "\\[", "")) %>%
-  mutate(Species = str_replace_all(Species, "\\]", "")) %>%
+  mutate(Species = str_replace(Species, "\\[", "")) %>%
+  mutate(Species = str_replace(Species, "\\]", "")) %>%
   spread(Species, Counts)
 
 
@@ -389,15 +353,10 @@ malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_n
 
 
 ```{r run_ancom}
-malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_clr_test, Vardat = metadata_new, 
+malt_species.decontam_filtered_noblanks.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_test, Vardat = metadata_new, 
                                                                 adjusted = F, repeated = F, main.var = "Village", adj.formula = NULL, repeat.var = "Village", 
                                                                 longitudinal = T, random.formula = "~1|Village", multcorr=2, sig = 0.05, prev.cut = 0.90)
 
-malt_species.decontam_filtered_noblanks_clr.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_test, Vardat = metadata_new, 
-                                                                adjusted = F, repeated = F, main.var = "Village", adj.formula = NULL, repeat.var = "Village", 
-                                                                longitudinal = T, random.formula = "~1|Village", multcorr=2, sig = 0.05, prev.cut = 0.90)
-
-# both of these give: Error in `[.data.frame`(data.pair, , 1) : undefined columns selected
 
 ```
 
