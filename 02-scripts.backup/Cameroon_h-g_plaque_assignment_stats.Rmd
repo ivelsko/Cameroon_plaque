@@ -230,5 +230,20 @@ db_plot_village
 ```
 
 
+```{r uky_graphs, eval = F}
+
+malt_CMC_HMP_JAE_Yano_RSC_assignments_uky <- malt_CMC_HMP_JAE_Yano_RSC_assignments %>%
+  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
+  mutate(Percent = Aligned/Queries*100) %>%
+  filter(!str_detect(SampleID, "10M|EXB|LIB"))
+  
+assigned <- plot_box_whisker(malt_CMC_HMP_JAE_Yano_RSC_assignments_uky, hasmtdta = F, "Percent", "Village", "Village", "Percent of reads assigned by MALT with RefSeqCustom")
+assigned
+
+ggsave("05-results.backup/malt_assignments_plots_pct_uky.pdf", plot = assigned, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+       dpi = 300)
+
+```
 
 

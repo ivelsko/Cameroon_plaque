@@ -1120,6 +1120,77 @@ heatmap_base <- ggplot(data_heatmap, aes(Taxon, Individual, fill = CLR)) +
 
 
 
+```{r uky_plots, eval = F}
+# now on filtered tables
+presabs_table_f <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>%
+                                         gather("Species","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                                         spread(Species, Counts) %>%
+                                         column_to_rownames("SampleID")
+  
+# calculate observed species for each sample with janitor 'adorn_totals'
+malt_species.decontam_filtered.os <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_species") %>%
+  select(Observed_species) %>%
+  rownames_to_column("SampleID") 
+
+plot_box_whisker(malt_species.decontam_filtered.os, "Observed_species", "Env", "Env", "Number of species")
+NoS <- plot_box_whisker(malt_species.decontam_filtered.os, "Observed_species", "Village", "Village", "Number of species")
+
+ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+       dpi = 300)
+
+malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
+names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# merge with the metadata file and plot
+malt_species.decontam_filtered.shannon <- malt_species.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID") 
+
+plot_box_whisker(malt_species.decontam_filtered.shannon, "Shannon_index", "Env", "Env", "Shannon Index")
+Shannon <- plot_box_whisker(malt_species.decontam_filtered.shannon, "Shannon_index", "Village", "Village", "Shannon Index")
+
+ggsave("05-results.backup/Shannon_UKY.pdf", plot = Shannon, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+       dpi = 300)
+
+
+heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
+
+ggsave("05-results.backup/heatmap_species_UKY.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 7, height = 7, units = c("in"),
+       dpi = 300)
+
+```
 
 
 
