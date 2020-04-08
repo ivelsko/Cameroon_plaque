@@ -560,7 +560,7 @@ malt_species.decontam_top50_all_clr_long <- malt_species.decontam_top50_all_clr 
 # make a heatmap with ggplot
 heatmap_base <- ggplot(malt_species.decontam_top50_all_clr_long, aes(SampleID, Species, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -651,7 +651,7 @@ malt_species.decontam_top50_cmc_clr_long <- malt_species.decontam_top50_cmc_clr 
 # make a heat map for just the CMC samples
 heatmap_base <- ggplot(malt_species.decontam_top50_cmc_clr_long, aes(SampleID, Species, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -768,7 +768,7 @@ malt_species.decontam_top50_each_clr_long <- malt_species.decontam_top50_each_cl
 # make the heatmap with ggplot
 heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -848,7 +848,7 @@ malt_genus.decontam_top50_all_clr_long <- malt_genus.decontam_top50_all_clr %>%
 # make a heatmap with ggplot
 heatmap_base <- ggplot(malt_genus.decontam_top50_all_clr_long, aes(SampleID, genus, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -940,7 +940,7 @@ malt_genus.decontam_top50_cmc_clr_long <- malt_genus.decontam_top50_cmc_clr %>%
 # make a heat map for just the CMC samples
 heatmap_base <- ggplot(malt_genus.decontam_top50_cmc_clr_long, aes(SampleID, genus, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -1057,7 +1057,7 @@ malt_genus.decontam_top50_each_clr_long <- malt_genus.decontam_top50_each_clr %>
 # make the heatmap with ggplot
 heatmap_base <- ggplot(malt_genus.decontam_top50_each_clr_long, aes(SampleID, genus, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
@@ -1177,7 +1177,7 @@ ggsave("05-results.backup/Shannon_UKY.pdf", plot = Shannon, device = "pdf",
 
 heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),

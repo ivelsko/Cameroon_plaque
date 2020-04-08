@@ -579,7 +579,7 @@ malt_species_decontam_filtered_noblanks.plsda$loadings$X %>%
 ```{r fa_species_decontam_noblanks}
 # fa.parallel(malt_species.decontam_filtered_noblanks, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 6, rotate = "varimax", fm = "ols") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 6, rotate = "varimax", fm = "minres") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
 # if using fm = "ols", the column titles will be 1, 2, etc and not M1, M2, etc as you get from using fm = "minres"
 
 print(malt_species.decontam_filtered_noblanks.fa)
@@ -606,6 +606,8 @@ graphinfo <- graphinfo %>%
 
 # now make loadings into a table and designate each species in the residual with the highest absolute value
 malt_species.decontam_filtered_noblanks.fa.df <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks.fa$loadings)
+# b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
+colnames(malt_species.decontam_filtered_noblanks.fa.df) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
 malt_species.decontam_filtered_noblanks.fa.df <- malt_species.decontam_filtered_noblanks.fa.df %>%
   as_tibble(.) %>%
   bind_cols(., graphinfo) %>%
@@ -628,9 +630,16 @@ head(malt_species.decontam_filtered_noblanks.fa.df)
 
 # now run a discriminant analysis
 
+# save the species using in downstream discriminant analyses as a table
+malt_species.decontam_filtered_noblanks.fa_species <- malt_species.decontam_filtered_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  select(Species)
+
+fwrite(malt_species.decontam_filtered_noblanks.fa_species, file = "./05-results.backup/malt_species.decontam_filtered_noblanks.fa_species.tsv", quote = F, sep = "\t")
+
 ```
 
-```{r lda_species_decontam_noblanks}
+```{r lda_species_decontam_noblanks_eg}
 
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_species_noblanks <- malt_species.decontam_filtered_noblanks.fa.df %>% 
@@ -643,24 +652,28 @@ malt_species.decontam_filtered_noblanks_lda_table <- malt_species.decontam_filte
   rownames_to_column("SampleID") %>%
   inner_join(., metadata_noblanks %>%
                # change the column after SampleID to get the metadata category you want 
-               # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
-               select(SampleID, Ethnic_Group)) %>%
-  select(SampleID, Ethnic_Group, everything())
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Village, everything())
 
 rownames(malt_species.decontam_filtered_noblanks_lda_table) <- malt_species.decontam_filtered_noblanks_lda_table$SampleID
 malt_species.decontam_filtered_noblanks_lda_table <- malt_species.decontam_filtered_noblanks_lda_table %>% select(-SampleID)
 
-malt_species.decontam_filtered_noblanks_lda <- lda(Ethnic_Group ~ ., malt_species.decontam_filtered_noblanks_lda_table)
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+malt_species.decontam_filtered_noblanks_lda <- lda(Village ~ ., malt_species.decontam_filtered_noblanks_lda_table)
 # malt_species.decontam_filtered_noblanks_lda # show results
 malt_species.decontam_filtered_noblanks_lda
 plot(malt_species.decontam_filtered_noblanks_lda, dimen = 2)
 
 lda.data <- cbind(malt_species.decontam_filtered_noblanks_lda_table, predict(malt_species.decontam_filtered_noblanks_lda)$x)
 
-ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
                         geom_point(size = 4) +
-                        scale_colour_manual(values = Ethnic_Group_colors) +
-                        scale_shape_manual(values = Ethnic_Group_shapes) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
                         xlab("LD1") +
                         ylab("LD2") +
                         theme_minimal(base_size = 10) +
@@ -669,9 +682,10 @@ ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
 
 ```
 
+
 Now without Yanomami samples
 ```{r fa_species_decontam_noblanks_noyanomami}
-malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 7, rotate = "oblimin", fm = "ols") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 7, rotate = "varimax", fm = "minres") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
 print(malt_species.decontam_filtered_noblanks_noyanomami.fa)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa,sort=TRUE)
@@ -696,6 +710,8 @@ graphinfo <- graphinfo %>%
 
 # now make loadings into a table and designate each species in the residual with the highest absolute value
 malt_species.decontam_filtered_noblanks_noyanomami.fa.df <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks_noyanomami.fa$loadings)
+# b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
+colnames(malt_species.decontam_filtered_noblanks_noyanomami.fa.df) <- c("MR1","MR2","MR3","MR4","MR5","MR6","MR7")
 malt_species.decontam_filtered_noblanks_noyanomami.fa.df <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>%
   as_tibble(.) %>%
   bind_cols(., graphinfo) %>%
@@ -712,13 +728,21 @@ malt_species.decontam_filtered_noblanks_noyanomami.fa.df <- malt_species.deconta
   select(Species,everything(.)) %>%
   gather("Group","Residual", 7:ncol(.)) %>%
   filter(Residual != "0") %>%
-  select(Residual, Species, MR1, MR2, MR4, MR3, MR5)
+  select(Residual, Species, MR1, MR2, MR3, MR4, MR5)
 
 head(malt_species.decontam_filtered_noblanks_noyanomami.fa.df)
 
+
+# save the species using in downstream discriminant analyses as a table
+malt_species.decontam_filtered_noblanks_noyanomami.fa_species <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  select(Species)
+
+fwrite(malt_species.decontam_filtered_noblanks_noyanomami.fa_species, file = "./05-results.backup/malt_species.decontam_filtered_noblanks_noyanomami.fa_species.tsv", quote = F, sep = "\t")
+
 ```
 
-```{r da_species_decontam_noblanks_noyanomami}
+```{r da_species_decontam_noblanks_noyanomami_eg}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -730,7 +754,7 @@ malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.deco
   rownames_to_column("SampleID") %>%
   inner_join(., metadata_noblanks_noyanomami %>%
                # change the column after SampleID to get the metadata category you want 
-               # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
                select(SampleID, Ethnic_Group)) %>%
   select(SampleID, Ethnic_Group, everything())
 
@@ -744,7 +768,7 @@ plot(malt_species.decontam_filtered_noblanks_noyanomami_lda, dimen = 2)
 
 lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
 
-ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
+noyanomami_eg <- ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
                         geom_point(size = 4) +
                         scale_colour_manual(values = Ethnic_Group_colors) +
                         scale_shape_manual(values = Ethnic_Group_shapes) +
@@ -754,6 +778,223 @@ ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
 
+noyanomami_eg
+
+```
+
+
+```{r da_species_decontam_noblanks_noyanomami_age}
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_clr %>%
+  select(one_of(fa_species_noblanks_noyanomami)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_noblanks_noyanomami %>%
+               select(SampleID, Age_group)) %>%
+  select(SampleID, Age_group, everything())
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami_da_table) <- malt_species.decontam_filtered_noblanks_noyanomami_da_table$SampleID
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_da_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami_lda <- lda(Age_group ~ ., malt_species.decontam_filtered_noblanks_noyanomami_da_table)
+malt_species.decontam_filtered_noblanks_noyanomami_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
+
+noyanomami_ag <- ggplot(lda.data, aes(LD1, LD2, colour = Age_group, shape = Age_group)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Age_group_colors) +
+                        scale_shape_manual(values = Age_group_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+noyanomami_ag
+
+```
+
+
+```{r da_species_decontam_noblanks_noyanomami_me}
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_clr %>%
+  select(one_of(fa_species_noblanks_noyanomami)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_noblanks_noyanomami %>%
+               select(SampleID, Market_economy)) %>%
+  select(SampleID, Market_economy, everything())
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami_da_table) <- malt_species.decontam_filtered_noblanks_noyanomami_da_table$SampleID
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_da_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami_lda <- lda(Market_economy ~ ., malt_species.decontam_filtered_noblanks_noyanomami_da_table)
+malt_species.decontam_filtered_noblanks_noyanomami_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
+
+noyanomami_me <- ggplot(lda.data, aes(LD1, LD2, colour = Market_economy, shape = Market_economy, size = Market_economy)) +
+                        geom_point() +
+                        scale_colour_manual(values = Market_economy_colors) +
+                        scale_shape_manual(values = Market_economy_shapes) +
+                        scale_size_manual(values = Market_economy_size) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+noyanomami_me
+
+```
+
+
+```{r da_species_decontam_noblanks_noyanomami_sex}
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_clr %>%
+  select(one_of(fa_species_noblanks_noyanomami)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_noblanks_noyanomami %>%
+               select(SampleID, Sex)) %>%
+  select(SampleID, Sex, everything()) %>%
+  filter(Sex != "Unknown")
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami_da_table) <- malt_species.decontam_filtered_noblanks_noyanomami_da_table$SampleID
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_da_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami_lda <- lda(Sex ~ ., malt_species.decontam_filtered_noblanks_noyanomami_da_table)
+malt_species.decontam_filtered_noblanks_noyanomami_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
+
+# # works only if the Unknown sample is left in
+# ggplot(lda.data, aes(LD1, LD2, colour = Sex, shape = Sex)) +
+#                         geom_point(size = 4) +
+#                         scale_colour_manual(values = Sex_colors) +
+#                         scale_shape_manual(values = Sex_shapes) +
+#                         xlab("LD1") +
+#                         ylab("LD2") +
+#                         theme_minimal(base_size = 10) +
+#                         theme(legend.position = "top") +
+#                         theme(legend.title = element_blank())
+
+noyanomami_sex <- ggplot(lda.data, aes(x = Sex, y = LD1, group = Sex, fill = Sex)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Sex)) +
+                        scale_fill_manual(values = Sex_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+
+noyanomami_sex
+
+```
+
+
+```{r da_species_decontam_noblanks_noyanomami_ts}
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_clr %>%
+  select(one_of(fa_species_noblanks_noyanomami)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_noblanks_noyanomami %>%
+               select(SampleID, Tooth_site)) %>%
+  select(SampleID, Tooth_site, everything())
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami_da_table) <- malt_species.decontam_filtered_noblanks_noyanomami_da_table$SampleID
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_da_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami_lda <- lda(Tooth_site ~ ., malt_species.decontam_filtered_noblanks_noyanomami_da_table)
+malt_species.decontam_filtered_noblanks_noyanomami_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
+
+noyanomami_ts <- ggplot(lda.data, aes(LD1, LD2, colour = Tooth_site, shape = Tooth_site)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Tooth_site_colors) +
+                        scale_shape_manual(values = Tooth_site_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+noyanomami_ts
+
+```
+
+
+```{r da_species_decontam_noblanks_noyanomami_vi}
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_clr %>%
+  select(one_of(fa_species_noblanks_noyanomami)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_noblanks_noyanomami %>%
+               select(SampleID, Village)) %>%
+  select(SampleID, Village, everything())
+
+rownames(malt_species.decontam_filtered_noblanks_noyanomami_da_table) <- malt_species.decontam_filtered_noblanks_noyanomami_da_table$SampleID
+malt_species.decontam_filtered_noblanks_noyanomami_da_table <- malt_species.decontam_filtered_noblanks_noyanomami_da_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_noblanks_noyanomami_lda <- lda(Village ~ ., malt_species.decontam_filtered_noblanks_noyanomami_da_table)
+malt_species.decontam_filtered_noblanks_noyanomami_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_noblanks_noyanomami_da_table, predict(malt_species.decontam_filtered_noblanks_noyanomami_lda)$x)
+
+noyanomami_vi <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+noyanomami_vi
+
+```
+
+```{r noblanks_images}
+
+allplots_noyanomami <- plot_grid(noyanomami_eg, noyanomami_ag,
+          noyanomami_me, noyanomami_sex,
+          noyanomami_ts, noyanomami_vi,
+          nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
+
+
+ggsave("05-results.backup/allplots_noyanomami.pdf", plot = allplots_noyanomami, device = "pdf",
+       scale = 1, width = 10, height = 10, units = c("in"),
+       dpi = 300)
 
 ```
 
@@ -762,7 +1003,7 @@ Now only CMC samples
 ```{r fa_species_decontam_cmc}
 # fa.parallel(malt_species.decontam_filtered_cmc, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 6, rotate = "oblimin", fm = "ols") # rotate = "oblimin" "Varimax" # fm = "ols" "minres"
+malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 6, rotate = "varimax", fm = "minres") # rotate = "oblimin" "Varimax" # fm = "ols" "minres"
 print(malt_species.decontam_filtered_cmc.fa)
 # print(malt_species.decontam_filtered_cmc.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_cmc.fa,sort=TRUE)
@@ -787,15 +1028,17 @@ graphinfo <- graphinfo %>%
 
 # now make loadings into a table and designate each species in the residual with the highest absolute value
 malt_species.decontam_filtered_cmc.fa.df <- as.data.frame.matrix(malt_species.decontam_filtered_cmc.fa$loadings)
+# b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
+colnames(malt_species.decontam_filtered_cmc.fa.df) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
 malt_species.decontam_filtered_cmc.fa.df <- malt_species.decontam_filtered_cmc.fa.df %>%
   as_tibble(.) %>%
   bind_cols(., graphinfo) %>%
   mutate(MR11 = as.character(MR11),
-         MR31 = as.character(MR31),
-         MR21 = as.character(MR21)) %>%
+         MR21 = as.character(MR21),
+         MR31 = as.character(MR31)) %>%
   mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
-         MR31 = replace(MR21, MR31 != "0", "MR3"),
-         MR21 = replace(MR31, MR21 != "0", "MR2")) %>%
+         MR21 = replace(MR21, MR21 != "0", "MR2"),
+         MR31 = replace(MR31, MR31 != "0", "MR2")) %>%
   select(Species,everything(.)) %>%
   gather("Group","Residual", 5:ncol(.)) %>%
   filter(Residual != "0") %>%
@@ -805,13 +1048,20 @@ head(malt_species.decontam_filtered_cmc.fa.df)
 
 # now run a discriminant analysis
 
+# save the species using in downstream discriminant analyses as a table
+malt_species.decontam_filtered_cmc.fa_species <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  select(Species)
+
+fwrite(malt_species.decontam_filtered_cmc.fa_species, file = "./05-results.backup/malt_species.decontam_filtered_cmc.fa_species.tsv", quote = F, sep = "\t")
+
 ```
 
-```{r lda_species_decontam_cmc}
+```{r lda_species_decontam_cmc_eg}
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR3","MR2")) %>%
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
   pull(Species)
 
 # sub-sample the species table for only those species
@@ -820,7 +1070,7 @@ malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_c
   rownames_to_column("SampleID") %>%
   inner_join(., metadata_cmc %>%
                # change the column after SampleID to get the metadata category you want 
-               # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
                select(SampleID, Ethnic_Group)) %>%
   select(SampleID, Ethnic_Group, everything())
 
@@ -830,27 +1080,249 @@ malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_c
 malt_species.decontam_filtered_cmc_lda <- lda(Ethnic_Group ~ ., malt_species.decontam_filtered_cmc_lda_table)
 malt_species.decontam_filtered_cmc_lda # show results
 
-plot(malt_species.decontam_filtered_cmc_lda)
+plotit <- plot(malt_species.decontam_filtered_cmc_lda)
+plotit
 
 lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+# lda.data <- lda.data %>%
+#   rownames_to_column("SampleID")
 
 
-# this won't work with only 2 groups. Need to make another graph. Follow bar charts of plot()?
-# ggplot(lda.data, aes(LD1, LD2, colour = Ethnic_Group, shape = Ethnic_Group)) +
-#                         geom_point(size = 4) +
-#                         scale_colour_manual(values = Ethnic_Group_colors) +
-#                         scale_shape_manual(values = Ethnic_Group_shapes) +
-#                         xlab("LD1") +
-#                         ylab("LD2") +
-#                         theme_minimal(base_size = 10) +
-#                         theme(legend.position = "top") +
-#                         theme(legend.title = element_blank())
+cmc_eg <- ggplot(lda.data, aes(x = Ethnic_Group, y = LD1, group = Ethnic_Group, fill = Ethnic_Group)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Ethnic_Group)) +
+                        scale_fill_manual(values = Ethnic_Group_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("Ethnic Group") +
+                        ylab("LD1") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
 
+cmc_eg
 
 ```
 
 
+```{r lda_species_decontam_cmc_age}
 
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_clr %>%
+  select(one_of(fa_species_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_cmc %>%
+               select(SampleID, Age_group)) %>%
+  select(SampleID, Age_group, everything())
+
+rownames(malt_species.decontam_filtered_cmc_lda_table) <- malt_species.decontam_filtered_cmc_lda_table$SampleID
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_lda_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc_lda <- lda(Age_group ~ ., malt_species.decontam_filtered_cmc_lda_table)
+malt_species.decontam_filtered_cmc_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+
+cmc_ag <- ggplot(lda.data, aes(LD1, LD2, colour = Age_group, shape = Age_group, size = Age_group)) +
+                        geom_point() +
+                        scale_colour_manual(values = Age_group_colors) +
+                        scale_shape_manual(values = Age_group_shapes) +
+                        scale_size_manual(values = Age_group_size) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+cmc_ag
+```
+
+
+```{r lda_species_decontam_cmc_me}
+
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_clr %>%
+  select(one_of(fa_species_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_cmc %>%
+               select(SampleID, Market_economy)) %>%
+  select(SampleID, Market_economy, everything())
+
+rownames(malt_species.decontam_filtered_cmc_lda_table) <- malt_species.decontam_filtered_cmc_lda_table$SampleID
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_lda_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc_lda <- lda(Market_economy ~ ., malt_species.decontam_filtered_cmc_lda_table)
+malt_species.decontam_filtered_cmc_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+
+cmc_me <- ggplot(lda.data, aes(LD1, LD2, colour = Market_economy, shape = Market_economy, size = Market_economy)) +
+                        geom_point() +
+                        scale_colour_manual(values = Market_economy_colors) +
+                        scale_size_manual(values = Market_economy_size) +
+                        scale_shape_manual(values = Market_economy_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+cmc_me
+
+```
+
+
+```{r lda_species_decontam_cmc_sex}
+
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_clr %>%
+  select(one_of(fa_species_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_cmc %>%
+               select(SampleID, Sex)) %>%
+  select(SampleID, Sex, everything())
+
+rownames(malt_species.decontam_filtered_cmc_lda_table) <- malt_species.decontam_filtered_cmc_lda_table$SampleID
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_lda_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc_lda <- lda(Sex ~ ., malt_species.decontam_filtered_cmc_lda_table)
+malt_species.decontam_filtered_cmc_lda # show results
+
+plot(malt_species.decontam_filtered_cmc_lda)
+
+lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+
+cmc_sex <- ggplot(lda.data, aes(x = Sex, y = LD1, group = Sex, fill = Sex)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Sex)) +
+                        scale_fill_manual(values = Sex_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("Ethnic Group") +
+                        ylab("LD1") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+cmc_sex
+
+```
+
+
+```{r lda_species_decontam_cmc_ts}
+
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_clr %>%
+  select(one_of(fa_species_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_cmc %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Tooth_site)) %>%
+  select(SampleID, Tooth_site, everything())
+
+rownames(malt_species.decontam_filtered_cmc_lda_table) <- malt_species.decontam_filtered_cmc_lda_table$SampleID
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_lda_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc_lda <- lda(Tooth_site ~ ., malt_species.decontam_filtered_cmc_lda_table)
+malt_species.decontam_filtered_cmc_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+
+plot(malt_species.decontam_filtered_cmc_lda)
+
+cmc_ts <- ggplot(lda.data, aes(x = Tooth_site, y = LD1, group = Tooth_site, fill = Tooth_site)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Tooth_site)) +
+                        scale_fill_manual(values = Tooth_site_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("Ethnic Group") +
+                        ylab("LD1") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+cmc_ts
+
+```
+
+
+```{r lda_species_decontam_cmc_village}
+
+# select only the species that make up the 1st 2 residuals, based on the scree plot above
+fa_species_cmc <- malt_species.decontam_filtered_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_clr %>%
+  select(one_of(fa_species_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata_cmc %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+  select(SampleID, Village, everything())
+
+rownames(malt_species.decontam_filtered_cmc_lda_table) <- malt_species.decontam_filtered_cmc_lda_table$SampleID
+malt_species.decontam_filtered_cmc_lda_table <- malt_species.decontam_filtered_cmc_lda_table %>% select(-SampleID)
+
+malt_species.decontam_filtered_cmc_lda <- lda(Village ~ ., malt_species.decontam_filtered_cmc_lda_table)
+malt_species.decontam_filtered_cmc_lda # show results
+
+lda.data <- cbind(malt_species.decontam_filtered_cmc_lda_table, predict(malt_species.decontam_filtered_cmc_lda)$x)
+
+cmc_vi <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village, size = Village)) +
+                        geom_point() +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        scale_size_manual(values = Village_size) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+cmc_vi
+
+```
+
+```{r cmc_images}
+
+allplots_cmc <- plot_grid(cmc_eg, cmc_ag,
+          cmc_me, cmc_sex,
+          cmc_ts, cmc_vi,
+          nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
+
+ggsave("05-results.backup/allplots_cmc.pdf", plot = allplots_cmc, device = "pdf",
+       scale = 1, width = 9, height = 10, units = c("in"),
+       dpi = 300)
+
+```
 
 
 # Not using, SI-PCA and sPLS-DA
