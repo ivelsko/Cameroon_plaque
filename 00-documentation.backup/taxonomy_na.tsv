@@ -154,6 +154,7 @@ P1	452284	Ustilaginomycotina	Ustilaginomycotina	d__Fungi|p__Basidiomycota
 P1	2204096	Wallemiomycotina	Wallemiomycotina	d__Fungi|p__Basidiomycota
 C1	355688	Agaricomycetes incertae sedis	Agaricomycetes 	d__Fungi|p__Basidiomycota|c__Agaricomycetes
 C1	452333	Agaricomycetidae	Agaricomycetidae	d__Fungi|p__Basidiomycota|c__Agaricomycetes
+O1	227334	Coniophorineae	Coniophorineae	d__Fungi|p__Basidiomycota|c__Agaricomycetes|o__Boletales
 P1	6032	Apansporoblastina	Apansporoblastina	d__Fungi|p__Microsporidia
 P1	469895	Microsporidia incertae sedis	Microsporidia 	d__Fungi|p__Microsporidia
 P1	6036	Pansporoblastina	Pansporoblastina	d__Fungi|p__Microsporidia
@@ -161,156 +162,38 @@ P1	214504	Glomeromycotina	Glomeromycotina	d__Fungi|p__Mucoromycota
 P1	1137986	Mortierellomycotina	Mortierellomycotina	d__Fungi|p__Mucoromycota
 P1	451507	Mucoromycotina	Mucoromycotina	d__Fungi|p__Mucoromycota
 D3	2136008	unclassified archaeal dsDNA viruses	archaeal dsDNA	d__Viruses
-S	35244	Bovine alphaherpesvirus 5	Bovine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Bovine alphaherpesvirus 5
-S	10320	Bovine alphaherpesvirus 1	Bovine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Bovine alphaherpesvirus 1
-S	1027247	Bovine astrovirus B76-2/HK	Bovine astrovirus	d__Viruses|f__Astroviridae|g__Mamastrovirus|s__Bovine astrovirus B76-2/HK
-S	1027248	Bovine astrovirus B76/HK	Bovine astrovirus	d__Viruses|f__Astroviridae|g__Mamastrovirus|s__Bovine astrovirus B76/HK
-S	130499	Bovine atadenovirus D	Bovine atadenovirus	d__Viruses|f__Adenoviridae|g__Atadenovirus|s__Bovine atadenovirus D
-S	10385	Bovine gammaherpesvirus 4	Bovine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Rhadinovirus|s__Bovine gammaherpesvirus 4
-S	129727	Bovine papular stomatitis virus	Bovine papular	d__Viruses|f__Poxviridae|g__Parapoxvirus|s__Bovine papular stomatitis virus
-S1	857312	Brochothrix phage A9	Brochothrix phage A9	d__Viruses|o__Caudovirales|f__Herelleviridae|s__Brochothrix phage A9
-F1	2560071	Brockvirinae	Brockvirinae	d__Viruses|o__Caudovirales|f__Herelleviridae
-S	2170139	Brown greater galago prosimian foamy virus	Brown greater	d__Viruses|o__Ortervirales|f__Retroviridae|g__Prosimiispumavirus|s__Brown greater galago prosimian foamy virus
-S1	1503289	BtMr-AlphaCoV/SAX2011	BtMr-AlphaCoV/SAX2011	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Alphacoronavirus|s__BtMr-AlphaCoV/SAX2011
-S	2282206	Bufonid herpesvirus 1	Bufonid herpesvirus	d__Viruses|o__Herpesvirales|s__Bufonid herpesvirus 1
-S	1324959	Burdock mottle virus	Burdock mottle	d__Viruses|f__Benyviridae|g__Benyvirus|s__Burdock mottle virus
-S	74320	Buzura suppressaria nucleopolyhedrovirus	Buzura suppressaria	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Buzura suppressaria nucleopolyhedrovirus
-S	1960254	Cacao swollen shoot Togo A virus	Cacao swollen	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Cacao swollen shoot Togo A virus
-S	2560365	Cachoeira Porteira orthobunyavirus	Cachoeira Porteira	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Cachoeira Porteira orthobunyavirus
-S1	1138490	Cachoeira Porteira virus	Cachoeira Porteira	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Cachoeira Porteira virus
-S	1513235	Cafeteria roenbergensis virus	Cafeteria roenbergensis	d__Viruses|f__Mimiviridae|g__Cafeteriavirus|s__Cafeteria roenbergensis virus
-S1	693272	Cafeteria roenbergensis virus BV-PW1	Cafeteria roenbergensis virus BV-PW1	d__Viruses|f__Mimiviridae|g__Cafeteriavirus|s__Cafeteria roenbergensis virus BV-PW1
 D1	2498710	Caldiserica/Cryosericota group	Caldiserica/Cryosericota group	d__Viruses
-S	106331	Callitrichine gammaherpesvirus 3	Callitrichine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Gammaherpesvirinae|g__Lymphocryptovirus|s__Callitrichine gammaherpesvirus 3
-S	2170107	Camel associated porprismacovirus 3	Camel associated	d__Viruses|f__Smacoviridae|g__Porprismacovirus|s__Camel associated porprismacovirus 3
-S	10484	Campoletis sonorensis ichnovirus	Campoletis sonorensis	d__Viruses|f__Polydnaviridae|g__Ichnovirus|s__Campoletis sonorensis ichnovirus
-S	1765754	Camponotus nipponicus virus	Camponotus nipponicus	d__Viruses|f__Totiviridae|s__Camponotus nipponicus virus 
-S1	1229752	Campylobacter phage CP30A	Campylobacter phage CP30A	d__Viruses
-S1	1715288	Canary bornavirus 1	Canary bornavirus	d__Viruses
-S	170325	Canid alphaherpesvirus 1	Canid alphaherpesvirus	d__Viruses
-S1	10514	Canine adenovirus 2	Canine adenovirus	d__Viruses
-S	10537	Canine mastadenovirus A	Canine mastadenovirus	d__Viruses
-S1	1226723	Canis familiaris papillomavirus 13	Canis familiaris	d__Viruses
-S1	1495866	Cat Que virus	Cat Que	d__Viruses
-S	1850906	Catopsilia pomona nucleopolyhedrovirus	Catopsilia pomona	d__Viruses
-S1	1678225	Catu virus	Catu virus	d__Viruses
-S	1667230	Caucasus prunus virus	Caucasus prunus	d__Viruses
-S1	1041929	Cavally virus	Cavally virus	d__Viruses
-S	33706	Caviid betaherpesvirus 2	Caviid betaherpesvirus	d__Viruses
-G1	2509476	Cegacovirus	Cegacovirus	d__Viruses
-S1	1327976	Cellulophaga phage phi12:1	Cellulophaga phage phi12:1	d__Viruses
-S1	1327982	Cellulophaga phage phi18:1	Cellulophaga phage phi18:1	d__Viruses
-S1	1328029	Cellulophaga phage phi4:1	Cellulophaga phage phi4:1	d__Viruses
-S1	756282	Cellulophaga phage phiST	Cellulophaga phage phiST	d__Viruses
-S	1908813	Ceratobasidium endornavirus C	Ceratobasidium endornavirus	d__Viruses
-S	1908806	Ceratobasidium endornavirus A	Ceratobasidium endornavirus	d__Viruses
-S	10317	Cercopithecine alphaherpesvirus 2	Cercopithecine alphaherpesvirus	d__Viruses
-S	35246	Cercopithecine alphaherpesvirus 9	Cercopithecine alphaherpesvirus	d__Viruses
-S	50292	Cercopithecine betaherpesvirus 5	Cercopithecine betaherpesvirus	d__Viruses
-S	2170100	Cereal yellow dwarf virus RPV	Cereal yellow	d__Viruses
-S1	1158189	Chaco virus	Chaco virus	d__Viruses
-S	497136	Chaetoceros tenuissimus RNA virus 01	Chaetoceros tenuissimus	d__Viruses
-S	267285	Chalara elegans RNA Virus 1	Chalara elegans	d__Viruses
-S	1608044	Changping Tick Virus 2	Changping Tick	d__Viruses
-F1	2169597	Chebruvirinae	Chebruvirinae	d__Viruses
-S	36344	Chelonus inanitus bracovirus	Chelonus inanitus	d__Viruses
-S	2035708	Cherax quadricarinatus iridovirus	Cherax quadricarinatus	d__Viruses
-S	131226	Cherry mottle leaf virus	Cherry mottle	d__Viruses
-S	52280	Chilli veinal mottle virus	Chilli veinal	d__Viruses
-S1	1123958	Chimpanzee adenovirus Y25	Chimpanzee adenovirus	d__Viruses
-S	2170110	Chimpanzee associated porprismacovirus 2	Chimpanzee associated	d__Viruses
-S1	332937	Chimpanzee herpesvirus strain 105640	Chimpanzee herpesvirus	d__Viruses
-S	2169772	Chiropteran bocaparvovirus 3	Chiropteran bocaparvovirus	d__Viruses
-S	2170147	Chiropteran protoparvovirus 1	Chiropteran protoparvovirus	d__Viruses
-S	1891720	Chlorocebus pygerythrus polyomavirus 3	Chlorocebus pygerythrus	d__Viruses
-S1	169173	Choclo virus	Choclo virus	d__Viruses
-F1	10241	Chordopoxvirinae	Chordopoxvirinae	d__Viruses
-F2	40070	unclassified Chordopoxvirinae	Chordopoxvirinae	d__Viruses
-S	10288	Choristoneura biennis entomopoxvirus	Choristoneura biennis	d__Viruses
-S	208973	Choristoneura fumiferana multiple nucleopolyhedrovirus	Choristoneura fumiferana	d__Viruses
-S	58094	Choristoneura rosaceana nucleopolyhedrovirus	Choristoneura rosaceana	d__Viruses
-S	1993631	Choristoneura rosaceana entomopoxvirus	Choristoneura rosaceana	d__Viruses
-S1	1293539	Choristoneura rosaceana entomopoxvirus 'L'	Choristoneura rosaceana	d__Viruses
-S	455364	Chrysochromulina ericina virus	Chrysochromulina ericina	d__Viruses
-S	1207438	Chrysodeixis includens nucleopolyhedrovirus	Chrysodeixis includens	d__Viruses
-S	1788441	Circovirus-like genome DCCV-13	Circovirus-like genome	d__Viruses
-S	1788455	Circovirus-like genome DHCV-6	Circovirus-like genome	d__Viruses
-S1	2267236	Citrobacter phage CF1 ERZ-2017	Citrobacter phage CF1 ERZ-2017	d__Viruses
-S1	1540095	Citrobacter phage Moon	Citrobacter phage Moon	d__Viruses
-S	1307957	Clanis bilineata nucleopolyhedrovirus	Clanis bilineata	d__Viruses
-S1	686439	Clavibacter phage CMP1	Clavibacter phage CMP1	d__Viruses
-S	1950126	Clematis chlorotic mottle virus	Clematis chlorotic	d__Viruses
-S	1986289	Clostera anastomosis granulovirus A	Clostera anastomosis	d__Viruses
-S1	1986291	Clostera anastomosis granulovirus Henan	Clostera anastomosis	d__Viruses
-S	93386	Columbid alphaherpesvirus 1	Columbid alphaherpesvirus	d__Viruses
-S	2022783	Common bottlenose dolphin gammaherpesvirus 1 strain Sarasota	Common bottlenose	d__Viruses
-S	540070	Common midwife toad virus	Common midwife	d__Viruses
-F1	675075	Comovirinae	Comovirinae	d__Viruses
-O1	227334	Coniophorineae	Coniophorineae	d__Viruses
-O1	2499399	Cornidovirineae	Cornidovirineae	d__Viruses
-F1	693995	Coronavirinae	Coronavirinae	d__Viruses
-F2	2664420	unclassified Coronavirinae	Coronavirinae	d__Viruses
-F2	233263	unclassified coronaviruses	coronaviruses	d__Viruses
-S1	384848	Corynebacterium phage P1201	Corynebacterium phage P1201	d__Viruses
-S1	2047871	Corynebacterium phage Zion	Corynebacterium phage Zion	d__Viruses
-S	39640	Cotesia congregata bracovirus	Cotesia congregata	d__Viruses
-S1	930275	Cotia virus SPAn232	Cotia virus SPAn232	d__Viruses
-S	2056780	Cow vetch latent virus	Cow vetch	d__Viruses
-S	67761	Cowpea mild mottle virus	Cowpea mild	d__Viruses
-F2	1978007	crAss-like viruses	crAss-like viruses	d__Viruses
-S	1605972	Cricetid gammaherpesvirus 2	Cricetid gammaherpesvirus	d__Viruses
-S1	1162295	Cronobacter phage CR3	Cronobacter phage CR3	d__Viruses
-S1	1162290	Cronobacter phage CR9	Cronobacter phage CR9	d__Viruses
-S	40282	Cryphonectria hypovirus 2	Cryphonectria hypovirus	d__Viruses
-S	12235	Cucumber green mottle mosaic virus	Cucumber green	d__Viruses
-S	130556	Culex nigripalpus nucleopolyhedrovirus	Culex nigripalpus	d__Viruses
-F1	2169531	Cvivirinae	Cvivirinae	d__Viruses
-S	28289	Cydia pomonella granulovirus	Cydia pomonella	d__Viruses
-S	1602124	Cymbidium chlorotic mosaic virus	Cymbidium chlorotic	d__Viruses
-S1	507488	Cynomolgus adenovirus 1	Cynomolgus adenovirus	d__Viruses
-S	180230	Cyprinid herpesvirus 3	Cyprinid herpesvirus	d__Viruses
-S	317858	Cyprinid herpesvirus 1	Cyprinid herpesvirus	d__Viruses
-S1	1965368	Dinoroseobacter phage vB_DshS-R5C	Dinoroseobacter phage vB_DshS-R5C	d__Viruses
-G	699180	Dinovernavirus	Dinovernavirus	d__Viruses
-S	2079134	Dishui lake phycodnavirus 1	Dishui lake	d__Viruses
 D2	2204151	unclassified DNA viruses	DNA viruses	d__Viruses
-S	1574422	Dromedary stool-associated circular ssDNA virus	Dromedary stool-associated	d__Viruses
-S	2057187	Drosophila innubila nudivirus	Drosophila innubila	d__Viruses
-S1	1802951	Drosophila unispina virus 1	Drosophila unispina virus 1	d__Viruses
 D3	79205	unclassified dsDNA phages	dsDNA phages	d__Viruses
 D3	51368	unclassified dsDNA viruses	dsDNA viruses	d__Viruses
-G1	2508225	Dumedivirus	Dumedivirus	d__Viruses
-S1	1264700	Edwardsiella phage MSW-3	Edwardsiella phage MSW-3	d__Viruses
-S	768738	Elephant endotheliotropic herpesvirus 5	Elephant endotheliotropic	d__Viruses
-S	548914	Elephant endotheliotropic herpesvirus 4	Elephant endotheliotropic	d__Viruses
-G1	2509481	Embecovirus	Embecovirus	d__Viruses
-S1	709484	Enterobacter phage CC31	Enterobacter phage CC31	d__Viruses
-S1	2070180	Enterobacter phage Ec_L1	Enterobacter phage Ec_L1	d__Viruses
-S1	1455074	Enterobacter phage PG7	Enterobacter phage PG7	d__Viruses
-S1	1222338	Enterobacteria phage GEC-3S	Enterobacteria phage GEC-3S	d__Viruses
-S1	697227	Enterobacteria phage IME08	Enterobacteria phage IME08	d__Viruses
-S1	50948	Enterobacteria phage RB49	Enterobacteria phage RB49	d__Viruses
-S1	1640885	Enterococcus phage EFLK1	Enterococcus phage EFLK1	d__Viruses
-S1	1747289	Enterococcus phage vB_EfaS_IME196	Enterococcus phage vB_EfaS_IME196	d__Viruses
-F1	10284	Entomopoxvirinae	Entomopoxvirinae	d__Viruses
-O1	162479	Entylomatales incertae sedis	Entylomatales 	d__Viruses
-S	166056	Epinotia aporema granulovirus	Epinotia aporema	d__Viruses
-S	70600	Epiphyas postvittana nucleopolyhedrovirus	Epiphyas postvittana	d__Viruses
-S	2035399	Eptesicus fuscus gammaherpesvirus	Eptesicus fuscus	d__Viruses
-S1	1464071	Eptesicus serotinus papillomavirus 1	Eptesicus serotinus	d__Viruses
-S	80341	Equid alphaherpesvirus 3	Equid alphaherpesvirus	d__Viruses
-S	39637	Equid alphaherpesvirus 8	Equid alphaherpesvirus	d__Viruses
-S	12657	Equid gammaherpesvirus 2	Equid gammaherpesvirus	d__Viruses
-S	10371	Equid gammaherpesvirus 5	Equid gammaherpesvirus	d__Viruses
-S1	67603	Equine adenovirus 2	Equine adenovirus	d__Viruses
-S	129955	Equine mastadenovirus B	Equine mastadenovirus	d__Viruses
-S	307444	Erinnyis ello granulovirus	Erinnyis ello	d__Viruses
-S1	1564096	Erwinia phage phiEa2809	Erwinia phage phiEa2809	d__Viruses
-S1	1051674	Erwinia phage vB_Eam-MM7	Erwinia phage vB_Eam-MM7	d__Viruses
-S1	1883370	Erwinia phage vB_EamM_Asesino	Erwinia phage vB_EamM_Asesino	d__Viruses
-S1	2060127	Erwinia phage vB_EamM_Desertfox	Erwinia phage vB_EamM_Desertfox	d__Viruses
-G	40121	Erythroparvovirus	Erythroparvovirus	d__Viruses
-S1	1495286	Escherichia phage e4/1c	Escherichia phage e4/1c	d__Viruses
+G1	2509481	Embecovirus	Embecovirus	d__Viruses|o__Nidovirales|f__ Coronaviridae|g__Betacoronavirus
+S1	709484	Enterobacter phage CC31	Enterobacter phage CC31	d__Viruses|o__Caudovirales|f__Myoviridae|g__Karamvirus|s__Enterobacter phage CC31
+S1	2070180	Enterobacter phage Ec_L1	Enterobacter phage Ec_L1	d__Viruses|o__ Caudovirales|f__Siphoviridae|g__Eclunavirus|s__Enterobacter phage Ec_L1
+S1	1455074	Enterobacter phage PG7	Enterobacter phage PG7	d__Viruses|o__ Caudovirales|f__Myoviridae|g__ Karamvirus|s__Enterobacter phage PG7
+S1	1222338	Enterobacteria phage GEC-3S	Enterobacteria phage GEC-3S	d__Viruses|o__Caudovirales|f__Myoviridae|g__Krischvirus|s__Enterobacteria phage GEC-3S
+S1	697227	Enterobacteria phage IME08	Enterobacteria phage IME08	d__Viruses|o__Caudovirales|F__Myoviridae|g__Dhakavirus|s__Enterobacteria phage IME08
+S1	50948	Enterobacteria phage RB49	Enterobacteria phage RB49	d__Viruses|o__Caudovirales|f__Myoviridae|g__Krischvirus|s__Enterobacteria phage RB49
+S1	1640885	Enterococcus phage EFLK1	Enterococcus phage EFLK1	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Kochikohdavirus|s__Enterococcus phage EFLK1
+S1	1747289	Enterococcus phage vB_EfaS_IME196	Enterococcus phage vB_EfaS_IME196	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Efquatrovirus|s__Enterococcus phage vB_EfaS_IME196
+F1	10284	Entomopoxvirinae	Entomopoxvirinae	d__Viruses|f__Poxviridae
+O1	162479	Entylomatales incertae sedis	Entylomatales 	d__Fungi|p__Basidiomycota|c__Exobasidiomycetes|o__Entylomatales
+S	166056	Epinotia aporema granulovirus	Epinotia aporema	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Epinotia aporema granulovirus
+S	70600	Epiphyas postvittana nucleopolyhedrovirus	Epiphyas postvittana	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Epiphyas postvittana nucleopolyhedrovirus
+S	2035399	Eptesicus fuscus gammaherpesvirus	Eptesicus fuscus	d__Viruses|o__Herpesvirales|f__Herpesviridae|s__Eptesicus fuscus gammaherpesvirus
+S1	1464071	Eptesicus serotinus papillomavirus 1	Eptesicus serotinus	d__Viruses|f__ Papillomaviridae|g__Dyopsipapillomavirus|s__Eptesicus serotinus papillomavirus 1
+S	80341	Equid alphaherpesvirus 3	Equid alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Equid alphaherpesvirus 3
+S	39637	Equid alphaherpesvirus 8	Equid alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Equid alphaherpesvirus 8
+S	12657	Equid gammaherpesvirus 2	Equid gammaherpesvirus	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Percavirus|s__Equid gammaherpesvirus 2
+S	10371	Equid gammaherpesvirus 5	Equid gammaherpesvirus	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Percavirus|s__Equid gammaherpesvirus 5
+S1	67603	Equine adenovirus 2	Equine adenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Equine mastadenovirus B
+S	129955	Equine mastadenovirus B	Equine mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Equine mastadenovirus B
+S	307444	Erinnyis ello granulovirus	Erinnyis ello	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Erinnyis ello granulovirus
+S1	1564096	Erwinia phage phiEa2809	Erwinia phage phiEa2809	d__Viruses|o__Caudovirales|f__Ackermannviridae|s__Erwinia virus Ea2809
+S1	1051674	Erwinia phage vB_Eam-MM7	Erwinia phage vB_Eam-MM7	d__Viruses|o__Caudovirales|f__Myoviridae|g__Kolesnikvirus|s__Erwinia phage vB_Eam-MM7
+S1	1883370	Erwinia phage vB_EamM_Asesino	Erwinia phage vB_EamM_Asesino	d__Viruses|o__ Caudovirales|F__Myoviridae|g__Erskinevirus|s__Erwinia phage vB_EamM_Asesino
+S1	2060127	Erwinia phage vB_EamM_Desertfox	Erwinia phage vB_EamM_Desertfox	d__Viruses|o__ Caudovirales|f__Myoviridae|g__Agricanvirus|s__Erwinia phage vB_EamM_Desertfox
+G	40121	Erythroparvovirus	Erythroparvovirus	d__Viruses|f__Parvoviridae|g__Erythroparvovirus
+S1	1495286	Escherichia phage e4/1c	Escherichia phage e4/1c	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Rogunavirus|s__Escherichia phage e4/1c
 S1	1340750	Escherichia phage JH2	Escherichia phage JH2	d__Viruses
 S	1572753	Escherichia phage P483	Escherichia phage P483	d__Viruses
 S1	1141141	Escherichia phage vB_EcoM_ACG-C40	Escherichia phage vB_EcoM_ACG-C40	d__Viruses
@@ -368,23 +251,31 @@ D3	439490	unclassified ssRNA viruses	ssRNA viruses	d__Viruses
 D4	128706	Haloviruses	Haloviruses	d__Viruses
 D4	988644	unclassified ssRNA negative-strand viruses	ssRNA negative-strand	d__Viruses
 D4	35278	unclassified ssRNA positive-strand viruses	ssRNA positive-strand	d__Viruses
-S	12161	Beet yellows virus	Beet yellows	d__Viruses|f__Closteroviridae|g__Closterovirus|s__Beet yellows virus
-S	2219133	Alces alces faeces associated microvirus MP10 5560	Alces alces	d__Viruses|f__Microviridae|s__Alces alces faeces associated microvirus MP10 5560
-S1	1269028	Acanthamoeba polyphaga moumouvirus	Acanthamoeba polyphaga	d__Viruses|f__Mimiviridae|s__Acanthamoeba polyphaga moumouvirus 
-S	28321	Amsacta moorei entomopoxvirus	Amsacta moorei	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Amsacta moorei entomopoxvirus
-S	341721	Aedes pseudoscutellaris reovirus	Aedes pseudoscutellaris	d__Viruses|f__Reoviridae|g__Dinovernavirus|s__Aedes pseudoscutellaris reovirus 
+S1	1123958	Chimpanzee adenovirus Y25	Chimpanzee adenovirus	d__Viruses|f__ Adenoviridae|fg__Mastadenovirus|s__Chimpanzee adenovirus Y25
+S1	507488	Cynomolgus adenovirus 1	Cynomolgus adenovirus	d__Viruses|f__ Adenoviridae|g__Mastadenovirus|s__Cynomolgus adenovirus 1
+S	1850906	Catopsilia pomona nucleopolyhedrovirus	Catopsilia pomona	d__Viruses|f__ Baculoviridae|g__Alphabaculovirus|s__Catopsilia pomona nucleopolyhedrovirus 
+S	1788441	Circovirus-like genome DCCV-13	Circovirus-like genome	d__Viruses|f__ Circoviridae|g__|s__Circovirus-like genome DCCV-13
+S	1788455	Circovirus-like genome DHCV-6	Circovirus-like genome	d__Viruses|f__ Circoviridae|g__|s__Circovirus-like genome DHCV-6
+S	2170100	Cereal yellow dwarf virus RPV	Cereal yellow	d__Viruses|f__ Luteoviridae|g__Polerovirus|s__Cereal yellow dwarf virus RPV
+S1	1226723	Canis familiaris papillomavirus 13	Canis familiaris	d__Viruses|f__ Papillomaviridae|g__Firstpapillomavirinae|s__Taupapillomavirus 2
+S	455364	Chrysochromulina ericina virus	Chrysochromulina ericina	d__Viruses|f__ Phycodnaviridae|g__|s__Chrysochromulina ericina virus
+S	2079134	Dishui lake phycodnavirus 1	Dishui lake	d__Viruses|f__ Phycodnaviridae|g__Prasinovirus|s__Dishui lake phycodnavirus 1
 S1	111167	Bovine adenovirus 6	Bovine adenovirus	d__Viruses|f__Adenoviridae|g__Atadenovirus|s__Bovine adenovirus 6
 S	130500	Bovine adenovirus E	Bovine adenovirus	d__Viruses|f__Adenoviridae|g__Atadenovirus|s__Bovine adenovirus E
+S	130499	Bovine atadenovirus D	Bovine atadenovirus	d__Viruses|f__Adenoviridae|g__Atadenovirus|s__Bovine atadenovirus D
 S	2015370	Bat mastadenovirus C	Bat mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Bat mastadenovirus C
 S	2015372	Bat mastadenovirus D	Bat mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Bat mastadenovirus D
 S1	1788433	Bat mastadenovirus WIV11	Bat mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Bat mastadenovirus WIV11
 S1	1788434	Bat mastadenovirus WIV12	Bat mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Bat mastadenovirus WIV12
 S1	1714377	Bottlenose dolphin adenovirus 1	Bottlenose dolphin	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Bottlenose dolphin adenovirus 1
+S1	10514	Canine adenovirus 2	Canine adenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Canine mastadenovirus A
+S	10537	Canine mastadenovirus A	Canine mastadenovirus	d__Viruses|f__Adenoviridae|g__Mastadenovirus|s__Canine mastadenovirus A
 S	437444	Acidianus bottle-shaped virus	Acidianus bottle-shaped	d__Viruses|f__Ampullaviridae|g__Ampullavirus|s__Acidianus bottle-shaped virus
 S	10497	African swine fever virus	African swine	d__Viruses|f__Asfarviridae|g__Asfivirus|s__African swine fever virus
 S1	645425	Bottlenose dolphin astrovirus 1	Bottlenose dolphin	d__Viruses|f__Astroviridae|g__Mamastrovirus|s__Bottlenose dolphin astrovirus 1
+S	1027247	Bovine astrovirus B76-2/HK	Bovine astrovirus	d__Viruses|f__Astroviridae|g__Mamastrovirus|s__Bovine astrovirus B76-2/HK
+S	1027248	Bovine astrovirus B76/HK	Bovine astrovirus	d__Viruses|f__Astroviridae|g__Mamastrovirus|s__Bovine astrovirus B76/HK
 S	542343	Adoxophyes orana nucleopolyhedrovirus	Adoxophyes orana	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Adoxophyes orana nucleopolyhedrovirus
-S	170617	Adoxophyes orana granulovirus	Adoxophyes orana	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Adoxophyes orana granulovirus
 S	208013	Agrotis ipsilon multiple nucleopolyhedrovirus	Agrotis ipsilon	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Agrotis ipsilon multiple nucleopolyhedrovirus
 S	1962501	Agrotis segetum nucleopolyhedrovirus A	Agrotis segetum	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Agrotis segetum nucleopolyhedrovirus A
 S	1580580	Agrotis segetum nucleopolyhedrovirus B	Agrotis segetum	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Agrotis segetum nucleopolyhedrovirus B
@@ -393,41 +284,91 @@ S	307461	Apocheima cinerarium nucleopolyhedrovirus	Apocheima cinerarium	d__Virus
 S	307456	Autographa californica multiple nucleopolyhedrovirus	Autographa californica	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Autographa californica multiple nucleopolyhedrovirus
 S1	46015	Autographa californica nucleopolyhedrovirus	Autographa californica	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Autographa californica multiple nucleopolyhedrovirus
 S	271108	Bombyx mori nucleopolyhedrovirus	Bombyx mori	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Bombyx mori nucleopolyhedrovirus
+S	74320	Buzura suppressaria nucleopolyhedrovirus	Buzura suppressaria	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Buzura suppressaria nucleopolyhedrovirus
+S	208973	Choristoneura fumiferana multiple nucleopolyhedrovirus	Choristoneura fumiferana	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Choristoneura fumiferana multiple nucleopolyhedrovirus
+S	58094	Choristoneura rosaceana nucleopolyhedrovirus	Choristoneura rosaceana	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Choristoneura rosaceana nucleopolyhedrovirus
+S	1207438	Chrysodeixis includens nucleopolyhedrovirus	Chrysodeixis includens	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Chrysodeixis includens nucleopolyhedrovirus
+S	1307957	Clanis bilineata nucleopolyhedrovirus	Clanis bilineata	d__Viruses|f__Baculoviridae|g__Alphabaculovirus|s__Clanis bilineata nucleopolyhedrovirus
+S	170617	Adoxophyes orana granulovirus	Adoxophyes orana	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Adoxophyes orana granulovirus
 S	362830	Artogeia rapae granulovirus	Artogeia rapae	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Artogeia rapae granulovirus
+S	1986289	Clostera anastomosis granulovirus A	Clostera anastomosis	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Clostera anastomosis granulovirus A
+S1	1986291	Clostera anastomosis granulovirus Henan	Clostera anastomosis	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Clostera anastomosis granulovirus Henan
+S	28289	Cydia pomonella granulovirus	Cydia pomonella	d__Viruses|f__Baculoviridae|g__Betabaculovirus|s__Cydia pomonella granulovirus
+S	130556	Culex nigripalpus nucleopolyhedrovirus	Culex nigripalpus	d__Viruses|f__Baculoviridae|g__Deltabaculovirus|s__Culex nigripalpus nucleopolyhedrovirus
+S	1324959	Burdock mottle virus	Burdock mottle	d__Viruses|f__Benyviridae|g__Benyvirus|s__Burdock mottle virus
 S	1797140	Acidianus tailed spindle virus	Acidianus tailed	d__Viruses|f__Bicaudaviridae|s__Acidianus tailed spindle virus
 S	339420	Blackberry chlorotic ringspot virus	Blackberry chlorotic	d__Viruses|f__Bromoviridae|g__Ilarvirus|s__Blackberry chlorotic ringspot virus
 S	1618234	Avon-Heathcote Estuary associated circular virus 11	Avon-Heathcote Estuary	d__Viruses|f__Circoviridae
+S	1574422	Dromedary stool-associated circular ssDNA virus	Dromedary stool-associated	d__Viruses|f__Circoviridae|s__Dromedary stool-associated circular ssDNA virus
+S	12161	Beet yellows virus	Beet yellows	d__Viruses|f__Closteroviridae|g__Closterovirus|s__Beet yellows virus
 S	2338394	Blackcurrant-associated closterovirus 1	Blackcurrant-associated closterovirus	d__Viruses|f__Closteroviridae|g__Closterovirus|s__Blackcurrant-associated closterovirus 1
 S	267970	Bean yellow disorder virus	Bean yellow	d__Viruses|f__Closteroviridae|g__Crinivirus|s__Bean yellow disorder virus
+S	1908806	Ceratobasidium endornavirus A	Ceratobasidium endornavirus	d__Viruses|f__Endornaviridae|g__|s__Ceratobasidium endornavirus A
+S	1908813	Ceratobasidium endornavirus C	Ceratobasidium endornavirus	d__Viruses|f__Endornaviridae|g__|s__Ceratobasidium endornavirus C
 S	1384490	Basella alba alphaendornavirus 1	Basella alba	d__Viruses|f__Endornaviridae|g__Alphaendornavirus|s__Basella alba alphaendornavirus 1
 S1	358764	Border disease virus	Border disease	d__Viruses|f__Flaviviridae|g__Pestivirus|s__Border disease virus
+S	40282	Cryphonectria hypovirus 2	Cryphonectria hypovirus	d__Viruses|f__Hypoviridae|g__Hypovirus|s__Cryphonectria hypovirus 2
 F1	2017756	Alphairidovirinae	Alphairidovirinae	d__Viruses|f__Iridoviridae
 F1	2017757	Betairidovirinae	Betairidovirinae	d__Viruses|f__Iridoviridae
+S	2035708	Cherax quadricarinatus iridovirus	Cherax quadricarinatus	d__Viruses|f__Iridoviridae|g__|s__Cherax quadricarinatus iridovirus
 S	1465751	Anopheles minimus irodovirus	Anopheles minimus	d__Viruses|f__Iridoviridae|g__Chloriridovirus|s__Anopheles minimus irodovirus
+S	540070	Common midwife toad virus	Common midwife	d__Viruses|f__Iridoviridae|g__Ranavirus|s__Common midwife toad virus
 S1	72201	Armadillidium vulgare iridescent virus	Armadillidium vulgare	d__Viruses|f__Iridoviridae|g__ridovirus|s__Armadillidium vulgare iridescent virus
+S	2219133	Alces alces faeces associated microvirus MP10 5560	Alces alces	d__Viruses|f__Microviridae|s__Alces alces faeces associated microvirus MP10 5560
+S	1513235	Cafeteria roenbergensis virus	Cafeteria roenbergensis	d__Viruses|f__Mimiviridae|g__Cafeteriavirus|s__Cafeteria roenbergensis virus
+S1	693272	Cafeteria roenbergensis virus BV-PW1	Cafeteria roenbergensis virus BV-PW1	d__Viruses|f__Mimiviridae|g__Cafeteriavirus|s__Cafeteria roenbergensis virus BV-PW1
 S	212035	Acanthamoeba polyphaga mimivirus	Acanthamoeba polyphaga	d__Viruses|f__Mimiviridae|g__Mimivirus|s__Acanthamoeba polyphaga mimivirus
+S1	1269028	Acanthamoeba polyphaga moumouvirus	Acanthamoeba polyphaga	d__Viruses|f__Mimiviridae|s__Acanthamoeba polyphaga moumouvirus 
+S	2056780	Cow vetch latent virus	Cow vetch	d__Viruses|f__Nanoviridae
+S	2057187	Drosophila innubila nudivirus	Drosophila innubila	d__Viruses|f__Nudiviridae|s__Drosophila innubila nudivirus
 S1	2259811	Bat bocavirus XM30	Bat bocavirus	d__Viruses|f__Parvoviridae|g__Bocaparvovirus|s__Bat bocavirus XM30
+S	2169772	Chiropteran bocaparvovirus 3	Chiropteran bocaparvovirus	d__Viruses|f__Parvoviridae|g__Bocaparvovirus|s__Chiropteran bocaparvovirus 3
+S	2170147	Chiropteran protoparvovirus 1	Chiropteran protoparvovirus	d__Viruses|f__Parvoviridae|g__Protoparvovirus|s__Chiropteran protoparvovirus 1
 S	322019	Acanthocystis turfacea chlorella virus 1	Acanthocystis turfacea	d__Viruses|f__Phycodnaviridae|g__Chlorovirus|s__Acanthocystis turfacea chlorella virus 1
 S	1474867	Aureococcus anophagefferens virus	Aureococcus anophagefferens	d__Viruses|f__Phycodnaviridae|s__Aureococcus anophagefferens virus
+S	39640	Cotesia congregata bracovirus	Cotesia congregata	d__Viruses|f__Polydnaviridae|g__Bracovirus|s__Cotesia congregata bracovirus
+S	10484	Campoletis sonorensis ichnovirus	Campoletis sonorensis	d__Viruses|f__Polydnaviridae|g__Ichnovirus|s__Campoletis sonorensis ichnovirus
+S	1891720	Chlorocebus pygerythrus polyomavirus 3	Chlorocebus pygerythrus	d__Viruses|f__Polyomaviridae|g__Alphapolyomavirus|s__Chlorocebus pygerythrus polyomavirus 3
 S	45661	Banana bract mosaic virus	Banana bract	d__Viruses|f__Potyviridae|g__Potyvirus|s__Banana bract mosaic virus
+S	52280	Chilli veinal mottle virus	Chilli veinal	d__Viruses|f__Potyviridae|g__Potyvirus|s__Chilli veinal mottle virus
+F1	10241	Chordopoxvirinae	Chordopoxvirinae	d__Viruses|f__Poxviridae
+F2	40070	unclassified Chordopoxvirinae	Chordopoxvirinae	d__Viruses|f__Poxviridae
 S	62099	Anomala cuprea entomopoxvirus	Anomala cuprea	d__Viruses|f__Poxviridae|g__Alphaentomopoxvirus|s__Anomala cuprea entomopoxvirus
 S	1993630	Adoxophyes honmai entomopoxvirus	Adoxophyes honmai	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Adoxophyes honmai entomopoxvirus
 S1	1293540	Adoxophyes honmai entomopoxvirus 'L'	Adoxophyes honmai	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Adoxophyes honmai entomopoxvirus ‘L’
+S	28321	Amsacta moorei entomopoxvirus	Amsacta moorei	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Amsacta moorei entomopoxvirus
+S	10288	Choristoneura biennis entomopoxvirus	Choristoneura biennis	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Choristoneura biennis entomopoxvirus
+S	1993631	Choristoneura rosaceana entomopoxvirus	Choristoneura rosaceana	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Choristoneura rosaceana entomopoxvirus
+S1	1293539	Choristoneura rosaceana entomopoxvirus 'L'	Choristoneura rosaceana	d__Viruses|f__Poxviridae|g__Betaentomopoxvirus|s__Choristoneura rosaceana entomopoxvirus
+S	129727	Bovine papular stomatitis virus	Bovine papular	d__Viruses|f__Poxviridae|g__Parapoxvirus|s__Bovine papular stomatitis virus
 S	67082	BeAn 58058 virus	BeAn 58058	d__Viruses|f__Poxviridae|s__BeAn 58058 virus
+S1	930275	Cotia virus SPAn232	Cotia virus SPAn232	d__Viruses|f__Poxviridae|s__Cotia virus SPAn232
 S1	465447	American grass carp reovirus	American grass	d__Viruses|f__Reoviridae|g__Aquareovirus|s__American grass carp reovirus
+G	699180	Dinovernavirus	Dinovernavirus	d__Viruses|f__Reoviridae|g__Dinovernavirus
+S	341721	Aedes pseudoscutellaris reovirus	Aedes pseudoscutellaris	d__Viruses|f__Reoviridae|g__Dinovernavirus|s__Aedes pseudoscutellaris reovirus 
+S	2170107	Camel associated porprismacovirus 3	Camel associated	d__Viruses|f__Smacoviridae|g__Porprismacovirus|s__Camel associated porprismacovirus 3
+S	2170110	Chimpanzee associated porprismacovirus 2	Chimpanzee associated	d__Viruses|f__Smacoviridae|g__Porprismacovirus|s__Chimpanzee associated porprismacovirus 2
 S	1714570	Blueberry shoestring virus	Blueberry shoestring	d__Viruses|f__Solemoviridae|g__Sobemovirus|s__Blueberry shoestring virus
+S	1602124	Cymbidium chlorotic mosaic virus	Cymbidium chlorotic	d__Viruses|f__Solemoviridae|g__Sobemovirus|s__Cymbidium chlorotic mosaic virus
+S	1950126	Clematis chlorotic mottle virus	Clematis chlorotic	d__Viruses|f__Tombusviridae|g__Pelarspovirus|s__Clematis chlorotic mottle virus
+S	267285	Chalara elegans RNA Virus 1	Chalara elegans	d__Viruses|f__Totiviridae|g__Victorivirus|s__Chalara elegans RNA Virus 1
+S	1765754	Camponotus nipponicus virus	Camponotus nipponicus	d__Viruses|f__Totiviridae|s__Camponotus nipponicus virus 
 S	46436	Beet soil-borne virus	Beet soil-borne	d__Viruses|f__Virgaviridae|g__Pomovirus|s__Beet soil-borne virus
-S1	1195072	Bacillus phage vB_BceM_Bc431v3	Bacillus phage vB_BceM_Bc431v3	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Caeruleovirus|s__Bacillus phage vB_BceM_Bc431v3
-S1	2024264	Agrobacterium phage Atu_ph07	Agrobacterium phage Atu_ph07	d__Viruses|o__Caudovirales|f__Myoviridae|g__Polybotosvirus|s__Agrobacterium phage Atu_ph07
-S1	1566993	Arthrobacter phage vB_ArtM-ArV1	Arthrobacter phage vB_ArtM-ArV1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Radnorvirus|s__Arthrobacter phage vB_ArtM-ArV1
-F1	542835	Autographivirinae	Autographivirinae	d__Viruses|o__Caudovirales|f__Podoviridae
-F2	1132574	unclassified Autographivirinae	Autographivirinae	d__Viruses|o__Caudovirales|f__Podoviridae
-S1	2015839	Arthrobacter phage Molivia	Arthrobacter phage Molivia	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Amigovirus|s__Arthrobacter phage Molivia
-S1	1241371	Abalone herpesvirus Victoria/AUS/2009	Abalone herpesvirus	d__Viruses|o__Herpesvirales|f__Malacoherpesviridae|g__Aurivirus|s__Abalone herpesvirus Victoria/AUS/2009 
-S	1490026	Blackberry Virus F	Blackberry Virus	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Blackberry Virus F
-S	128790	Bean rugose mosaic virus	Bean rugose	d__Viruses|o__Picornavirales|f__Secoviridae|g__Comovirus|s__Bean rugose mosaic virus
+S	12235	Cucumber green mottle mosaic virus	Cucumber green	d__Viruses|f__Virgaviridae|g__Tobamovirus|s__Cucumber green mottle mosaic virus
+S1	1264700	Edwardsiella phage MSW-3	Edwardsiella phage MSW-3	d__Viruses|o__ Caudovirales|f__Myoviridae|g__Yokohamavirus|s__Edwardsiella virus MSW3
+S1	756282	Cellulophaga phage phiST	Cellulophaga phage phiST	d__Viruses|o__ Caudovirales|f__Siphoviridae|g__Cbastvirus
+S1	1327976	Cellulophaga phage phi12:1	Cellulophaga phage phi12:1	d__Viruses|o__ Caudovirales|f__Siphoviridae|g__Helsingorvirus|s__Cellulophaga phage phi12:1 
+S1	1327982	Cellulophaga phage phi18:1	Cellulophaga phage phi18:1	d__Viruses|o__ Caudovirales|f__Siphoviridae|g__Helsingorvirus|s__Cellulophaga phage phi18:1 
+S	50292	Cercopithecine betaherpesvirus 5	Cercopithecine betaherpesvirus	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Cytomegalovirus|s__Cercopithecine betaherpesvirus 5
+S	548914	Elephant endotheliotropic herpesvirus 4	Elephant endotheliotropic	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Proboscivirus|s__Elephant endotheliotropic herpesvirus 4
+S	768738	Elephant endotheliotropic herpesvirus 5	Elephant endotheliotropic	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Proboscivirus|s__Elephant endotheliotropic herpesvirus 5
+S1	332937	Chimpanzee herpesvirus strain 105640	Chimpanzee herpesvirus	d__Viruses|o__ Herpesvirales|f__Herpesviridae|g__Simplexvirus|s__Chimpanzee herpesvirus strain 105640
+G1	2509476	Cegacovirus	Cegacovirus	d__Viruses|o__ Nidovirales|f__ Coronaviridae|g__Gammacoronavirus
+S	1667230	Caucasus prunus virus	Caucasus prunus	d__Viruses|o__ Riboviria|f__Tymovirales|g__Trivirinae|s__Caucasus prunus virus 
+F1	2169531	Cvivirinae	Cvivirinae	d__Viruses|o__Caudovirales|f__Ackermannviridae
 F1	2169530	Aglimvirinae	Aglimvirinae	d__Viruses|o__Caudovirales|f__Ackermannviridae
 S1	926589	Escherichia phage PhaxI	Escherichia phage PhaxI	d__Viruses|o__Caudovirales|f__Ackermannviridae|g__Kuttervirus|s__Escherichia virus PhaxI
+F1	2560071	Brockvirinae	Brockvirinae	d__Viruses|o__Caudovirales|f__Herelleviridae
 F1	2560070	Bastillevirinae	Bastillevirinae	d__Viruses|o__Caudovirales|f__Herelleviridae
 F2	2572874	unclassified Bastillevirinae	Bastillevirinae	d__Viruses|o__Caudovirales|f__Herelleviridae
 S1	1204533	Bacillus phage phiAGATE	Bacillus phage phiAGATE	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Agatevirus|s__Bacillus phage phiAGATE
@@ -437,6 +378,7 @@ S1	1486658	Bacillus phage Evoli	Bacillus phage Evoli	d__Viruses|o__Caudovirales|
 S1	1486660	Bacillus phage Hoody T	Bacillus phage Hoody T	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Bastillevirus|s__Bacillus virus HoodyT
 S1	1141133	Bacillus phage B4	Bacillus phage B4	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Bequatrovirus|s__Bacillus virus B4
 S1	1406781	Bacillus phage BigBertha	Bacillus phage BigBertha	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Bequatrovirus|s__Bacillus virus Bigbertha
+S1	1195072	Bacillus phage vB_BceM_Bc431v3	Bacillus phage vB_BceM_Bc431v3	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Caeruleovirus|s__Bacillus phage vB_BceM_Bc431v3
 S1	584892	Bacillus phage Bcp1	Bacillus phage Bcp1	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Caeruleovirus|s__Bacillus virus Bcp1
 S1	1792245	Bacillus phage Deep Blue	Bacillus phage Deep Blue	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Caeruleovirus|s__Bacillus virus Deepblue
 S1	1406785	Bacillus phage Grass	Bacillus phage Grass	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Nitunavirus|s__Bacillus virus Grass
@@ -446,12 +388,16 @@ S1	1126950	Bacillus phage BCP78	Bacillus phage BCP78	d__Viruses|o__Caudovirales|
 S1	1690456	Bacillus phage TsarBomba	Bacillus phage TsarBomba	d__Viruses|o__Caudovirales|f__Herelleviridae|g__Tsarbombavirus|s__Bacillus virus TsarBomba
 S1	1540091	Bacillus phage Moonbeam	Bacillus phage Moonbeam	d__Viruses|o__Caudovirales|f__Herelleviridae|s__Bacillus virus Moonbeam
 S1	1285382	Bacillus phage SIOphi	Bacillus phage SIOphi	d__Viruses|o__Caudovirales|f__Herelleviridae|s__Bacillus virus SIOphi
+S1	857312	Brochothrix phage A9	Brochothrix phage A9	d__Viruses|o__Caudovirales|f__Herelleviridae|s__Brochothrix phage A9
 S1	1429768	Erwinia phage Ea35-70	Erwinia phage Ea35-70	d__Viruses|o__Caudovirales|f__Myoviridae|g__Agricanvirus|s__Erwinia virus Ea35-70
 S1	2070057	Vibrio phage Aphrodite1	Vibrio phage Aphrodite1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Aphroditevirus|s__Vibrio virus Aphrodite1
 S1	2010329	Acidovorax phage ACP17	Acidovorax phage ACP17	d__Viruses|o__Caudovirales|f__Myoviridae|g__Busanvirus|s__Acidovorax virus ACP17
+S1	1162295	Cronobacter phage CR3	Cronobacter phage CR3	d__Viruses|o__Caudovirales|f__Myoviridae|g__Certrevirus|s__Cronobacter virus CR3
+S1	1162290	Cronobacter phage CR9	Cronobacter phage CR9	d__Viruses|o__Caudovirales|f__Myoviridae|g__Certrevirus|s__Cronobacter virus CR9
 S1	1815630	Pseudomonas phage pf16	Pseudomonas phage pf16	d__Viruses|o__Caudovirales|f__Myoviridae|g__Chakrabartyvirus|s__Pseudomonas virus pf16
 S1	1837930	Escherichia phage MX01	Escherichia phage MX01	d__Viruses|o__Caudovirales|f__Myoviridae|g__Dhakavirus|s__Escherichia virus MX01
 S1	1029988	Erwinia phage phiEaH2	Erwinia phage phiEaH2	d__Viruses|o__Caudovirales|f__Myoviridae|g__Erskinevirus|s__Erwinia virus EaH2
+S1	1229752	Campylobacter phage CP30A	Campylobacter phage CP30A	d__Viruses|o__Caudovirales|f__Myoviridae|g__Fletchervirus|s__Campylobacter phage CP30A 
 S1	1567027	Escherichia phage vB_EcoM_VR20	Escherichia phage vB_EcoM_VR20	d__Viruses|o__Caudovirales|f__Myoviridae|g__Gaprivervirus|s__Escherichia virus VR20
 S1	1567029	Escherichia phage vB_EcoM_VR26	Escherichia phage vB_EcoM_VR26	d__Viruses|o__Caudovirales|f__Myoviridae|g__Gaprivervirus|s__Escherichia virus VR26
 S1	1401669	Erwinia phage PhiEaH1	Erwinia phage PhiEaH1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Iapetusvirus|s__Erwinia virus EaH1
@@ -460,10 +406,14 @@ S1	50948	Escherichia phage RB49	Escherichia phage RB49	d__Viruses|o__Caudovirale
 S1	1701798	Arthrobacter phage Brent	Arthrobacter phage Brent	d__Viruses|o__Caudovirales|f__Myoviridae|g__Marthavirus|s__Arthrobacter virus Brent
 S1	1772315	Arthrobacter phage Sonny	Arthrobacter phage Sonny	d__Viruses|o__Caudovirales|f__Myoviridae|g__Marthavirus|s__Arthrobacter virus Sonny
 S1	1837876	Acinetobacter phage vB_AbaM_ME3	Acinetobacter phage vB_AbaM_ME3	d__Viruses|o__Caudovirales|f__Myoviridae|g__Metrivirus|s__Acinetobacter phage vB_AbaM_ME3 
+S1	2267236	Citrobacter phage CF1 ERZ-2017	Citrobacter phage CF1 ERZ-2017	d__Viruses|o__Caudovirales|f__Myoviridae|g__Moonvirus|s__Citrobacter phage CF1 ERZ-2017
+S1	1540095	Citrobacter phage Moon	Citrobacter phage Moon	d__Viruses|o__Caudovirales|f__Myoviridae|g__Moonvirus|s__Citrobacter phage Moon
 S1	2006684	Pseudomonas phage Noxifer	Pseudomonas phage Noxifer	d__Viruses|o__Caudovirales|f__Myoviridae|g__Noxifervirus|s__Pseudomonas virus Noxifer
 S1	1458843	Pseudomonas phage phiPsa374	Pseudomonas phage phiPsa374	d__Viruses|o__Caudovirales|f__Myoviridae|g__Otagovirus|s__Pseudomonas virus Psa374
 S1	538398	Pseudomonas phage PB1	Pseudomonas phage PB1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Pbunavirus|s__Pseudomonas virus PB1
+S1	2024264	Agrobacterium phage Atu_ph07	Agrobacterium phage Atu_ph07	d__Viruses|o__Caudovirales|f__Myoviridae|g__Polybotosvirus|s__Agrobacterium phage Atu_ph07
 S1	1772328	Arthrobacter phage PrincessTrina	Arthrobacter phage PrincessTrina	d__Viruses|o__Caudovirales|f__Myoviridae|g__Radnorvirus|s__Arthrobacter phage PrincessTrina
+S1	1566993	Arthrobacter phage vB_ArtM-ArV1	Arthrobacter phage vB_ArtM-ArV1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Radnorvirus|s__Arthrobacter phage vB_ArtM-ArV1
 S1	75320	Vibrio phage KVP40	Vibrio phage KVP40	d__Viruses|o__Caudovirales|f__Myoviridae|g__Schizotequatrovirus|s__Vibrio virus KVP40
 S1	115992	Vibrio phage nt-1	Vibrio phage nt-1	d__Viruses|o__Caudovirales|f__Myoviridae|g__Schizotequatrovirus|s__Vibrio virus nt1
 S1	1391428	Escherichia phage 4MG	Escherichia phage 4MG	d__Viruses|o__Caudovirales|f__Myoviridae|g__Seunavirus|s__Escherichia virus 4MG
@@ -473,6 +423,8 @@ S1	1938577	Vibrio phage pTD1	Vibrio phage pTD1	d__Viruses|o__Caudovirales|f__Myo
 S1	1262540	Vibrio phage VP4B	Vibrio phage VP4B	d__Viruses|o__Caudovirales|f__Myoviridae|g__Tidunavirus|s__Vibrio virus VP4B
 S1	1198013	Aeromonas phage Aes508	Aeromonas phage Aes508	d__Viruses|o__Caudovirales|f__Myoviridae|g__Tulanevirus|s__Aeromonas phage Aes508
 S1	1131317	Escherichia phage FV3	Escherichia phage FV3	d__Viruses|o__Caudovirales|f__Myoviridae|g__Vequintavirus|s__Escherichia virus FV3
+F1	542835	Autographivirinae	Autographivirinae	d__Viruses|o__Caudovirales|f__Podoviridae
+F2	1132574	unclassified Autographivirinae	Autographivirinae	d__Viruses|o__Caudovirales|f__Podoviridae
 S1	1927013	Aquamicrobium phage P14	Aquamicrobium phage P14	d__Viruses|o__Caudovirales|f__Podoviridae|g__Aqualcavirus|s__Aquamicrobium phage P14
 S1	1873949	Pseudomonas phage Andromeda	Pseudomonas phage Andromeda	d__Viruses|o__Caudovirales|f__Podoviridae|g__Bifseptvirus|s__Pseudomonas virus Andromeda
 S1	1258572	Escherichia phage EC1-UPM	Escherichia phage EC1-UPM	d__Viruses|o__Caudovirales|f__Podoviridae|g__Gamaleyavirus|s__Escherichia virus EC1UPM
@@ -480,12 +432,15 @@ S1	1429767	Erwinia phage Ea9-2	Erwinia phage Ea9-2	d__Viruses|o__Caudovirales|f_
 S1	1852641	Erwinia phage vB_EamP_Frozen	Erwinia phage vB_EamP_Frozen	d__Viruses|o__Caudovirales|f__Podoviridae|g__Johnsonvirus|s__Erwinia virus Frozen
 S1	1416009	Achromobacter phage JWAlpha	Achromobacter phage JWAlpha	d__Viruses|o__Caudovirales|f__Podoviridae|g__Jwalphavirus|s__Achromobacter virus JWAlpha
 S1	1752027	Pseudomonas phage phiR18	Pseudomonas phage phiR18	d__Viruses|o__Caudovirales|f__Podoviridae|g__Kochitakasuvirus|s__Pseudomonas virus R18
+S1	1328029	Cellulophaga phage phi4:1	Cellulophaga phage phi4:1	d__Viruses|o__Caudovirales|f__Podoviridae|g__Lightbulbvirus|s__Cellulophaga phage phi4:1 
 S1	386793	Pseudomonas phage LKA1	Pseudomonas phage LKA1	d__Viruses|o__Caudovirales|f__Podoviridae|g__Phikmvvirus|s__Pseudomonas virus LKA1
 S1	2048978	Pseudomonas phage tabernarius	Pseudomonas phage tabernarius	d__Viruses|o__Caudovirales|f__Podoviridae|g__Tabernariusvirus|s__Pseudomonas virus tabernarius
 S1	1235661	Pseudomonas phage UFV-P2	Pseudomonas phage UFV-P2	d__Viruses|o__Caudovirales|f__Podoviridae|g__Vicosavirus|s__Pseudomonas virus UFVP2
+F2	1978007	crAss-like viruses	crAss-like viruses	d__Viruses|o__Caudovirales|f__Podoviridae|s__crAss-like viruses 
 F1	1982875	Arquatrovirinae	Arquatrovirinae	d__Viruses|o__Caudovirales|f__Siphoviridae
 F1	1982876	Bclasvirinae	Bclasvirinae	d__Viruses|o__Caudovirales|f__Siphoviridae
 S1	1647306	Mycobacterium phage Baee	Mycobacterium phage Baee	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Acadianvirus|s__Mycobacterium virus Baee
+S1	2015839	Arthrobacter phage Molivia	Arthrobacter phage Molivia	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Amigovirus|s__Arthrobacter phage Molivia
 S1	1887641	Gordonia phage Bantam	Gordonia phage Bantam	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Bantamvirus|s__Gordonia virus Bantam
 S1	543153	Mycobacterium phage Predator	Mycobacterium phage Predator	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Barnyardvirus|s__Mycobacterium virus Predator
 S1	1821549	Gordonia phage BaxterFox	Gordonia phage BaxterFox	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Baxtervirus|s__Gordonia virus BaxterFox
@@ -493,7 +448,10 @@ S1	1821565	Gordonia phage Yeezy	Gordonia phage Yeezy	d__Viruses|o__Caudovirales|
 S1	1486424	Mycobacterium phage Bernal13	Mycobacterium phage Bernal13	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Bernalvirus|s__Mycobacterium virus Bernal13
 S1	2079427	Streptomyces phage Bing	Streptomyces phage Bing	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Bingvirus|s__Streptomyces virus Bing
 S1	1838063	Gordonia phage Bowser	Gordonia phage Bowser	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Bowservirus|s__Gordonia virus Bowser
+S1	2047871	Corynebacterium phage Zion	Corynebacterium phage Zion	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Ceetrepovirus|s__Corynebacterium virus Zion
 S1	1150989	Vibrio phage pVp-1	Vibrio phage pVp-1	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Cetovirus|s__Vibrio virus pVp1
+S1	384848	Corynebacterium phage P1201	Corynebacterium phage P1201	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Chunghsingvirus|s__Corynebacterium virus P1201
+S1	686439	Clavibacter phage CMP1	Clavibacter phage CMP1	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Cimpunavirus|s__Clavibacter virus CMP1
 S1	1698252	Mycobacterium phage BrownCNA	Mycobacterium phage BrownCNA	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Coopervirus|s__Mycobacterium virus BrownCNA
 S1	1034130	Mycobacterium phage ChrisnMich	Mycobacterium phage ChrisnMich	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Coopervirus|s__Mycobacterium virus Chrisnmich
 S1	1429905	Mycobacterium phage JAMaL	Mycobacterium phage JAMaL	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Coopervirus|s__Mycobacterium virus JAMaL
@@ -524,6 +482,7 @@ S1	1305710	Mycobacterium phage FF47	Mycobacterium phage FF47	d__Viruses|o__Caudo
 S1	1229755	Vibrio phage vB_VpaS_MAR10	Vibrio phage vB_VpaS_MAR10	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Mardecavirus|s__Vibrio virus MAR10
 S1	1772295	Arthrobacter phage Circum	Arthrobacter phage Circum	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Mudcatvirus|s__Arthrobacter virus Circum
 S1	1796997	Arthrobacter phage Mudcat	Arthrobacter phage Mudcat	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Mudcatvirus|s__Arthrobacter virus Mudcat
+S1	1965368	Dinoroseobacter phage vB_DshS-R5C	Dinoroseobacter phage vB_DshS-R5C	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Nanhaivirus|s__Dinoroseobacter phage vB_DshS-R5C
 S1	1844477	Pseudomonas phage NP1	Pseudomonas phage NP1	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Nipunavirus|s__Pseudomonas virus NP1
 S1	1175654	Pseudomonas phage PaMx25	Pseudomonas phage PaMx25	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Nipunavirus|s__Pseudomonas virus PaMx25
 S1	1887656	Gordonia phage Zirinka	Gordonia phage Zirinka	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Nymphadoravirus|s__Gordonia virus Zirinka
@@ -572,28 +531,68 @@ S1	1821554	Gordonia phage Hotorobo	Gordonia phage Hotorobo	d__Viruses|o__Caudovi
 S1	1821566	Gordonia phage Yvonnetastic	Gordonia phage Yvonnetastic	d__Viruses|o__Caudovirales|f__Siphoviridae|g__Yvonnevirus|s__Gordonia virus Yvonnetastic
 S1	1664247	Achromobacter phage phiAxp-3	Achromobacter phage phiAxp-3	d__Viruses|o__Caudovirales|f__Siphoviridae|s__Achromobacter phage phiAxp-2
 S	491893	Abalone shriveling syndrome-associated virus	Abalone shriveling	d__Viruses|o__Caudovirales|s__Abalone shriveling syndrome-associated virus
+S	317858	Cyprinid herpesvirus 1	Cyprinid herpesvirus	d__Viruses|o__Herpesvirale|f__ Alloherpesviridae|g__Cyprinivirus|s__Cyprinid herpesvirus 1
+S	180230	Cyprinid herpesvirus 3	Cyprinid herpesvirus	d__Viruses|o__Herpesvirale|f__ Alloherpesviridae|g__Cyprinivirus|s__Cyprinid herpesvirus 3
+S	33706	Caviid betaherpesvirus 2	Caviid betaherpesvirus	d__Viruses|o__Herpesvirale|f__ Herpesviridae|g__|s__
 S	150286	Anguillid herpesvirus 1	Anguillid herpesvirus	d__Viruses|o__Herpesvirales|f__Alloherpesviridae|g__Cyprinivirus|s__Anguillid herpesvirus 1
 S	320884	Acipenserid herpesvirus 2	Acipenserid herpesvirus	d__Viruses|o__Herpesvirales|f__Alloherpesviridae|g__Ictalurivirus|s__Acipenserid herpesvirus 2
+S	106331	Callitrichine gammaherpesvirus 3	Callitrichine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Gammaherpesvirinae|g__Lymphocryptovirus|s__Callitrichine gammaherpesvirus 3
 F1	10293	Alphaherpesvirinae	Alphaherpesvirinae	d__Viruses|o__Herpesvirales|f__Herpesviridae
 F1	10357	Betaherpesvirinae	Betaherpesvirinae	d__Viruses|o__Herpesvirales|f__Herpesviridae
+S	50290	Aotine betaherpesvirus 1	Aotine betaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Cytomegalovirus|s__Aotine betaherpesvirus 1
 S	138184	Alcelaphine gammaherpesvirus 2	Alcelaphine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Macavirus|s__Alcelaphine gammaherpesvirus 2
 S	35252	Alcelaphine gammaherpesvirus 1	Alcelaphine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Macavirus|s__Alcelaphine gammaherpesvirus 2
-S	50290	Aotine betaherpesvirus 1	Aotine betaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Cytomegalovirus|s__Aotine betaherpesvirus 1
+S	93386	Columbid alphaherpesvirus 1	Columbid alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Mardivirus|s__Columbid alphaherpesvirus 1
 S	85618	Ateline gammaherpesvirus 3	Ateline gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Rhadinovirus|s__Ateline gammaherpesvirus 3
+S	10385	Bovine gammaherpesvirus 4	Bovine gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Rhadinovirus|s__Bovine gammaherpesvirus 4
+S	2022783	Common bottlenose dolphin gammaherpesvirus 1 strain Sarasota	Common bottlenose	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Rhadinovirus|s__Common bottlenose dolphin gammaherpesvirus 1 strain Sarasota
+S	1605972	Cricetid gammaherpesvirus 2	Cricetid gammaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Rhadinovirus|s__Cricetid gammaherpesvirus 2 
+S	10317	Cercopithecine alphaherpesvirus 2	Cercopithecine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Simplexvirus|s__Cercopithecine alphaherpesvirus 2
+S	10320	Bovine alphaherpesvirus 1	Bovine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Bovine alphaherpesvirus 1
+S	35244	Bovine alphaherpesvirus 5	Bovine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Bovine alphaherpesvirus 5
+S	170325	Canid alphaherpesvirus 1	Canid alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Canid alphaherpesvirus
+S	35246	Cercopithecine alphaherpesvirus 9	Cercopithecine alphaherpesvirus	d__Viruses|o__Herpesvirales|f__Herpesviridae|g__Varicellovirus|s__Cercopithecine alphaherpesvirus 9
+S1	1241371	Abalone herpesvirus Victoria/AUS/2009	Abalone herpesvirus	d__Viruses|o__Herpesvirales|f__Malacoherpesviridae|g__Aurivirus|s__Abalone herpesvirus Victoria/AUS/2009 
+S	2282206	Bufonid herpesvirus 1	Bufonid herpesvirus	d__Viruses|o__Herpesvirales|s__Bufonid herpesvirus 1
+O1	2499399	Cornidovirineae	Cornidovirineae	d__Viruses|o__Nidovirales
+F1	693995	Coronavirinae	Coronavirinae	d__Viruses|o__Nidovirales|f__Coronaviridae
+F2	2664420	unclassified Coronavirinae	Coronavirinae	d__Viruses|o__Nidovirales|f__Coronaviridae
+F2	233263	unclassified coronaviruses	coronaviruses	d__Viruses|o__Nidovirales|f__Coronaviridae
+S1	1503289	BtMr-AlphaCoV/SAX2011	BtMr-AlphaCoV/SAX2011	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Alphacoronavirus|s__BtMr-AlphaCoV/SAX2011
 S	2501961	Bat Hp-betacoronavirus Zhejiang2013	Bat Hp-betacoronavirus	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Betacoronavirus|s__Bat Hp-betacoronavirus Zhejiang2013
 S1	1541205	Bat Hp-betacoronavirus/Zhejiang2013	Bat Hp-betacoronavirus/Zhejiang2013	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Betacoronavirus|s__Bat Hp-betacoronavirus Zhejiang2013
 S1	1385427	Betacoronavirus Erinaceus/VMC/DEU/2012	Betacoronavirus Erinaceus/VMC/DEU/2012	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Betacoronavirus|s__Betacoronavirus Erinaceus/VMC/DEU/2012
 S	694015	Beluga whale coronavirus SW1	Beluga whale	d__Viruses|o__Nidovirales|f__Coronaviridae|g__Gammacoronavirus|s__Beluga whale coronavirus SW1
+S1	1041929	Cavally virus	Cavally virus	d__Viruses|o__Nidovirales|f__Mesoniviridae|g__Alphamesonivirus|s__Cavally virus 
+G1	2508225	Dumedivirus	Dumedivirus	d__Viruses|o__Nidovirales|f__Mononiviridae|g__Alphamononivirus
 S	69577	Banana streak virus	Banana streak	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Banana streak virus 
 S1	334778	Banana streak virus Acuminata Yunnan	Banana streak virus Acuminata	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Banana streak virus Acuminata Yunnan
+S	1490026	Blackberry Virus F	Blackberry Virus	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Blackberry Virus F
+S	1960254	Cacao swollen shoot Togo A virus	Cacao swollen	d__Viruses|o__Ortervirales|f__Caulimoviridae|g__Badnavirus|s__Cacao swollen shoot Togo A virus
 F2	206036	Avian retroviruses	Avian retroviruses	d__Viruses|o__Ortervirales|f__Retroviridae
 S	338079	African green monkey simian foamy virus	African green	d__Viruses|o__Ortervirales|f__Retroviridae|g__|s__Spumavirus
+S	2170139	Brown greater galago prosimian foamy virus	Brown greater	d__Viruses|o__Ortervirales|f__Retroviridae|g__Prosimiispumavirus|s__Brown greater galago prosimian foamy virus
 S	93465	Avian endogenous retrovirus EAV-HP	Avian endogenous	d__Viruses|o__Ortervirales|f__Retroviridae|s__Avian endogenous retrovirus EAV-HP
+S	497136	Chaetoceros tenuissimus RNA virus 01	Chaetoceros tenuissimus	d__Viruses|o__Picornavirales|f__Marnaviridae|g__Bacillarnavirus|s__Chaetoceros tenuissimus RNA virus 01
 S1	1223302	Bluegill picornavirus	Bluegill picornavirus	d__Viruses|o__Picornavirales|f__Picornaviridae|g__Limnipivirus|s__Bluegill picornavirus
+F1	675075	Comovirinae	Comovirinae	d__Viruses|o__Picornavirales|f__Secoviridae
+S	128790	Bean rugose mosaic virus	Bean rugose	d__Viruses|o__Picornavirales|f__Secoviridae|g__Comovirus|s__Bean rugose mosaic virus
+S	67761	Cowpea mild mottle virus	Cowpea mild	d__Viruses|o__Tymovirales|f__Betaflexiviridae|g__Carlavirus|s__Cowpea mild mottle virus
+S	131226	Cherry mottle leaf virus	Cherry mottle	d__Viruses|o__Tymovirales|f__Betaflexiviridae|g__Trichovirus|s__Cherry mottle leaf virus
+S1	1158189	Chaco virus	Chaco virus	d__Viruses|p__ Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Rhabdoviridae|g__Sripuvirus|s__Chaco sripuvirus
+S	1608044	Changping Tick Virus 2	Changping Tick	d__Viruses|s__Changping Tick Virus 2
+S	36344	Chelonus inanitus bracovirus	Chelonus inanitus	d__Viruses|f__Polydnaviridae|g__Bracovirus|s__Chelonus inanitus bracovirus 
+F1	2169597	Chebruvirinae	Chebruvirinae	d__Viruses|o__Caudovirales|f__Siphoviridae
 P1	2497570	Haploviricotina	Haploviricotina	d__Viruses|p__Negarnaviricota
 P1	2497571	Polyploviricotina	Polyploviricotina	d__Viruses|p__Negarnaviricota
-S1	1611877	Adana virus	Adana virus	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Phenuiviridae|g__Phlebovirus|s__Adana virus 
+S1	169173	Choclo virus	Choclo virus	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Hantaviridae|g__Orthohantavirus|s__Choclo virus
 S1	273355	Anhembi virus	Anhembi virus	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Anhembi virus
+S	2560365	Cachoeira Porteira orthobunyavirus	Cachoeira Porteira	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Cachoeira Porteira orthobunyavirus
+S1	1138490	Cachoeira Porteira virus	Cachoeira Porteira	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Cachoeira Porteira virus
+S1	1495866	Cat Que virus	Cat Que	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Cat Que virus
+S1	1678225	Catu virus	Catu virus	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Peribunyaviridae|g__Orthobunyavirus|s__Catu orthobunyavirus
+S1	1611877	Adana virus	Adana virus	d__Viruses|p__Negarnaviricota|c__Ellioviricetes|o__Bunyavirales|f__Phenuiviridae|g__Phlebovirus|s__Adana virus 
+S1	1715288	Canary bornavirus 1	Canary bornavirus	d__Viruses|p__Negarnaviricota|c__Mongiviricetes|o__Mononegavirales|f__Bornaviridae|g__Orthobornavirus|s__Canary bornavirus
 S1	1884917	Aquatic bird bornavirus 2	Aquatic bird	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Bornaviridae|g__Orthobornavirus|s__Aquatic bird bornavirus 2
 S1	1922653	Beihai rhabdo-like virus 3	Beihai rhabdo-like virus 3	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Nyamiviridae|g__Berhavirus|s__Beihai rhabdo-like virus 3
 S	875624	Avian avulavirus 10	Avian avulavirus	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Paramyxoviridae|g__Avulavirus|s__Avian avulavirus 10
@@ -605,6 +604,7 @@ S1	862945	Avian paramyxovirus penguin/Falkland Islands/324/2007	Avian paramyxovi
 S	2560259	Achimota pararubulavirus 1	Achimota pararubulavirus	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Paramyxoviridae|g__Pararubulavirus|s__Achimota pararubulavirus 1
 S	1972564	American bat vesiculovirus	American bat	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Rhabdoviridae|g__Vesiculovirus|s__American bat vesiculovirus
 S1	1344113	American bat vesiculovirus TFFN-2013	American bat	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Rhabdoviridae|g__Vesiculovirus|s__American bat vesiculovirus
+S1	1802951	Drosophila unispina virus 1	Drosophila unispina virus 1	d__Viruses|p__Negarnaviricota|c__Monjiviricetes|o__Mononegavirales|f__Xinmoviridae|g__Anphevirus|s__Drosophila unispina virus 1
 S1	1261100	Achimota virus 1	Achimota virus 1	d__Viruses|p__Riboviria|c__Monjiviricetes|o__Mononegavirales|f__Paramyxoviridae|g__Pararubulavirus|s__Achimota virus 1 
 S	1100043	Apis mellifera filamentous virus	Apis mellifera	d__Viruses|s__Apis mellifera filamentous virus
 S	1746057	Beihai barnacle viurs 1	Beihai barnacle	d__Viruses|s__Beihai barnacle viurs 1

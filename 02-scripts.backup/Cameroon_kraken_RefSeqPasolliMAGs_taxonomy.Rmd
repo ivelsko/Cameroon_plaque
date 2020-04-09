@@ -13,6 +13,8 @@ output:
 library(knitr)
 library(data.table)
 library(janitor)
+library(taxize)
+library(myTAI)
 library(plyr)
 library(tidyverse)
 library(gplots)
@@ -143,11 +145,11 @@ rsmp_mpa_reports_species <- rsmp_mpa_reports %>%
 
 
 ```{r load_data_table}
-# this takes several minutes, they're large files
-rso_reports <- fread("./00-documentation.backup/kraken_standard_rso_reports.tsv")
+# this takes several minutes, they're large files (~500MB)
+rso_reports <- fread("./00-documentation.backup/over100MB/kraken_standard_rso_reports.tsv")
 rso_reports$SampleID <- gsub(".kraken","", rso_reports$SampleID)
 
-rsmp_reports <- fread("./00-documentation.backup/kraken_standard_rsmp_reports.tsv")
+rsmp_reports <- fread("./00-documentation.backup/over100MB/kraken_standard_rsmp_reports.tsv")
 rsmp_reports$SampleID <- gsub(".kraken","", rsmp_reports$SampleID)
 
 rso_reports <- rso_reports %>% as_tibble() %>%
@@ -160,6 +162,38 @@ rsmp_reports <- rsmp_reports %>% as_tibble() %>%
   separate(col = "Run", into =c("Run","Database"), sep = "\\.")
 
 ```
+
+```{r taxid_list}
+
+taxidlist <- rso_reports %>%
+  bind_rows(rsmp_reports) %>%
+  select(NCBItaxID) %>%
+  unique() %>%
+  pull()
+
+
+```
+
+```{r get_taxids}
+
+taxon_summary <- ncbi_get_taxon_summary(id = taxidlist, key = "fc17e8c944d5eb3217cce3d5e7e41af83708")
+
+df_list <- list()
+for (i in 1:nrow(taxon_summary)){
+tax  <- taxonomy(organism = taxon_summary[i,]$name, db = "ncbi",output = "classification")
+df <- data.frame(lapply(tax$name, function(x) data.frame(x)))
+colnames(df) <- tax$rank
+df_list[[i]] <- df
+Sys.sleep(0.5)
+}
+
+combined_df <- do.call(rbind.fill, df_list)
+
+combined_df <- combined_df %>%
+  select(superkingdom, phylum, class, order, family, genus, species)
+
+```
+
 
 ```{r species_differences_mpa, eval = F}
 

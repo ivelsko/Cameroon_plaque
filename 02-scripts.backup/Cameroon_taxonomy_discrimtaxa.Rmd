@@ -579,7 +579,7 @@ malt_species_decontam_filtered_noblanks.plsda$loadings$X %>%
 ```{r fa_species_decontam_noblanks}
 # fa.parallel(malt_species.decontam_filtered_noblanks, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 6, rotate = "varimax", fm = "minres") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+malt_species.decontam_filtered_noblanks.fa <- fa(malt_species.decontam_filtered_noblanks_clr, nfactors = 6, rotate = "oblimin", fm = "ols") # rotate = "varimax" "Varimax" "oblimin" # fm = "ols" "minres"
 # if using fm = "ols", the column titles will be 1, 2, etc and not M1, M2, etc as you get from using fm = "minres"
 
 print(malt_species.decontam_filtered_noblanks.fa)
@@ -600,9 +600,10 @@ malt_species.decontam_filtered_noblanks.fa$values %>%
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(malt_species.decontam_filtered_noblanks.fa))
+colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
 graphinfo <- graphinfo %>%
   rownames_to_column("Species") %>%
-  as_tibble(.)
+  as_tibble(.) 
 
 # now make loadings into a table and designate each species in the residual with the highest absolute value
 malt_species.decontam_filtered_noblanks.fa.df <- as.data.frame.matrix(malt_species.decontam_filtered_noblanks.fa$loadings)
@@ -685,7 +686,7 @@ ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
 
 Now without Yanomami samples
 ```{r fa_species_decontam_noblanks_noyanomami}
-malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 7, rotate = "varimax", fm = "minres") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+malt_species.decontam_filtered_noblanks_noyanomami.fa <- fa(malt_species.decontam_filtered_noblanks_noyanomami_clr, nfactors = 7, rotate = "oblimin", fm = "ols") # rotate = "varimax" "Varimax" "oblimin" # fm = "ols" "minres"
 print(malt_species.decontam_filtered_noblanks_noyanomami.fa)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_noblanks_noyanomami.fa,sort=TRUE)
@@ -704,6 +705,7 @@ malt_species.decontam_filtered_noblanks_noyanomami.fa$values %>%
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(malt_species.decontam_filtered_noblanks_noyanomami.fa))
+colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5","MR6","MR7")
 graphinfo <- graphinfo %>%
   rownames_to_column("Species") %>%
   as_tibble(.)
@@ -1003,7 +1005,7 @@ Now only CMC samples
 ```{r fa_species_decontam_cmc}
 # fa.parallel(malt_species.decontam_filtered_cmc, fm = "minres", n.iter = 19)
 
-malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 6, rotate = "varimax", fm = "minres") # rotate = "oblimin" "Varimax" # fm = "ols" "minres"
+malt_species.decontam_filtered_cmc.fa <- fa(malt_species.decontam_filtered_cmc_clr, nfactors = 6, rotate = "oblimin", fm = "ols") # rotate = "varimax" "oblimin" "Varimax" # fm = "ols" "minres"
 print(malt_species.decontam_filtered_cmc.fa)
 # print(malt_species.decontam_filtered_cmc.fa$loadings,cutoff = 0.7)
 # print(malt_species.decontam_filtered_cmc.fa,sort=TRUE)
@@ -1022,6 +1024,7 @@ malt_species.decontam_filtered_cmc.fa$values %>%
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(malt_species.decontam_filtered_cmc.fa))
+colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
 graphinfo <- graphinfo %>%
   rownames_to_column("Species") %>%
   as_tibble(.)
