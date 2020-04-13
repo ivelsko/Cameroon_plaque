@@ -1,0 +1,87 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque metadata and colors"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(tidyverse)
+
+```
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+This creates an RData object that has the cleaned up taxonomy tables for species
+and genus, where the species/genera that were identified as contaminants with
+decontam in `Cameroon_taxonomy_decontam.Rmd` are removed. All the column headers
+are cleaned up. 
+
+Read in the full species and genus tables.
+```{r load_data}
+malt_species_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_species_bacteria_archaea.txt")
+malt_genus_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_genus_bacteria_archaea.txt")
+
+# clean the file names
+malt_species_raw <- rename(malt_species_raw, Species = `#Datasets`)
+colnames(malt_species_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub(".fastq.truncated","", colnames(malt_species_raw))
+
+
+# remove human and unassigned reads
+malt_species_raw <- malt_species_raw %>% filter(!str_detect(Species, "Homo sapiens"))
+malt_species_raw <- malt_species_raw %>% filter(!str_detect(Species, "Not assigned"))
+# get rid of the extra column
+malt_species_raw <- malt_species_raw %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+
+malt_genus_raw <- rename(malt_genus_raw, Species = `#Datasets`)
+colnames(malt_genus_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub(".fastq.truncated","", colnames(malt_genus_raw))
+
+# remove human and unassigned reads
+malt_genus_raw <- malt_genus_raw %>% filter(!str_detect(Species, "Homo"))
+malt_genus_raw <- malt_genus_raw %>% filter(!str_detect(Species, "Not assigned"))
+# get rid of the extra column at the begining
+malt_genus_raw <- malt_genus_raw %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+
+```
+
+Read in the contaminant list from `Cameroon_taxonomy_decontam.Rmd` and remove them from the taxonomy table. 
+```{r contaminants}
+
+contaminants_species <- fread("05-results.backup/malt_contaminants_species.tsv", header = T, sep = "\t")
+contaminants_genus <- fread("05-results.backup/malt_contaminants_genus.tsv")
+
+malt_species.decontam <- malt_species_raw %>%
+  anti_join(., contaminants_species)
+
+malt_genus.decontam <- malt_genus_raw %>%
+  anti_join(., contaminants_genus)
+
+```
+
+
+```{r save_data}
+save(malt_species_raw,
+     malt_genus_raw,
+     malt_species.decontam,
+     malt_genus.decontam,
+     file = "./05-results.backup/CMC_taxonomy_tables.RData")
+
+```

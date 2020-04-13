@@ -38,187 +38,15 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 # MALT read stats
 The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19), with the following database: /projects1/malt/databases/indexed/index040/full-nt_2017-10. 
 ```{r load_data}
-## load the species and genus tables generated in MEGAN
-# malt_species <- fread("05-results.backup/CMC_MALT_nt_species_bacteria_archaea.txt")
-# malt_genus <- fread("05-results.backup/CMC_MALT_nt_genus_bacteria_archaea.txt")
 
-# malt_species <- fread("05-results.backup/CMC_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("05-results.backup/CMC_MALT_RSC_genus_bacteria_archaea.txt")
-
-# malt_species <- fread("05-results.backup/CMC_someHMP_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("05-results.backup/CMC_someHMP_MALT_RSC_genus_bacteria_archaea.txt")
-
-# malt_species <- fread("./05-results.backup/CMC_HMP_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("./05-results.backup/CMC_HMP_MALT_RSC_genus_bacteria_archaea.txt")
-
-# malt_species <- fread("./05-results.backup/CMC_HMP_JAE_MALT_RSC_species_bacteria_archaea.txt")
-# malt_genus <- fread("./05-results.backup/CMC_HMP_JAE_MALT_RSC_genus_bacteria_archaea.txt")
-
-malt_species <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_species_bacteria_archaea.txt")
-malt_genus <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_genus_bacteria_archaea.txt")
-
-# clean the file names
-malt_species <- rename(malt_species, Species = `#Datasets`)
-colnames(malt_species) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
-colnames(malt_species) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
-colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_species))
-colnames(malt_species) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_species))
-colnames(malt_species) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species))
-colnames(malt_species) <- gsub(".fastq.truncated","", colnames(malt_species))
-
-
-# remove human and unassigned reads
-malt_species <- malt_species %>% filter(!str_detect(Species, "Homo sapiens"))
-malt_species <- malt_species %>% filter(!str_detect(Species, "Not assigned"))
-# get rid of the extra column
-malt_species <- malt_species %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
-
-malt_genus <- rename(malt_genus, Species = `#Datasets`)
-colnames(malt_genus) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
-colnames(malt_genus) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
-colnames(malt_genus) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_genus))
-colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_genus))
-colnames(malt_genus) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus))
-colnames(malt_genus) <- gsub(".fastq.truncated","", colnames(malt_genus))
-
-# remove human and unassigned reads
-malt_genus <- malt_genus %>% filter(!str_detect(Species, "Homo"))
-malt_genus <- malt_genus %>% filter(!str_detect(Species, "Not assigned"))
-# get rid of the extra column at the begining
-malt_genus <- malt_genus %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
 
 # load the metadata file
-metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-metadata <- metadata %>%
-  rename(SampleID = `#SampleID`)  %>%
-  as_tibble() %>%
-  mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial")) %>%
-  mutate(Description = fct_relevel(Description, "HunterGatherer", "Yanomami", "HMP_supPlaque", "HMP_subPlaque",
-                                   "HMP10M_supPlaque", "HMP10M_subPlaque","JAE","JAE10M",
-                                   "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Yanomami","HMP","HMP10M","JAE","JAE10M",
-                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
-                                     "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
-                                      "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female", "ExtractionGauze","ExtractionBlank","LibraryBlank","Unknown"),
-         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
-         Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
-         Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
-                               "ExtractionGauze","ExtractionBlank","LibraryBlank"),
-         Industry = fct_relevel(Industry, "Non-industrial","Industrial"))
-
-fullSRR <- metadata %>%
-  select(SampleID) %>%
-  filter(str_detect(SampleID, "SRR")) %>%
-  filter(!str_detect(SampleID, "10M")) %>%
-  pull
-```
-
-```{r colors_shapes_passionfruit, eval = F}
-Village_colors <- c(`202` = "#C70E7B", `204` = "#60CB57", `205` = "#577EA1", `203` = "#E68561", `206` = "#172869",
-                     ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-village_shapes <- c(`202` = 15, `205` = 18, `204` = 17, `203` = 16, `206` = 25,
-                    ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-Ethnic_Group_colors <- c(Baka = "#C70E7B", Nzime = "#172869",
-                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17, 
-                         ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-Env_colors <- c(HunterGatherer = "#C70E7B", ExtractionGauze = "#881C00",
-                ExtractionBlank = "#A34D1A", LibraryBlank = "#CC986A")
-Env_shapes <- c(HunterGatherer = 19, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-market_economy_colors <- c(`Logging road` = "#C70E7B", `Forrest camp` = "#172869", Farming = "#60CB57",
-                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18,
-                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-age_group_colors <- c(`18-29` = "#C70E7B", `30-39` = "#E68561", `40-49` = "#60CB57", `50-59` = "#577EA1", `60+` = "#172869",
-                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25,
-                      ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-sex_colors <- c(Female = "#C70E7B", Male = "#172869", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-sex_shapes <- c(Female = 19, Male = 17, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-
-tooth_site_colors <- c(Anterior = "#C70E7B", Posterior = "#172869", 
-                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-tooth_site_shapes <- c(Anterior = 19, Posterior = 17, 
-                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+load("./05-results.backup/CMC_metadata.RData")
 
 ```
 
-```{r colors_shapes_peachpear}
-# lacroix_palette("PeachPear", n = 8, type = "continuous")
-# "#FF3200" "#EF8158" "#E9BD8E" "#CBDDA7" "#38BCAD" "#0B91B5" "#065FA3" "#172869"
-
-Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
-                    Yanomami = "#C70E7B", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
-                     ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Village_shapes <- c(`202` = 15, `203` = 16, `205` = 17,`204` = 18, `206` = 25, Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
-                    ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Village_size <- c(`202` = 4.5, `203` = 4, `205` = 4,`204` = 6, `206` = 4, Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
-                    ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", Yanomami = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9", 
-                         JAE10M = "#ffeda0", JAE = "#feb24c",ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
-                         ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Ethnic_Group_size <- c(Baka = 4, Nzime = 4,  Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
-                         ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
-                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#969696", HMP_subPlaque = "#969696", # HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
-                        HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
-                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 10, HMP_subPlaque = 13, HMP10M_supPlaque = 10, 
-                        HMP10M_subPlaque = 13, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_subPlaque = 4, HMP10M_supPlaque = 4, 
-                        HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#172869", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
-                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, Industrial = 15,
-                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
-                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869",
-                      `10-18` = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
-                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25, `10-18` = 14, HMP = 7, HMP10M = 9,
-                      ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
-                      ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Sex_colors <- c(Female = "#FF3200", Male = "#172869", Unknown = "#bdbdbd",
-                ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Sex_shapes <- c(Female = 19, Male = 17, Unknown = 16, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Sex_size <- c(Female = 4, Male = 4, Unknown = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
-                       ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  Buccal_mucosa = 14, HMP = 7, HMP10M = 9,
-                       ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Tooth_site_size <- c(Anterior = 4, Posterior = 4,  Buccal_mucosa = 4, HMP = 4, HMP10M = 4,
-                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
-                           ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
-Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
-                           ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
-Industry_size <- c(`Non-industrial` = 4, Industrial = 4,
-                           ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
-
-```
 
 ```{r pca_plotting_functions}
 # plotting PCA with colored dots
@@ -507,22 +335,22 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle) {
 Before running decontam, let's plot the samples in a PCA to see if there are any that are clearly not good-quality
 ```{r raw_plot}
 
-malt_species_raw <- malt_species %>%
+malt_species_raw_pcain <- malt_species_raw %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          spread(Species,Counts)
 
-rownames(malt_species_raw) <- malt_species_raw$SampleID
+rownames(malt_species_raw_pcain) <- malt_species_raw_pcain$SampleID
 
-malt_species_raw <- malt_species_raw %>% select(-SampleID)
+malt_species_raw_pcain <- malt_species_raw_pcain %>% select(-SampleID)
 
-malt_species_raw = malt_species_raw+1
+malt_species_raw_pcain = malt_species_raw_pcain+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
-tune.pca(malt_species_raw, logratio = 'CLR')
+tune.pca(malt_species_raw_pcain, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
-malt_species.pca <- mixOmics::pca(malt_species_raw, ncomp = 3, logratio = 'CLR')
+malt_species.pca <- mixOmics::pca(malt_species_raw_pcain, ncomp = 3, logratio = 'CLR')
 plot(malt_species.pca)
 
 
@@ -545,15 +373,15 @@ outliersF <- str_c(outliers, collapse = "|")
 Read in the contaminant list from `Cameroon_taxonomy_decontam.Rmd` and remove them from the taxonomy table. 
 ```{r contaminants}
 
-contaminants_species <- fread("05-results.backup/malt_contaminants_species.tsv", header = T, sep = "\t")
-contaminants_genus <- fread("05-results.backup/malt_contaminants_genus.tsv")
-
-malt_species.decontam <- malt_species %>%
-  anti_join(., contaminants_species)
-
-malt_genus.decontam <- malt_genus %>%
-  anti_join(., contaminants_genus)
-
+# contaminants_species <- fread("05-results.backup/malt_contaminants_species.tsv", header = T, sep = "\t")
+# contaminants_genus <- fread("05-results.backup/malt_contaminants_genus.tsv")
+# 
+# malt_species.decontam <- malt_species %>%
+#   anti_join(., contaminants_species)
+# 
+# malt_genus.decontam <- malt_genus %>%
+#   anti_join(., contaminants_genus)
+# 
 
 ```
 
@@ -564,7 +392,7 @@ by PCA to see how contaminants/low abundance species affect the relationships of
 samples to eachother between groups.
 ```{r pca_all_species}
 # unfiltered and not decontaminated
-malt_species_unfiltered <- malt_species %>%
+malt_species_unfiltered <- malt_species_raw %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
                                          # select(-contains("10M")) %>%
@@ -594,7 +422,7 @@ plot_pca_titles(malt_species_unfiltered, "PC3", "PC2", "Description", "Env", "En
 
 
 # filtered only
-malt_species_filtered <- malt_species %>%
+malt_species_filtered <- malt_species_raw %>%
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          select(-one_of(outliers)) %>%
                                          # select(-contains("10M")) %>%
@@ -679,7 +507,7 @@ the case for these mature plaque samples as well, but I suspect it would be.
 
 ```{r pca_all_genus}
 # unfiltered and not decontaminated
-malt_genus_unfiltered <- malt_genus %>%
+malt_genus_unfiltered <- malt_genus_raw %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          select(-one_of(outliers)) %>%
                                          # select(-contains("10M")) %>%
@@ -707,7 +535,7 @@ plot_pca_titles(malt_genus_unfiltered, "PC3", "PC2", "Description", "Env", "Env"
 
 
 # filtered only
-malt_genus_filtered <- malt_genus %>%
+malt_genus_filtered <- malt_genus_raw %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          select(-one_of(outliers)) %>%
                                          # select(-contains("10M")) %>%
