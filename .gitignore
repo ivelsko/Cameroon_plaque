@@ -12,3 +12,4 @@
 02-scripts.backup/.snakemake/
 02-scripts.backup/.Rhistory
 02-scripts.backup/.DS_Store
+02-scripts.backup/._*
