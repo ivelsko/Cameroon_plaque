@@ -1,0 +1,336 @@
+---
+title: "Cameroon plaque taxonomy analysis - Kraken RefSeq database w/ & w/o Pasolli MAGs clean up file"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(taxize)
+library(myTAI)
+library(plyr)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_raw_data_table, eval = F}
+# this takes several minutes, they're large files (~500MB)
+rso_reports <- fread("./00-documentation.backup/over100MB/kraken_standard_rso_reports.tsv")
+rso_reports$SampleID <- gsub(".kraken","", rso_reports$SampleID)
+
+rsmp_reports <- fread("./00-documentation.backup/over100MB/kraken_standard_rsmp_reports.tsv")
+rsmp_reports$SampleID <- gsub(".kraken","", rsmp_reports$SampleID)
+
+rso_reports <- rso_reports %>% as_tibble() %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+
+rsmp_reports <- rsmp_reports %>% as_tibble() %>%
+  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
+  separate(col = "Run", into =c("Run","Database"), sep = "\\.")
+
+
+# save(rso_reports, rsmp_reports, file = "./05-results.backup/over100MB/kraken_refseq_reports.RData")
+# save(rso_reports, file = "./05-results.backup/kraken_refseqO_reports.RData")
+# save(rsmp_reports, file = "./05-results.backup/kraken_refseqPM_reports.RData")
+#save(rso_reports, rsmp_reports, file = "~/Downloads/kraken_refseq_reports.RData")
+
+```
+
+```{r load_data}
+
+# load("./05-results.backup/over100MB/kraken_refseq_reports.RData")
+load("./05-results.backup/kraken_refseqO_reports.RData")
+load("./05-results.backup/kraken_refseqPM_reports.RData")
+
+taxonomy_list <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
+
+```
+
+
+```{r taxonomy_na, eval = F}
+
+# add the full taxonomy series in taxonomy_list to the samples by their species name
+# this requires a lot of manipulation b/c of inconsistencies in naming
+# there are still species that don't have a full taxonomy b/c of inconsistencies in naming
+rso_reports_tax_mod <- rso_reports %>%
+  mutate(SciNameFull = SciName) %>% # create a new column called SciNameFull by copying column SciName (keep this column untouched for later)
+  rename(SciNameSplit = SciName) %>% # rename column SciName to SciNameSplit (this will be modified, split, and re-pasted together)
+  mutate(SciNameSplit = str_replace(SciNameSplit, " sp\\. ", "_sp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, "oral taxon ", "oral_taxon_"),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "Candidatus ", "Candidatus_"),
+         SciNameSplit = str_replace(SciNameSplit, " bacterium ", "_bacterium_"),
+         SciNameSplit = str_replace(SciNameSplit, " phage ", "_phage_"),
+         SciNameSplit = str_replace(SciNameSplit, "incertae sedis", ""),
+         SciNameSplit = str_replace(SciNameSplit, " sensu stricto", ""),
+         SciNameSplit = str_replace(SciNameSplit, " = ", "_=_"),
+         SciNameSplit = str_replace(SciNameSplit, " genomosp\\. ", "_genomosp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, " archaeon ", "_archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, " virus ", "_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "axon 44", "axon44"),
+         SciNameSplit = str_replace(SciNameSplit, "archaeon ", "archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "Clostridiales Family", "Clostridiales_Family"),
+         SciNameSplit = str_replace(SciNameSplit, "Muribaculaceae ", "Muribaculaceae_"),
+         SciNameSplit = str_replace(SciNameSplit, "Arthrobacter virus ", "Arthrobacter_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "alpha proteobacterium", "alpha_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "beta proteobacterium", "beta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "gamma proteobacterium", "gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "delta proteobacterium", "delta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Bacillus virus", "Bacillus_virus"),
+         SciNameSplit = str_replace(SciNameSplit, "Group II \\'CF-1\\'", "Group_II_\\'CF-1\\'"),
+         SciNameSplit = str_replace(SciNameSplit, "[Scytonema hofmanni]_UTEX ", "[Scytonema_hofmanni]_UTEX_"),
+         SciNameSplit = str_replace(SciNameSplit, "marine gamma proteobacterium", "marine_gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Paramecium bursaria Chlorella ", "Paramecium_bursaria_Chlorella_"),
+         SciNameSplit = str_replace(SciNameSplit, "filamentous cyanobacterium CCP", "filamentous_cyanobacterium_CCP"),
+         SciNameSplit = str_replace(SciNameSplit, "Legionella endosymbiont of Polyplax serrata", "Legionella_endosymbiont_of_Polyplax_serrata"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont of unidentified scaly snail isolate Monju", "endosymbiont_of_unidentified_scaly_snail_isolate_Monju"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont GvMRE of Glomus versiforme", "endosymbiont_GvMRE_of_Glomus_versiforme"),
+         SciNameSplit = str_replace(SciNameSplit, "unclassified ", "")) %>%
+  select(Percent, Number_rooted, Number_direct, Rank, NCBItaxID, SciNameFull, SampleID, Run, Database, SciNameSplit) %>%
+  separate(col = "SciNameSplit", into = c("genus","species","strain"), sep = " ", convert = TRUE) %>% # SciNameSplit is now the last column. Split it
+  select(-strain) %>% # remove the strains
+  mutate(species = replace_na(species, "lll")) %>%
+  unite(SciNameShort, genus, species, sep = " ") %>% # repaste genus and specis names from SciNameSplit into SciNameShort, then put the text back to the original
+  mutate(SciNameShort = str_replace(SciNameShort, "_sp\\._", " sp\\. "),
+         SciNameShort = str_replace(SciNameShort,  "oral_taxon_", "oral taxon "),
+         SciNameShort = str_replace(SciNameShort,  "Candidatus_", "Candidatus "),
+         SciNameShort = str_replace(SciNameShort,  "_bacterium_", " bacterium "),
+         SciNameShort = str_replace(SciNameShort, "_=_", " = "),
+         SciNameShort = str_replace(SciNameShort, "_genomosp\\._", " genomosp\\. "),
+         SciNameShort = str_replace(SciNameShort, "_archaeon_", " archaeon "),
+         SciNameShort = str_replace(SciNameShort, "archaeon_", "archaeon "),
+         SciNameShort = str_replace(SciNameShort, "_virus_", " virus "),
+         SciNameShort = str_replace(SciNameShort, "axon44", "axon 44"),
+         SciNameShort = str_replace(SciNameShort, "taxon 44", "Taxon 44"),
+         SciNameShort = str_replace(SciNameShort, "Clostridiales_Family", "Clostridiales Family"),
+         SciNameShort = str_replace(SciNameShort, "Muribaculaceae_", "Muribaculaceae "),
+         SciNameShort = str_replace(SciNameShort, "Arthrobacter_virus_", "Arthrobacter virus "),
+         SciNameShort = str_replace(SciNameShort, "alpha_proteobacterium", "alpha proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "beta_proteobacterium", "beta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "gamma_proteobacterium", "gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "delta_proteobacterium", "delta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Bacillus_virus", "Bacillus virus"),
+         SciNameShort = str_replace(SciNameShort, "Group_II_\\'CF-1\\'", "Group II \\'CF-1\\'"),
+         SciNameShort = str_replace(SciNameShort, "[Scytonema_hofmanni]_UTEX_", "[Scytonema hofmanni]_UTEX "),
+         SciNameShort = str_replace(SciNameShort, "marine_gamma_proteobacterium", "marine gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Paramecium_bursaria_Chlorella_", "Paramecium bursaria Chlorella "),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "Legionella_endosymbiont_of_Polyplax_serrata", "Legionella endosymbiont of Polyplax serrata"),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_of_unidentified_scaly_snail_isolate_Monju", "endosymbiont of unidentified scaly snail isolate Monju"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_GvMRE_of_Glomus_versiforme", "endosymbiont GvMRE of Glomus versiforme"),
+         SciNameShort = str_replace(SciNameShort, "_phage_", " phage "),
+         SciNameShort = str_replace(SciNameShort, " str\\.", ""),
+         SciNameShort = str_replace(SciNameShort,  " lll", "")) %>%
+  rename(SciName = SciNameShort)%>% # rename SciNameShort to SciName to match the column in taxonomy_list
+  full_join(., taxonomy_list, by = "SciName") # add taxonomy to the table with taxonomy_list by merging the columns "SciName"
+
+# now add the missing taxonomy in an additional step, with a full_join using the SciNameFull and Taxonomy columns
+
+
+
+# add the full taxonomy series in taxonomy_list to the samples by their species name
+# this requires a lot of manipulation b/c of inconsistencies in naming
+# there are still species that don't have a full taxonomy b/c of inconsistencies in naming
+rsmp_reports_tax_mod <- rsmp_reports %>%
+  mutate(SciNameFull = SciName) %>%
+  rename(SciNameSplit = SciName) %>%
+  mutate(SciNameSplit = str_replace(SciNameSplit, " sp\\. ", "_sp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, "oral taxon ", "oral_taxon_"),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "\\'", ""),
+         SciNameSplit = str_replace(SciNameSplit, "Candidatus ", "Candidatus_"),
+         SciNameSplit = str_replace(SciNameSplit, " bacterium ", "_bacterium_"),
+         SciNameSplit = str_replace(SciNameSplit, " phage ", "_phage_"),
+         SciNameSplit = str_replace(SciNameSplit, "incertae sedis", ""),
+         SciNameSplit = str_replace(SciNameSplit, " sensu stricto", ""),
+         SciNameSplit = str_replace(SciNameSplit, " = ", "_=_"),
+         SciNameSplit = str_replace(SciNameSplit, " genomosp\\. ", "_genomosp\\._"),
+         SciNameSplit = str_replace(SciNameSplit, " archaeon ", "_archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "axon 44", "axon44"),
+         SciNameSplit = str_replace(SciNameSplit, " virus ", "_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "archaeon ", "archaeon_"),
+         SciNameSplit = str_replace(SciNameSplit, "Clostridiales Family", "Clostridiales_Family"),
+         SciNameSplit = str_replace(SciNameSplit, "Muribaculaceae ", "Muribaculaceae_"),
+         SciNameSplit = str_replace(SciNameSplit, "Arthrobacter virus ", "Arthrobacter_virus_"),
+         SciNameSplit = str_replace(SciNameSplit, "alpha proteobacterium", "alpha_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "beta proteobacterium", "beta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "gamma proteobacterium", "gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "delta proteobacterium", "delta_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Bacillus virus", "Bacillus_virus"),
+         SciNameSplit = str_replace(SciNameSplit, "Group II \\'CF-1\\'", "Group_II_\\'CF-1\\'"),
+         SciNameSplit = str_replace(SciNameSplit, "[Scytonema hofmanni]_UTEX ", "[Scytonema_hofmanni]_UTEX_"),
+         SciNameSplit = str_replace(SciNameSplit, "marine gamma proteobacterium", "marine_gamma_proteobacterium"),
+         SciNameSplit = str_replace(SciNameSplit, "Paramecium bursaria Chlorella ", "Paramecium_bursaria_Chlorella_"),
+         SciNameSplit = str_replace(SciNameSplit, "filamentous cyanobacterium CCP", "filamentous_cyanobacterium_CCP"),
+         SciNameSplit = str_replace(SciNameSplit, "Legionella endosymbiont of Polyplax serrata", "Legionella_endosymbiont_of_Polyplax_serrata"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont of unidentified scaly snail isolate Monju", "endosymbiont_of_unidentified_scaly_snail_isolate_Monju"),
+         SciNameSplit = str_replace(SciNameSplit, "endosymbiont GvMRE of Glomus versiforme", "endosymbiont_GvMRE_of_Glomus_versiforme"),
+         SciNameSplit = str_replace(SciNameSplit, "unclassified ", "")) %>%
+  select(Percent, Number_rooted, Number_direct, Rank, NCBItaxID, SciNameFull, SampleID, Run, Database, SciNameSplit) %>%
+  separate(col = "SciNameSplit", into = c("genus","species","strain"), sep = " ", convert = TRUE) %>%
+  select(-strain) %>%
+  mutate(species = replace_na(species, "lll")) %>%
+  unite(SciNameShort, genus, species, sep = " ") %>%
+  mutate(SciNameShort = str_replace(SciNameShort, "_sp\\._", " sp\\. "),
+         SciNameShort = str_replace(SciNameShort,  "oral_taxon_", "oral taxon "),
+         SciNameShort = str_replace(SciNameShort,  "Candidatus_", "Candidatus "),
+         SciNameShort = str_replace(SciNameShort,  "_bacterium_", " bacterium "),
+         SciNameShort = str_replace(SciNameShort, "_=_", " = "),
+         SciNameShort = str_replace(SciNameShort, "_genomosp\\._", " genomosp\\. "),
+         SciNameShort = str_replace(SciNameShort, "_archaeon_", " archaeon "),
+         SciNameShort = str_replace(SciNameShort, "archaeon_", "archaeon "),
+         SciNameShort = str_replace(SciNameShort, "_virus_", " virus "),
+         SciNameShort = str_replace(SciNameShort, "axon44", "axon 44"),
+         SciNameShort = str_replace(SciNameShort, "taxon 44", "Taxon 44"),
+         SciNameShort = str_replace(SciNameShort, "Clostridiales_Family", "Clostridiales Family"),
+         SciNameShort = str_replace(SciNameShort, "Muribaculaceae_", "Muribaculaceae "),
+         SciNameShort = str_replace(SciNameShort, "Arthrobacter_virus_", "Arthrobacter virus "),
+         SciNameShort = str_replace(SciNameShort, "alpha_proteobacterium", "alpha proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "beta_proteobacterium", "beta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "gamma_proteobacterium", "gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "delta_proteobacterium", "delta proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Bacillus_virus", "Bacillus virus"),
+         SciNameShort = str_replace(SciNameShort, "Group_II_\\'CF-1\\'", "Group II \\'CF-1\\'"),
+         SciNameShort = str_replace(SciNameShort, "[Scytonema_hofmanni]_UTEX_", "[Scytonema hofmanni]_UTEX "),
+         SciNameShort = str_replace(SciNameShort, "marine_gamma_proteobacterium", "marine gamma proteobacterium"),
+         SciNameShort = str_replace(SciNameShort, "Paramecium_bursaria_Chlorella_", "Paramecium bursaria Chlorella "),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "Legionella_endosymbiont_of_Polyplax_serrata", "Legionella endosymbiont of Polyplax serrata"),
+         SciNameShort = str_replace(SciNameShort, "filamentous_cyanobacterium_CCP", "filamentous cyanobacterium CCP"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_of_unidentified_scaly_snail_isolate_Monju", "endosymbiont of unidentified scaly snail isolate Monju"),
+         SciNameShort = str_replace(SciNameShort, "endosymbiont_GvMRE_of_Glomus_versiforme", "endosymbiont GvMRE of Glomus versiforme"),
+         SciNameShort = str_replace(SciNameShort, " str\\.", ""),
+         SciNameShort = str_replace(SciNameShort, "_phage_", " phage "),
+         SciNameShort = str_replace(SciNameShort,  " lll", "")) %>%
+  rename(SciName = SciNameShort)%>%
+  full_join(., taxonomy_list, by = "SciName")
+
+# now add the missing taxonomy in an additional step, with a full_join using the SciNameFull and Taxonomy columns
+
+
+# now combine the RefSeqOnly and RefSeq+PasolliMAGs tables and pull out only the taxa that don't have full taxonomy
+taxonomy_na_mod <- rso_reports_tax_mod %>%
+  bind_rows(., rsmp_reports_tax_mod) %>%
+  filter(is.na(Taxonomy)) %>%
+  arrange(SciName) %>%
+  select(Rank, NCBItaxID, SciNameFull, SciName) %>%
+  unique()
+
+# fwrite(taxonomy_na_mod, file = "./00-documentation.backup/taxonomy_na.tsv", quote = F, sep = "\t")
+
+```
+
+```{r taxid_list_na}
+# read in the list of taxonomy IDs that don't have a full taxonomy series from the chunk above, if starting here
+taxonomy_na_mod <- fread("./00-documentation.backup/taxonomy_na.tsv")
+
+# pull out the list of NCBI taxonomy IDs to feed into taxize to get the full taxonomy series
+taxidlist <- taxonomy_na_mod %>%
+  select(NCBItaxID) %>%
+  unique() %>%
+  pull()
+
+
+```
+
+```{r get_taxids_na}
+# use this chunk to get the full taxonomy series of the NCBItaxIDs that didn't work
+# this comes from this website: https://reslp.github.io/blog/Download-Taxinfo-with-R/
+
+# use the IDs to get the taxonomy from NCBI with taxize
+taxon_summary <- ncbi_get_taxon_summary(id = taxidlist, key = "fc17e8c944d5eb3217cce3d5e7e41af83708")
+
+# make a df list with the taxonomy of all IDs separated into individual columns by level (phylum, superfamily, etc)
+df_list <- list()
+for (i in 1:nrow(taxon_summary)){
+tax  <- taxonomy(organism = taxon_summary[i,]$name, db = "ncbi",output = "classification")
+df <- data.frame(lapply(tax$name, function(x) data.frame(x)))
+colnames(df) <- tax$rank
+df_list[[i]] <- df
+Sys.sleep(0.5)
+}
+
+# put all the entries together into one data frame
+# this doesn't include the taxID for each entry, but we need to have the taxID for each
+combined_df <- do.call(rbind.fill, df_list)
+
+# select only the levels we want from the full data frame (superkingdom, phylum, class, order, family, genus, species)
+combined_df <- combined_df %>%
+  select(superkingdom, phylum, class, order, family, genus, species)
+
+# # Write this dataframe out, then go through and align the taxonomy series with the NCBItaxID by the species names
+# # Adding the NCBItaxID to the full taxonomy series allows us to fill in the taxonomy_na and taxonomy.list.uniq.split files
+# # That will allow us to add the full taxonomy series to the full tables (rso_reports_tax_mod, rsmp_reports_tax_mod)
+# fwrite(combined_df, file = "./00-documentation.backup/taxonomy_na_found.tsv", quote = F, sep = "\t")
+
+```
+
+```{r remaining_taxonomy, eval = F}
+# read in the file with remaining taxonomy from by-hand adjustments based on the files produced above
+remaining_taxonomy <- fread("")
+
+# merge it with the main files by NCBItaxID
+
+rso_reports_tax_mod <- rso_reports_tax_mod %>%
+  full_join(., remaining_taxonomy)
+
+rsmp_reports_tax_mod <- rsmp_reports_tax_mod %>%
+  full_join(., remaining_taxonomy)
+
+# check if there are any remaining NAs in the taxonomy column
+taxonomy_remaining_na_mod <- rso_reports_tax_mod %>%
+  bind_rows(., rsmp_reports_tax_mod) %>%
+  filter(is.na(Taxonomy)) %>%
+  arrange(SciName) %>%
+  select(Rank, NCBItaxID, SciNameFull, SciName) %>%
+  unique()
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
