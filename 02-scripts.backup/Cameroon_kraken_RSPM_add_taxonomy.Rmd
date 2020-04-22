@@ -409,6 +409,8 @@ duplicate_taxIds <- duplicate_taxIds %>% filter(row_number() %% 2 == 0)
 all_taxonomy <- all_taxonomy %>%
   anti_join(., duplicate_taxIds)
 
+# fwrite(all_taxonomy, file = "./00-documentation.backup/all_taxonomy_filtered.csv")
+
 ```
 
 Now add all of the full taxonomy to the Kraken report files. 
@@ -451,7 +453,18 @@ rsmp_reports_tax <- rsmp_reports_tax %>%
 
 ```
 
+The 3 runs looked identical, so to perform analyses we'll select data from just
+the first run to work with. This will make the files smaller, and we'll be able to
+save them as an RData file to load into a new file for analysis.
+```{r}
+rso_reports_tax_run1 <- rso_reports_tax %>%
+  filter(Run == "1")
 
+rsmp_reports_tax_run1 <- rsmp_reports_tax %>%
+  filter(Run == "1")
+
+save(rso_reports_tax_run1, rsmp_reports_tax_run1, file = "./05-results.backup/kraken_refseq_run1.RData")
+```
 
 
 

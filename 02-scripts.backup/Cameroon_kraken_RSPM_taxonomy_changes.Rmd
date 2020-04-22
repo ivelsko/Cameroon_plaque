@@ -13,8 +13,7 @@ output:
 library(knitr)
 library(data.table)
 library(janitor)
-library(taxize)
-library(myTAI)
+library(taxa)
 library(plyr)
 library(tidyverse)
 library(gplots)
@@ -29,17 +28,42 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
 
+```{r load_data}
+load("./05-results.backup/kraken_refseq_run1.RData")
 
+# this file has the full taxonomy string for all samples (by hand added in all missing f__|g__, etc)
+all_taxonomy <- fread("./00-documentation.backup/all_taxonomy_filtered_split.csv")
+all_taxonomy <- all_taxonomy %>%
+  as_tibble(.) %>%
+  select(-Root) %>%
+  mutate(Taxonomy = str_replace_all(Taxonomy, "root\\|", ""))
+
+load("./05-results.backup/CMC_metadata.RData")
+
+# remove the samples and columns we're not looking at
+metadata_mcR <- metadata %>%
+  filter(!str_detect(SampleID, "SRR164|10M|EXB|LIB")) %>%
+  select(SampleID, Env, Description, Industry, Ethnic_Group, Village, Market_economy, Age_group, Sex, Tooth_site)
+
+```
+
+Create tables that present the number of read assignments at each taxonomic
+level (Phylum, Genus, Species) with the RefSeqOnly and RefSeq+PasolliMAGs
+databases, the difference between each, and the fold-difference between the
+number of assignments to each taxon. Positive fold-difference means there were
+more assignments to that taxon in the RefSeq+PasolliMAGs database, and negative
+values means there were more assignments to that taxon in the RefSeqOnly
+database.
 ```{r taxon_differences}
 
-db_phylum_compare <- rso_reports %>%
+db_phylum_compare <- rso_reports_tax_run1 %>%
   filter(str_detect(SampleID, "CMC")) %>%
   filter(str_detect(Rank, "P")) %>%
   group_by(SampleID, SciName) %>%
   summarize(Rooted_avg = mean(Number_rooted)) %>%
   mutate(Database = "RefSeqOnly") %>%
   select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
               filter(str_detect(SampleID, "CMC")) %>%
               filter(str_detect(Rank, "P")) %>%
               group_by(SampleID, SciName) %>%
@@ -54,14 +78,14 @@ db_phylum_compare <- rso_reports %>%
          Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
   arrange(desc(Fold_difference))
 
-db_genus_compare <- rso_reports %>%
+db_genus_compare <- rso_reports_tax_run1 %>%
   filter(str_detect(SampleID, "CMC")) %>%
   filter(str_detect(Rank, "G")) %>%
   group_by(SampleID, SciName) %>%
   summarize(Rooted_avg = mean(Number_rooted)) %>%
   mutate(Database = "RefSeqOnly") %>%
   select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
               filter(str_detect(SampleID, "CMC")) %>%
               filter(str_detect(Rank, "G")) %>%
               group_by(SampleID, SciName) %>%
@@ -76,14 +100,14 @@ db_genus_compare <- rso_reports %>%
          Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
   arrange(desc(Fold_difference))
 
-db_species_compare <- rso_reports %>%
+db_species_compare <- rso_reports_tax_run1 %>%
   filter(str_detect(SampleID, "CMC")) %>%
   filter(str_detect(Rank, "S")) %>%
   group_by(SampleID, SciName) %>%
   summarize(Rooted_avg = mean(Number_rooted)) %>%
   mutate(Database = "RefSeqOnly") %>%
   select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
               filter(str_detect(SampleID, "CMC")) %>%
               filter(str_detect(Rank, "S")) %>%
               group_by(SampleID, SciName) %>%
@@ -101,7 +125,9 @@ db_species_compare <- rso_reports %>%
 
 ```
 
-
+There's a lot to look through in the tables above, so to make it easier to
+diges, look at the taxa that have at least 100 reads assigned by both databases,
+and for which the read difference is at least 100.
 ```{r}
 db_species_compare_short <- db_species_compare %>%
   filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
@@ -118,7 +144,11 @@ db_species_compare_phage <- db_species_compare %>%
 
 ```
 
-
+Look at the taxonomy of the MAGs from the Pasolli paper taht were added to the
+RefSeq database to create our RefSeq+PasolliMAGs database. Where were these taxa
+in the taxonomic tree? What are the most abundant taxa at each level (can we
+expect increases in assignments of certain taxa b/c there are a lot more of them
+in the RSPM database?)
 ```{r mag_info}
 # this is where the Pasolli MAG info is: 
 # /projects1/microbiome_calculus/Cameroon_plaque/00-documentation.backup/Pasolli2019_SGBinfo.csv
@@ -192,6 +222,81 @@ table_temp <- fread("./04-analysis/kraken/output/RefSeqPasolliMAGs/SRR514329_S0_
 table_temp1 <- table_temp %>%
   filter(V3 == 0, V1 != "U")
 ```
+
+Let's see if we can get the data into metacoder to visualize how the assignments change around the tree
+```{r otu_tables}
+# make an OTU table for the RefSeqOnly dataset
+rso_otu_table <- rso_reports_tax_run1 %>%
+  select(NCBItaxID, SampleID, Number_direct) %>%
+  spread(SampleID, Number_direct, fill = 0) %>%
+  filter(NCBItaxID != "0") %>%
+  select(-matches("10M|SRR164|EXB|LIB"))
+
+# make an OTU table for the RefSeq+PasolliMAGs dataset
+rsmp_otu_table <- rsmp_reports_tax_run1 %>%
+  select(NCBItaxID, SampleID, Number_direct) %>%
+  spread(SampleID, Number_direct, fill = 0) %>%
+  filter(NCBItaxID != "0") %>%
+  select(-matches("10M|SRR164|EXB|LIB"))
+
+```
+
+```{r otu_table_tax}
+
+rso_otu_table <- rso_otu_table %>%
+  inner_join(., all_taxonomy, by = "NCBItaxID")
+
+rsmp_otu_table <- rsmp_otu_table %>%
+    inner_join(., all_taxonomy, by = "NCBItaxID")
+
+```
+
+```{r taxa_object}
+
+obj <- parse_tax_data(rso_otu_table,
+                      class_cols = "Taxonomy",
+                      class_sep = "\\|",
+                      # class_regex = "^([a-zA-Z]{0,1})_{0,2}(.*)$",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "info",
+                                    name = "taxon_name"))
+print(obj)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
