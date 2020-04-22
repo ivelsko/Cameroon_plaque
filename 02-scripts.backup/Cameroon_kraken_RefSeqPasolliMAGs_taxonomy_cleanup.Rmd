@@ -49,7 +49,7 @@ rsmp_reports <- rsmp_reports %>% as_tibble() %>%
 # save(rso_reports, rsmp_reports, file = "./05-results.backup/over100MB/kraken_refseq_reports.RData")
 # save(rso_reports, file = "./05-results.backup/kraken_refseqO_reports.RData")
 # save(rsmp_reports, file = "./05-results.backup/kraken_refseqPM_reports.RData")
-#save(rso_reports, rsmp_reports, file = "~/Downloads/kraken_refseq_reports.RData")
+# save(rso_reports, rsmp_reports, file = "~/Downloads/kraken_refseq_reports.RData")
 
 ```
 
@@ -59,11 +59,26 @@ rsmp_reports <- rsmp_reports %>% as_tibble() %>%
 load("./05-results.backup/kraken_refseqO_reports.RData")
 load("./05-results.backup/kraken_refseqPM_reports.RData")
 
-taxonomy_list <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
+# this has the taxonomy list from the mpa-style reports
+taxonomy_list_raw <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
+# make sure to remove all trailing spaces at the ends of the taxonomy, and add root| to the begining of each
+taxonomy_list <- taxonomy_list_raw %>%
+  mutate(Taxonomy = str_squish(Taxonomy),
+         Root = "root|") %>%
+  select(SciName, Root, Taxonomy) %>%
+  unite("TaxonomyFull", Root:Taxonomy) %>%
+  rename(Taxonomy = TaxonomyFull)
 
 ```
 
-
+This will put the full taxonomy onto the Kraken report files by the species
+names. The text needs to be manipulated for this to work, and still not all of
+them will have full taxonomy assigned because of differences in the text.
+Following this, export a list of the NCBI taxIDs that don't have the full
+taxonomy added, and this will need to be gotten with taxize in a chunk below,
+followed by hand-checking. Also export a list of the full taxonomy with the
+NCBItaxID, for easier adding to the report files later along with the taxonomy
+that had to be retrieved with taxize.
 ```{r taxonomy_na, eval = F}
 
 # add the full taxonomy series in taxonomy_list to the samples by their species name
@@ -143,9 +158,6 @@ rso_reports_tax_mod <- rso_reports %>%
   rename(SciName = SciNameShort)%>% # rename SciNameShort to SciName to match the column in taxonomy_list
   full_join(., taxonomy_list, by = "SciName") # add taxonomy to the table with taxonomy_list by merging the columns "SciName"
 
-# now add the missing taxonomy in an additional step, with a full_join using the SciNameFull and Taxonomy columns
-
-
 
 # add the full taxonomy series in taxonomy_list to the samples by their species name
 # this requires a lot of manipulation b/c of inconsistencies in naming
@@ -224,8 +236,6 @@ rsmp_reports_tax_mod <- rsmp_reports %>%
   rename(SciName = SciNameShort)%>%
   full_join(., taxonomy_list, by = "SciName")
 
-# now add the missing taxonomy in an additional step, with a full_join using the SciNameFull and Taxonomy columns
-
 
 # now combine the RefSeqOnly and RefSeq+PasolliMAGs tables and pull out only the taxa that don't have full taxonomy
 taxonomy_na_mod <- rso_reports_tax_mod %>%
@@ -237,8 +247,22 @@ taxonomy_na_mod <- rso_reports_tax_mod %>%
 
 # fwrite(taxonomy_na_mod, file = "./00-documentation.backup/taxonomy_na.tsv", quote = F, sep = "\t")
 
+
+# now get the taxonomy with NCBItaxIDs in a single file for later
+taxonomy_IDs <- rso_reports_tax_mod %>%
+  bind_rows(., rsmp_reports_tax_mod) %>%
+  filter(!is.na(Taxonomy)) %>%
+  filter(!is.na(NCBItaxID)) %>%
+  arrange(NCBItaxID) %>%
+  select(NCBItaxID, Taxonomy) %>%
+  unique()
+
+# fwrite(taxonomy_IDs, file = "./00-documentation.backup/taxonomy_IDs.tsv", quote = F, sep = "\t")
+
 ```
 
+Read in the file with NCBItaxIDs that didn't have full taxonomy after the chunk
+above. We'll try to get these through the package taxize.
 ```{r taxid_list_na}
 # read in the list of taxonomy IDs that don't have a full taxonomy series from the chunk above, if starting here
 taxonomy_na_mod <- fread("./00-documentation.backup/taxonomy_na.tsv")
@@ -252,6 +276,7 @@ taxidlist <- taxonomy_na_mod %>%
 
 ```
 
+Use taxize to get the full taxonomy in a data frame. 
 ```{r get_taxids_na}
 # use this chunk to get the full taxonomy series of the NCBItaxIDs that didn't work
 # this comes from this website: https://reslp.github.io/blog/Download-Taxinfo-with-R/
@@ -277,37 +302,106 @@ combined_df <- do.call(rbind.fill, df_list)
 combined_df <- combined_df %>%
   select(superkingdom, phylum, class, order, family, genus, species)
 
-# # Write this dataframe out, then go through and align the taxonomy series with the NCBItaxID by the species names
-# # Adding the NCBItaxID to the full taxonomy series allows us to fill in the taxonomy_na and taxonomy.list.uniq.split files
-# # That will allow us to add the full taxonomy series to the full tables (rso_reports_tax_mod, rsmp_reports_tax_mod)
 # fwrite(combined_df, file = "./00-documentation.backup/taxonomy_na_found.tsv", quote = F, sep = "\t")
 
 ```
 
-```{r remaining_taxonomy, eval = F}
-# read in the file with remaining taxonomy from by-hand adjustments based on the files produced above
-remaining_taxonomy <- fread("")
+Create a full, non-redundant taxonomy file with the NCBItaxID and the full taxonomy string
+```{r full_taxonomy_list}
+# this has the taxonomy and NCBItaxIDs that worked from the chunk taxonomy_na
+taxonomy_IDs_raw <- fread("./00-documentation.backup/taxonomy_IDs.tsv")
 
-# merge it with the main files by NCBItaxID
+# this file contains duplicate NCBItaxIDs that need to be filtered out
+tax_IDs_dupes <- taxonomy_IDs %>%
+  get_dupes(NCBItaxID)
 
-rso_reports_tax_mod <- rso_reports_tax_mod %>%
-  full_join(., remaining_taxonomy)
+# we'll select and get rid of the even rows
+tax_IDs_dupes <- tax_IDs_dupes %>% filter(row_number() %% 2 == 0)
 
-rsmp_reports_tax_mod <- rsmp_reports_tax_mod %>%
-  full_join(., remaining_taxonomy)
+taxonomy_IDs <- taxonomy_IDs_raw %>%
+  anti_join(., tax_IDs_dupes)
 
-# check if there are any remaining NAs in the taxonomy column
-taxonomy_remaining_na_mod <- rso_reports_tax_mod %>%
-  bind_rows(., rsmp_reports_tax_mod) %>%
-  filter(is.na(Taxonomy)) %>%
-  arrange(SciName) %>%
-  select(Rank, NCBItaxID, SciNameFull, SciName) %>%
-  unique()
+# this has the missing taxonomy from the chunk taxonomy_na, that was gotten with taxize and then checked and filled in by hand in ./00-documentation.backup/taxonomy_na.tsv
+missing_taxonomy_raw <- fread("./00-documentation.backup/missing_taxonomy.csv")
 
+# make sure to remove all trailing spaces at the ends of the taxonomy, and add root| to the begining of each
+missing_taxonomy <- missing_taxonomy_raw %>%
+  as_tibble(.) %>%
+  mutate(Taxonomy = str_squish(Taxonomy),
+         Root = "root|") %>%
+  select(NCBItaxID, Root, Taxonomy) %>%
+  unite("TaxonomyFull", Root:Taxonomy, sep = "") %>%
+  rename(Taxonomy = TaxonomyFull) %>%
+  mutate(Taxonomy = str_replace(Taxonomy, "root\\|root", "root"))
 
+# these files both have some duplicated NCBItaxIDs, so we need to remove them
+missing_tax_dupes <- missing_taxonomy %>%
+  get_dupes(NCBItaxID)
+
+# we'll select and get rid of the even rows
+missing_tax_dupes <- missing_tax_dupes %>% filter(row_number() %% 2 == 0)
+
+missing_taxonomy <- missing_taxonomy %>%
+  anti_join(., missing_tax_dupes)
+
+# combine both taxonomy files to make one big complete one
+all_taxonomy <- taxonomy_IDs %>%
+  bind_rows(., missing_taxonomy) %>%
+  as_tibble(.) %>%
+  arrange(NCBItaxID)
+
+# there are 3 taxIDs that are now duplicated, and one copy of each must be removed
+duplicate_taxIds <- all_taxonomy %>%
+  arrange(NCBItaxID) %>%
+  get_dupes(NCBItaxID)
+
+# we'll select and get rid of the even rows
+duplicate_taxIds <- duplicate_taxIds %>% filter(row_number() %% 2 == 0)
+
+all_taxonomy <- all_taxonomy %>%
+  anti_join(., duplicate_taxIds)
 
 ```
 
+Now add all of the full taxonomy to the Kraken report files. 
+```{r add_taxonomy}
+
+# now add the taxonomy to the kraken RefSeqOnly report file
+rso_reports_tax <- rso_reports %>%
+  full_join(., all_taxonomy) 
+
+# the number of rows is bigger for rso_reports_tax than for rso_reports by 802. Check for NAs to explain this
+# check if there are still NAs in the taxonomy column (nope, that's good)
+rso_reports_tax %>%
+  filter(is.na(NCBItaxID))
+
+# check if there are  NAs in the other columns (yes, there are 802)
+rso_reports_tax %>%
+  filter(is.na(Database))
+
+# get rid of those 802 rows with NAs (these taxa must be only in the rsmp_reports file)
+rso_reports_tax <- rso_reports_tax %>%
+  filter(!is.na(Database))
+
+
+# now add the taxonomy to the kraken RefSeq+PasolliMAGs report file
+rsmp_reports_tax <- rsmp_reports %>%
+  full_join(., all_taxonomy)
+
+# the number of rows is bigger for rso_reports_tax than for rso_reports by 1322. Check for NAs to explain this
+# check if there are still NAs in the taxonomy column (nope, that's good)
+rsmp_reports_tax %>%
+  filter(is.na(NCBItaxID))
+
+# check if there are  NAs in the other columns (yes, there are 1322)
+rsmp_reports_tax %>%
+  filter(is.na(Database))
+
+ # get rid of those 1322 rows with NAs (these taxa must be only in the rso_reports file)
+rsmp_reports_tax <- rsmp_reports_tax %>%
+  filter(!is.na(Database))
+
+```
 
 
 

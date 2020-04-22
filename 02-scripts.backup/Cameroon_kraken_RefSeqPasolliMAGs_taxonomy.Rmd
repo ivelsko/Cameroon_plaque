@@ -184,6 +184,12 @@ rsmp_reports <- rsmp_reports %>% as_tibble() %>%
   separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.report\\.") %>%
   separate(col = "Run", into =c("Run","Database"), sep = "\\.")
 
+
+# save(rso_reports, rsmp_reports, file = "./05-results.backup/over100MB/kraken_refseq_reports.RData")
+save(rso_reports, file = "./05-results.backup/kraken_refseqO_reports.RData")
+save(rsmp_reports, file = "./05-results.backup/kraken_refseqPM_reports.RData")
+#save(rso_reports, rsmp_reports, file = "~/Downloads/kraken_refseq_reports.RData")
+
 ```
 
 ```{r taxid_list_all, eval = F}
@@ -307,6 +313,10 @@ db_species_compare_phage <- db_species_compare %>%
 ```
 
 ```{r taxonomy_na, eval = F}
+# load("./05-results.backup/over100MB/kraken_refseq_reports.RData")
+load("./05-results.backup/kraken_refseqO_reports.RData")
+load("./05-results.backup/kraken_refseqPM_reports.RData")
+
 taxonomy_list <- fread("./00-documentation.backup/taxonomy.list.uniq.split")
 
 
@@ -316,12 +326,12 @@ rso_reports_tax <- rso_reports %>%
 rsmp_reports_tax <- rsmp_reports %>%
   full_join(., taxonomy_list, by = "SciName")
 
-taxonomy_na <- rso_reports_tax %>%
-  bind_rows(., rsmp_reports_tax) %>%
-  filter(is.na(Taxonomy)) %>%
-  arrange(SciName) %>%
-  select(Rank, NCBItaxID, SciName) %>%
-  unique()
+# taxonomy_na <- rso_reports_tax %>%
+#   bind_rows(., rsmp_reports_tax) %>%
+#   filter(is.na(Taxonomy)) %>%
+#   arrange(SciName) %>%
+#   select(Rank, NCBItaxID, SciName) %>%
+#   unique()
 
 
 # rsmp_reports_tax_mod <- rsmp_reports %>%
