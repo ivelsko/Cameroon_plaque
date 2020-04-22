@@ -28,7 +28,55 @@ opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
+
+```{r load_standard_report_data, eval = F}
+# run this only once and then in the future read in the files that were saved, in the section below
+
+# load the standard format output tables
+rso_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqOnly/", pattern = ".+report.+", full.names = T)
+rsmp_report_list <- list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T)
+
+rso_reports <- map_dfr(rso_report_list, function(fn) {
+  fread(fn, col.names = c("Percent", "Number_rooted", "Number_direct","Rank","NCBItaxID","SciName"), sep = "\t") %>%
+  mutate(SampleID = basename(fn))
+})
+
+# mpa_short_list <- head(list.files(path = "./04-analysis/kraken/output/RefSeqPasolliMAGs/", pattern = ".+report.+", full.names = T), n = 3L)
+
+#rso_reports$SciName <- gsub(" ","", rso_reports$SciName)
+rso_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rso_reports$SampleID)
+rso_reports$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_000","", rso_reports$SampleID)
+rso_reports$SampleID <- gsub("_S0_L001_R1_001","", rso_reports$SampleID)
+
+# fwrite(rso_reports, file = "./00-documentation.backup/kraken_standard_rso_reports.tsv", quote = F, sep = "\t")
+
+rso_reports %>% filter(str_detect(Rank, "U|R|D"))
+
+
+rsmp_reports <- map_dfr(rsmp_report_list, function(fn) {
+  fread(fn, col.names = c("Percent", "Number_rooted", "Number_direct","Rank","NCBItaxID","SciName"), sep = "\t") %>%
+  mutate(SampleID = basename(fn))
+})
+
+#rsmp_reports$SciName <- gsub(" ","", rsmp_reports$SciName)
+rsmp_reports$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_000","", rsmp_reports$SampleID)
+rsmp_reports$SampleID <- gsub("_S0_L001_R1_001","", rsmp_reports$SampleID)
+
+# fwrite(rsmp_reports, file = "./00-documentation.backup/kraken_standard_rsmp_reports.tsv", quote = F, sep = "\t")
+
+```
+
+
 ```{r load_raw_data_table, eval = F}
+# run this once then after load the RData files this creates
+
 # this takes several minutes, they're large files (~500MB)
 rso_reports <- fread("./00-documentation.backup/over100MB/kraken_standard_rso_reports.tsv")
 rso_reports$SampleID <- gsub(".kraken","", rso_reports$SampleID)
@@ -263,7 +311,7 @@ taxonomy_IDs <- rso_reports_tax_mod %>%
 
 Read in the file with NCBItaxIDs that didn't have full taxonomy after the chunk
 above. We'll try to get these through the package taxize.
-```{r taxid_list_na}
+```{r taxid_list_na, eval = F}
 # read in the list of taxonomy IDs that don't have a full taxonomy series from the chunk above, if starting here
 taxonomy_na_mod <- fread("./00-documentation.backup/taxonomy_na.tsv")
 
@@ -277,7 +325,7 @@ taxidlist <- taxonomy_na_mod %>%
 ```
 
 Use taxize to get the full taxonomy in a data frame. 
-```{r get_taxids_na}
+```{r get_taxids_na, eval = F}
 # use this chunk to get the full taxonomy series of the NCBItaxIDs that didn't work
 # this comes from this website: https://reslp.github.io/blog/Download-Taxinfo-with-R/
 
