@@ -14,6 +14,7 @@ library(knitr)
 library(data.table)
 library(janitor)
 library(taxa)
+library(metacoder)
 library(plyr)
 library(tidyverse)
 library(gplots)
@@ -32,17 +33,29 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 load("./05-results.backup/kraken_refseq_run1.RData")
 
 # this file has the full taxonomy string for all samples (by hand added in all missing f__|g__, etc)
-all_taxonomy <- fread("./00-documentation.backup/all_taxonomy_filtered_split.csv")
-all_taxonomy <- all_taxonomy %>%
+all_taxonomy_raw <- fread("./00-documentation.backup/all_taxonomy_filtered_hand.csv")
+all_taxonomy <- all_taxonomy_raw %>%
   as_tibble(.) %>%
-  select(-Root) %>%
-  mutate(Taxonomy = str_replace_all(Taxonomy, "root\\|", ""))
+  mutate(Taxonomy = str_replace_all(Taxonomy, "root", "r__root"),
+         Taxonomy = str_replace_all(Taxonomy, "root\\|_", "root\\|"),
+         NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) # this adds ncbi_ in front of all NCBItaxIDs so the column isn't mistaken for numeric and therefore a sample column later
 
-load("./05-results.backup/CMC_metadata.RData")
+
+# we won't load the metadata RData object b/c the factors cause problems later b/c of samples that are removed before analysis
+metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 
 # remove the samples and columns we're not looking at
 metadata_mcR <- metadata %>%
+  rename(SampleID = `#SampleID`) %>%
   filter(!str_detect(SampleID, "SRR164|10M|EXB|LIB")) %>%
+  mutate(Industry = str_replace_all(Industry, "Non-industrial", "NonIndustrial"),
+         Market_economy = str_replace_all(Market_economy, "Logging road", "LoggingRoad"),
+         Market_economy = str_replace_all(Market_economy, "Forrest camp", "ForrestCamp"),
+         Age_group = str_replace_all(Age_group, "18-29", "20s"),
+         Age_group = str_replace_all(Age_group, "30-39", "30s"),
+         Age_group = str_replace_all(Age_group, "40-49", "40s"),
+         Age_group = str_replace_all(Age_group, "50-59", "50s"),
+         Age_group = str_replace_all(Age_group, "60+", "60up")) %>% # I think the - and spaces cause problems with coloring the plots)
   select(SampleID, Env, Description, Industry, Ethnic_Group, Village, Market_economy, Age_group, Sex, Tooth_site)
 
 ```
@@ -128,7 +141,7 @@ db_species_compare <- rso_reports_tax_run1 %>%
 There's a lot to look through in the tables above, so to make it easier to
 diges, look at the taxa that have at least 100 reads assigned by both databases,
 and for which the read difference is at least 100.
-```{r}
+```{r taxon_diffs_short, eval = F}
 db_species_compare_short <- db_species_compare %>%
   filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
 
@@ -228,15 +241,17 @@ Let's see if we can get the data into metacoder to visualize how the assignments
 # make an OTU table for the RefSeqOnly dataset
 rso_otu_table <- rso_reports_tax_run1 %>%
   select(NCBItaxID, SampleID, Number_direct) %>%
+  mutate(NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) %>% # use this for groups instead of cols in metacoder section below. It ensures the NCBItaxID column isn't mistaken for a numeric, and therefore sample, column
   spread(SampleID, Number_direct, fill = 0) %>%
-  filter(NCBItaxID != "0") %>%
+  filter(NCBItaxID != "ncbi_0") %>%
   select(-matches("10M|SRR164|EXB|LIB"))
 
 # make an OTU table for the RefSeq+PasolliMAGs dataset
 rsmp_otu_table <- rsmp_reports_tax_run1 %>%
   select(NCBItaxID, SampleID, Number_direct) %>%
+  mutate(NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) %>% # use this for groups instead of cols in metacoder section below. It ensures the NCBItaxID column isn't mistaken for a numeric, and therefore sample, column
   spread(SampleID, Number_direct, fill = 0) %>%
-  filter(NCBItaxID != "0") %>%
+  filter(NCBItaxID != "ncbi_0") %>%
   select(-matches("10M|SRR164|EXB|LIB"))
 
 ```
@@ -244,26 +259,138 @@ rsmp_otu_table <- rsmp_reports_tax_run1 %>%
 ```{r otu_table_tax}
 
 rso_otu_table <- rso_otu_table %>%
-  inner_join(., all_taxonomy, by = "NCBItaxID")
+  inner_join(., all_taxonomy, by = "NCBItaxID") %>%
+  select(NCBItaxID, Taxonomy, everything())
 
 rsmp_otu_table <- rsmp_otu_table %>%
-    inner_join(., all_taxonomy, by = "NCBItaxID")
+    inner_join(., all_taxonomy, by = "NCBItaxID") %>%
+  select(NCBItaxID, Taxonomy, everything())
 
 ```
 
-```{r taxa_object}
-
-obj <- parse_tax_data(rso_otu_table,
+```{r taxa_object_rso}
+# parse the taxonomy
+rso_obj <- parse_tax_data(rso_otu_table,
                       class_cols = "Taxonomy",
-                      class_sep = "\\|",
-                      # class_regex = "^([a-zA-Z]{0,1})_{0,2}(.*)$",
+                      class_sep = "|",
                       class_regex = "^(.+)__(.+)$",
-                      class_key = c(tax_rank = "info",
-                                    name = "taxon_name"))
-print(obj)
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into rso_obj$data$class_data$tax_rank and into rso_obj$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into rso_obj$data$class_data$name
+
+# sum the number of observations of each taxon
+# rso_obj$data$tax_abund <- calc_taxon_abund(rso_obj, "tax_data", cols = metadata_mcR$SampleID) # from the Example (https://grunwaldlab.github.io/metacoder_documentation/example.html)
+rso_obj$data$tax_abund <- calc_taxon_abund(rso_obj, "tax_data", groups = metadata_mcR$SampleID) # from the FAQ (https://grunwaldlab.github.io/metacoder_documentation/faq.html)
+
+# Add taxon name to tax_abund to see filtering effects easier
+rso_obj$data$tax_abund <- rso_obj$data$tax_abund %>%
+  mutate(taxon = taxon_names(rso_obj)) %>%
+  select(taxon_id, taxon, everything())
+
+rso_obj$data$tax_occ <- calc_n_samples(rso_obj, "tax_abund", groups = metadata_mcR$Industry, cols = rso_otu_table$SampleID)
+
+print(rso_obj)
+
+# Select only the genera
+rso_obj_g <- rso_obj %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+  filter_obs("tax_abund", taxon_ranks == "g")
+
+print(rso_obj_g)
+
+# Select only the order
+rso_obj_o <- rso_obj %>%
+  filter_obs("tax_abund", taxon_ranks == "o")
+
+# # filter out viruses??
+# rso_obj$taxon_names()
+# 
+# rso_obj_noV <- rso_obj %>%
+#   filter_obs("tax_abund", !str_detect(Taxonomy, "Virus"))
+# 
+# 
+# rso_obj_noV <- filter_obs(rso_obj, "tax_abund", !str_detect(tax_data$Taxonomy, "Virus"))
 
 ```
 
+```{r taxa_object_rsmp}
+# parse the taxonomy
+rsmp_obj <- parse_tax_data(rsmp_otu_table,
+                      class_cols = "Taxonomy",
+                      class_sep = "|",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into rsmp_obj$data$class_data$tax_rank and into rsmp_obj$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into rsmp_obj$data$class_data$name
+
+# sum the number of observations of each taxon
+# rsmp_obj$data$tax_abund <- calc_taxon_abund(rsmp_obj, "tax_data", cols = metadata_mcR$SampleID) # from the Example (https://grunwaldlab.github.io/metacoder_documentation/example.html)
+rsmp_obj$data$tax_abund <- calc_taxon_abund(rsmp_obj, "tax_data", groups = metadata_mcR$SampleID) # from the FAQ (https://grunwaldlab.github.io/metacoder_documentation/faq.html)
+
+# Add taxon name to tax_abund to see filtering effects easier
+rsmp_obj$data$tax_abund <- rsmp_obj$data$tax_abund %>%
+  mutate(taxon = taxon_names(rsmp_obj)) %>%
+  select(taxon_id, taxon, everything())
+
+rsmp_obj$data$tax_occ <- calc_n_samples(rsmp_obj, "tax_abund", groups = metadata_mcR$Industry, cols = rsmp_otu_table$SampleID)
+
+print(rsmp_obj)
+
+# Select only the genera
+rsmp_obj_g <- rsmp_obj %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+  filter_obs("tax_abund", taxon_ranks == "g")
+
+print(rsmp_obj_g)
+
+# Select only the order
+rsmp_obj_o <- rsmp_obj %>%
+  filter_obs("tax_abund", taxon_ranks == "o")
+
+```
+
+```{r metacoder_tree}
+
+# Figure out what this is coloring/sizing by
+set.seed(1)
+heat_tree(rso_obj_g, 
+          node_label = rso_obj_g$taxon_names(),
+          node_size = rso_obj_g$n_obs(),
+          node_color = NonIndustrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+
+set.seed(1)
+heat_tree(rsmp_obj_g, 
+          node_label = rsmp_obj_g$taxon_names(),
+          node_size = rsmp_obj_g$n_obs(),
+          node_color = NonIndustrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+
+set.seed(1)
+heat_tree(rso_obj_o, 
+          node_label = rso_obj_o$taxon_names(),
+          node_size = rso_obj_o$n_obs(),
+          node_color = NonIndustrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+
+set.seed(1)
+heat_tree(rsmp_obj_o, 
+          node_label = rsmp_obj_o$taxon_names(),
+          node_size = rsmp_obj_o$n_obs(),
+          node_color = NonIndustrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+
+```
 
 
 
