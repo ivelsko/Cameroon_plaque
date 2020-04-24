@@ -661,7 +661,28 @@ snakemake -s aadder.Snakefile --cluster-config aadder-cluster.config --cluster '
 
 snakemake -s strepSRRP_gene_align_cluster.Snakefile --cluster-config decipher-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j -n # for a test run
 
-
+########################################################
+# Taxonomy differences between Kraken assignemnts with RefSeqOnly and RefSeq+PasolliMAGs
+# pre-MetacodeR file fixes
+# fixing the taxonomy names in 00-documentation.backup/all_taxonomy_filtered_hand.csv
+sed 's/VIruses/Viruses/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed.csv
+sed 's/root\|d__Viruses/root\|_d__Viruses/g' all_taxonomy_filtered_hand-fixed.csv > all_taxonomy_filtered_hand-fixed2.csv
+rm all_taxonomy_filtered_hand-fixed.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
+sed 's/root\|d__Eukaryota/root\|_d__Eukaryota/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+sed 's/Eukaryotas/Eukaryota/g' all_taxonomy_filtered_hand-fixed2.csv > all_taxonomy_filtered_hand-fixed3.csv
+rm all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed3.csv all_taxonomy_filtered_hand.csv
+sed 's/d__Eukaryota/d__Fungi/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
+sed 's/root\|d__Fungi/root\|_d__Fungi/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
+sed 's/\|k__Fungi//g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
+sed 's/root\|d__Bacteria/root\|_d__Bacteria/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
+sed 's/root\|d__Archaea/root\|_d__Archaea/g' all_taxonomy_filtered_hand.csv > all_taxonomy_filtered_hand-fixed2.csv
+mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
 
 
 

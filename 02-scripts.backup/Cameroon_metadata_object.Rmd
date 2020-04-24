@@ -81,6 +81,7 @@ Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_s
                         HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Database_colors <- c(nt = "#172869", RefSeqCustom = "#FF3200")
+Kraken_db_colors <- c(RefSeqOnly = "#172869", RefSeqPasolliMAGs = "#FF3200")
 
 Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -127,6 +128,7 @@ save(metadata,
      Env_colors, Env_shapes, Env_size,
      Description_colors, Description_shapes, Description_size, 
      Database_colors,
+     Kraken_db_colors,
      Industry_shapes, Industry_size, Industry_colors,
      Market_economy_colors, Market_economy_size, Market_economy_size,
      Sex_colors, Sex_shapes, Sex_size,

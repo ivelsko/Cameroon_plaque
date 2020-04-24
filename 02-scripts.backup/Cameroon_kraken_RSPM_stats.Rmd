@@ -87,6 +87,8 @@ kraken_readstats <- bind_rows(rso_readstats,rspm_readstats)
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData")
 
+Kraken_db_colors
+
 # merge data and metadata
 kraken_readstats <- kraken_readstats %>%
   mutate(Percent_classified = Classified/(Classified+Unclassified)*100) %>%
@@ -102,12 +104,28 @@ kraken_readstats %>%
   ggplot(., aes(x = Village, y = Percent_classified, fill = Database)) +
     geom_boxplot() +
     geom_jitter(size = 0.5, alpha = 0.5) +
-    scale_fill_manual(values = Database_colors) +
+    scale_fill_manual(values = Kraken_db_colors) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("Village") +
     ylab("Percent of reads classified")
 
+RSPM_kraken_compare <- kraken_readstats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  ggplot(., aes(x = Village, y = Percent_classified, fill = Database)) +
+    geom_boxplot() +
+    geom_jitter(size = 0.5, alpha = 0.5) +
+    scale_fill_manual(values = Kraken_db_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    xlab("Village") +
+    ylab("Percent of reads classified")
+
+RSPM_kraken_compare
+
+ggsave("05-results.backup/RSPM_kraken_compare_UKY.pdf", plot = RSPM_kraken_compare, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+       dpi = 300)
 
 ```
 

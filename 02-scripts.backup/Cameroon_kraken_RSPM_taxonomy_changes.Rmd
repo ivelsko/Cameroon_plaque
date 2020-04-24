@@ -60,6 +60,7 @@ metadata_mcR <- metadata %>%
 
 ```
 
+
 Create tables that present the number of read assignments at each taxonomic
 level (Phylum, Genus, Species) with the RefSeqOnly and RefSeq+PasolliMAGs
 databases, the difference between each, and the fold-difference between the
@@ -268,6 +269,7 @@ rsmp_otu_table <- rsmp_otu_table %>%
 
 ```
 
+
 ```{r taxa_object_rso}
 # parse the taxonomy
 rso_obj <- parse_tax_data(rso_otu_table,
@@ -299,6 +301,7 @@ print(rso_obj_g)
 
 # Select only the order
 rso_obj_o <- rso_obj %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
   filter_obs("tax_abund", taxon_ranks == "o")
 
 # # filter out viruses??
@@ -308,7 +311,8 @@ rso_obj_o <- rso_obj %>%
 #   filter_obs("tax_abund", !str_detect(Taxonomy, "Virus"))
 # 
 # 
-# rso_obj_noV <- filter_obs(rso_obj, "tax_abund", !str_detect(tax_data$Taxonomy, "Virus"))
+# rso_obj_noV <- filter_taxa(rso_obj, "tax_abund", !str_detect(tax_data$Taxonomy, "Virus"))
+# rso_obj_noV <- filter_taxa(rso_obj, taxon_names == "Virus"))
 
 ```
 
@@ -347,11 +351,11 @@ rsmp_obj_o <- rsmp_obj %>%
 
 ```
 
-```{r metacoder_tree}
+```{r metacoder_tree_rso_g}
 
 # Figure out what this is coloring/sizing by
 set.seed(1)
-heat_tree(rso_obj_g, 
+rso_obj_g_tree_NI <- heat_tree(rso_obj_g, 
           node_label = rso_obj_g$taxon_names(),
           node_size = rso_obj_g$n_obs(),
           node_color = NonIndustrial,
@@ -359,11 +363,69 @@ heat_tree(rso_obj_g,
           node_color_axis_label = "Samples with reads",
           layout = "davidson-harel", # The primary layout algorithm
           initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rso_obj_g_tree_NI
+
+# ggsave("05-results.backup/rso_obj_g_tree_NI.pdf", plot = rso_obj_g_tree_NI, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 set.seed(1)
-heat_tree(rsmp_obj_g, 
+rso_obj_g_tree_I <- heat_tree(rso_obj_g, 
+          node_label = rso_obj_g$taxon_names(),
+          node_size = rso_obj_g$n_obs(),
+          node_color = Industrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rso_obj_g_tree_I
+
+# ggsave("05-results.backup/rso_obj_g_tree_I.pdf", plot = rso_obj_g_tree_I, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r metacoder_tree_rspm_g}
+
+# Figure out what this is coloring/sizing by
+set.seed(1)
+rsmp_obj_g_NI <- heat_tree(rsmp_obj_g, 
           node_label = rsmp_obj_g$taxon_names(),
           node_size = rsmp_obj_g$n_obs(),
+          node_color = NonIndustrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rsmp_obj_g_NI
+
+# ggsave("05-results.backup/rsmp_obj_g_NI.pdf", plot = rsmp_obj_g_NI, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+
+set.seed(1)
+rsmp_obj_g_I <-heat_tree(rsmp_obj_g, 
+          node_label = rsmp_obj_g$taxon_names(),
+          node_size = rsmp_obj_g$n_obs(),
+          node_color = Industrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rsmp_obj_g_I
+
+# ggsave("05-results.backup/rsmp_obj_g_I.pdf", plot = rsmp_obj_g_I, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r metacoder_tree_rso_o, eval = F}
+
+# Figure out what this is coloring/sizing by
+set.seed(1)
+heat_tree(rso_obj_o, 
+          node_label = rso_obj_o$taxon_names(),
+          node_size = rso_obj_o$n_obs(), # n_obs is a function that calculates, in this case, the number of OTUs per taxon
           node_color = NonIndustrial,
           node_size_axis_label = "OTU count",
           node_color_axis_label = "Samples with reads",
@@ -374,12 +436,17 @@ set.seed(1)
 heat_tree(rso_obj_o, 
           node_label = rso_obj_o$taxon_names(),
           node_size = rso_obj_o$n_obs(),
-          node_color = NonIndustrial,
+          node_color = Industrial,
           node_size_axis_label = "OTU count",
           node_color_axis_label = "Samples with reads",
           layout = "davidson-harel", # The primary layout algorithm
           initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
 
+```
+
+```{r metacoder_tree_rspm_o, eval = F}
+
+# Figure out what this is coloring/sizing by
 set.seed(1)
 heat_tree(rsmp_obj_o, 
           node_label = rsmp_obj_o$taxon_names(),
@@ -390,13 +457,173 @@ heat_tree(rsmp_obj_o,
           layout = "davidson-harel", # The primary layout algorithm
           initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
 
+set.seed(1)
+heat_tree(rsmp_obj_o, 
+          node_label = rsmp_obj_o$taxon_names(),
+          node_size = rsmp_obj_o$n_obs(),
+          node_color = Industrial,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+
 ```
 
+To compare the 2 databases, I think I need to have the OTU tables combined into
+one table, with the sample names changed to indicate which database was used. So
+add the database to the sample names (_rso, _rsmp) for each and combine the 2
+tables into 1. Then make a new metadata table that has the new sample names.
+Then combine the 2 into a new taxa object for comparisons.
+```{r combine_data}
+# make an OTU table for the combined RefSeqOnly and RefSeq+PasolliMAGs dataset
+rsomp_otu_table <- rso_reports_tax_run1 %>%
+  select(NCBItaxID, SampleID, Number_direct) %>%
+  mutate(NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_"), # use this for groups instead of cols in metacoder section below. It ensures the NCBItaxID column isn't mistaken for a numeric, and therefore sample, column
+         SampleID = str_replace_all(SampleID, "$","_rso")) %>% 
+  spread(SampleID, Number_direct, fill = 0) %>%
+  filter(NCBItaxID != "ncbi_0",
+         NCBItaxID != "ncbi_1") %>% # see if this solves the problem of having root twice in mapping heat_tree_matrix
+  select(-matches("10M|SRR164|EXB|LIB")) %>%
+  # combine RefSeqOnly above with the RefSeq+PasolliMAGs
+  full_join(., rsmp_reports_tax_run1 %>%
+              select(NCBItaxID, SampleID, Number_direct) %>%
+              mutate(NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_"), # use this for groups instead of cols in below. It ensures the NCBItaxID column isn't read as a numeric, and therefore sample, column
+                     SampleID = str_replace_all(SampleID, "$","_rsmp")) %>% 
+              spread(SampleID, Number_direct, fill = 0) %>%
+              filter(NCBItaxID != "ncbi_0",
+                     NCBItaxID != "ncbi_1") %>%
+              select(-matches("10M|SRR164|EXB|LIB"))) %>%
+  replace(., is.na(.), 0)
+
+rsomp_otu_table <- rsomp_otu_table %>%
+  inner_join(., all_taxonomy, by = "NCBItaxID") %>%
+  select(NCBItaxID, Taxonomy, everything())
+
+# combine metadata with new sample names
+metadata_both <- metadata_mcR %>%
+  mutate(SampleID = str_replace_all(SampleID, "$", "_rso"),
+         Database = "RefSeqOnly",
+         SampleDB = str_replace(Industry, "$","_rso")) %>%
+  bind_rows(., metadata_mcR %>%
+              mutate(SampleID = str_replace_all(SampleID, "$","_rsmp"),
+                     Database = "RefSeqPasolliMAGs",
+                     SampleDB = str_replace(Industry, "$","_rsmp")))
+
+```
+
+```{r taxa_object_rsomp}
+# parse the taxonomy
+rsomp_obj <- parse_tax_data(rsomp_otu_table,
+                      class_cols = "Taxonomy",
+                      class_sep = "|",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into rsomp_obj$data$class_data$tax_rank and into rsomp_obj$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into rsomp_obj$data$class_data$name
+
+# sum the number of observations of each taxon
+rsomp_obj$data$tax_abund <- calc_taxon_abund(rsomp_obj, "tax_data", groups = metadata_both$SampleID) # from the FAQ (https://grunwaldlab.github.io/metacoder_documentation/faq.html)
+
+# Add taxon name to tax_abund to see filtering effects easier
+rsomp_obj$data$tax_abund <- rsomp_obj$data$tax_abund %>%
+  mutate(taxon = taxon_names(rsomp_obj)) %>%
+  select(taxon_id, taxon, everything())
+
+rsomp_obj$data$tax_occ <- calc_n_samples(rsomp_obj, "tax_abund", groups = metadata_both$SampleDB, cols = rsomp_otu_table$SampleID)
+
+# print(rsomp_obj)
+
+# Select only the genera
+rsomp_obj_g <- rsomp_obj %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+  filter_obs("tax_abund", taxon_ranks == "g")
+
+# print(rsomp_obj_g)
+
+# # Select only the family
+# rsomp_obj_f <- rsomp_obj %>%
+#   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+#   filter_obs("tax_abund", taxon_ranks == "f")
+
+# Remove viruses
+rsomp_obj_noV <- filter_taxa(rsomp_obj, taxon_names != "Viruses", reassign_obs = c(tax_abund = FALSE)) %>% # or try reassign_obs = FALSE, check also drop_taxa. As it is, there are still viruses in the plots. They just come directly off the root, instead of off a Viruses node
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE))
+# %>%
+#   filter_obs("tax_abund", taxon_ranks == "g", reassign_obs = c(tax_abund = FALSE)) # adding this makes it not work
+
+# Calculate the differences in abundance of taxa between the databases for Industrial and NonIndustrial groups
+rsomp_obj_noV$data$diff_table <- compare_groups(rsomp_obj_noV,
+                                      dataset = "tax_abund",
+                                      cols = metadata_both$SampleID, # What columns of sample data to use
+                                      groups = metadata_both$SampleDB) # What category each sample is assigned to
+
+# print(rsomp_obj_noV$data$diff_table)
+
+```
+
+```{r rsomp_test_trees}
+
+set.seed(1)
+rsomp_obj_noV_tree_NI_rso <- heat_tree(rsomp_obj_noV, 
+          node_label = rsomp_obj_noV$taxon_names(),
+          node_size = rsomp_obj_noV$n_obs(),
+          node_color = NonIndustrial_rso,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rsomp_obj_noV_tree_NI_rso
+
+# ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rso.pdf", plot = rsomp_obj_noV_tree_NI_rso, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+set.seed(1)
+rsomp_obj_noV_tree_NI_rsmp <- heat_tree(rsomp_obj_noV, 
+          node_label = rsomp_obj_noV$taxon_names(),
+          node_size = rsomp_obj_noV$n_obs(),
+          node_color = NonIndustrial_rsmp,
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Samples with reads",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
+rsomp_obj_noV_tree_NI_rsmp
+
+# ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rsmp.pdf", plot = rsomp_obj_noV_tree_NI_rsmp, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r group_differences}
+
+set.seed(1)
+heat_tree(rsomp_obj_noV, 
+          node_label = taxon_names,
+          node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
+          node_color = log2_median_ratio, # A column from `obj$data$diff_table`
+          node_color_interval = c(-2, 2), # The range of `log2_median_ratio` to display
+          node_color_range = c("cyan", "gray", "tan"), # The color palette used
+          node_size_axis_label = "OTU count",
+          node_color_axis_label = "Log 2 ratio of median proportions",
+          layout = "davidson-harel", # The primary layout algorithm
+          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
 
 
+set.seed(1)
+heat_tree_matrix(rsomp_obj_noV,
+                 data = "diff_table",
+                 node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
+                 node_label = taxon_names,
+                 node_color = log2_median_ratio, # A column from `obj$data$diff_table`
+                 node_color_range = diverging_palette(), # The built-in palette for diverging data
+                 node_color_trans = "linear", # The default is scaled by circle area
+                 node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
+                 edge_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
+                 node_size_axis_label = "Number of OTUs",
+                 node_color_axis_label = "Log2 ratio median proportions",
+                 layout = "davidson-harel", # The primary layout algorithm
+                 initial_layout = "reingold-tilford", # The layout algorithm that initializes node locations
+                 output_file = "differential_heat_tree_g.pdf") # Saves the plot as a pdf file
 
-
-
+```
 
 
 
