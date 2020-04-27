@@ -32,7 +32,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```{r load_data}
 load("./05-results.backup/kraken_refseq_run1.RData")
 
-# this file has the full taxonomy string for all samples (by hand added in all missing f__|g__, etc)
+# this file has the full taxonomy string for all samples (by hand added in all missing taxonomy from taxize or NCBI taxonomy page online, etc)
 all_taxonomy_raw <- fread("./00-documentation.backup/all_taxonomy_filtered_hand.csv")
 all_taxonomy <- all_taxonomy_raw %>%
   as_tibble(.) %>%
@@ -304,15 +304,9 @@ rso_obj_o <- rso_obj %>%
   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
   filter_obs("tax_abund", taxon_ranks == "o")
 
-# # filter out viruses??
-# rso_obj$taxon_names()
-# 
-# rso_obj_noV <- rso_obj %>%
-#   filter_obs("tax_abund", !str_detect(Taxonomy, "Virus"))
-# 
-# 
-# rso_obj_noV <- filter_taxa(rso_obj, "tax_abund", !str_detect(tax_data$Taxonomy, "Virus"))
-# rso_obj_noV <- filter_taxa(rso_obj, taxon_names == "Virus"))
+# Remove viruses
+rso_obj_noV <- filter_taxa(rso_obj, taxon_names != "Viruses", reassign_obs = c(tax_abund = FALSE)) %>% # or try reassign_obs = FALSE, check also drop_taxa. As it is, there are still viruses in the plots. They just come directly off the root, instead of off a Viruses node
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE))
 
 ```
 
@@ -539,6 +533,8 @@ rsomp_obj_g <- rsomp_obj %>%
 
 # print(rsomp_obj_g)
 
+# save(rsomp_obj, file = "./05-results.backup/kraken_RSOMP_taxa_envt.RData")
+
 # # Select only the family
 # rsomp_obj_f <- rsomp_obj %>%
 #   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
@@ -558,14 +554,19 @@ rsomp_obj_noV$data$diff_table <- compare_groups(rsomp_obj_noV,
 
 # print(rsomp_obj_noV$data$diff_table)
 
+
+x %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+  filter_obs("tax_abund", taxon_ranks == "g")
+
 ```
 
 ```{r rsomp_test_trees}
 
 set.seed(1)
-rsomp_obj_noV_tree_NI_rso <- heat_tree(rsomp_obj_noV, 
-          node_label = rsomp_obj_noV$taxon_names(),
-          node_size = rsomp_obj_noV$n_obs(),
+rsomp_obj_noV_tree_g_rso <- heat_tree(rsomp_obj_g, 
+          node_label = rsomp_obj_g$taxon_names(),
+          node_size = rsomp_obj_g$n_obs(),
           node_color = NonIndustrial_rso,
           node_size_axis_label = "OTU count",
           node_color_axis_label = "Samples with reads",
@@ -573,13 +574,13 @@ rsomp_obj_noV_tree_NI_rso <- heat_tree(rsomp_obj_noV,
           initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
 rsomp_obj_noV_tree_NI_rso
 
-# ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rso.pdf", plot = rsomp_obj_noV_tree_NI_rso, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rso.pdf", plot = rsomp_obj_noV_tree_NI_rso, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 set.seed(1)
-rsomp_obj_noV_tree_NI_rsmp <- heat_tree(rsomp_obj_noV, 
-          node_label = rsomp_obj_noV$taxon_names(),
-          node_size = rsomp_obj_noV$n_obs(),
+rsomp_obj_noV_tree_g_rsmp <- heat_tree(rsomp_obj_g, 
+          node_label = rsomp_obj_g$taxon_names(),
+          node_size = rsomp_obj_g$n_obs(),
           node_color = NonIndustrial_rsmp,
           node_size_axis_label = "OTU count",
           node_color_axis_label = "Samples with reads",
