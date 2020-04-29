@@ -30,9 +30,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 
 ```{r load_data}
-load("./05-results.backup/kraken_refseq_run1.RData")
-
-load("./05-results.backup/kraken_RSOMP_taxa_envt.RData")
+load("./05-results.backup/kraken_refseq_run1.RData") # this has the files with OTU coutns needed to create the taxa environments
 
 # this file has the full taxonomy string for all samples (by hand added in all missing taxonomy from taxize or NCBI taxonomy page online, etc)
 all_taxonomy_raw <- fread("./00-documentation.backup/all_taxonomy_filtered_hand.csv")
@@ -470,7 +468,12 @@ one table, with the sample names changed to indicate which database was used. So
 add the database to the sample names (_rso, _rsmp) for each and combine the 2
 tables into 1. Then make a new metadata table that has the new sample names.
 Then combine the 2 into a new taxa object for comparisons.
-```{r combine_data}
+
+If you do not have the taxa environment saved, or you modified the input files
+to create the environment, run this `combine_data` chunk and the following
+`taxa_object_rsomp` chunk. If you have the environment saved, skip these chunks
+and run the `filter_rsomp_obj` chunk that comes after.
+```{r combine_data, eval = F}
 # make an OTU table for the combined RefSeqOnly and RefSeq+PasolliMAGs dataset
 rsomp_otu_table <- rso_reports_tax_run1 %>%
   select(NCBItaxID, SampleID, Number_direct) %>%
@@ -507,7 +510,7 @@ metadata_both <- metadata_mcR %>%
 
 ```
 
-```{r taxa_object_rsomp}
+```{r taxa_object_rsomp, eval = F}
 # parse the taxonomy
 rsomp_obj <- parse_tax_data(rsomp_otu_table,
                       class_cols = "Taxonomy",
@@ -528,20 +531,125 @@ rsomp_obj$data$tax_occ <- calc_n_samples(rsomp_obj, "tax_abund", groups = metada
 
 # print(rsomp_obj)
 
-# Select only the genera
-rsomp_obj_g <- rsomp_obj %>%
-  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
-  filter_obs("tax_abund", taxon_ranks == "g")
-
-# print(rsomp_obj_g)
-
 # save(rsomp_obj, file = "./05-results.backup/kraken_RSOMP_taxa_envt.RData")
 
-# # Select only the family
-# rsomp_obj_f <- rsomp_obj %>%
-#   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
-#   filter_obs("tax_abund", taxon_ranks == "f")
+```
 
+# Start here to work on this tomorrow
+Let's follow the Human microbiome example on the metacodeR page (https://grunwaldlab.github.io/metacoder_documentation/publication--05--16s_human_microbiome.html)
+```{r metacoder_example}
+# analysis parameters
+matrix_plot_depth <- 6 # The maximum number of ranks to display
+color_interval <- c(-4, 4) # The range of values (log 2 ratio of median proportion) to display
+min_read_count <- 100 # The minium number of reads needed for a taxon to be graphed
+
+# parse the taxonomy
+rsomp_obj_test <- parse_tax_data(rsomp_otu_table,
+                      class_cols = "Taxonomy",
+                      class_sep = "|",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into rsomp_obj_test$data$class_data$tax_rank and into rsomp_obj_test$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into rsomp_obj_test$data$class_data$name
+
+names(rsomp_obj_test$data) <- c("otu_count","taxonomy_data") # Rename abundnace matrix to something more understandable
+
+# filter the taxonomy
+rsomp_obj_test <- filter_taxa(rsomp_obj_test, !grepl(taxon_names, pattern =  "Viruses")) # filter out Virus, viridae, virinae
+rsomp_obj_test <- filter_taxa(rsomp_obj_test, !grepl(taxon_names, pattern =  "viridae")) # filter out Virus, viridae, virinae
+rsomp_obj_test <- filter_taxa(rsomp_obj_test, !grepl(taxon_names, pattern =  "virinae")) # filter out Virus, viridae, virinae
+rsomp_obj_test <- filter_taxa(rsomp_obj_test, !grepl(taxon_names, pattern =  "virus")) # filter out Virus, viridae, virinae
+
+# convert counts to proportions
+rsomp_obj_test$data$otu_prop <- calc_obs_props(rsomp_obj_test,
+                                               data = "otu_count",
+                                               cols = metadata_both$SampleID)
+
+
+# calculate abundance per taxon 
+rsomp_obj_test$data$otu_abund <- calc_taxon_abund(rsomp_obj_test, 
+                                                  "otu_prop", 
+                                                  cols = metadata_both$SampleID)
+
+
+# add a new tibble with the abundance of each taxon to the environment
+rsomp_obj_test <- rsomp_obj_test %>%
+  mutate_obs("otu_abund", abundance = rowMeans(rsomp_obj_test$data$otu_abund[metadata_both$SampleID]))
+
+# plot everything
+set.seed(1)
+plot_all <- rsomp_obj_test %>%
+  filter_taxa(abundance >= 0.001) %>%
+  filter_taxa(taxon_names != "") %>% # Some taxonomic levels are not named
+  heat_tree(node_size = n_obs,
+            # node_size_range = c(0.01, 0.06),
+            node_size_axis_label = "Number of OTUs",
+            node_color = abundance,
+            node_color_axis_label = "Mean proportion of reads",
+            node_label = taxon_names)
+plot_all
+
+```
+
+Calculate differences between the databases and plot showing that
+```{r metacoder_ex_cont_database_diff_plots}
+
+rsomp_obj_test$data$diff_table <- compare_groups(rsomp_obj_test,
+                                           data = "otu_abund",
+                                           cols = metadata_both$SampleID,
+                                           groups = metadata_both$SampleDB)
+                                           
+rsomp_obj_test <- mutate_obs(rsomp_obj_test, "diff_table",
+                       wilcox_q_value = p.adjust(wilcox_p_value, method = "fdr"),
+                       log2_median_ratio = ifelse(wilcox_q_value < 0.05 | is.na(wilcox_q_value), log2_median_ratio, 0))
+                       
+plot_database_diff <- function(site_1, site_2, seed = 1) {
+  set.seed(seed)
+  rsomp_obj_test %>%
+    # mutate_obs("tax_prop", abundance = rowMeans(rsomp_obj_test$data$tax_prop[sample_data$sample_id])) %>%
+    filter_taxa(abundance >= 0.001, reassign_obs = FALSE) %>%
+    filter_taxa(taxon_names != "", reassign_obs = FALSE) %>% # Some taxonomic levels are not named
+    filter_obs("diff_table", treatment_1 %in% c(site_1, site_2), treatment_2 %in% c(site_1, site_2)) %>%
+    heat_tree(node_size_axis_label = "Number of OTUs",
+              node_size = n_obs,
+              node_color_axis_label = "Log 2 ratio of median proportions",
+              node_color = log2_median_ratio,
+              node_color_range = diverging_palette(),
+              node_color_trans = "linear",
+              node_color_interval = c(-5, 5),
+              edge_color_interval = c(-5, 5),
+              node_label = taxon_names)
+}
+
+rso_vs_rsmp_NI <- plot_database_diff("NonIndustrial_rsmp", "NonIndustrial_rso")
+rso_vs_rsmp_I <- plot_database_diff("Industrial_rsmp", "Industrial_rso")
+rso_NI_vs_I <- plot_database_diff("NonIndustrial_rso", "Industrial_rso")
+rsmp_NI_vs_I <- plot_database_diff("NonIndustrial_rsmp", "Industrial_rsmp")
+
+# ggsave("05-results.backup/rso_vs_rsmp_NI.pdf", plot = rso_vs_rsmp_NI, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("05-results.backup/rso_vs_rsmp_I.pdf", plot = rso_vs_rsmp_I, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("05-results.backup/rso_NI_vs_I.pdf", plot = rso_NI_vs_I, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("05-results.backup/rsmp_NI_vs_I.pdf", plot = rsmp_NI_vs_I, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+Load the saved environment. 
+```{r filter_rsomp_obj}
+load("./05-results.backup/kraken_RSOMP_taxa_envt.RData") # this is the saved taxa environment so you don't have to wait to generate it
+
+```
+
+Filter out viruses.
+```{r rsomp_filter_viruses}
 # Remove viruses
 rsomp_obj_noV <- filter_taxa(rsomp_obj, taxon_names != "Viruses", reassign_obs = c(tax_abund = FALSE)) %>% # or try reassign_obs = FALSE, check also drop_taxa. As it is, there are still viruses in the plots. They just come directly off the root, instead of off a Viruses node
   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE))
@@ -557,11 +665,46 @@ rsomp_obj_noV$data$diff_table <- compare_groups(rsomp_obj_noV,
 # print(rsomp_obj_noV$data$diff_table)
 
 
+```
+
+
+Filter at different taxonomic levels.
+```{r rsomp_filter_levels}
+
+# # Select only the family
+# rsomp_obj_f <- rsomp_obj %>%
+#   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+#   filter_obs("tax_abund", taxon_ranks == "f")
+
+# Select only the genera
+rsomp_obj_g <- rsomp_obj %>%
+  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
+  filter_obs("tax_abund", taxon_ranks == "g")
+
+# print(rsomp_obj_g)
+
+# this is from the metacodeR package and I'm using it to testing the filtering
+# Parse data for example
+x = parse_tax_data(hmp_otus, class_cols = "lineage", class_sep = ";",
+                   class_key = c(tax_rank = "taxon_rank", tax_name = "taxon_name"),
+                   class_regex = "^(.+)__(.+)$")
+                   
+# Calculate the taxon abundance for each numeric column (i.e. sample)
+x$data$tax_abund <- calc_taxon_abund(x, "tax_data", groups = hmp_samples$sex)
+
+# Add taxon name to tax_abund to see filtering effects easier
+x$data$tax_abund <- x$data$tax_abund %>%
+  mutate(taxon = taxon_names(x)) %>%
+  select(taxon_id, taxon, everything())
+
+
 x %>%
   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
   filter_obs("tax_abund", taxon_ranks == "g")
 
+
 ```
+
 
 ```{r rsomp_test_trees}
 
