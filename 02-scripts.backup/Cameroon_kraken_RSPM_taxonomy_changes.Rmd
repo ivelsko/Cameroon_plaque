@@ -58,9 +58,20 @@ metadata_mcR <- metadata %>%
          Age_group = str_replace_all(Age_group, "60+", "60up")) %>% # I think the - and spaces cause problems with coloring the plots)
   select(SampleID, Env, Description, Industry, Ethnic_Group, Village, Market_economy, Age_group, Sex, Tooth_site)
 
+# make a metadata table for the databases
+metadata_database <- tibble(c("RefSeqCounts","PasolliMAGsCount"),c("RefSeqOnly","RSPasolliMAGs"), c("No","Yes"))
+names(metadata_database)[1] <- "SampleID"
+names(metadata_database)[2] <- "Database"
+names(metadata_database)[3] <- "MAGs"
+
+metadata_pm <- tibble(c("PasolliMAGsCount"),c("RSPasolliMAGs"), c("Yes"))
+names(metadata_pm)[1] <- "SampleID"
+names(metadata_pm)[2] <- "Database"
+names(metadata_pm)[3] <- "MAGs"
+
 ```
 
-
+# Database taxonomy distribution
 Look at the taxonomy of the RefSeq only database. Then later we'll compare this
 to the database including the Pasolli MAGs, to see what areas of the tree are
 being filled out by the Pasolli MAGs.
@@ -68,14 +79,13 @@ being filled out by the Pasolli MAGs.
 # read in the sheet that lists the genomes used in making the database
 refseqonly <- fread("./00-documentation.backup/refseq_selected_genomes.txt.gz")
 
-# read in the taxonomy file
-
 
 # prepare an OTU-type table with counts of the number of each species included
 refseq_tax_data <- refseqonly %>%
   select(species_taxid, organism_name) %>%
   rename(NCBItaxID = species_taxid,
          Species = organism_name) %>% 
+  filter(!str_detect(Species, "virus|phage|satellite|viroid|viridae|virinae|Virus|AlphaCoV|circular|phytoplasma|endosymbiont")) %>% # remove all viruses b/c there aren't any in the Pasolli MAGs so we're not interested in them
   mutate(Count = 1,
          NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) %>%
   group_by(NCBItaxID, Species) %>%
@@ -86,7 +96,56 @@ refseq_tax_data <- refseqonly %>%
   
 # now check for NAs in the taxonomy. Do any need to be filled in? Unfortunately, yes. Way too many
 refseq_tax_data_nas <- refseq_tax_data %>%
-  filter(is.na(Taxonomy))
+  filter(is.na(Taxonomy)) %>%
+  arrange(Species)
+
+# fwrite(refseq_tax_data_nas, file = "./00-documentation.backup/additional_taxonomy.tsv", quote = F, sep = "\t")
+# use this file to add the taxonomy. Remove by hand any duplicated NCBI tax IDs assigned to different strains of the same species, and any additional non-bacteria/archaea that weren't filtered out in the step above
+
+# Now read in the file with the additional taxonomy added and combine with the all_taxonomy file, then add taxonomy to the refseq table again. This time there should be no NAs
+additional_taxonomy <- fread("./00-documentation.backup/additional_taxonomy_filled.tsv")
+
+# fix to make it consistent like all_taxonomy
+additional_taxonomy <- additional_taxonomy %>%
+  as_tibble(.) %>%
+  select(-Species) %>%
+  mutate(Taxonomy = str_replace_all(Taxonomy, "root", "r__root"),
+         Taxonomy = str_replace_all(Taxonomy, "root\\|_", "root\\|"),
+         Taxonomy = str_replace_all(Taxonomy, "g__\\|",""),
+         Taxonomy = str_replace_all(Taxonomy, "f__\\|",""),
+         Taxonomy = str_replace_all(Taxonomy, "o__\\|",""))
+
+# merge the 2 taxonomy files
+full_taxonomy <- all_taxonomy %>%
+  bind_rows(., additional_taxonomy) %>%
+  arrange(NCBItaxID)
+
+# finally add the taxonomy to the RefSeq file
+refseq_tax_data <- refseqonly %>%
+  select(species_taxid, organism_name) %>%
+  rename(NCBItaxID = species_taxid,
+         Species = organism_name) %>% 
+  filter(!str_detect(Species, "virus|phage|satellite|viroid|viridae|virinae|Virus|AlphaCoV|circular|phytoplasma|endosymbiont")) %>% # remove all viruses b/c there aren't any in the Pasolli MAGs so we're not interested in them
+  mutate(Count = 1,
+         NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) %>%
+  # add taxonomy to the table 
+  left_join(., full_taxonomy, by = "NCBItaxID") %>%
+    group_by(NCBItaxID, Taxonomy) %>%
+  summarize(RefSeqCounts = sum(Count)) %>%
+  ungroup() %>%
+  filter(!is.na(Taxonomy)) %>%
+  select(NCBItaxID, Taxonomy, everything())
+
+# check that no taxIDs are duplicated
+refseq_tax_data %>% select(NCBItaxID) %>% unique() # some are
+refseq_tax_data %>% get_dupes(NCBItaxID)
+
+
+# now check for NAs again
+refseq_tax_data_nas <- refseq_tax_data %>%
+  filter(is.na(Taxonomy)) %>%
+  arrange(Species)
+# yes, these are all viruses that don't match the patterns included above, but we don't need to include, so removing them in the last step is ok to do.
 
 ```
 
@@ -165,15 +224,241 @@ mag_tax_data <- mag_info %>%
   select(closestTaxID, closestTaxLevel) %>%
   rename(Taxonomy = closestTaxLevel, 
          NCBItaxID = closestTaxID) %>%
+  # add a count column and change the taxonomy format to match that of the all_taxonomy file
   mutate(Count = 1,
-         NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_")) %>%
-  group_by(NCBItaxID, Taxonomy) %>%
-  summarize(PasolliMAGsCount = sum(Count))
+         NCBItaxID = str_replace_all(NCBItaxID, "^", "ncbi_"),
+         Taxonomy = str_replace_all(Taxonomy, "k__Bacteria", "r__root|d__Bacteria"),
+         Taxonomy = str_replace_all(Taxonomy, "k__Archaea", "r__root|d__Archaea"),
+         Taxonomy = str_replace_all(Taxonomy, "__", "XYZ"),
+         Taxonomy = str_replace_all(Taxonomy, "_", " "), 
+         Taxonomy = str_replace_all(Taxonomy, "XYZ", "__"),
+         Taxonomy = str_replace_all(Taxonomy, " sp ", " sp. ")) %>%
+  group_by(Taxonomy) %>%
+  summarize(PasolliMAGsCount = sum(Count)) %>%
+  ungroup()
 
-  
+dupe_mag <- mag_info %>% select(closestTaxLevel, closestTaxID) %>% arrange(closestTaxLevel) %>% unique() %>% get_dupes(closestTaxID) %>% select(closestTaxID, closestTaxLevel, dupe_count)
+
 ```
 
 
+Create tables that present the number of read assignments at each taxonomic
+level (Phylum, Genus, Species) with the RefSeqOnly and RefSeq+PasolliMAGs
+databases, the difference between each, and the fold-difference between the
+number of assignments to each taxon. Positive fold-difference means there were
+more assignments to that taxon in the RefSeq+PasolliMAGs database, and negative
+values means there were more assignments to that taxon in the RefSeqOnly
+database.
+```{r taxon_differences}
+
+db_phylum_compare <- rso_reports_tax_run1 %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "P")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "P")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
+db_genus_compare <- rso_reports_tax_run1 %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "G")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "G")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
+db_species_compare <- rso_reports_tax_run1 %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  filter(str_detect(Rank, "S")) %>%
+  group_by(SampleID, SciName) %>%
+  summarize(Rooted_avg = mean(Number_rooted)) %>%
+  mutate(Database = "RefSeqOnly") %>%
+  select(SciName, SampleID, Database, Rooted_avg) %>%
+  bind_rows(., rsmp_reports_tax_run1 %>%
+              filter(str_detect(SampleID, "CMC")) %>%
+              filter(str_detect(Rank, "S")) %>%
+              group_by(SampleID, SciName) %>%
+              summarize(Rooted_avg = mean(Number_rooted)) %>%
+              mutate(Database = "RefSeqPasolliMAGs") %>%
+              select(SciName, SampleID, Database, Rooted_avg)) %>%
+  group_by(Database, SciName) %>%
+  summarize(Total_rooted = sum(Rooted_avg)) %>%
+  spread(Database, Total_rooted) %>%
+  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
+  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
+         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
+  arrange(desc(Fold_difference))
+
+
+```
+
+There's a lot to look through in the tables above, so to make it easier to
+diges, look at the taxa that have at least 100 reads assigned by both databases,
+and for which the read difference is at least 100.
+```{r taxon_diffs_short, eval = F}
+db_species_compare_short <- db_species_compare %>%
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
+
+db_genus_compare_short <- db_genus_compare %>%
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
+
+db_phylum_compare_short <- db_phylum_compare %>%
+  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
+
+db_species_compare_phage <- db_species_compare %>%
+  filter(str_detect(SciName, "phage")) %>%
+  filter(!str_detect(SciName, "Bacteria"))
+
+```
+
+Now make plots that show the regions of the trees that are different between the
+database with and without MAGs. Start with a tree showing the distribution of
+the MAGs, then one of the RefSeq database, and then one showing the difference
+between RSO and RSMP(?)
+```{r pm_otu_table}
+# parse the taxonomy
+pm_database_obj <- parse_tax_data(mag_tax_data,
+                      class_cols = "Taxonomy",
+                      class_sep = "|",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into database_obj$data$class_data$tax_rank and into database_obj$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into database_obj$data$class_data$name
+
+names(pm_database_obj$data) <- c("otu_count","taxonomy_data") # Rename abundnace matrix to something more understandable
+
+# filter the taxonomy
+pm_database_obj <- filter_taxa(pm_database_obj, !grepl(taxon_names, pattern =  "Viruses")) # filter out Viruses, there are only 4 to begin with
+
+# convert counts to proportions
+pm_database_obj$data$otu_prop <- calc_obs_props(pm_database_obj,
+                                               data = "otu_count",
+                                               cols = metadata_pm$SampleID)
+
+
+# calculate abundance per taxon 
+pm_database_obj$data$otu_abund <- calc_taxon_abund(pm_database_obj, 
+                                                  "otu_prop", 
+                                                  cols = metadata_pm$SampleID)
+
+
+# add a new tibble with the abundance of each taxon to the environment
+pm_database_obj <- pm_database_obj %>%
+  mutate_obs("otu_abund", abundance = rowMeans(pm_database_obj$data$otu_abund[metadata_pm$SampleID]))
+
+```
+
+```{r PasolliMAGs_tree}
+# analysis parameters
+matrix_plot_depth <- 6 # The maximum number of ranks to display
+color_range <- c(viridis::plasma(10)[4:9], "lightgrey")
+colorscale <- c("#172869","grey97","#FF3200") # set the color scale for a diverging pallette
+min_read_count <- 100 # The minium number of reads needed for a taxon to be graphed
+
+set.seed(1)
+plot_pm <- database_obj %>%
+  filter_taxa(abundance > 0.0001) %>%
+  filter_obs("tax_abund", taxon_ranks == "g") %>%
+  heat_tree(node_size = abundance,
+            # node_size_range = c(0.01, 0.06),
+            node_size_axis_label = "Number of OTUs",
+            node_color = abundance	,
+            node_color_range = colorscale,
+            edge_color_range = colorscale,
+            node_color_axis_label = "Mean proportion of reads",
+            node_label = taxon_names)
+plot_pm
+
+```
+
+
+```{r rspm_database_otu_table}
+# join the RefSeq database and MAG database tables into 1
+rpmp_database_otu_table <- refseq_tax_data %>%
+  select(-NCBItaxID) %>%
+  full_join(., mag_tax_data, by = c("Taxonomy")) %>%
+  replace(., is.na(.), 0)
+  
+# parse the taxonomy
+rspm_database_obj <- parse_tax_data(rspm_database_otu_table,
+                      class_cols = "Taxonomy",
+                      class_sep = "|",
+                      class_regex = "^(.+)__(.+)$",
+                      class_key = c(tax_rank = "taxon_rank", # the first part recognized by the regex; goes into database_obj$data$class_data$tax_rank and into database_obj$taxon_ranks
+                                    name = "taxon_name")) # the second part recognized by the regex; goes into database_obj$data$class_data$name
+
+names(rspm_database_obj$data) <- c("otu_count","taxonomy_data") # Rename abundnace matrix to something more understandable
+
+# filter the taxonomy
+rspm_database_obj <- filter_taxa(rspm_database_obj, !grepl(taxon_names, pattern =  "Viruses")) # filter out Viruses, there are only 4 to begin with
+
+# convert counts to proportions
+rspm_database_obj$data$otu_prop <- calc_obs_props(rspm_database_obj,
+                                               data = "otu_count",
+                                               cols = metadata_database$SampleID)
+
+
+# calculate abundance per taxon 
+rspm_database_obj$data$otu_abund <- calc_taxon_abund(rspm_database_obj, 
+                                                  "otu_prop", 
+                                                  cols = metadata_database$SampleID)
+
+
+# add a new tibble with the abundance of each taxon to the environment
+rspm_database_obj <- rspm_database_obj %>%
+  mutate_obs("otu_abund", abundance = rowMeans(rspm_database_obj$data$otu_abund[metadata_database$SampleID]))
+
+
+```
+
+```{r RSPM_tree}
+# plot everything
+set.seed(1)
+plot_rspm <- rspm_database_obj %>%
+  filter_taxa(abundance >= 0.01) %>%
+  heat_tree(node_size = n_obs,
+            # node_size_range = c(0.01, 0.06),
+            node_size_axis_label = "Number of OTUs",
+            node_color = abundance	,
+            node_color_range = color_range,
+            edge_color_range = color_range,
+            node_color_axis_label = "Mean proportion of reads",
+            node_label = taxon_names)
+plot_rspm
+
+```
+
+
+
+
+# Sample taxonomy assignment changes
 To compare the 2 databases, I think I need to have the OTU tables combined into
 one table, with the sample names changed to indicate which database was used. So
 add the database to the sample names (_rso, _rsmp) for each and combine the 2
@@ -221,8 +506,8 @@ metadata_both <- metadata_mcR %>%
 
 ```
 
-# Start here to work on this tomorrow
-Let's follow the Human microbiome example on the metacodeR page (https://grunwaldlab.github.io/metacoder_documentation/publication--05--16s_human_microbiome.html)
+Let's follow the Human microbiome example on the metacodeR page 
+(https://grunwaldlab.github.io/metacoder_documentation/publication--05--16s_human_microbiome.html)
 ```{r metacoder_example, eval = F}
 # analysis parameters
 matrix_plot_depth <- 6 # The maximum number of ranks to display
@@ -405,173 +690,6 @@ combo_plot <- grid.arrange(ncol = 2, nrow = 1,
 
 ```
 
-
-Filter at different taxonomic levels.
-```{r rsomp_filter_levels, eval = F}
-
-# # Select only the family
-# rsomp_obj_f <- rsomp_obj %>%
-#   filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
-#   filter_obs("tax_abund", taxon_ranks == "f")
-
-# Select only the genera
-rsomp_obj_g <- rsomp_obj %>%
-  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
-  filter_obs("tax_abund", taxon_ranks == "g")
-
-# print(rsomp_obj_g)
-
-# this is from the metacodeR package and I'm using it to testing the filtering
-# Parse data for example
-x = parse_tax_data(hmp_otus, class_cols = "lineage", class_sep = ";",
-                   class_key = c(tax_rank = "taxon_rank", tax_name = "taxon_name"),
-                   class_regex = "^(.+)__(.+)$")
-                   
-# Calculate the taxon abundance for each numeric column (i.e. sample)
-x$data$tax_abund <- calc_taxon_abund(x, "tax_data", groups = hmp_samples$sex)
-
-# Add taxon name to tax_abund to see filtering effects easier
-x$data$tax_abund <- x$data$tax_abund %>%
-  mutate(taxon = taxon_names(x)) %>%
-  select(taxon_id, taxon, everything())
-
-
-x %>%
-  filter_taxa(n_obs > 10, reassign_obs = c(tax_abund = FALSE)) %>%
-  filter_obs("tax_abund", taxon_ranks == "g")
-
-
-```
-
-Can delete this section if the trees above work
-```{r rsomp_test_trees}
-
-set.seed(1)
-rsomp_obj_noV_tree_g_rso <- heat_tree(rsomp_obj_g, 
-          node_label = rsomp_obj_g$taxon_names(),
-          node_size = rsomp_obj_g$n_obs(),
-          node_color = NonIndustrial_rso,
-          node_size_axis_label = "OTU count",
-          node_color_axis_label = "Samples with reads",
-          layout = "davidson-harel", # The primary layout algorithm
-          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
-rsomp_obj_noV_tree_NI_rso
-
-ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rso.pdf", plot = rsomp_obj_noV_tree_NI_rso, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-set.seed(1)
-rsomp_obj_noV_tree_g_rsmp <- heat_tree(rsomp_obj_g, 
-          node_label = rsomp_obj_g$taxon_names(),
-          node_size = rsomp_obj_g$n_obs(),
-          node_color = NonIndustrial_rsmp,
-          node_size_axis_label = "OTU count",
-          node_color_axis_label = "Samples with reads",
-          layout = "davidson-harel", # The primary layout algorithm
-          initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
-rsomp_obj_noV_tree_NI_rsmp
-
-# ggsave("05-results.backup/rsomp_obj_noV_tree_NI_rsmp.pdf", plot = rsomp_obj_noV_tree_NI_rsmp, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-```
-
-Create tables that present the number of read assignments at each taxonomic
-level (Phylum, Genus, Species) with the RefSeqOnly and RefSeq+PasolliMAGs
-databases, the difference between each, and the fold-difference between the
-number of assignments to each taxon. Positive fold-difference means there were
-more assignments to that taxon in the RefSeq+PasolliMAGs database, and negative
-values means there were more assignments to that taxon in the RefSeqOnly
-database.
-```{r taxon_differences}
-
-db_phylum_compare <- rso_reports_tax_run1 %>%
-  filter(str_detect(SampleID, "CMC")) %>%
-  filter(str_detect(Rank, "P")) %>%
-  group_by(SampleID, SciName) %>%
-  summarize(Rooted_avg = mean(Number_rooted)) %>%
-  mutate(Database = "RefSeqOnly") %>%
-  select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports_tax_run1 %>%
-              filter(str_detect(SampleID, "CMC")) %>%
-              filter(str_detect(Rank, "P")) %>%
-              group_by(SampleID, SciName) %>%
-              summarize(Rooted_avg = mean(Number_rooted)) %>%
-              mutate(Database = "RefSeqPasolliMAGs") %>%
-              select(SciName, SampleID, Database, Rooted_avg)) %>%
-  group_by(Database, SciName) %>%
-  summarize(Total_rooted = sum(Rooted_avg)) %>%
-  spread(Database, Total_rooted) %>%
-  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
-  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
-         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
-  arrange(desc(Fold_difference))
-
-db_genus_compare <- rso_reports_tax_run1 %>%
-  filter(str_detect(SampleID, "CMC")) %>%
-  filter(str_detect(Rank, "G")) %>%
-  group_by(SampleID, SciName) %>%
-  summarize(Rooted_avg = mean(Number_rooted)) %>%
-  mutate(Database = "RefSeqOnly") %>%
-  select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports_tax_run1 %>%
-              filter(str_detect(SampleID, "CMC")) %>%
-              filter(str_detect(Rank, "G")) %>%
-              group_by(SampleID, SciName) %>%
-              summarize(Rooted_avg = mean(Number_rooted)) %>%
-              mutate(Database = "RefSeqPasolliMAGs") %>%
-              select(SciName, SampleID, Database, Rooted_avg)) %>%
-  group_by(Database, SciName) %>%
-  summarize(Total_rooted = sum(Rooted_avg)) %>%
-  spread(Database, Total_rooted) %>%
-  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
-  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
-         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
-  arrange(desc(Fold_difference))
-
-db_species_compare <- rso_reports_tax_run1 %>%
-  filter(str_detect(SampleID, "CMC")) %>%
-  filter(str_detect(Rank, "S")) %>%
-  group_by(SampleID, SciName) %>%
-  summarize(Rooted_avg = mean(Number_rooted)) %>%
-  mutate(Database = "RefSeqOnly") %>%
-  select(SciName, SampleID, Database, Rooted_avg) %>%
-  bind_rows(., rsmp_reports_tax_run1 %>%
-              filter(str_detect(SampleID, "CMC")) %>%
-              filter(str_detect(Rank, "S")) %>%
-              group_by(SampleID, SciName) %>%
-              summarize(Rooted_avg = mean(Number_rooted)) %>%
-              mutate(Database = "RefSeqPasolliMAGs") %>%
-              select(SciName, SampleID, Database, Rooted_avg)) %>%
-  group_by(Database, SciName) %>%
-  summarize(Total_rooted = sum(Rooted_avg)) %>%
-  spread(Database, Total_rooted) %>%
-  select(SciName, RefSeqOnly, RefSeqPasolliMAGs) %>%
-  mutate(Read_difference = RefSeqPasolliMAGs - RefSeqOnly, 
-         Fold_difference = log2(RefSeqPasolliMAGs/RefSeqOnly)) %>%
-  arrange(desc(Fold_difference))
-
-
-```
-
-There's a lot to look through in the tables above, so to make it easier to
-diges, look at the taxa that have at least 100 reads assigned by both databases,
-and for which the read difference is at least 100.
-```{r taxon_diffs_short, eval = F}
-db_species_compare_short <- db_species_compare %>%
-  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
-
-db_genus_compare_short <- db_genus_compare %>%
-  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
-
-db_phylum_compare_short <- db_phylum_compare %>%
-  filter(RefSeqOnly >=100, RefSeqPasolliMAGs >= 100, Read_difference >=100 | Read_difference <= -100)
-
-db_species_compare_phage <- db_species_compare %>%
-  filter(str_detect(SciName, "phage")) %>%
-  filter(!str_detect(SciName, "Bacteria"))
-
-```
 
 # Individual tables
 If we want to use individual tables (RSO, RSMP) then use these, otherwise delete them. THey don't follow the same HMP example as RSOMP and that one works great while this one has issues still
