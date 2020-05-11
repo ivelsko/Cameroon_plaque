@@ -48,7 +48,7 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
       df_X <- df %>%
               inner_join(metadata %>%
                            select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID")
 
     stat_info_table = df_X[[stat_info]]
     metadata_group = df_X[[metadata_group]]
@@ -81,7 +81,11 @@ outliersF <- str_c(outliers, collapse = "|")
 
 
 # Alpha-diversity
-First we want to know if there are differences in the total diveristy of identified species between *XXXMETADATAXXX*. We'll look at alpha-diversity for this, using both the observed species and Shannon diverity metrics. Observed species to tell us which *XXXMETADATAXXX* have more species/genera, and Shannon to tell us which has more even distribution of species/genera. 
+First we want to know if there are differences in the total diveristy of
+identified species between *XXXMETADATAXXX*. We'll look at alpha-diversity for
+this, using both the observed species and Shannon diverity metrics. Observed
+species to tell us which *XXXMETADATAXXX* have more species/genera, and Shannon
+to tell us which has more even distribution of species/genera.
 
 ## Observed Speceies/Genera
 ```{r observed_species}
@@ -106,7 +110,6 @@ malt_species.decontam.os <- presabs_table %>%
 
 plot_box_whisker(malt_species.decontam.os, "Observed_species", "Env", "Env", "Number of species")
 plot_box_whisker(malt_species.decontam.os, "Observed_species", "Village", "Village", "Number of species")
-
 
 # now on filtered tables
 presabs_table_f <- malt_species.decontam %>%
@@ -281,7 +284,7 @@ plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Village
 Let's also look specifically at evenness of the samples using Pielou's evenness. This calculation (derived from Shannon's index) gives us a number from 0 to 1, where 0 is no evenness and 1 is perfect evenness. We want to see if there are any groups that have substantially greater species/genera evenness than the others. We're not interested in what the actual number is, or how even the samples appear to be, except relative to eachother. 
 ```{r evenness_pielou}
 evenness.species <- diversity(malt_species.decontam.matrix)
-evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam_filtered.matrix)))
+evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam.matrix)))
 names(evenness.species)[1] <- "Pielou_evenness"
 
 # merge with the metadata file and plot

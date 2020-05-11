@@ -1,0 +1,932 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque batch effects"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(vegan)
+library(compositions)
+library(janitor)
+library(ggheatmap)
+library(tidyverse)
+library(gplots)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+Start with a check that there are not substantial differences in the diversity
+between extraction batches or library build batches.
+```{r species_os}
+# make Relab binary to make a presence/absence table
+batch_table_os <- malt_species.decontam %>%
+               select(-one_of(outliers)) %>%
+               adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+               mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+               select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+               gather("SampleID","Counts",2:ncol(.)) %>%
+               spread(Species,Counts) %>%
+               gather("Species","Counts",2:ncol(.)) %>%
+               mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+               spread(Species, Counts) %>%
+               filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+               adorn_totals(., where = "col", name = "Observed_species") %>%
+               select(SampleID, Observed_species) %>%
+               inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+               filter(!is.na(LibraryBatch))
+
+# plot extraction batch
+batch_table_os %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# plot library batch
+ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_os <- batch_table_os %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, ExtractionBatch)$p.value)
+kw_os # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- batch_table_os %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_os # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_os <- batch_table_os %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, LibraryBatch)$p.value)
+kw_os # the library batches aren't significantly different from eachother
+
+wilcox <- batch_table_os %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_os # none of the library batches are significantly different
+
+
+# and the filtered data
+# make Relab binary to make a presence/absence table
+batch_table_os <- malt_species.decontam %>%
+               select(-one_of(outliers)) %>%
+               adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+               mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+               filter(Percent > 0.001) %>%
+               select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+               gather("SampleID","Counts",2:ncol(.)) %>%
+               spread(Species,Counts) %>%
+               gather("Species","Counts",2:ncol(.)) %>%
+               mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+               spread(Species, Counts) %>%
+               filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+               adorn_totals(., where = "col", name = "Observed_species") %>%
+               select(SampleID, Observed_species) %>%
+               inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+               filter(!is.na(LibraryBatch))
+
+# plot extraction batch
+batch_table_os %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# plot library batch
+ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# perform a kruskal-wallace test to determine if the extraction/ batches are differentially abundant
+kw_os <- batch_table_os %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, ExtractionBatch)$p.value)
+kw_os # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- batch_table_os %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_os
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_os <- batch_table_os %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, LibraryBatch)$p.value)
+kw_os # the library batches aren't significantly different from eachother
+
+wilcox <- batch_table_os %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_os # none of the library batches are significantly different
+
+```
+
+Now at the genus level
+```{r genus_os}
+batch_table_og <- malt_genus.decontam %>%
+                 select(-one_of(outliers)) %>%
+                 adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                 mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                 select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                 gather("SampleID","Counts",2:ncol(.)) %>%
+                 spread(Species,Counts) %>%
+                 gather("Species","Counts",2:ncol(.)) %>%
+                 mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                 spread(Species, Counts) %>%
+                 filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+                 adorn_totals(., where = "col", name = "Observed_species") %>%
+                 select(SampleID, Observed_species) %>%
+                 inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+                 filter(!is.na(LibraryBatch))
+
+# plot extraction batch
+batch_table_og %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# plot library batch
+ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_og <- batch_table_og %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, ExtractionBatch)$p.value)
+kw_og # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- batch_table_og %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_og # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_og <- batch_table_og %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, LibraryBatch)$p.value)
+kw_og # the library batches aren't significantly different from eachother
+
+wilcox <- batch_table_og %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_og # none of the library batches are significantly different
+
+
+# and the filtered data
+batch_table_og <- malt_genus.decontam %>%
+                 select(-one_of(outliers)) %>%
+                 adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                 mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                 filter(Percent > 0.001) %>%
+                 select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                 gather("SampleID","Counts",2:ncol(.)) %>%
+                 spread(Species,Counts) %>%
+                 gather("Species","Counts",2:ncol(.)) %>%
+                 mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                 spread(Species, Counts) %>%
+                 filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+                 adorn_totals(., where = "col", name = "Observed_species") %>%
+                 select(SampleID, Observed_species) %>%
+                 inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+                 filter(!is.na(LibraryBatch))
+
+# plot extraction batch
+batch_table_og %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+# plot library batch
+ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Observed species") +
+       ggtitle("Number of observed species")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_og <- batch_table_og %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, ExtractionBatch)$p.value)
+kw_og # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- batch_table_og %>%
+  select(SampleID, Observed_species, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_og # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_og <- batch_table_og %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(Observed_species, LibraryBatch)$p.value)
+kw_og # the library batches aren't significantly different from eachother
+
+wilcox <- batch_table_og %>%
+  select(SampleID, Observed_species, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_og # none of the library batches are significantly different
+
+```
+
+Shannon diversity species
+```{r species_shannon}
+# Shannon diversity with the package vegan
+malt_species.decontam.matrix <- as.matrix(malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+ 
+malt_species.decontam.shannon <- as.data.frame(diversity(malt_species.decontam.matrix, index = "shannon"))
+names(malt_species.decontam.shannon)[1] <- "Shannon index"
+
+# merge with the metadata file and plot
+malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+malt_species.decontam.shannon %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - species")
+
+# plot library batch
+ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - species")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_ss <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, ExtractionBatch)$p.value)
+kw_ss # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_shannons # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ss <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, LibraryBatch)$p.value)
+kw_ss # the library batches aren't significantly different from eachother
+
+wilcox <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_shannons # none of the library batches are significantly different
+
+
+# and the filtered data
+malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+ 
+malt_species.decontam.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
+names(malt_species.decontam.shannon)[1] <- "Shannon index"
+
+# merge with the metadata file and plot
+malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+malt_species.decontam.shannon %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - species")
+
+# plot library batch
+ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - species")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_ss <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, ExtractionBatch)$p.value)
+kw_ss # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_shannons # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ss <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, LibraryBatch)$p.value)
+kw_ss # the library batches aren't significantly different from eachother
+
+wilcox <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_shannons # none of the library batches are significantly different
+
+```
+
+Shannon diversity genus
+```{r genus_shannon}
+# Shannon diversity with the package vegan
+malt_genus.decontam.matrix <- as.matrix(malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_genus.decontam.shannon <- as.data.frame(diversity(malt_genus.decontam.matrix, index = "shannon"))
+names(malt_genus.decontam.shannon)[1] <- "Shannon index"
+
+# merge with the metadata file and plot
+malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+malt_genus.decontam.shannon %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - genus")
+
+# plot library batch
+ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - genus")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_sg <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, ExtractionBatch)$p.value)
+kw_sg # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_shannong # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_sg <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, LibraryBatch)$p.value)
+kw_sg # the library batches aren't significantly different from eachother
+
+wilcox <- malt_species.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_shannong # none of the library batches are significantly different
+
+# and the filtered data
+malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_genus.decontam.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
+names(malt_genus.decontam.shannon)[1] <- "Shannon index"
+
+# merge with the metadata file and plot
+malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+malt_genus.decontam.shannon %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - genus")
+
+# plot library batch
+ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Shannon index") +
+       ggtitle("Shannon index - genus")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_sg <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, ExtractionBatch)$p.value)
+kw_sg # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_shannong # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_sg <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Shannon index`, LibraryBatch)$p.value)
+kw_sg # the library batches aren't significantly different from eachother
+
+wilcox <- malt_genus.decontam.shannon %>%
+  select(SampleID, `Shannon index`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_shannong # none of the library batches are significantly different
+
+```
+
+
+Pileou's evenness species
+```{r pileou_species}
+evenness.species <- diversity(malt_species.decontam.matrix)
+evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam.matrix)))
+names(evenness.species)[1] <- "Pileou's evenness"
+
+# merge with the metadata file and plot
+evenness.species <- evenness.species %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+evenness.species %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Pileou's evenness`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+# plot library batch
+ggplot(evenness.species, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_ps <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, ExtractionBatch)$p.value)
+kw_ps # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_pileous # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ps <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, LibraryBatch)$p.value)
+kw_ps # the library batches aren't significantly different from eachother
+
+wilcox <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_pileous # none of the library batches are significantly different
+
+
+# and with the filtered data
+evenness.species <- diversity(malt_species.decontam_filtered.matrix)
+evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam_filtered.matrix)))
+names(evenness.species)[1] <- "Pileou's evenness"
+
+# merge with the metadata file and plot
+evenness.species <- evenness.species %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+evenness.species %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Pileou's evenness`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+# plot library batch
+ggplot(evenness.species, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_ps <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, ExtractionBatch)$p.value)
+kw_ps # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_pileous # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ps <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, LibraryBatch)$p.value)
+kw_ps # the library batches aren't significantly different from eachother
+
+wilcox <- evenness.species %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_pileous # none of the library batches are significantly different
+
+```
+
+Pileou's evenness genus
+```{r pileou_genus}
+evenness.genus <- diversity(malt_genus.decontam.matrix)
+evenness.genus <- as.data.frame(evenness.genus/log(specnumber(malt_genus.decontam.matrix)))
+names(evenness.genus)[1] <- "Pileou's evenness"
+
+# merge with the metadata file and plot
+evenness.genus <- evenness.genus %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+evenness.genus %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Pileou's evenness`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+# plot library batch
+ggplot(evenness.genus, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_pg <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, ExtractionBatch)$p.value)
+kw_pg # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_pileoug # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ps <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, LibraryBatch)$p.value)
+kw_ps # the library batches aren't significantly different from eachother
+
+wilcox <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_pileoug # none of the library batches are significantly different
+
+
+# and with the filtered data
+evenness.genus <- diversity(malt_genus.decontam_filtered.matrix)
+evenness.genus <- as.data.frame(evenness.genus/log(specnumber(malt_genus.decontam_filtered.matrix)))
+names(evenness.genus)[1] <- "Pileou's evenness"
+
+# merge with the metadata file and plot
+evenness.genus <- evenness.genus %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(metadata %>%
+             select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch))
+  
+# plot extraction batch
+evenness.genus %>%
+  filter(!is.na(ExtractionBatch)) %>%
+    ggplot(., aes(x = ExtractionBatch, y = `Pileou's evenness`, fill = ExtractionBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       # scale_fill_manual(values = ExtractionBatch_colors) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+# plot library batch
+ggplot(evenness.genus, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = LibraryBatch)) +
+       geom_boxplot() +
+       geom_jitter(alpha = 0.5) +
+       theme_minimal() +
+       theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+       ylab("Pileou's evenness") +
+       ggtitle("Pileou's evenness - genus")
+
+
+# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+kw_pg <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23") %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, ExtractionBatch)$p.value)
+kw_pg # the extraction batches aren't significantly different from eachother
+
+# perform a post-hoc test to determine if any extraction group is significantly different from the others
+wilcox <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
+  filter(!is.na(ExtractionBatch)) %>%
+  filter(ExtractionBatch != "Ex01_VE_2019-01-23")
+
+wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
+wilcox_pileoug # none of the extraction batches are significantly different
+
+# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+kw_ps <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) %>%
+  summarise(kruskal_wallis_pvalue = kruskal.test(`Pileou's evenness`, LibraryBatch)$p.value)
+kw_ps # the library batches aren't significantly different from eachother
+
+wilcox <- evenness.genus %>%
+  select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
+  filter(!is.na(LibraryBatch)) 
+
+wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$LibraryBatch, p.adjust.method = "fdr")
+wilcox_pileoug # none of the library batches are significantly different
+
+```
+
+
+
+

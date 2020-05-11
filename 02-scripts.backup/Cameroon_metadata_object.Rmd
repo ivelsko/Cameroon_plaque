@@ -27,6 +27,7 @@ interested in.
 ```{r metadata}
 # load the metadata file
 metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
 metadata <- metadata %>%
   rename(SampleID = `#SampleID`)  %>%
   as_tibble() %>%
@@ -35,8 +36,12 @@ metadata <- metadata %>%
                                    "ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Yanomami","HMP","HMP10M","JAE","JAE10M",
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         ExtractionBatch = fct_relevel(ExtractionBatch, "Ex01_VE_2019-01-23","Ex04_VE_2019-02-18","Ex05_VE_2019-02-18",
+                                       "Ex06_VE_2019-02-21","Ex07_VE_2019-02-21","Ex08_VE_2019-02-25","Ex09_VE_2019-03-13"),
          Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
                                      "ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         LibraryBatch = fct_relevel(LibraryBatch, "Li03_VE_2019-04-17","Li04_VE_2019-04-17","Li05_VE_2019-04-17",
+                                       "Li06_VE_2019-05-02","Li07_VE_2019-05-06","Li08_VE_2019-05-06","Li09_VE_2019-05-06"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
@@ -72,6 +77,14 @@ Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3",
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
+ExtractionBatch_colors <- c(`Ex01_VE_2019-01-23` = "#FF3200", `Ex04_VE_2019-02-18` = "#172869", `Ex05_VE_2019-02-18` = "#C70E7B", 
+                            `Ex06_VE_2019-02-21` = "#969696", `Ex07_VE_2019-02-21` = "#d9d9d9", 
+                         `Ex08_VE_2019-02-25` = "#ffeda0", `Ex09_VE_2019-03-13` = "#feb24c")
+ExtractionBatch_shapes <- c(`Ex01_VE_2019-01-23` = 19, `Ex04_VE_2019-02-18` = 17,  `Ex05_VE_2019-02-18` = 14, `Ex06_VE_2019-02-21` = 7, 
+                            `Ex07_VE_2019-02-21` = 9, `Ex08_VE_2019-02-25` = 7, `Ex09_VE_2019-03-13` = 9)
+ExtractionBatch_size <- c(`Ex01_VE_2019-01-23` = 4, `Ex04_VE_2019-02-18` = 4,  `Ex05_VE_2019-02-18` = 4, `Ex06_VE_2019-02-21` = 4, 
+                          `Ex07_VE_2019-02-21` = 4, `Ex08_VE_2019-02-25` = 4, `Ex09_VE_2019-03-13` = 4)
+
 Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#969696", HMP_subPlaque = "#969696", # HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
                         HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -89,6 +102,14 @@ Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Industry_size <- c(`Non-industrial` = 4, Industrial = 4,
                            ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
+LibraryBatch_colors <- c(`Li03_VE_2019-04-17` = "#FF3200", `Li04_VE_2019-04-17` = "#172869", `Li05_VE_2019-04-17` = "#C70E7B", 
+                            `Li06_VE_2019-05-02` = "#969696", `Li07_VE_2019-05-06` = "#d9d9d9", 
+                         `Li08_VE_2019-05-06` = "#ffeda0", `Li09_VE_2019-05-06` = "#feb24c")
+LibraryBatch_shapes <- c(`Li03_VE_2019-04-17` = 19, `Li04_VE_2019-04-17` = 17,  `Li05_VE_2019-04-17` = 14, `Li06_VE_2019-05-02` = 7, 
+                            `Li07_VE_2019-05-06` = 9, `Li08_VE_2019-05-06` = 7, `Li09_VE_2019-05-06` = 9)
+LibraryBatch_size <- c(`Li03_VE_2019-04-17` = 4, `Li04_VE_2019-04-17` = 4,  `Li05_VE_2019-04-17` = 4, `Li06_VE_2019-05-02` = 4, 
+                          `Li07_VE_2019-05-06` = 4, `Li08_VE_2019-05-06` = 4, `Li09_VE_2019-05-06` = 4)
 
 Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#172869", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -126,10 +147,12 @@ save(metadata,
      Age_group_colors, Age_group_shapes, Age_group_size,
      Ethnic_Group_colors, Ethnic_Group_shapes, Ethnic_Group_size,
      Env_colors, Env_shapes, Env_size,
+     ExtractionBatch_colors, ExtractionBatch_shapes, ExtractionBatch_size,
      Description_colors, Description_shapes, Description_size, 
      Database_colors,
      Kraken_db_colors,
      Industry_shapes, Industry_size, Industry_colors,
+     LibraryBatch_colors, LibraryBatch_shapes, LibraryBatch_size,
      Market_economy_colors, Market_economy_size, Market_economy_size,
      Sex_colors, Sex_shapes, Sex_size,
      Tooth_site_colors, Tooth_site_shapes, Tooth_site_size,
