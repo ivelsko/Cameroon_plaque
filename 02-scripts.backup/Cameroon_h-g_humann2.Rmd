@@ -676,6 +676,17 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arr
              caption = "PC1 negative loadings")
 
 ```
+_PC1+:_
+
+
+_PC1-:_
+
+
+_PC2+:_
+
+
+_PC2-:_
+
 
 
 ```{r outliers, eval=F}
@@ -823,6 +834,56 @@ pca_V_plot
 
 ```
 
+```{r pca_KOs_noyanomami_metadata}
+# create the input matrix
+humann2_KO_mat <- humann2_KOs %>%
+  filter(!str_detect(Ortholog, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-contains("SRR164")) %>% # these plot with EXB and LIB controls in the PCA above
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Ortholog, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M"))%>%
+  adorn_totals(where = "row", name = "Sum") %>%
+  gather("Ortholog","CPM", 2:ncol(.)) %>%
+  spread(SampleID, CPM) %>%
+  mutate(Percent = Sum/sum(Sum)) %>%
+  filter(Percent > 0.0005) %>%
+  select(-c("Sum","Percent")) %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Ortholog, CPM)
+
+rownames(humann2_KO_mat) <- humann2_KO_mat$SampleID
+humann2_KO_mat <- as.matrix(humann2_KO_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_KO_noyanomami.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_EG_plot
+pca_EG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_EG_plot
+
+pca_AG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+pca_AG_plot
+
+pca_ME_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+pca_ME_plot
+
+pca_S_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+pca_S_plot
+
+pca_TS_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+pca_TS_plot
+
+pca_V_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Village", "Village", "Village")
+pca_V_plot
+
+```
 
 ```{r pca_KOs_cmc_metadata}
 # create the input matrix
@@ -904,7 +965,7 @@ adonis(humann2_KO_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Villag
 Now to see which of the orthologs have the strongest loadings in PC1 and PC2
 ```{r pca_KO_biplot}
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
+pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_KO_biplot_pc1
 
 # what are those pathways?
@@ -923,7 +984,7 @@ pandoc.table(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              caption = "PC1 negative loadings")
 
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
+pca_EG_biplot_pc2 <- plot_pca_bi(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_biplot_pc2
 
 # what are those pathways?
@@ -983,6 +1044,103 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10  %>% arrange(PC2),
              caption = "PC2 negative loadings")
 
 ```
+_*All samples*_
+_PC1+:_
+K01839 - phosphopentomutase [EC:5.4.2.7]; carbohydrate metabolism
+K01989 - putative ABC transport system substrate-binding protein; membrane transport
+K01819 - galactose-6-phosphate isomerase [EC:5.3.1.26]; carbohydrate metabolism
+K07088 - uncharacterized protein
+K01223 - 6-phospho-beta-glucosidase [EC:3.2.1.86]; carbohydrate metabolism
+K03839 - flavodoxin I; energy metabolism
+K15986 - manganese-dependent inorganic pyrophosphatase [EC:3.6.1.1]; energy metabolism
+K03650 - tRNA modification GTPase [EC:3.6.-.-]; tRNA biosynthesis
+K03569 - rod shape-determining protein MreB and related proteins
+K15580 - oligopeptide transport system substrate-binding protein; membrane transport
+
+_PC1-:_
+K09791 - uncharacterized protein (ycaR)
+K07481 - transposase, IS5 family
+K01494 - dCTP deaminase [EC:3.5.4.13]; nucleotide metabolism
+K03801 - lipoyl(octanoyl) transferase [EC:2.3.1.181]; metabolism of cofactors and vitamins
+K00033 - 6-phosphogluconate dehydrogenase [EC:1.1.1.44 1.1.1.343]; carbohydrate metabolism
+K07054 - uncharacterized protein (ypfJ)
+K02897 - large subunit ribosomal protein L25; translation
+K02050 - NitT/TauT family transport system permease protein; membrane transport
+K00340 - NADH-quinone oxidoreductase subunit K [EC:7.1.1.2]; energy metabolism
+K02437 - glycine cleavage system H protein; carbohydrate metabolism
+
+_PC2+:_
+K02032 - peptide/nickel transport system ATP-binding protein; membrane transport
+K07114 - Ca-activated chloride channel homolog; membrane transport
+K07133 - uncharacterized protein
+K11710 - manganese/zinc/iron transport system ATP- binding protein [EC:7.2.2.5]; membrane transport
+K02031 - peptide/nickel transport system ATP-binding protein; membrane transport
+K10441 - ribose transport system ATP-binding protein [EC:7.5.2.7]; membrane transport
+K03924 - MoxR-like ATPase [EC:3.6.3.-]
+K02034 - peptide/nickel transport system permease protein; membrane transport
+K02033 - peptide/nickel transport system permease protein; membrane transport
+K02026 - multiple sugar transport system permease protein; membrane transport
+
+_PC2-:_
+K07729 - putative transcriptional regulator; transcription factor
+K06199 - fluoride exporter; membrane transport
+K02825 - pyrimidine operon attenuation protein / uracil phosphoribosyltransferase [EC:2.4.2.9]; nucleotide metabolism
+K03621 - phosphate acyltransferase [EC:2.3.1.274]; lipid metabolism
+K00991 - 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase [EC:2.7.7.60]; biosynthesis of secondary metabolites
+K02793 - mannose PTS system EIIA component [EC:2.7.1.191]; carbohydrate metabolism
+K02794 - mannose PTS system EIIAB component [EC:2.7.1.191]; carbohydrate metabolism
+K07166 - ACT domain-containing protein; signaling protein
+K01091 - phosphoglycolate phosphatase [EC:3.1.3.18]; carbohydrate metabolism
+K07058 - membrane protein (yhjD, yihH, rbn)
+
+_*CMC samples only*_
+_PC1+:_
+K00260 - glutamate dehydrogenase [EC:1.4.1.2]; amino acid metabolism, arginine biosynthesis
+K01819 - galactose-6-phosphate isomerase [EC:5.3.1.26]; carbohydrate metabolism
+K01839 - phosphopentomutase [EC:5.4.2.7]; carbohydrate metabolism
+K03856 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
+K01989 - putative ABC transport system substrate-binding protein
+K01223 - 6-phospho-beta-glucosidase [EC:3.2.1.86]; carbohydrate metabolism
+K07088 - uncharacterized protein
+K16957 - L-cystine transport system substrate-binding protein; membrane transport
+K15986 - manganese-dependent inorganic pyrophosphatase [EC:3.6.1.1]; energy metabolism
+K04486 - histidinol-phosphatase (PHP family) [EC:3.1.3.15]; amino acid metabolism
+
+_PC1-:_
+K09791 - uncharacterized protein (ycaR)
+K07481 - transposase, IS5 family
+K07054 - uncharacterized protein (ypfJ)
+K01494 - dCTP deaminase [EC:3.5.4.13]; nucleotide metabolism
+K04759 - ferrous iron transport protein B; membrane transport
+K02050 - NitT/TauT family transport system permease protein
+K10441 - ribose transport system ATP-binding protein [EC:7.5.2.7]; membrane transport
+K02027 - multiple sugar transport system substrate-binding protein (ycjN); membrane transport
+K02897 - large subunit ribosomal protein L25
+K00340 - NADH-quinone oxidoreductase subunit K [EC:7.1.1.2]; energy metabolism
+
+_PC2+:_
+K00260 - glutamate dehydrogenase [EC:1.4.1.2]; energy metabolism, amino acid metabolism
+K04031 - ethanolamine utilization protein EutS
+K01623 - fructose-bisphosphate aldolase, class I [EC:4.1.2.13]; carbohydrate metabolism
+K11708 - manganese/zinc/iron transport system permease protein; membrane transport
+K02032 - peptide/nickel transport system ATP-binding protein; membrane transport
+K02009 - cobalt/nickel transport protein; membrane transport
+K01995 - branched-chain amino acid transport system ATP-binding protein; membrane transport
+K03839 - flavodoxin I; eneregy metabolism
+K11707 - manganese/zinc/iron transport system substrate-binding protein; membrane transport
+K03856 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
+
+_PC2-:_
+K03060 - DNA-directed RNA polymerase subunit omega [EC:2.7.7.6]; transcription
+K02036 - phosphate transport system ATP-binding protein [EC:7.3.2.1]; membrane transport
+K03402 - transcriptional regulator of arginine metabolism; transcription factor
+K01626 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
+K00969 - nicotinate-nucleotide adenylyltransferase [EC:2.7.7.18]; metabolism of cofactors and vitamins
+K07166 - ACT domain-containing protein; signaling protein (gvcR)
+K02529 - LacI family transcriptional regulator; transcription factor
+K02970 - small subunit ribosomal protein S21
+K05896 - segregation and condensation protein A; DNA replication
+K00016 - L-lactate dehydrogenase [EC:1.1.1.27]; carbohydrate metabolism
 
 ```{r}
 

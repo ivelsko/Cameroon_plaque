@@ -92,7 +92,7 @@ ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = Librar
        ylab("Observed species") +
        ggtitle("Number of observed species")
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_os <- batch_table_os %>%
   select(SampleID, Observed_species, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -109,7 +109,7 @@ wilcox <- batch_table_os %>%
 wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_os # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_os <- batch_table_os %>%
   select(SampleID, Observed_species, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -166,7 +166,7 @@ ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = Librar
        ylab("Observed species") +
        ggtitle("Number of observed species")
 
-# perform a kruskal-wallace test to determine if the extraction/ batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction/ batches have significantly different diversity
 kw_os <- batch_table_os %>%
   select(SampleID, Observed_species, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -183,7 +183,7 @@ wilcox <- batch_table_os %>%
 wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_os
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_os <- batch_table_os %>%
   select(SampleID, Observed_species, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -241,7 +241,7 @@ ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = Librar
        ggtitle("Number of observed species")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_og <- batch_table_og %>%
   select(SampleID, Observed_species, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -258,7 +258,7 @@ wilcox <- batch_table_og %>%
 wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_og # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_og <- batch_table_og %>%
   select(SampleID, Observed_species, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -315,7 +315,7 @@ ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = Librar
        ggtitle("Number of observed species")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_og <- batch_table_og %>%
   select(SampleID, Observed_species, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -332,7 +332,7 @@ wilcox <- batch_table_og %>%
 wilcox_og <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_og # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_og <- batch_table_og %>%
   select(SampleID, Observed_species, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -393,7 +393,7 @@ ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`,
        ggtitle("Shannon index - species")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%
   select(SampleID, `Shannon index`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -410,7 +410,7 @@ wilcox <- malt_species.decontam.shannon %>%
 wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_shannons # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%
   select(SampleID, `Shannon index`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -469,7 +469,7 @@ ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`,
        ggtitle("Shannon index - species")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%
   select(SampleID, `Shannon index`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -486,7 +486,7 @@ wilcox <- malt_species.decontam.shannon %>%
 wilcox_shannons <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_shannons # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%
   select(SampleID, `Shannon index`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -547,7 +547,7 @@ ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, f
        ggtitle("Shannon index - genus")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_sg <- malt_genus.decontam.shannon %>%
   select(SampleID, `Shannon index`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -564,7 +564,7 @@ wilcox <- malt_genus.decontam.shannon %>%
 wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_shannong # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_sg <- malt_genus.decontam.shannon %>%
   select(SampleID, `Shannon index`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -622,7 +622,7 @@ ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, f
        ggtitle("Shannon index - genus")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_sg <- malt_genus.decontam.shannon %>%
   select(SampleID, `Shannon index`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -639,7 +639,7 @@ wilcox <- malt_genus.decontam.shannon %>%
 wilcox_shannong <-  pairwise.wilcox.test(wilcox$`Shannon index`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_shannong # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_sg <- malt_genus.decontam.shannon %>%
   select(SampleID, `Shannon index`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -692,7 +692,7 @@ ggplot(evenness.species, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = L
        ggtitle("Pileou's evenness - genus")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ps <- evenness.species %>%
   select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -709,7 +709,7 @@ wilcox <- evenness.species %>%
 wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_pileous # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ps <- evenness.species %>%
   select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -758,7 +758,7 @@ ggplot(evenness.species, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = L
        ylab("Pileou's evenness") +
        ggtitle("Pileou's evenness - genus")
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ps <- evenness.species %>%
   select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -775,7 +775,7 @@ wilcox <- evenness.species %>%
 wilcox_pileous <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_pileous # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ps <- evenness.species %>%
   select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -827,7 +827,7 @@ ggplot(evenness.genus, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = Lib
        ggtitle("Pileou's evenness - genus")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_pg <- evenness.genus %>%
   select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -844,7 +844,7 @@ wilcox <- evenness.genus %>%
 wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_pileoug # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ps <- evenness.genus %>%
   select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%
@@ -894,7 +894,7 @@ ggplot(evenness.genus, aes(x = LibraryBatch, y = `Pileou's evenness`, fill = Lib
        ggtitle("Pileou's evenness - genus")
 
 
-# perform a kruskal-wallace test to determine if the extraction batches are differentially abundant
+# perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_pg <- evenness.genus %>%
   select(SampleID, `Pileou's evenness`, ExtractionBatch) %>%
   filter(!is.na(ExtractionBatch)) %>%
@@ -911,7 +911,7 @@ wilcox <- evenness.genus %>%
 wilcox_pileoug <-  pairwise.wilcox.test(wilcox$`Pileou's evenness`, wilcox$ExtractionBatch, p.adjust.method = "fdr")
 wilcox_pileoug # none of the extraction batches are significantly different
 
-# perform a kruskal-wallace test to determine if the library batches are differentially abundant
+# perform a kruskal-wallace test to determine if the library batches have significantly different diversity
 kw_ps <- evenness.genus %>%
   select(SampleID, `Pileou's evenness`, LibraryBatch) %>%
   filter(!is.na(LibraryBatch)) %>%

@@ -65,14 +65,14 @@ Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `6
 Age_group_size <- c(`18-29` = 4.5, `30-39` = 4, `40-49` = 4, `50-59` = 6, `60+` = 4, `10-18` = 4, HMP = 4, HMP10M = 4,
                       ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#172869", Yanomami = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9", 
+Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#065FA3", Yanomami = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9", 
                          JAE10M = "#ffeda0", JAE = "#feb24c",ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                          ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Ethnic_Group_size <- c(Baka = 4, Nzime = 4,  Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
                          ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#065FA3", HMP10M = "#172869", JAE10M = "#ffeda0", JAE = "#feb24c",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
@@ -85,15 +85,15 @@ ExtractionBatch_shapes <- c(`Ex01_VE_2019-01-23` = 19, `Ex04_VE_2019-02-18` = 17
 ExtractionBatch_size <- c(`Ex01_VE_2019-01-23` = 4, `Ex04_VE_2019-02-18` = 4,  `Ex05_VE_2019-02-18` = 4, `Ex06_VE_2019-02-21` = 4, 
                           `Ex07_VE_2019-02-21` = 4, `Ex08_VE_2019-02-25` = 4, `Ex09_VE_2019-03-13` = 4)
 
-Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#969696", HMP_subPlaque = "#969696", # HMP_supPlaque = "#172869", HMP_subPlaque = "#172869", 
-                        HMP10M_supPlaque = "#065FA3", HMP10M_subPlaque = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#065FA3", HMP_subPlaque = "#065FA3", # HMP_supPlaque = "#", HMP_subPlaque = "#172869", 
+                        HMP10M_supPlaque = "#172869", HMP10M_subPlaque = "#172869", JAE10M = "#ffeda0", JAE = "#feb24c",
                         ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Description_shapes <- c(HunterGatherer = 19, Yanomami = 14, HMP_supPlaque = 10, HMP_subPlaque = 13, HMP10M_supPlaque = 10, 
                         HMP10M_subPlaque = 13, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_subPlaque = 4, HMP10M_supPlaque = 4, 
                         HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Database_colors <- c(nt = "#172869", RefSeqCustom = "#FF3200")
+Database_colors <- c(nt = "#065FA3", RefSeqCustom = "#FF3200")
 Kraken_db_colors <- c(RefSeqOnly = "#172869", RefSeqPasolliMAGs = "#FF3200")
 
 Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
@@ -111,19 +111,19 @@ LibraryBatch_shapes <- c(`Li03_VE_2019-04-17` = 19, `Li04_VE_2019-04-17` = 17,  
 LibraryBatch_size <- c(`Li03_VE_2019-04-17` = 4, `Li04_VE_2019-04-17` = 4,  `Li05_VE_2019-04-17` = 4, `Li06_VE_2019-05-02` = 4, 
                           `Li07_VE_2019-05-06` = 4, `Li08_VE_2019-05-06` = 4, `Li09_VE_2019-05-06` = 4)
 
-Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#172869", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
+Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, Industrial = 15,
                            ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
                            ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Sex_colors <- c(Female = "#FF3200", Male = "#172869", Unknown = "#bdbdbd",
+Sex_colors <- c(Female = "#FF3200", Male = "#065FA3", Unknown = "#bdbdbd",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Sex_shapes <- c(Female = 19, Male = 17, Unknown = 16, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Sex_size <- c(Female = 4, Male = 4, Unknown = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#172869", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
+Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#065FA3", Buccal_mucosa = "#C70E7B", HMP = "#969696", HMP10M = "#d9d9d9",
                        ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Tooth_site_shapes <- c(Anterior = 19, Posterior = 17,  Buccal_mucosa = 14, HMP = 7, HMP10M = 9,
                        ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
@@ -131,7 +131,7 @@ Tooth_site_size <- c(Anterior = 4, Posterior = 4,  Buccal_mucosa = 4, HMP = 4, H
                        ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD",
-                    Yanomami = "#C70E7B", HMP = "#172869", HMP10M = "#065FA3", JAE10M = "#ffeda0", JAE = "#feb24c",
+                    Yanomami = "#C70E7B", HMP = "#065FA3", HMP10M = "#172869", JAE10M = "#ffeda0", JAE = "#feb24c",
                      ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Village_shapes <- c(`202` = 15, `203` = 16, `205` = 17,`204` = 18, `206` = 25, Yanomami = 14, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9,
                     ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
@@ -153,7 +153,7 @@ save(metadata,
      Kraken_db_colors,
      Industry_shapes, Industry_size, Industry_colors,
      LibraryBatch_colors, LibraryBatch_shapes, LibraryBatch_size,
-     Market_economy_colors, Market_economy_size, Market_economy_size,
+     Market_economy_colors, Market_economy_shapes, Market_economy_size,
      Sex_colors, Sex_shapes, Sex_size,
      Tooth_site_colors, Tooth_site_shapes, Tooth_site_size,
      Village_shapes, Village_colors, Village_size,

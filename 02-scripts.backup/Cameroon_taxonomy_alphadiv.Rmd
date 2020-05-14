@@ -12,6 +12,7 @@ output:
 ```{r load_libraries, echo = F, message = F}
 library(knitr)
 library(data.table)
+library(rstatix)
 library(vegan)
 library(compositions)
 library(janitor)
@@ -37,6 +38,12 @@ load("./05-results.backup/CMC_taxonomy_tables.RData")
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData")
 
+# load the metadata file again without factors for stats
+metadata_nofactors <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata_nofactors <- metadata_nofactors %>% 
+  rename(SampleID = `#SampleID`) %>%
+  select(SampleID, Env, Age, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village)
+
 ```
 
 
@@ -60,7 +67,7 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
                          theme_minimal() +
                          #scale_y_continuous(trans='log10') +
                          #scale_y_continuous(trans='pseudo_log') +
-                         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
                          ylab(stat_info) +
                          ggtitle(title_text)
 
@@ -68,6 +75,7 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
 }
 
 ```
+
 
 List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
 ```{r outliers}
@@ -281,7 +289,12 @@ plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Village
 
 
 ## Pielou's Evenness
-Let's also look specifically at evenness of the samples using Pielou's evenness. This calculation (derived from Shannon's index) gives us a number from 0 to 1, where 0 is no evenness and 1 is perfect evenness. We want to see if there are any groups that have substantially greater species/genera evenness than the others. We're not interested in what the actual number is, or how even the samples appear to be, except relative to eachother. 
+Let's also look specifically at evenness of the samples using Pielou's evenness.
+This calculation (derived from Shannon's index) gives us a number from 0 to 1,
+where 0 is no evenness and 1 is perfect evenness. We want to see if there are
+any groups that have substantially greater species/genera evenness than the
+others. We're not interested in what the actual number is, or how even the
+samples appear to be, except relative to eachother.
 ```{r evenness_pielou}
 evenness.species <- diversity(malt_species.decontam.matrix)
 evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam.matrix)))
@@ -308,7 +321,9 @@ plot_box_whisker(evenness.species_filtered, "Pielou_evenness", "Env", "Env", "Pi
 plot_box_whisker(evenness.species_filtered, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
 
 ```
-In this dataset EXB059.A1601 has no detected genera, and this is the samples that was removed in the warning notice (it ends up with NA for the evenness calculation).
+In this dataset EXB059.A1601 has no detected genera, and this is the samples
+that was removed in the warning notice (it ends up with NA for the evenness
+calculation).
 
 At the genus level
 ```{r evenness_pielou_genus}
@@ -337,8 +352,588 @@ plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Env", "Env", "Piel
 plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
 
 ```
-In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these are the 2 samples that were removed in the warning notice (they end up with NA for the evenness calculation).
+In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these
+are the 2 samples that were removed in the warning notice (they end up with NA
+for the evenness calculation).
 
+### Stats for samples without controls
+```{r samples_stats_species_noyanomami}
+# Filtered species tables alpha-diversity stats
+# get the number of observed species
+presabs_table_f <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>%
+                                         gather("Species","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                                         spread(Species, Counts) %>%
+                                         column_to_rownames("SampleID")
+  
+# calculate observed species for each sample with janitor 'adorn_totals'
+malt_species.decontam_filtered.alpha <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_species") %>%
+  select(Observed_species) %>%
+  rownames_to_column("SampleID") 
+
+
+# get the Shannon index
+malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
+names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# convert row names to a column and combine with the observed species table
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., malt_species.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+  
+# Get the evenness index
+evenness.species_filtered <- diversity(malt_species.decontam_filtered.matrix)
+evenness.species_filtered <- as.data.frame(evenness.species_filtered/log(specnumber(malt_species.decontam_filtered.matrix)))
+names(evenness.species_filtered)[1] <- "Pileou_evenness"
+
+# merge with the metadata file and plot
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., evenness.species_filtered %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+
+# now plot the observed species
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Env", "Env", "Environment")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy", "Market_economy", "Market economy")
+
+
+# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+# add metadata to the table
+malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
+  inner_join(., metadata_nofactors %>%
+               select(SampleID, Env, Age, Age_group, Ethnic_Group, 
+                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+
+# define the metadata categories to test for significnat differences in diversity
+Envmt <- colnames(malt_species.decontam_filtered.alpha_meta %>%
+                    select(Env, Age, Age_group, Ethnic_Group, 
+                           Market_economy, Sex, Tooth_site, Village))
+
+# test for significant differences in diversity between the metadata categories
+species_kruskal_pvals <- lapply(Envmt, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  kruskal_test(Observed_species ~ lastone) %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble() %>%
+  arrange(p)
+species_kruskal_pvals
+
+# pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
+Envmt_sig <- species_kruskal_pvals %>%
+  filter(p <= 0.05) %>%
+  distinct(Category) %>%
+  pull(Category)
+
+# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+species_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  pairwise_wilcox_test(Observed_species ~ lastone, p.adjust.method = "fdr") %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Shannon_index ~ lastone, p.adjust.method = "fdr") %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ lastone, p.adjust.method = "fdr") %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( )%>%
+  arrange(p.adj)
+
+species_wilcox_pvals
+
+```
+Only Env (p = 0.0251), Ethnic group (p = 0.0379), and Market economy (p =
+0.0413) have significant differences in diversity, and only in the number of
+species (Observed species). The post-hoc test show that the only significant
+difference in the Ethnic group category is between Baka and JAE (p.adj = 0.037)
+where Baka has a higher average, in the Env category is between HunterGatherer
+and JAE (p.adj = 0.046) where HunterGatherer has a higher average, and in Market
+economy is  between Industrial and Logging road (p.adj = 0.048) where Logging
+road has a higher average.
+
+```{r samples_stats_genus_noyanomami}
+# Filtered genus tables alpha-diversity stats
+# get the number of observed genus
+presabs_table_f <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>%
+                                         gather("Species","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                                         spread(Species, Counts) %>%
+                                         column_to_rownames("SampleID")
+  
+# calculate observed genus for each sample with janitor 'adorn_totals'
+malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_genera") %>%
+  select(Observed_genera) %>%
+  rownames_to_column("SampleID") 
+
+
+# get the Shannon index
+malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_genus.decontam_filtered.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
+names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# convert row names to a column and combine with the observed genus table
+malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
+  full_join(., malt_genus.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+  
+# Get the evenness index
+evenness.genus_filtered <- diversity(malt_genus.decontam_filtered.matrix)
+evenness.genus_filtered <- as.data.frame(evenness.genus_filtered/log(specnumber(malt_genus.decontam_filtered.matrix)))
+names(evenness.genus_filtered)[1] <- "Pileou_evenness"
+
+# merge with the metadata file and plot
+malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
+  full_join(., evenness.genus_filtered %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+
+# now plot the observed genus
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Env", "Env", "Environment")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Market_economy", "Market_economy", "Market economy")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Age_group", "Age_group", "Age group")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth site")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+
+
+# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+# add metadata to the table
+malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
+  inner_join(., metadata_nofactors %>%
+               select(SampleID, Env, Age, Age_group, Ethnic_Group, 
+                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+
+# define the metadata categories to test for significnat differences in diversity
+Envmt <- colnames(malt_genus.decontam_filtered.alpha_meta %>%
+                    select(Env, Age_group, Ethnic_Group, 
+                           Market_economy, Sex, Tooth_site, Village))
+
+# test for significant differences in diversity between the metadata categories
+genus_kruskal_pvals <- lapply(Envmt, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  kruskal_test(Observed_genera ~ lastone) %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble() %>%
+  arrange(p)
+
+genus_kruskal_pvals
+
+# pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
+Envmt_sig <- genus_kruskal_pvals %>%
+  filter(p <= 0.05) %>%
+  distinct(Category) %>%
+  pull(Category)
+
+# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+genus_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  pairwise_wilcox_test(Observed_genera ~ lastone, p.adjust.method = "fdr") %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Shannon_index ~ lastone, p.adjust.method = "fdr") %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ lastone, p.adjust.method = "fdr") %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( )%>%
+  arrange(p.adj)
+
+genus_wilcox_pvals
+
+```
+Six metadata categories have significant differences in diversity. Number of
+genera: Env (p = 0.00000346), Tooth site (p = 0.00000382), Ethnic group (p =
+0.00000438), Village (p = 0.0000055), Age group (p = 0.000111), and Market
+economy (p = 0.0000974); Evenness: Tooth site (p = 0.0315). The post-hoc tests
+show significant differences in Age group between all age categories and HMP
+(18-29,40-49,50-59 p=0.000555; 30-39 p=0.00069; 60+ p=0.014) where HMP is always
+lower. Significant differences in Env between HMP and HunterGatherer (p =
+0.0000019) and HMP and JAE (p = 0.006) where HMP is lower than both HG and JAE.
+Significant differences in Ethnic group between HMP and Baka (p = 0.00000121),
+HMP and Nzime (p = 0.003), and HMP and JAE (p = 0.008), where is lower than all
+others. Significant differences in Market economy between Industrial and Forrest
+camp (p = 0.000163), Industrial and Logging road (p = 0.002), Industrial and
+Farming (p = 0.04), where Industrial is lower than all 3. Significant
+differences in Village between HMP and 204 (p = 0.0000191), HMP and 202 (p =
+0.001), HMP and 205 (p = 0.001), HMP and 203 (p = 0.002), HMP and JAE (p =
+0.016), 204 and 206 (p = 0.017), where HMP is lower than all others, and 206 is
+lower than 204. Significant differences in number of genera in Tooth site
+between HMP and Anterior (p = 0.0000097), and HMP and Posterior (p = 0.0000097),
+where HMP is lower than the others, and significnat differences in evenness of
+Tooth site between Anterior and Posterior (p = 0.026), where anterior is higher
+than posterior.
+
+## Diversity of CMC samples only
+Let's also look at the CMC samples alone, without the HMP and JAE samples. Are
+there differences in diversity between the various metadata groups?
+
+
+### Stats for CMC samples only
+```{r samples_stats_species_cmc}
+# Filtered species tables alpha-diversity stats
+# get the number of observed species
+presabs_table_f <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>%
+                                         gather("Species","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                                         spread(Species, Counts) %>%
+                                         column_to_rownames("SampleID")
+  
+# calculate observed species for each sample with janitor 'adorn_totals'
+malt_species.decontam_filtered.alpha <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_species") %>%
+  select(Observed_species) %>%
+  rownames_to_column("SampleID") 
+
+
+# get the Shannon index
+malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
+names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# convert row names to a column and combine with the observed species table
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., malt_species.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+  
+# Get the evenness index
+evenness.species_filtered <- diversity(malt_species.decontam_filtered.matrix)
+evenness.species_filtered <- as.data.frame(evenness.species_filtered/log(specnumber(malt_species.decontam_filtered.matrix)))
+names(evenness.species_filtered)[1] <- "Pileou_evenness"
+
+# merge with the metadata file and plot
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., evenness.species_filtered %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+
+# now plot the observed species
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
+plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Tooth_site", "Tooth_site", "Tooth site")
+
+
+# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+# add metadata to the table
+malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
+  inner_join(., metadata_nofactors %>%
+               select(SampleID, Age, Age_group, Ethnic_Group, 
+                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+
+# define the metadata categories to test for significnat differences in diversity
+Envmt <- colnames(malt_species.decontam_filtered.alpha_meta %>%
+                    select(Age_group, Ethnic_Group, 
+                           Market_economy, Sex, Tooth_site, Village))
+
+# test for significant differences in diversity between the metadata categories
+species_kruskal_pvals <- lapply(Envmt, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  kruskal_test(Observed_species ~ lastone) %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble() %>%
+  arrange(p)
+species_kruskal_pvals
+
+# pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
+Envmt_sig <- species_kruskal_pvals %>%
+  filter(p <= 0.05) %>%
+  distinct(Category) %>%
+  pull(Category)
+
+# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+species_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  pairwise_wilcox_test(Observed_species ~ lastone, p.adjust.method = "fdr") %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Shannon_index ~ lastone, p.adjust.method = "fdr") %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ lastone, p.adjust.method = "fdr") %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( )%>%
+  arrange(p.adj)
+
+species_wilcox_pvals
+
+```
+Two metadata categories have significant differences in diversity, Sex (Shannon
+index (p = 0.0392), and Evenness (p = 0.00982)) and Tooth site (number of
+species (p = 0.0427)). The post-hoc test show that in the Tooth site category
+Anterior is significantly (p.adj = 0.043) is significnatly higher than
+Posterior. In the sex category Females are significantly higher in Shannon index
+(p = 0.039) and Evenness (p = 0.009) than Males.
+
+
+```{r samples_stats_genus_cmc}
+# Filtered genus tables alpha-diversity stats
+# get the number of observed genus
+presabs_table_f <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>%
+                                         gather("Species","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+                                         spread(Species, Counts) %>%
+                                         column_to_rownames("SampleID")
+  
+# calculate observed genus for each sample with janitor 'adorn_totals'
+malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_genera") %>%
+  select(Observed_genera) %>%
+  rownames_to_column("SampleID") 
+
+
+# get the Shannon index
+malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
+                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts) %>% 
+                                         column_to_rownames("SampleID"))
+
+malt_genus.decontam_filtered.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
+names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# convert row names to a column and combine with the observed genus table
+malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
+  full_join(., malt_genus.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+  
+# Get the evenness index
+evenness.genus_filtered <- diversity(malt_genus.decontam_filtered.matrix)
+evenness.genus_filtered <- as.data.frame(evenness.genus_filtered/log(specnumber(malt_genus.decontam_filtered.matrix)))
+names(evenness.genus_filtered)[1] <- "Pileou_evenness"
+
+# merge with the metadata file and plot
+malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
+  full_join(., evenness.genus_filtered %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+
+# now plot the observed genus
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth site")
+plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+
+
+# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+# add metadata to the table
+malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
+  inner_join(., metadata_nofactors %>%
+               select(SampleID, Env, Age_group, Ethnic_Group, 
+                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+
+# define the metadata categories to test for significnat differences in diversity
+Envmt <- colnames(malt_genus.decontam_filtered.alpha_meta %>%
+                    select(Age_group, Ethnic_Group, 
+                           Market_economy, Sex, Tooth_site, Village))
+
+# test for significant differences in diversity between the metadata categories
+genus_kruskal_pvals <- lapply(Envmt, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  kruskal_test(Observed_genera ~ lastone) %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            kruskal_test(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble() %>%
+  arrange(p)
+
+genus_kruskal_pvals
+
+# pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
+Envmt_sig <- genus_kruskal_pvals %>%
+  filter(p <= 0.05) %>%
+  distinct(Category) %>%
+  pull(Category)
+
+# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+genus_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  pairwise_wilcox_test(Observed_genera ~ lastone, p.adjust.method = "fdr") %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Shannon_index ~ lastone, p.adjust.method = "fdr") %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ lastone, p.adjust.method = "fdr") %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( )%>%
+  arrange(p.adj)
+
+genus_wilcox_pvals
+
+```
+Two metadata categories have significant differences in diversity, Tooth site
+(Shannon index (p = 0.0123), and Evenness (p = 0.00185)) and Village (number of
+genera (p = 0.0423)). The post-hoc test show that in the Tooth site category
+Anterior has higher Shannon index (p.adj = 0.012) and Evenness (p.adj = 0.002)
+than Posterior. In the village category 204 has significantly higher number of
+genera (p = 0.047) than 206.
 
 ## Heatmaps
 ```{r metadata_heatmaps}
@@ -957,7 +1552,23 @@ heatmap_base
 
 ```
 
+```{r samples_heatmap_uky}
+heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
 
+heatmap_base
+
+# ggsave("05-results.backup/heatmap_species_UKY.pdf", plot = heatmap_base, device = "pdf",
+#        scale = 1, width = 7, height = 7, units = c("in"),
+#        dpi = 300)
+
+```
 
 
 ```{r heatmap_from_james, eval = F}
@@ -1007,79 +1618,6 @@ heatmap_base <- ggplot(data_heatmap, aes(Taxon, Individual, fill = CLR)) +
 
 
 
-
-
-```{r uky_plots, eval = F}
-# now on filtered tables
-presabs_table_f <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
-  
-# calculate observed species for each sample with janitor 'adorn_totals'
-malt_species.decontam_filtered.os <- presabs_table_f %>%
-  adorn_totals(., where = "col", name = "Observed_species") %>%
-  select(Observed_species) %>%
-  rownames_to_column("SampleID") 
-
-plot_box_whisker(malt_species.decontam_filtered.os, "Observed_species", "Env", "Env", "Number of species")
-NoS <- plot_box_whisker(malt_species.decontam_filtered.os, "Observed_species", "Village", "Village", "Number of species")
-
-ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
-
-malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
-names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
-
-# merge with the metadata file and plot
-malt_species.decontam_filtered.shannon <- malt_species.decontam_filtered.shannon %>%
-  rownames_to_column("SampleID") 
-
-plot_box_whisker(malt_species.decontam_filtered.shannon, "Shannon_index", "Env", "Env", "Shannon Index")
-Shannon <- plot_box_whisker(malt_species.decontam_filtered.shannon, "Shannon_index", "Village", "Village", "Shannon Index")
-
-ggsave("05-results.backup/Shannon_UKY.pdf", plot = Shannon, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-
-heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, Species, fill = CLR)) +
-  geom_tile() +
-  scale_fill_viridis_c(option = "A") +
-  theme_minimal(base_size = 7) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
-        plot.margin = margin(0, 0, 0, 0, "pt"),
-        axis.title.y = element_blank(),
-        legend.position = "left")
-
-heatmap_base
-
-ggsave("05-results.backup/heatmap_species_UKY.pdf", plot = heatmap_base, device = "pdf",
-       scale = 1, width = 7, height = 7, units = c("in"),
-       dpi = 300)
-
-```
 
 
 
