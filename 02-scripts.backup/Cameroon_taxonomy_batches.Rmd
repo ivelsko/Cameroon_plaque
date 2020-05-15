@@ -146,7 +146,7 @@ batch_table_os <- malt_species.decontam %>%
                filter(!is.na(LibraryBatch))
 
 # plot extraction batch
-batch_table_os %>%
+extraction_os <- batch_table_os %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -156,15 +156,22 @@ batch_table_os %>%
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Observed species") +
        ggtitle("Number of observed species")
+extraction_os
+
+ggsave("05-results.backup/extraction_os.pdf", plot = extraction_os, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+library_os <- ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Observed species") +
        ggtitle("Number of observed species")
+library_os
+ggsave("05-results.backup/library_os.pdf", plot = library_os, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction/ batches have significantly different diversity
 kw_os <- batch_table_os %>%
@@ -196,6 +203,7 @@ wilcox <- batch_table_os %>%
 
 wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
 wilcox_os # none of the library batches are significantly different
+
 
 ```
 
@@ -448,7 +456,7 @@ malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
   filter(!is.na(LibraryBatch))
   
 # plot extraction batch
-malt_species.decontam.shannon %>%
+extraction_shannon <- malt_species.decontam.shannon %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -458,9 +466,12 @@ malt_species.decontam.shannon %>%
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Shannon index") +
        ggtitle("Shannon index - species")
+extraction_shannon
+ggsave("05-results.backup/extraction_shannon.pdf", plot = extraction_shannon, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+library_shannon <- ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
@@ -468,6 +479,8 @@ ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`,
        ylab("Shannon index") +
        ggtitle("Shannon index - species")
 
+ggsave("05-results.backup/library_shannon.pdf", plot = library_shannon, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%

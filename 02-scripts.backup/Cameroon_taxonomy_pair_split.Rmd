@@ -452,6 +452,85 @@ variation of the HMP samples in PC1/CP2 figures, they are clearly separated from
 all plaque/calculus in PC3. The CMC samples do not plot with the Yanomami
 samples.
 
+
+```{r pca_noyanomami_species}
+# make a table that has only samples from one or the other tooth site
+malt_species.decontam_filtered_noyanomami <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("EXB|LIB|10M|SRR164")) %>%
+                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         adorn_totals(where = "col", name = "Sum_species") %>%
+                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
+                                         filter(Percent > 0.001) %>%
+                                         select(-one_of(c("Sum_species","Percent"))) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(malt_species.decontam_filtered_noyanomami) <- malt_species.decontam_filtered_noyanomami$SampleID
+
+malt_species.decontam_filtered_noyanomami <- malt_species.decontam_filtered_noyanomami %>% select(-SampleID)
+
+malt_species.decontam_filtered_noyanomami = malt_species.decontam_filtered_noyanomami+1
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_species.decontam_filtered_noyanomami, logratio = 'CLR')
+
+# perform and plot a PCA to see how the data cluster
+# by Village
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Sex
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Age group
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Market economy
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Tooth site
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+# by Description (do HMP supragingival and HMP subgingival plaque samples separate?)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Description", "Description", "Description", 3)
+plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Description", "Description", "Description", 3)
+
+# by Individual sequencing depth
+# perform a PCA to see how the data cluster
+malt_species_decontam_filtered_noblanks.pca <- mixOmics::pca(malt_species.decontam_filtered_noyanomami, ncomp = 3, logratio = 'CLR')
+plot(malt_species_decontam_filtered_noblanks.pca)
+
+# Select out the PC variates into a new table and add the metadata for plotting
+malt_species_decontam_filtered_noblanks.pca.variates <- as.data.frame(malt_species_decontam_filtered_noblanks.pca$variates$X)
+malt_species_decontam_filtered_noblanks.pca.variates <- malt_species_decontam_filtered_noblanks.pca.variates %>%
+  rownames_to_column("SampleID")
+  
+malt_species_decontam_filtered_noblanks.pca.varmet <- inner_join(malt_species_decontam_filtered_noblanks.pca.variates, metadata, by = "SampleID")
+
+pca_malt_species_pc1pc2 <- ggplot(malt_species_decontam_filtered_noblanks.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
+  geom_point(size = 4) +
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  xlab(paste("PC1 - ", 100*(round(malt_species_decontam_filtered_noblanks.pca$explained_variance[1], 2)), "%", sep = "")) +
+  ylab(paste("PC2 - ", 100*(round(malt_species_decontam_filtered_noblanks.pca$explained_variance[2], 2)), "%", sep = "")) +
+  theme_minimal(base_size = 14) +
+  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
+
+pca_malt_species_pc1pc2
+
+# ggsave("05-results.backup/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+```
+
+
+
 ### Biplots
 Now we will look at the species that have strongest loadings in PC1, PC2, and
 PC3, to see what appears to drive differences between the sample groups. We will
@@ -1756,61 +1835,17 @@ variety of anaerobes and other unusual oral taxa.
 
 
 
-```{r uky_graphs, eval = F}
+```{r uky_graphs}
 
-all_village <- plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backup/all_village_uky.pdf", plot = all_village, device = "pdf",
+split_all_village <- plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+ggsave("05-results.backup/split_all_village.pdf", plot = split_all_village, device = "pdf",
        scale = 1, width = 7, height = 5, units = c("in"),
        dpi = 300)
 
-all_village_32 <- plot_pca_titles(malt_species.decontam_filtered_noblanks, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backup/all_village_32_uky.pdf", plot = all_village_32, device = "pdf",
+split_cmc_village <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+ggsave("05-results.backup/split_cmc_village.pdf", plot = split_cmc_village, device = "pdf",
        scale = 1, width = 7, height = 5, units = c("in"),
        dpi = 300)
-
-noy_desc <- plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Description", "Description", "Description", 3)
-ggsave("05-results.backup/noy_desc_uky.pdf", plot = noy_desc, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-noy_eg <- plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backup/noy_eg_uky.pdf", plot = noy_eg, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-noy_ts<- plot_pca_titles(malt_species.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backup/noy_ts_uky.pdf", plot = noy_ts, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-malt_species_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_noyanomami.pca, "PC1", "PC2", "Tooth_site", PC1)
-malt_species_decontam_filtered_noyanomami_biplot_121
-ggsave("05-results.backup/malt_species_decontam_filtered_noyanomami_biplot_121_uky.pdf", plot = malt_species_decontam_filtered_noyanomami_biplot_121, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-malt_species_decontam_filtered_noyanomami_biplot_122 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_noyanomami.pca, "PC1", "PC2", "Tooth_site", PC2)
-malt_species_decontam_filtered_noyanomami_biplot_122
-ggsave("05-results.backup/malt_species_decontam_filtered_noyanomami_biplot_122_uky.pdf", plot = malt_species_decontam_filtered_noyanomami_biplot_122, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-cmc_village <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backupcmc_village_uky.pdf", plot = cmc_village, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-cmc_ts <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
-ggsave("05-results.backup/cmc_ts_uky.pdf", plot = cmc_ts, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
-malt_species.decontam_filtered_nocontrols_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_nocontrols.pca, "PC1", "PC2", "Tooth_site", PC1)
-malt_species.decontam_filtered_nocontrols_biplot_121
-ggsave("05-results.backup/malt_species.decontam_filtered_nocontrols_biplot_121_uky.pdf", plot = malt_species.decontam_filtered_nocontrols_biplot_121, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
-
 
 ```
 
