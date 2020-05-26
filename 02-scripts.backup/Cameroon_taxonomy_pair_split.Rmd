@@ -364,7 +364,7 @@ What is the relationship of the groups in a PCA without the blanks?
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M")) %>%
-                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         select(-one_of(anterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -458,7 +458,7 @@ samples.
 malt_species.decontam_filtered_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         select(-one_of(anterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -630,7 +630,7 @@ buccal samples have higher proportions of *Neisseria* than plaque.
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         select(-one_of(anterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -755,7 +755,7 @@ metadata_noblanks <- metadata_noblanks %>%
   rename(SampleID = `#SampleID`)  %>%
   filter(!SampleID %in% outliers) %>%
   filter(!str_detect(SampleID, "SRR16460|EXB|LIB|10M")) %>%
-  filter(!SampleID %in% posterior) %>% # this is the group to remove
+  filter(!SampleID %in% anterior) %>% # this is the group to remove
   as_tibble() %>%
   mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","JAE"),
@@ -870,7 +870,7 @@ other sample types? Do they cluster by any of the metadata categories?
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         select(-one_of(anterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -954,7 +954,7 @@ metadata_cmc <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metad
 metadata_cmc <- metadata_cmc %>%
   rename(SampleID = `#SampleID`) %>%
   filter(!SampleID %in% outliers) %>%
-  filter(!SampleID %in% posterior) %>%
+  filter(!SampleID %in% anterior) %>%
   filter(Description == "HunterGatherer") %>%
   select(SampleID, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
   as_tibble() %>%
@@ -1064,7 +1064,7 @@ boxplot(sex_betadisper_cmc)
 malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
+                                         select(-one_of(anterior)) %>% # change this between anterior and posterior, depending on which samples you want to remove
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1165,7 +1165,7 @@ resolution with genus data?
 malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
@@ -1350,7 +1350,7 @@ CMC along PC3, but separate from HMP on PC2.
 malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1589,7 +1589,7 @@ other sample types? Do they cluster by any of the metadata categories?
 malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1741,7 +1741,7 @@ boxplot(village_betadisper_cmc_genus)
 malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|JAE|SRR")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%

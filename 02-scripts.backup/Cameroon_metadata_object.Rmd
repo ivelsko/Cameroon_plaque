@@ -77,13 +77,13 @@ Env_colors <- c(HunterGatherer = "#FF3200", HMP = "#065FA3", HMP10M = "#172869",
 Env_shapes <- c(HunterGatherer = 19, HMP = 7, HMP10M = 9, JAE = 7, JAE10M = 9, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Env_size <- c(HunterGatherer = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-ExtractionBatch_colors <- c(`Ex01_VE_2019-01-23` = "#FF3200", `Ex04_VE_2019-02-18` = "#172869", `Ex05_VE_2019-02-18` = "#C70E7B", 
-                            `Ex06_VE_2019-02-21` = "#969696", `Ex07_VE_2019-02-21` = "#d9d9d9", 
-                         `Ex08_VE_2019-02-25` = "#ffeda0", `Ex09_VE_2019-03-13` = "#feb24c")
+ExtractionBatch_colors <- c(`Ex01_VE_2019-01-23` = "#F8766D", `Ex04_VE_2019-02-18` = "#C49A00", `Ex05_VE_2019-02-18` = "#53B400", 
+                            `Ex06_VE_2019-02-21` = "#00C094", `Ex07_VE_2019-02-21` = "#00B6EB", `Ex08_VE_2019-02-25` = "#A58AFF", 
+                            `Ex09_VE_2019-03-13` = "#FB61D7", HMP = "#065FA3", JAE = "#feb24c", Yanomami = "#C70E7B")
 ExtractionBatch_shapes <- c(`Ex01_VE_2019-01-23` = 19, `Ex04_VE_2019-02-18` = 17,  `Ex05_VE_2019-02-18` = 14, `Ex06_VE_2019-02-21` = 7, 
-                            `Ex07_VE_2019-02-21` = 9, `Ex08_VE_2019-02-25` = 7, `Ex09_VE_2019-03-13` = 9)
+                            `Ex07_VE_2019-02-21` = 9, `Ex08_VE_2019-02-25` = 7, `Ex09_VE_2019-03-13` = 9, Yanomami = 14, HMP = 7, JAE = 7)
 ExtractionBatch_size <- c(`Ex01_VE_2019-01-23` = 4, `Ex04_VE_2019-02-18` = 4,  `Ex05_VE_2019-02-18` = 4, `Ex06_VE_2019-02-21` = 4, 
-                          `Ex07_VE_2019-02-21` = 4, `Ex08_VE_2019-02-25` = 4, `Ex09_VE_2019-03-13` = 4)
+                          `Ex07_VE_2019-02-21` = 4, `Ex08_VE_2019-02-25` = 4, `Ex09_VE_2019-03-13` = 4, Yanomami = 4, HMP = 4, JAE = 4)
 
 Description_colors <- c(HunterGatherer = "#FF3200", Yanomami = "#C70E7B", HMP_supPlaque = "#065FA3", HMP_subPlaque = "#065FA3", # HMP_supPlaque = "#", HMP_subPlaque = "#172869", 
                         HMP10M_supPlaque = "#172869", HMP10M_subPlaque = "#172869", JAE10M = "#ffeda0", JAE = "#feb24c",
@@ -94,7 +94,7 @@ Description_size <- c(HunterGatherer = 4, Yanomami = 4, HMP_supPlaque = 4, HMP_s
                         HMP10M_subPlaque = 4, JAE = 4, JAE10M = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
 Database_colors <- c(nt = "#065FA3", RefSeqCustom = "#FF3200")
-Kraken_db_colors <- c(RefSeqOnly = "#172869", RefSeqPasolliMAGs = "#FF3200")
+Kraken_db_colors <- c(RefSeqOnly = "#065FA3", RefSeqPasolliMAGs = "#FF3200")
 
 Industry_colors <- c(`Non-industrial` = "#FF3200", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
@@ -103,13 +103,13 @@ Industry_shapes <- c(`Non-industrial` = 19, Industrial = 17,
 Industry_size <- c(`Non-industrial` = 4, Industrial = 4,
                            ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-LibraryBatch_colors <- c(`Li03_VE_2019-04-17` = "#FF3200", `Li04_VE_2019-04-17` = "#172869", `Li05_VE_2019-04-17` = "#C70E7B", 
-                            `Li06_VE_2019-05-02` = "#969696", `Li07_VE_2019-05-06` = "#d9d9d9", 
-                         `Li08_VE_2019-05-06` = "#ffeda0", `Li09_VE_2019-05-06` = "#feb24c")
+LibraryBatch_colors <- c(`Li03_VE_2019-04-17` = "#F8766D", `Li04_VE_2019-04-17` = "#C49A00", `Li05_VE_2019-04-17` = "#53B400", 
+                         `Li06_VE_2019-05-02` = "#00C094", `Li07_VE_2019-05-06` = "#00B6EB", `Li08_VE_2019-05-06` = "#A58AFF", 
+                         `Li09_VE_2019-05-06` = "#FB61D7", HMP = "#065FA3", JAE = "#feb24c", Yanomami = "#C70E7B")
 LibraryBatch_shapes <- c(`Li03_VE_2019-04-17` = 19, `Li04_VE_2019-04-17` = 17,  `Li05_VE_2019-04-17` = 14, `Li06_VE_2019-05-02` = 7, 
-                            `Li07_VE_2019-05-06` = 9, `Li08_VE_2019-05-06` = 7, `Li09_VE_2019-05-06` = 9)
+                            `Li07_VE_2019-05-06` = 9, `Li08_VE_2019-05-06` = 7, `Li09_VE_2019-05-06` = 9, Yanomami = 14, HMP = 7, JAE = 7)
 LibraryBatch_size <- c(`Li03_VE_2019-04-17` = 4, `Li04_VE_2019-04-17` = 4,  `Li05_VE_2019-04-17` = 4, `Li06_VE_2019-05-02` = 4, 
-                          `Li07_VE_2019-05-06` = 4, `Li08_VE_2019-05-06` = 4, `Li09_VE_2019-05-06` = 4)
+                          `Li07_VE_2019-05-06` = 4, `Li08_VE_2019-05-06` = 4, `Li09_VE_2019-05-06` = 4, Yanomami = 4, HMP = 4, JAE = 4)
 
 Market_economy_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Yanomami = "#C70E7B", Industrial = "#969696",
                            ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")

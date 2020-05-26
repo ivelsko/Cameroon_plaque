@@ -63,7 +63,7 @@ batch_table_os <- malt_species.decontam %>%
                gather("Species","Counts",2:ncol(.)) %>%
                mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
                spread(Species, Counts) %>%
-               filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+               filter(!str_detect(SampleID, "SRR|JAE|EXB|LIB")) %>%
                adorn_totals(., where = "col", name = "Observed_species") %>%
                select(SampleID, Observed_species) %>%
                inner_join(metadata %>%
@@ -137,7 +137,7 @@ batch_table_os <- malt_species.decontam %>%
                gather("Species","Counts",2:ncol(.)) %>%
                mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
                spread(Species, Counts) %>%
-               filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+               filter(!str_detect(SampleID, "SRR|JAE|EXB|LIB")) %>%
                adorn_totals(., where = "col", name = "Observed_species") %>%
                select(SampleID, Observed_species) %>%
                inner_join(metadata %>%
@@ -219,7 +219,7 @@ batch_table_og <- malt_genus.decontam %>%
                  gather("Species","Counts",2:ncol(.)) %>%
                  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
                  spread(Species, Counts) %>%
-                 filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+                 filter(!str_detect(SampleID, "SRR|JAE|EXB|LIB")) %>%
                  adorn_totals(., where = "col", name = "Observed_species") %>%
                  select(SampleID, Observed_species) %>%
                  inner_join(metadata %>%
@@ -293,7 +293,7 @@ batch_table_og <- malt_genus.decontam %>%
                  gather("Species","Counts",2:ncol(.)) %>%
                  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
                  spread(Species, Counts) %>%
-                 filter(!str_detect(SampleID, "SRR|EXB|LIB")) %>%
+                 filter(!str_detect(SampleID, "SRR|JAE|EXB|LIB")) %>%
                  adorn_totals(., where = "col", name = "Observed_species") %>%
                  select(SampleID, Observed_species) %>%
                  inner_join(metadata %>%

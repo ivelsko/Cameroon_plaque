@@ -18,6 +18,7 @@ library(vegan)
 library(ape)
 library(mixOmics)
 library(janitor)
+library(rstatix)
 library(pander)
 library(tidyverse)
 library(gplots)
@@ -36,7 +37,6 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 
 # HUMAnN2 assignment stats
-*This section needs to be checked and re-written*The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19). 
 ```{r load_data}
 ## load the species and genus tables generated with HUMAnN2
 humann2_path <- fread("./05-results.backup/humann2.pathabundance.all.tss.tsv")
@@ -334,7 +334,8 @@ humann2_alignment_stats <- humann2_alignment_stats %>%
          AlignedPct = 100 - UnalignedPct) %>%
   select(SampleID, Individual_Seq_Depth_NonHuman, UnalignedReads, AlignedReads, UnalignedPct, AlignedPct, everything())
 
-humann2_alignment_stats %>%
+humann2_alignment_stats_box <- humann2_alignment_stats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
   ggplot(., aes(Village, AlignedPct, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
@@ -342,9 +343,13 @@ humann2_alignment_stats %>%
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
     ggtitle("Percent of reads aligned by HUMAnN2")
+humann2_alignment_stats_box
+
+ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_alignment_stats_w <- humann2_alignment_stats %>%
-  filter(!str_detect(SampleID, "EXB|LIB")) 
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
 pairwise.wilcox.test(humann2_alignment_stats_w$AlignedPct, humann2_alignment_stats_w$Village, p.adjust.method = "fdr")
 
 ```
@@ -430,7 +435,8 @@ humann2_path_noblanks_long <- humann2_path %>%
   summarize(Paths = sum(CPM)) %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
-humann2_path_noblanks_long %>%
+humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
   ggplot(., aes(Village, Paths, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
@@ -438,9 +444,13 @@ humann2_path_noblanks_long %>%
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Number of pathways detected")
     ggtitle("Total number of pathways ID'd by HUMAnN2")
+humann2_path_noblanks_long_box
+
+ggsave("./05-results.backup/humann2_path_noblanks_box.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB")) 
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
 pairwise.wilcox.test(humann2_path_noblanks_long_w$Paths, humann2_path_noblanks_long_w$Village, p.adjust.method = "fdr")
 
 ```
@@ -525,6 +535,80 @@ adonis(humann2_path_noblanks_mat.euc ~ Tooth_site, humann2_path_noblanks_mat.euc
 ```
 
 
+```{r pca_paths_noyanomami_metadata}
+# create the input matrix
+humann2_path_noyanomami_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164"))
+
+rownames(humann2_path_noyanomami_mat) <- humann2_path_noyanomami_mat$SampleID
+humann2_path_noyanomami_mat <- as.matrix(humann2_path_noyanomami_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_noyanomami_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path_noyanomami.pca <- pca(humann2_path_noyanomami_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_EG_plot
+plot_pca(humann2_path_noyanomami.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+pca_AG_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+pca_AG_plot
+
+pca_ME_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+pca_ME_plot
+
+### there's a problem with this one about the size of the points. Using a different size_group lets it work
+pca_S_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+pca_S_plot
+
+pca_TS_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+pca_TS_plot
+
+pca_V_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Village", "Village", "Village")
+pca_V_plot
+
+# ggsave("./05-results.backup/pca_EG_noyanomami_paths.pdf", plot = pca_EG_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r adonis_paths_noyanomami}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+humann2_path_noyanomami_mat.euc <- vegdist(humann2_path_noyanomami.pca$X, method = "euclidean", na.rm = T)
+humann2_path_noyanomami_mat.euc.pcoa <- ape::pcoa(humann2_path_noyanomami_mat.euc)
+
+humann2_path_noyanomami_mat.euc.pcoavectors <- as.data.frame(humann2_path_noyanomami_mat.euc.pcoa$vectors)
+humann2_path_noyanomami_mat.euc.pcoavectors <- humann2_path_noyanomami_mat.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+humann2_path_noyanomami_mat.euc.vecmet <- inner_join(humann2_path_noyanomami_mat.euc.pcoavectors, metadata, by = "SampleID")
+
+humann2_path_noyanomami_mat.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(humann2_path_noyanomami_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, perm=999)
+
+
+```
+
+
 ```{r pca_paths_cmc_metadata}
 humann2_path_cmc_mat <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
@@ -566,6 +650,9 @@ pca_TS_plot
 pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
+ggsave("./05-results.backup/pca_EG_cmc_paths.pdf", plot = pca_EG_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+        dpi = 300)
 
 ```
 Again the only sort-of clustering that we see is by tooth site (anterior or
@@ -602,8 +689,12 @@ adonis(humann2_path_cmc_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + 
 Now to see which of the pathways have the strongest loadings in PC1 and PC2
 ```{r pca_path_biplot}
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc1 <- plot_pca_bi(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1 <- plot_pca_bi(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+        dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
@@ -620,8 +711,13 @@ pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
+# make a table of the pathways to save, to use again later in another R notebook
+# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2 <- plot_pca_bi(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
 pca_EG_biplot_pc2
 
 # what are those pathways?
@@ -639,9 +735,18 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+
+
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_cmc_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
@@ -657,6 +762,11 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arr
              justify = "lccr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
 
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
 pca_EG_cmc_biplot_pc2
@@ -675,18 +785,112 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arr
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-```
-_PC1+:_
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# 
+# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
 
+```
+_*All samples*_
+_PC1+:_
+GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
+GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
+PWY-7204: pyridoxal 5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
+PWY-5104: L-isoleucine biosynthesis I - common alternate pathway to synthesize L-isoleucine; known to exist in *Methanobrevibacter* and *Desulfovibrio*.
+PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
+PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
+PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
+GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
+PWY-7371: 1,4-dihydroxy-6-naphthoate  biosynthesis II - this is converted to menaquinone; menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; comes from chorismate (intermediate of aromatic amino acid biosynthesis);  
+PWY1G-0: mycothiol biosynthesis - major thiol found in Actinobacteria (opposed to glutathione); detoxifies stress-inducing factors, maintains reducing envt within the cell; 
 
 _PC1-:_
-
+PWY-6285: superpathway of fatty acids biosynthesis (E. coli) - standard fatty acid biosynthesis
+PWY-5971: palmitate biosynthesis II (bacteria and plants) - common saturated fatty acid
+PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
+PWY-6803: phosphatidylcholine acyl editing - production of triacylglycerols
+PWY-6113: superpathway of mycolate biosynthesis - found in mycobacterial cell walls
+PWY-5675: nitrate reduction V (assimilatory) - environmental nitrogen-containing compounds (nitrate, nitrite) must be reduced to be used by bacteria in producing their own N-containing compounds such as amino acids
+P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
+PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
+PWY-6859: all-trans-farnesol biosynthesis - found in eukaryia such as yeast; part of terpenoid synthesis
+PWY-5910: superpathway of geranylgeranyldiphosphate  biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
 
 _PC2+:_
-
+P23-PWY: reductive TCA cycle I - carbon dioxide fixation pathway found in autotrophic eubacteria and archaea; considered to be a primordial pathway for production of starting organic molecules for biosynthesis of sugars, lipids, amino acids, pyrimidines and pyrroles
+PWY-5104: L-isoleucine biosynthesis IV - synthesis from propanoate
+PWY-7003: glycerol degradation to butanol - butanol biosynthesis pathway from glycerol
+PWY4LZ-257: superpathway of fermentation (Chlamydomonas reinhardtii) - fermentation from pyruvate
+PWY-6588: pyruvate fermentation to acetone - anaerobic
+PWY66-398: TCA cycle III (animals) - energy metabolism
+PWY-6269: adenosylcobalamin salvage from cobinamide II - production of cobamides, which are enzyme cofactors; found in bacteria and archaea
+PWY-6549: L-glutamine biosynthesis III - amino acid biosynthesis in plants
+PWY-7254: TCA cycle VII (acetate-producers) - used by acetic acid bacteria are Gram-negative acidophilic α-proteobacteria that oxidize ethanol to acetate
+REDCITCYC: TCA cycle VIII (helicobacter) - specific to H. pylori
 
 _PC2-:_
+PWY0-1241: ADP-L-glycero-&beta;-D-manno-heptose biosynthesis - glycero-manno-heptoses are found in the cell surface polymers of many bacteria, particularly LPS
+PWY-6895: superpathway of thiamin diphosphate biosynthesis II - vitamin B1, an essential cofactor for enzymes involved in energy metabolism
+THISYN-PWY: superpathway of thiamin diphosphate biosynthesis I - vitamin B1, an essential cofactor for enzymes involved in energy metabolism; different version from above, carried by different organisms
+PWY-5083: NAD/NADH phosphorylation and dephosphorylation - very common cofactors
+PWY-5838: superpathway of menaquinol-8 biosynthesis I - menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; menaquinol-8 is common in facultatively anaerobic Gram - organisms
+PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis - menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; dimethylmenaquinol-8 is common in facultatively anaerobic Gram - organisms
+PWY-7210: pyrimidine deoxyribonucleotides biosynthesis from CTP - DNA synthesis 
+PWY-6892: thiazole biosynthesis I (E. coli) - only the synthesis of the thiazole moiety of thiamin; part of the thiamin phosphate synthesis pathway (vitamin B1) (E. coli version)
+PWY-6891: thiazole biosynthesis II (Bacillus) - only the synthesis of the thiazole moiety of thiamin; part of the thiamin phosphate synthesis pathway (vitamin B1) (Bacillus version)
+PWY-5675: nitrate reduction V (assimilatory) - environmental nitrogen-containing compounds (nitrate, nitrite) must be reduced to be used by bacteria in producing their own N-containing compounds such as amino acids
 
+
+_*CMC samples*_
+_PC1+:_
+GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
+PWY-7204: pyridoxal 5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
+PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
+GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
+PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
+GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
+RHAMCAT-PWY: L-rhamnose degradation I - common bacterial cell wall component, also used for energy
+PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
+PWY-5101: L-isoleucine biosynthesis II - synthesis from pyruvate
+PWY-7209: superpathway of pyrimidine ribonucleosides degradation - pyrimidine salvage pathway; uridine broken down to uracil and a ribose or to beta-alanine
+
+_PC1-:_
+PWY-6803: phosphatidylcholine acyl editing - production of triacylglycerols
+PWY-7431: aromatic biogenic amine degradation (bacteria) - synthesis of aromatic and aliphatic biogenic amines by decarboxylation of amino acids; biogenic amines have physiologic roles in prokaryotes (not listed)
+PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
+PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
+PWY-7392: taxadiene biosynthesis (engineered) - taxadiene is an intermediate in taxadiol biosynthesis (from Pacific yew tree, used in chemotherapy)
+PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass - energy metabolism
+P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
+PWY-6353: purine nucleotides degradation II (aerobic) - degradation of purine nucleotides to purine nucleosides, purine bases; nitrogen metabolism for nitrogen utilization
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA - bypasses steps that lead to loss of CO2, saving carbon
+
+_PC2+:_
+PWY-5101: L-isoleucine biosynthesis II - synthesis from pyruvate
+GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
+GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
+GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
+PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
+PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
+PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
+RHAMCAT-PWY: L-rhamnose degradation I - common bacterial cell wall component, also used for energy
+PWY-7204: pyridoxal 5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
+PWY-7209: superpathway of pyrimidine ribonucleosides degradation - pyrimidine salvage pathway; uridine broken down to uracil and a ribose or to beta-alanine
+
+_PC2-:_
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA - bypasses steps that lead to loss of CO2, saving carbon
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass - energy metabolism
+PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
+PWY-7431: aromatic biogenic amine degradation (bacteria) - synthesis of aromatic and aliphatic biogenic amines by decarboxylation of amino acids; biogenic amines have physiologic roles in prokaryotes (not listed)
+P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
+PWY-6803: phosphatidylcholine acyl editing - production of triacylglycerols
+PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
+PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
+PWY-7392: taxadiene biosynthesis (engineered) - taxadiene is an intermediate in taxadiol biosynthesis (from Pacific yew tree, used in chemotherapy)
+PWY-6353: purine nucleotides degradation II (aerobic) - degradation of purine nucleotides to purine nucleosides, purine bases; nitrogen metabolism for nitrogen utilization
 
 
 ```{r outliers, eval=F}
@@ -709,7 +913,8 @@ humann2_KO_long <- humann2_KOs %>%
   summarize(Paths = sum(CPM)) %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
-humann2_KO_long %>%
+humann2_KO_box <- humann2_KO_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
   ggplot(., aes(Village, Paths, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
@@ -717,9 +922,13 @@ humann2_KO_long %>%
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Number of KEGG orthologs detected")
     ggtitle("Total number of KEGG orthologs ID'd by HUMAnN2 (no filtering)")
+humann2_KO_box
+
+ggsave("./05-results.backup/humann2_KO_box.pdf", plot = humann2_KO_box, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_KO_long_w <- humann2_KO_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB")) 
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
 pairwise.wilcox.test(humann2_KO_long_w$Paths, humann2_KO_long_w$Village, p.adjust.method = "fdr")
 
 ```
@@ -865,8 +1074,8 @@ humann2_KO_noyanomami.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
 # plot the PCA
 pca_EG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
-pca_EG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_EG_plot
+pca_EG_plot23 <- plot_pca(humann2_KO_noyanomami.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_EG_plot23
 
 pca_AG_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 pca_AG_plot
@@ -883,7 +1092,39 @@ pca_TS_plot
 pca_V_plot <- plot_pca(humann2_KO_noyanomami.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
+
+# ggsave("./05-results.backup/pca_EG_KOs_noyanomami.pdf", plot = pca_EG_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+
 ```
+
+```{r adonis_KOs_noyanomami}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+humann2_KO_mat.euc <- vegdist(humann2_KO_noyanomami.pca$X, method = "euclidean", na.rm = T)
+humann2_KO_mat.euc.pcoa <- ape::pcoa(humann2_KO_mat.euc)
+
+humann2_KO_mat.euc.pcoavectors <- as.data.frame(humann2_KO_mat.euc.pcoa$vectors)
+humann2_KO_mat.euc.pcoavectors <- humann2_KO_mat.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+humann2_KO_mat.euc.vecmet <- inner_join(humann2_KO_mat.euc.pcoavectors, metadata, by = "SampleID")
+
+humann2_KO_mat.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  # stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(humann2_KO_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_KO_mat.euc.vecmet, perm=999)
+
+```
+
 
 ```{r pca_KOs_cmc_metadata}
 # create the input matrix
@@ -933,6 +1174,9 @@ pca_TS_plot
 pca_V_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
+ggsave("./05-results.backup/pca_EG_KOs_cmc.pdf", plot = pca_EG_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 ```
 
 ```{r adonis_KOs_cmc}
@@ -968,6 +1212,9 @@ Now to see which of the orthologs have the strongest loadings in PC1 and PC2
 pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_KO_biplot_pc1
 
+ggsave("./05-results.backup/humann2_KO_bi_noyanomami.pdf", plot = pca_EG_KO_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 # what are those pathways?
 pandoc.table(pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
@@ -982,6 +1229,10 @@ pandoc.table(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              justify = "lccr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
+
+# humann2_KO_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_biplot_pc2 <- plot_pca_bi(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
@@ -1002,14 +1253,17 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
 
-
-ggsave("~/Desktop/readflags.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-        dpi = 300)
+ggsave("./05-results.backup/humann2_KO_bi_cmc.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1025,6 +1279,11 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              justify = "lccr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
+
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "CMC"))
 
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_biplot_pc2
@@ -1042,6 +1301,13 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10  %>% arrange(PC2),
              justify = "lccr",
              split.tables = Inf,
              caption = "PC2 negative loadings")
+
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# 
+# fwrite(humann2_KO_biplot_list, file = "./05-results.backup/humann2_KO_biplot_list.tsv", quote = F, sep = "\t")
 
 ```
 _*All samples*_

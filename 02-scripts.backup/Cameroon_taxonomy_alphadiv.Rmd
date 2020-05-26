@@ -412,14 +412,21 @@ malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
   rownames_to_column("SampleID"), by = "SampleID")
 
 # now plot the observed species
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Env", "Env", "Environment")
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy", "Market_economy", "Market economy")
+os_env <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Env", "Env", "Environment")
+os_env
+os_ethnicity <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+os_ethnicity
+os_market <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy", "Market_economy", "Market economy")
+os_market
 
-
-# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
+# ggsave("./05-results.backup/os_env.pdf", plot = os_env, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/os_ethnicity.pdf", plot = os_ethnicity, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/os_market.pdf", plot = os_market, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
@@ -550,18 +557,41 @@ malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
   rownames_to_column("SampleID"), by = "SampleID")
 
 # now plot the observed genus
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Env", "Env", "Environment")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Market_economy", "Market_economy", "Market economy")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Age_group", "Age_group", "Age group")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth site")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+og_env <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Env", "Env", "Environment")
+og_env
+og_ethnicity <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+og_ethnicity
+og_market <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Market_economy", "Market_economy", "Market economy")
+og_market
+og_age <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Age_group", "Age_group", "Age group")
+og_age
+og_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
+og_village
+og_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth site")
+og_tooth
+evenness_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+evenness_tooth
 
-
-# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
+# ggsave("./05-results.backup/og_env.pdf", plot = og_env, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/og_ethnicity.pdf", plot = og_ethnicity, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/og_market.pdf", plot = og_market, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/og_age.pdf", plot = og_age, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/og_village.pdf", plot = og_village, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/og_tooth.pdf", plot = og_tooth, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/evenness_tooth.pdf", plot = evenness_tooth, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
@@ -715,14 +745,21 @@ malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
 plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
 plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
 plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
-plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Tooth_site", "Tooth_site", "Tooth site")
+shannon_sex <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
+shannon_sex
+evenness_sex <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
+evenness_sex
+os_tooth <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Tooth_site", "Tooth_site", "Tooth site")
+os_tooth
 
-
-# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
+# ggsave("./05-results.backup/shannon_sex.pdf", plot = shannon_sex, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/evenness_sex.pdf", plot = evenness_sex, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/os_tooth.pdf", plot = os_tooth, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
@@ -853,14 +890,21 @@ malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
 
 # now plot the observed genus
 plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth site")
-plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+og_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
+og_village
+shannong_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth site")
+shannong_tooth
+evennessg_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+evennessg_tooth
 
-
-# ggsave("05-results.backup/NoS_UKY.pdf", plot = NoS, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
+# ggsave("./05-results.backup/og_village.pdf", plot = og_village, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/shannong_tooth.pdf", plot = shannong_tooth, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/evennessg_tooth.pdf", plot = evennessg_tooth, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
@@ -1261,6 +1305,9 @@ heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, 
 
 heatmap_base
 
+ggsave("./05-results.backup/top50species_each_heatmap.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 ```
 
 
@@ -1341,6 +1388,8 @@ heatmap_base <- ggplot(malt_genus.decontam_top50_all_clr_long, aes(SampleID, gen
 
 heatmap_base
 
+ggsave("./05-results.backup/top50genera_each_heatmap.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 
