@@ -207,15 +207,7 @@ plot_pca_names(malt_species.pca,  "PC1", "PC2", "Description")
 
 ```
 
-List the outliers in the plot from section `raw_plot` and remove them before running decontam to ensure they're not influencing the contaminant assessment. 
-```{r outliers}
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
-              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
-              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
 
-outliersF <- str_c(outliers, collapse = "|")
-
-```
 
 # Decontamination with Decontam
 We want to know if there are any species that can be removed b/c they appear to be contaminants. Use the package decontam to determine which species may be contaminants. Prepare the matrix for decontam. 
