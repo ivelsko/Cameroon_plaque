@@ -1,0 +1,146 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque SEED decontam"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output: html_notebook
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(cuperdec)
+library(data.table)
+library(magrittr) ## for pipes!
+library(dplyr) # for mutate()!
+
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+Read in the full species and genus tables.
+```{r load_data}
+# read in the species table
+malt_species_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_species_bacteria_archaea.txt")
+
+# clean the file names
+malt_species_raw <- rename(malt_species_raw, Species = `#Datasets`)
+colnames(malt_species_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
+colnames(malt_species_raw) <- gsub(".fastq.truncated","", colnames(malt_species_raw))
+
+# remove human and unassigned reads, and remove the sub-sampled HMP and JAE samples
+malt_species_raw <- malt_species_raw %>% filter(!str_detect(Species, "Homo sapiens|Not assigned")) %>%
+  select(-contains("10M")) %>%
+  select(-Comparison_CMC_HMP_JAE_MALT_RSC) # remove the extra column at the begining
+
+
+# read in the genus table
+malt_genus_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_genus_bacteria_archaea.txt")
+
+
+# clean the column names
+malt_genus_raw <- rename(malt_genus_raw, Species = `#Datasets`)
+colnames(malt_genus_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
+colnames(malt_genus_raw) <- gsub(".fastq.truncated","", colnames(malt_genus_raw))
+
+# remove human and unassigned reads
+malt_genus_raw <- malt_genus_raw %>% filter(!str_detect(Species, "Homo|Not assigned")) %>%
+  select(-contains("10M")) %>%
+  select(-Comparison_CMC_HMP_JAE_MALT_RSC) # get rid of the extra column at the begining
+
+```
+
+Load metadata
+```{r load_metadata}
+
+metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
+#set the columns of interest to factors
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  mutate(Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
+                                "ExtractionGauze","ExtractionBlank","LibraryBlank"))
+
+```
+
+Use the example database
+```{r set_database}
+# load the example database
+example_database <- system.file("extdata",
+                                "example_database.tsv",
+                                package = "cuperdec")
+
+# convert the example database to a tibble
+database <- load_database(example_database, target = "oral") # %>% print()
+
+```
+
+```{r taxatable}
+
+taxatable <- load_taxa_table(malt_species_raw) # %>% print()
+
+```
+
+```{r metamap}
+metadata_map <- load_map(metadata,
+                     sample_col = "SampleID",
+                     source_col = "Env") # %>% print()
+
+```
+
+```{r simple_curve}
+curves <- calculate_curve(taxatable, database = database) %>%
+  print()
+
+plot_cuperdec(curves)
+
+```
+
+```{r metadata_curve}
+plot_cuperdec(curves, metadata_map)
+
+```
+
+```{r filter_curve}
+
+filter_result <- simple_filter(curves, threshold = 81) # threshold = 82 starts to color some of the CMC samples red
+
+plot_cuperdec(curves, metadata_map, filter_result)
+
+```
+
+```{r hard_burnin}
+
+burnin_result <- hard_burnin_filter(curves, threshold = 81, burnin = 0.9) # threshold = 50, burnin = 0.4 allows the highest ExtractionBlank line to turn turquoise; threshold = 81, burnin 0.1-0.9 keeps all CMC turquoise and all ExtractionBlank red
+# plot_cuperdec(curves, metadata_map, burnin_result)
+
+# restrict the plot to only the 1st 250 taxa
+plot_cuperdec(curves, metadata_map, burnin_result, restrict_x = 250)
+
+```
+
+```{r adaptive_burnin}
+
+burnin_result <- adaptive_burnin_filter(curves, threshold = 59) # threshold = 50 allows the highest ExtractionBlank line to turn turquoise; threshold = 60 keeps the highest ExtractionBlank line red but turns one CMC sample line red; threshold = 59 keeps all CMC turquoise and all ExtractionBlanks red; going higher turns more CMC red
+plot_cuperdec(curves, metadata_map, burnin_result, restrict_x = 250)
+
+```
+
+```{r discard_list}
+# this will not have any CMC samples
+discard_list <- burnin_result %>% filter(!Passed)
+discard_list
+
+```

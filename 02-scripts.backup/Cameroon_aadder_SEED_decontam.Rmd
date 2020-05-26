@@ -14,16 +14,10 @@ output:
 library(knitr)
 library(decontam)
 library(data.table)
-# library(vegan)
-# library(ape)
 library(mixOmics)
 library(janitor)
-# library(rstatix)
-# library(pander)
 library(tidyverse)
 library(gplots)
-# library(ggrepel)
-# library(viridis)
 library(cowplot)
 opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 ```
@@ -241,7 +235,9 @@ metadata.decontam <- metadata %>%
 
 ```
 
-Make a species abundance curve for the samples based on Env to get an idea of the number of species identified in each prior to filtering, and how long the tail is. 
+Make a protein abundance curve for the samples based on Env to get an idea of
+the number of proteins identified in each prior to filtering, and how long the
+tail is.
 ```{r rank_abundance_curves}
 
 seed_full_L4L <- seed_full_L4 %>%
@@ -276,19 +272,21 @@ pathway_abundance_curves <- function(df, envt, title_text) {
            geom_point() +
            theme_minimal() +
            scale_y_log10() +
-           geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
-           xlim(NA, 600) +
+           geom_hline(yintercept=0.0001, linetype="dashed", color = "red") +
+           # xlim(NA, 600) +
+           # ylim(0.0001, NA) +
+           # coord_cartesian(xlim = c(0, 600), ylim = c(0.0001, 1)) +
            ylab("Mean relative abundance") +
-           xlab("Pathway order") +
+           xlab("protein order") +
            ggtitle(title_text)
   
     return(species_abundance_plot)
 }
 
-path_curve_HG <- pathway_abundance_curves(species_orders, "HunterGatherer", "Hunter Gatherer - species")
-path_curve_EG <- pathway_abundance_curves(species_orders, "ExtractionGauze", "Extraction Gauze - species")
-path_curve_EB <- pathway_abundance_curves(species_orders, "ExtractionBlank", "Extraction Blank - species")
-path_curve_LB <- pathway_abundance_curves(species_orders, "LibraryBlank", "Library Blank - species")
+path_curve_HG <- pathway_abundance_curves(species_orders, "HunterGatherer", "Hunter Gatherer - SEED proteins")
+path_curve_EG <- pathway_abundance_curves(species_orders, "ExtractionGauze", "Extraction Gauze - SEED proteins")
+path_curve_EB <- pathway_abundance_curves(species_orders, "ExtractionBlank", "Extraction Blank - SEED proteins")
+path_curve_LB <- pathway_abundance_curves(species_orders, "LibraryBlank", "Library Blank - SEED proteins")
 
 plot_grid(path_curve_HG, path_curve_EG,
           path_curve_EB, path_curve_LB,
@@ -317,7 +315,10 @@ cont_freq_species_list <- contam.freq.species[which(contam.freq.species$contamin
 ggplot(contam.freq.species, aes(x=p)) +
   geom_histogram(bins=100) +
   scale_y_log10() +
-  ggtitle('Frequency - Species')
+  geom_hline(yintercept=10, linetype="dashed", color = "red") +
+  geom_hline(yintercept=2, linetype="dashed", color = "red") +
+  geom_vline(xintercept=0.9, linetype="dashed", color = "red") +
+  ggtitle('Frequency - SEED proteins')
 
 ```
 
@@ -341,14 +342,49 @@ cont_prev_species_list <- contam.prev.species[which(contam.prev.species$contamin
 ggplot(contam.prev.species, aes(x=p)) +
   geom_histogram(bins=100) +
   scale_y_log10() +
-  ggtitle('Prevalence - Species')
+  geom_hline(yintercept=10, linetype="dashed", color = "red") +
+  geom_hline(yintercept=2, linetype="dashed", color = "red") +
+  geom_vline(xintercept=0.6, linetype="dashed", color = "red") +
+  ggtitle('Prevalence - SEED proteins')
 
 ```
 
-Check the rank abundance curves to see how changing the cut-off threshold changes the tail.
+
+Check the combined prevalence and frequency method to see how it differs from the individual methods. 
+```{r decontam_combined}
+# Assign sample-type status to identify control samples (same as was done for prevalence)
+metadata.decontam$is.control <- metadata.decontam$Sample_or_Control=="Control"
+
+# Assign contaminant status
+contam.comb.species <- isContaminant(seed_full_L4.matrix, method="combined", 
+                                 conc=metadata.decontam$SumLibraryConcentration_copies_ul, 
+                                 neg=metadata.decontam$is.control,
+                                 threshold = 0.9)
+
+## Check how many contaminants
+table(contam.comb.species$contaminant)
+
+## List of contaminants
+cont_comb_species_list <- contam.comb.species[which(contam.comb.species$contaminant=="TRUE"), ]
+
+# Graph it to look at the histogram and pick a suitable probability-values cut-off
+ggplot(contam.comb.species, aes(x=p)) +
+  geom_histogram(bins=100) +
+  scale_y_log10() +
+  geom_hline(yintercept=10, linetype="dashed", color = "red") +
+  geom_hline(yintercept=2, linetype="dashed", color = "red") +
+  geom_vline(xintercept=0.9, linetype="dashed", color = "red") +
+  ggtitle('Combined - Species')
+
+```
+
+Check the rank abundance curves to see how changing the cut-off threshold
+changes the tail. This set of plots removes the proteins determined to be
+"contaminants" by decontam, using the list created from which ever method is
+selected.
 ```{r decontam_rank_abund_curve}
 
-contaminants_seed <- cont_prev_species_list %>% rownames_to_column("Pathway") %>% select(Pathway)
+contaminants_seed <- cont_prev_species_list %>% rownames_to_column("Pathway") %>% select(Pathway) # this uses the prevalence method contaminant list
 seed_full_L4.decontam <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
 seed_full_L4.decontam <- seed_full_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
@@ -387,10 +423,9 @@ seed_decontam_abundance_curves <- function(df, envt, title_text) {
            geom_point() +
            theme_minimal() +
            scale_y_log10() +
-           geom_hline(yintercept=0.001, linetype="dashed", color = "red") +
-           xlim(NA, 500) +
+           geom_hline(yintercept=0.0001, linetype="dashed", color = "red") +
            ylab("mean relative abundance") +
-           xlab("species order") +
+           xlab("protein order") +
            ggtitle(title_text) + 
            theme(plot.title = element_text(size = 8))
   
@@ -414,38 +449,7 @@ plot_grid(seed_decontam_curve_HG, seed_decontam_curve_EG, seed_decontam_curve_EB
 
 ```
 
-
-Check the combined prevalence and frequency method to see how it differs from the individual methods. 
-```{r decontam_combined}
-# Assign sample-type status to identify control samples (same as was done for prevalence)
-metadata.decontam$is.control <- metadata.decontam$Sample_or_Control=="Control"
-
-# Assign contaminant status
-contam.comb.species <- isContaminant(seed_full_L4.matrix, method="combined", 
-                                 conc=metadata.decontam$SumLibraryConcentration_copies_ul, 
-                                 neg=metadata.decontam$is.control,
-                                 threshold = 0.9)
-
-## Check how many contaminants
-table(contam.comb.species$contaminant)
-
-## List of contaminants
-cont_comb_species_list <- contam.comb.species[which(contam.comb.species$contaminant=="TRUE"), ]
-
-# Graph it to look at the histogram and pick a suitable probability-values cut-off
-ggplot(contam.comb.species, aes(x=p)) +
-  geom_histogram(bins=100) +
-  scale_y_log10() +
-  geom_hline(yintercept=10, linetype="dashed", color = "red") +
-  geom_hline(yintercept=2, linetype="dashed", color = "red") +
-  ggtitle('Combined - Species')
-
-```
-
-
-
-
-We'll use the prevalence method, because this doesn't include known oral taxa in
+_Change this section_ We'll use the prevalence method, because this doesn't include known oral taxa in
 the contaminant list (frequency method does), and it picks up a lot more than
 the combined method does (but is that important if we cut off the tail of
 low-abundance taxa (say <0.01% abundance) anyway?). But which cut-off to use?
