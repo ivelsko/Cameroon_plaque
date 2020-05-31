@@ -298,7 +298,7 @@ plot_grid(path_curve_HG, path_curve_EG,
 
 
 Now we're ready to run Decontam. Start with the frequency method. 
-```{r decontam_frequency}
+```{r decontam_frequency, eval = F}
 # Check for contamination by fequency
 contam.freq.species <- isContaminant(seed_full_L4.matrix, method="frequency", 
                                  conc=metadata.decontam$SumLibraryConcentration_copies_ul, 
@@ -330,7 +330,7 @@ metadata.decontam$is.control <- metadata.decontam$Sample_or_Control=="Control"
 #Try changing the probability threshold cut-off to see how many more or less are ID'd as contaminants
 contam.prev.species <- isContaminant(seed_full_L4.matrix, method="prevalence", 
                                  neg=metadata.decontam$is.control, 
-                                 threshold = 0.6)
+                                 threshold = 0.25)
 
 # Check number of contaminants
 table(contam.prev.species$contaminant)
@@ -344,14 +344,14 @@ ggplot(contam.prev.species, aes(x=p)) +
   scale_y_log10() +
   geom_hline(yintercept=10, linetype="dashed", color = "red") +
   geom_hline(yintercept=2, linetype="dashed", color = "red") +
-  geom_vline(xintercept=0.6, linetype="dashed", color = "red") +
+  geom_vline(xintercept=0.25, linetype="dashed", color = "red") +
   ggtitle('Prevalence - SEED proteins')
 
 ```
 
 
 Check the combined prevalence and frequency method to see how it differs from the individual methods. 
-```{r decontam_combined}
+```{r decontam_combined, eval = F}
 # Assign sample-type status to identify control samples (same as was done for prevalence)
 metadata.decontam$is.control <- metadata.decontam$Sample_or_Control=="Control"
 
@@ -449,18 +449,22 @@ plot_grid(seed_decontam_curve_HG, seed_decontam_curve_EG, seed_decontam_curve_EB
 
 ```
 
-_Change this section_ We'll use the prevalence method, because this doesn't include known oral taxa in
-the contaminant list (frequency method does), and it picks up a lot more than
-the combined method does (but is that important if we cut off the tail of
-low-abundance taxa (say <0.01% abundance) anyway?). But which cut-off to use?
-How does changing the cut-off affect the tail of low-abundance taxa? List out
-the pathways that are considered contaminants, to be removed from the table
-prior to all analyses. Then remove them from the table to make the
-decontaminated input table for analysis.
+We'll use the prevalence method, because that's what we used for the taxonomic
+decontam step. But which cut-off to use? Decided 0.25 because I don't know how
+much of a difference it makes when I also filter out low-abundance proteins.
+Most of the ones that are considered contaminants are filtered out by abundance
+cut-offs anyway. How does changing the cut-off affect the tail of low-abundance
+taxa? List out the pathways that are considered contaminants, to be removed from
+the table prior to all analyses. Then remove them from the table to make the
+decontaminated input table for analysis, and save as an RData object.
 ```{r contaminants}
 contaminants_seed <- cont_prev_species_list %>% rownames_to_column("Pathway") %>% select(Pathway)
-seed_full.decontam <- seed_full %>%
+seed_L4.decontam <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+seed_L4.decontam <- seed_L4.decontam %>%
   anti_join(., contaminants_seed)
+
+save(seed_full, seed_L4.decontam,
+     file = "./05-results.backup/CMC_seed_tables.RData")
 
 # write.table(malt_species.decontam, file = "05-results.backup/malt_species.decontam.tsv", sep="\t", quote=F, row.names = F)
 # write.table(malt_species, "05-results.backup/malt_species.tsv", sep="\t", quote=F, row.names = F)

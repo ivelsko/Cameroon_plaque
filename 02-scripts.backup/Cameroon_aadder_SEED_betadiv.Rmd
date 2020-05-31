@@ -39,19 +39,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 # SEED category assignment stats
 ```{r load_data}
 ## load the species and genus tables generated with HUMAnN2
-seed_full <- fread("./05-results.backup/aadder_SEED_counts.txt")
-seed_full <- as_tibble(seed_full)
-
-# clean the file names
-seed_full <- rename(seed_full, Pathway = `#Datasets`)
-colnames(seed_full) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","", colnames(seed_full))
-colnames(seed_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","", colnames(seed_full))
-colnames(seed_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.blastn.sam.gz","_10M", colnames(seed_full))
-colnames(seed_full) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","", colnames(seed_full))
-colnames(seed_full) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","_10M", colnames(seed_full))
-
-# remove unmapped and ungrouped reads
-# humann2_KOs <- humann2_KOs_full %>% filter(Ortholog != "UNMAPPED") %>% filter(!str_detect(Ortholog, "UNGROUPED"))
+load("./05-results.backup/CMC_seed_tables.RData")
 
 ```
 
@@ -247,7 +235,7 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle, pathways = c(
       pws_10 <- pws_10 %>%
         rename(pathway = Function) %>%
         mutate(Function = sapply(pathway, function(f) {
-                                  unlist(str_split(f, ":"))[1]
+                                  unlist(str_split(f, ";"))[4]
                            })) 
     }
 
@@ -259,7 +247,7 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle, pathways = c(
       neg_10 <- neg_10 %>%
       rename(pathway = Function) %>%
        mutate(Function = sapply(pathway, function(f) {
-                                  unlist(str_split(f, ":"))[1]
+                                  unlist(str_split(f, ";"))[4]
                            })) 
     }
 
@@ -320,7 +308,7 @@ seed_assignments_box <- seed_assignments %>%
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Percent of reads aligned by HUMAnN2")
+    ggtitle("Percent of reads assigned to SEED proteins")
 seed_assignments_box
 
 # ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
@@ -332,7 +320,18 @@ pairwise.wilcox.test(seed_assignments_w$Assigned, seed_assignments_w$Village, p.
 
 ```
 
-```{r pca_paths_with_controls}
+SEED pathways are separated into 4 levels: SEED, general biomolecule processing
+pathway, specific pathway, protein. I use L2, L3, and L4 to indicated the
+general pathway, specific pathway, and protein assignments, respectively. All
+assignments at levels higher than L4 are summs of the levels directly underneath
+(to get the total counts for a specific L3 path, sum all L4 proteins under that
+path, to get the total counts for a specific L2 path, sum all L3 paths under
+that L2 path). All analysis here is on the protein level, L4, and this is the
+abbreviation I use throughout. 
+
+Start with a PCA to see if any of the samples fall with the controls based on
+functional profile.
+```{r pca_L4_with_controls}
 # create the input matrix of only the protein-level assignments
 # start with the full table and pull out only the level 4 entries
 seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
@@ -352,25 +351,669 @@ tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
 seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_test_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_test_plot
+pca_L4_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-pca_test_plot_names <- plot_pca_names(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group")
-pca_test_plot_names
+# pca_L4_plot_names <- plot_pca_names(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group")
+# pca_L4_plot_names
+
+# Now with the decontaminated table
+seed_L4.decontam_filt <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_filt) <- seed_L4.decontam_filt$SampleID
+seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_filt_pca <- tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_filt.pca <- pca(seed_L4.decontam_filt, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_decontam_plot <- plot_pca(seed_L4.decontam_filt.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+L4_pca_controls <- plot_grid(pca_L4_plot, pca_L4_decontam_plot,
+          nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
+
+L4_pca_controls
 
 ```
 None of the samples appear to be outliers. The extraction gauze plots with the
 samples, but is very likely contaminated with spit. This is what we saw in the
-taxonomy
+taxonomy. The decontaminated L4 plot doesn't look all that different from the
+full L4 plot. Clearly in both plots, the subsampled HMP and JAE samples are
+plotting closer to the CMC samples than their full counterparts. This suggests
+that there is a stronger effect of read count on the functional profiles than
+there is on the taxonomy. We will continue to use the full HMP and JAE samples
+however, since that's what we used for taxonomy and HUMAnN2 analyses.
+
+
+How do the samples plot when the controls are removed? What's the relationship
+of the samples to eachother? Let's also look at how filtering and
+decontaminating affects the relationships of the samples.
+```{r pca_L4_filt_decontam}
+# Start with a full table that is not filtered or decontaminated
+seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+
+seed_full_L4 <- seed_full_L4 %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_full_L4) <- seed_full_L4$SampleID
+seed_full_L4 <- as.matrix(seed_full_L4 %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+# Now filter the full table, but don't decontaminate it
+seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+
+seed_full_L4 <- seed_full_L4 %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  adorn_totals(where = "col", name = "Total") %>%
+  mutate(Percent = Total/(sum(Total))*100) %>%
+  filter(Percent >= 0.0001) %>%
+  select(-c("Total","Percent")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_full_L4) <- seed_full_L4$SampleID
+seed_full_L4 <- as.matrix(seed_full_L4 %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_filt_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+
+# Now with the decontaminated table
+seed_L4.decontam_filt <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_filt) <- seed_L4.decontam_filt$SampleID
+seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_filt_pca <- tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_filt.pca <- pca(seed_L4.decontam_filt, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_decontam_plot <- plot_pca(seed_L4.decontam_filt.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+
+# Now filter the decontaminated table
+seed_L4.decontam_filt <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  adorn_totals(where = "col", name = "Total") %>%
+  mutate(Percent = Total/(sum(Total))*100) %>%
+  filter(Percent >= 0.0001) %>%
+  select(-c("Total","Percent")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_filt) <- seed_L4.decontam_filt$SampleID
+seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_filt_pca <- tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_filt.pca <- pca(seed_L4.decontam_filt, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_decontam_filt_plot <- plot_pca(seed_L4.decontam_filt.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+L4_pca_filtering <- plot_grid(pca_L4_plot, pca_L4_filt_plot,
+                              pca_L4_decontam_plot, pca_L4_decontam_filt_plot,
+                              nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
+
+L4_pca_filtering
+
+
+```
+The full table and the decontaminated table plots look very similar, as do the
+full-filtered and decontaminated-filtered plots. Clearly removing the
+"contaminant" proteins a doesn't remove proteins that strongly influence the
+relationship of the industrial and non-industrial samples to eachother.
+Filtering out the low abundance proteins (<0.0001%, <0.00005%) does cause the CMC and industrial
+samples to plot more closely, and in some cases overlap, suggesting that the low
+abundance proteins are what are distinct between the two sample types. Is this
+related to the pan-genome/accessory genome differences that may exist between
+strains of species found in each sample group? The HMP and JAE samples separate
+from eachother on PC2, which is more visible in the PC3-PC2 plots than in the
+PC1-PC2 plots.
+
+So which table to use, the decontaminated table, or the decontaminated and
+filtered table? Maybe try both to see what the differences are. Filtering
+proteins present at <0.0001% abundance from the decontaminated table removes
+~1000 proteins. Might be important for the biplot visualizations to filter the
+table to be able to see the arrows, otherwise, they'll all cluster tightly
+around the center of the plot.
+
+# Decontaminated table
+```{r pca_decontam_noblanks_metadata}
+
+seed_L4.decontam_noblanks <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_noblanks) <- seed_L4.decontam_noblanks$SampleID
+seed_L4.decontam_noblanks <- as.matrix(seed_L4.decontam_noblanks %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_noblanks_pca <- tune.pca(seed_L4.decontam_noblanks, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_noblanks.pca <- pca(seed_L4.decontam_noblanks, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+
+
+```
+
+```{r adonis_decontam_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4.decontam_noblanks.euc <- vegdist(seed_L4.decontam_noblanks.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_noblanks.euc.pcoa <- ape::pcoa(seed_L4.decontam_noblanks.euc)
+
+seed_L4.decontam_noblanks.euc.pcoavectors <- as.data.frame(seed_L4.decontam_noblanks.euc.pcoa$vectors)
+seed_L4.decontam_noblanks.euc.pcoavectors <- seed_L4.decontam_noblanks.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4.decontam_noblanks.euc.vecmet <- inner_join(seed_L4.decontam_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4.decontam_noblanks.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(seed_L4.decontam_noblanks.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_noblanks.euc.vecmet, perm=999)
+
+
+```
+
+```{r biplots_decontam_noblanks}
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+        dpi = 300)
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# make a table of the pathways to save, to use again later in another R notebook
+# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+
+
+```
+_PC1+_
+
+
+_PC1-_
+
+
+_PC2+_
+
+
+_PC2-_
 
 
 
 
+```{r pca_decontam_cmc_categories}
+
+seed_L4.decontam_cmc <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_cmc) <- seed_L4.decontam_cmc$SampleID
+seed_L4.decontam_cmc <- as.matrix(seed_L4.decontam_cmc %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_cmc_pca <- tune.pca(seed_L4.decontam_cmc, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_cmc.pca <- pca(seed_L4.decontam_cmc, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+
+```
+
+```{r adonis_decontam_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4.decontam_cmc.euc <- vegdist(seed_L4.decontam_cmc.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_cmc.euc.pcoa <- ape::pcoa(seed_L4.decontam_cmc.euc)
+
+seed_L4.decontam_cmc.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc.euc.pcoa$vectors)
+seed_L4.decontam_cmc.euc.pcoavectors <- seed_L4.decontam_cmc.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4.decontam_cmc.euc.vecmet <- inner_join(seed_L4.decontam_cmc.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4.decontam_cmc.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(seed_L4.decontam_cmc.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_cmc.euc.vecmet, perm=999)
+
+
+```
+
+```{r biplots_decontam_noblanks}
+# which paths distinguish sample groups when only CMC samples are included?
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_cmc_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+# what are those pathways?
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+
+pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_cmc_biplot_pc2
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# 
+# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
+
+
+```
+_PC1+_
+
+
+_PC1-_
+
+
+_PC2+_
+
+
+_PC2-_
 
 
 
 
+# Decontaminated and filtered table
+```{r pca_decontam_filt_noblanks_metadata}
 
+seed_L4.decontam_filt_noblanks <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  adorn_totals(where = "col", name = "Total") %>%
+  mutate(Percent = Total/(sum(Total))*100) %>%
+  filter(Percent >= 0.001) %>%
+  select(-c("Total","Percent")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_filt_noblanks) <- seed_L4.decontam_filt_noblanks$SampleID
+seed_L4.decontam_filt_noblanks <- as.matrix(seed_L4.decontam_filt_noblanks %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_filt_noblanks_pca <- tune.pca(seed_L4.decontam_filt_noblanks, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_filt_noblanks.pca <- pca(seed_L4.decontam_filt_noblanks, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+
+
+```
+
+```{r adonis_decontam_filt_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4.decontam_filt_noblanks.euc <- vegdist(seed_L4.decontam_filt_noblanks.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_filt_noblanks.euc.pcoa <- ape::pcoa(seed_L4.decontam_filt_noblanks.euc)
+
+seed_L4.decontam_filt_noblanks.euc.pcoavectors <- as.data.frame(seed_L4.decontam_filt_noblanks.euc.pcoa$vectors)
+seed_L4.decontam_filt_noblanks.euc.pcoavectors <- seed_L4.decontam_filt_noblanks.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4.decontam_filt_noblanks.euc.vecmet <- inner_join(seed_L4.decontam_filt_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4.decontam_filt_noblanks.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(seed_L4.decontam_filt_noblanks.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_filt_noblanks.euc.vecmet, perm=999)
+
+
+```
+
+```{r biplots_decontam_filt_noblanks}
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"),
+        dpi = 300)
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# make a table of the pathways to save, to use again later in another R notebook
+# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+
+
+```
+_PC1+_
+
+
+_PC1-_
+
+
+_PC2+_
+
+
+_PC2-_
+
+
+
+
+```{r pca_decontam_filt_cmc_categories}
+
+seed_L4.decontam_filt_cmc <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
+  adorn_totals(where = "col", name = "Total") %>%
+  mutate(Percent = Total/(sum(Total))*100) %>%
+  filter(Percent >= 0.001) %>%
+  select(-c("Total","Percent")) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway, Counts)
+
+rownames(seed_L4.decontam_filt_cmc) <- seed_L4.decontam_filt_cmc$SampleID
+seed_L4.decontam_filt_cmc <- as.matrix(seed_L4.decontam_filt_cmc %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4.decontam_filt_cmc_pca <- tune.pca(seed_L4.decontam_filt_cmc, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_filt_cmc.pca <- pca(seed_L4.decontam_filt_cmc, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+
+```
+
+
+```{r adonis_decontam_filt_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4.decontam_filt_cmc.euc <- vegdist(seed_L4.decontam_filt_cmc.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_filt_cmc.euc.pcoa <- ape::pcoa(seed_L4.decontam_filt_cmc.euc)
+
+seed_L4.decontam_filt_cmc.euc.pcoavectors <- as.data.frame(seed_L4.decontam_filt_cmc.euc.pcoa$vectors)
+seed_L4.decontam_filt_cmc.euc.pcoavectors <- seed_L4.decontam_filt_cmc.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4.decontam_filt_cmc.euc.vecmet <- inner_join(seed_L4.decontam_filt_cmc.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4.decontam_filt_cmc.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+# test for difference between different metadata categories 
+adonis(seed_L4.decontam_filt_cmc.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_filt_cmc.euc.vecmet, perm=999)
+
+
+```
+
+```{r biplots_decontam_filt_noblanks}
+# which paths distinguish sample groups when only CMC samples are included?
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_cmc_biplot_pc1
+
+ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+# what are those pathways?
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+
+pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_cmc_biplot_pc2
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# 
+# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
+
+
+```
+_PC1+_
+
+
+_PC1-_
+
+
+_PC2+_
+
+
+_PC2-_
 
 
 

@@ -42,7 +42,7 @@ load("./05-results.backup/CMC_metadata.RData")
 metadata_nofactors <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata_nofactors <- metadata_nofactors %>% 
   rename(SampleID = `#SampleID`) %>%
-  select(SampleID, Env, Age, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village)
+  select(SampleID, Env, Age, Age_group, Ethnic_Group, Market_economy, Market_economy_split, Sex, Tooth_site, Village)
 
 ```
 
@@ -54,8 +54,8 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
 
       df_X <- df %>%
               inner_join(metadata %>%
-                           select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID")
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy,
+                                  Market_economy_split, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID")
 
     stat_info_table = df_X[[stat_info]]
     metadata_group = df_X[[metadata_group]]
@@ -69,6 +69,7 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
                          #scale_y_continuous(trans='pseudo_log') +
                          theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
                          ylab(stat_info) +
+                         xlab(metadata_group) +
                          ggtitle(title_text)
 
     return(bx_wh_plot)
@@ -88,12 +89,13 @@ outliersF <- str_c(outliers, collapse = "|")
 ```
 
 
-# Alpha-diversity
+# Alpha-diversity of all samples
 First we want to know if there are differences in the total diveristy of
-identified species between *XXXMETADATAXXX*. We'll look at alpha-diversity for
-this, using both the observed species and Shannon diverity metrics. Observed
-species to tell us which *XXXMETADATAXXX* have more species/genera, and Shannon
-to tell us which has more even distribution of species/genera.
+identified species between various metadata categories. We'll look at
+alpha-diversity for this, using both the observed species and Shannon diverity
+metrics. Observed species to tell us which metadata categories have more
+species/genera, and Shannon to tell us which has more even distribution of
+species/genera.
 
 ## Observed Speceies/Genera
 ```{r observed_species}
@@ -282,8 +284,8 @@ names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
 malt_genus.decontam_filtered.shannon <- malt_genus.decontam_filtered.shannon %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Env", "Env", "Shannon Index")
-plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Village", "Village", "Shannon Index")
+plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Env", "Env", "Shannon Index - genus")
+plot_box_whisker(malt_genus.decontam_filtered.shannon, "Shannon_index", "Village", "Village", "Shannon Index - genus")
 
 ```
 
@@ -348,15 +350,15 @@ names(evenness_filtered.genus)[1] <- "Pielou_evenness"
 evenness_filtered.genus <- evenness_filtered.genus %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Env", "Env", "Pielou's evenness")
-plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
+plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Env", "Env", "Pielou's evenness - genus")
+plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Village", "Village", "Pielou's evenness - genus")
 
 ```
 In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these
 are the 2 samples that were removed in the warning notice (they end up with NA
 for the evenness calculation).
 
-### Stats for samples without controls
+## Stats for all samples without controls
 ```{r samples_stats_species_noyanomami}
 # Filtered species tables alpha-diversity stats
 # get the number of observed species
@@ -418,6 +420,8 @@ os_ethnicity <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed
 os_ethnicity
 os_market <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy", "Market_economy", "Market economy")
 os_market
+os_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy_split", "Market_economy_split", "Market economy")
+os_market_split
 
 # ggsave("./05-results.backup/os_env.pdf", plot = os_env, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
@@ -427,17 +431,20 @@ os_market
 # 
 # ggsave("./05-results.backup/os_market.pdf", plot = os_market, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./05-results.backup/os_market_split.pdf", plot = os_market_split, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
   inner_join(., metadata_nofactors %>%
                select(SampleID, Env, Age, Age_group, Ethnic_Group, 
-                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+                      Market_economy, Market_economy_split, Sex, Tooth_site, Village), by = "SampleID")
 
 # define the metadata categories to test for significnat differences in diversity
 Envmt <- colnames(malt_species.decontam_filtered.alpha_meta %>%
                     select(Env, Age, Age_group, Ethnic_Group, 
-                           Market_economy, Sex, Tooth_site, Village))
+                           Market_economy, Market_economy_split, Sex, Tooth_site, Village))
 
 # test for significant differences in diversity between the metadata categories
 species_kruskal_pvals <- lapply(Envmt, function(envmt) {
@@ -495,12 +502,14 @@ species_wilcox_pvals
 ```
 Only Env (p = 0.0251), Ethnic group (p = 0.0379), and Market economy (p =
 0.0413) have significant differences in diversity, and only in the number of
-species (Observed species). The post-hoc test show that the only significant
-difference in the Ethnic group category is between Baka and JAE (p.adj = 0.037)
-where Baka has a higher average, in the Env category is between HunterGatherer
-and JAE (p.adj = 0.046) where HunterGatherer has a higher average, and in Market
-economy is  between Industrial and Logging road (p.adj = 0.048) where Logging
-road has a higher average.
+species (Observed species).  The Market economy with Industrial samples split
+into plaque and calculus does not have significant differences between groups (p
+= 0.0621). The post-hoc test show that the only significant difference in the
+Ethnic group category is between Baka and JAE (p.adj = 0.037) where Baka has a
+higher average, in the Env category is between HunterGatherer and JAE (p.adj =
+0.046) where HunterGatherer has a higher average, and in Market economy is
+between Industrial and Logging road (p.adj = 0.048) where Logging road has a
+higher average.
 
 ```{r samples_stats_genus_noyanomami}
 # Filtered genus tables alpha-diversity stats
@@ -597,12 +606,12 @@ evenness_tooth
 malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
   inner_join(., metadata_nofactors %>%
                select(SampleID, Env, Age, Age_group, Ethnic_Group, 
-                      Market_economy, Sex, Tooth_site, Village), by = "SampleID")
+                      Market_economy, Market_economy_split, Sex, Tooth_site, Village), by = "SampleID")
 
 # define the metadata categories to test for significnat differences in diversity
 Envmt <- colnames(malt_genus.decontam_filtered.alpha_meta %>%
                     select(Env, Age_group, Ethnic_Group, 
-                           Market_economy, Sex, Tooth_site, Village))
+                           Market_economy, Market_economy_split, Sex, Tooth_site, Village))
 
 # test for significant differences in diversity between the metadata categories
 genus_kruskal_pvals <- lapply(Envmt, function(envmt) {
@@ -661,7 +670,8 @@ genus_wilcox_pvals
 ```
 Six metadata categories have significant differences in diversity. Number of
 genera: Env (p = 0.00000346), Tooth site (p = 0.00000382), Ethnic group (p =
-0.00000438), Village (p = 0.0000055), Age group (p = 0.000111), and Market
+0.00000438), Village (p = 0.0000055), Age group (p = 0.000111), Market economy
+with Industrial split into plaque and calculus (p = 0.00000704), and Market
 economy (p = 0.0000974); Evenness: Tooth site (p = 0.0315). The post-hoc tests
 show significant differences in Age group between all age categories and HMP
 (18-29,40-49,50-59 p=0.000555; 30-39 p=0.00069; 60+ p=0.014) where HMP is always
@@ -672,6 +682,10 @@ HMP and Nzime (p = 0.003), and HMP and JAE (p = 0.008), where is lower than all
 others. Significant differences in Market economy between Industrial and Forrest
 camp (p = 0.000163), Industrial and Logging road (p = 0.002), Industrial and
 Farming (p = 0.04), where Industrial is lower than all 3. Significant
+differences in Market economy with Industrial split into plaque and calculus
+between Forrest camp and Industrial plaque (p = 0.00000908), Logging road and
+Industrial plaque (p = 0.000056), Farming and Industrial plaque (p = 0.003), and
+between Industrial plaque and Industrial calculus (p = 0.01). Significant
 differences in Village between HMP and 204 (p = 0.0000191), HMP and 202 (p =
 0.001), HMP and 205 (p = 0.001), HMP and 203 (p = 0.002), HMP and JAE (p =
 0.016), 204 and 206 (p = 0.017), where HMP is lower than all others, and 206 is
@@ -979,7 +993,122 @@ Anterior has higher Shannon index (p.adj = 0.012) and Evenness (p.adj = 0.002)
 than Posterior. In the village category 204 has significantly higher number of
 genera (p = 0.047) than 206.
 
-## Heatmaps
+
+There is a significant difference in species diversity between Females and
+Males. We'll split each village by sex to see if there are differences in alpha
+diversity between the sexes in each village
+```{r sex_by_village_species}
+
+malt_species.decontam_filtered.alpha_meta %>%
+  group_by(Village) %>%
+  pairwise_wilcox_test(Observed_species ~ Sex, p.adjust.method = "fdr") %>%
+  bind_rows(malt_species.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            pairwise_wilcox_test(Shannon_index ~ Sex, p.adjust.method = "fdr")) %>%
+  bind_rows(malt_species.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ Sex, p.adjust.method = "fdr")) %>%
+  arrange(p.adj)
+
+# make a plot of village split by sex
+malt_species.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Observed_species, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Observed species") +
+         xlab("Sex") +
+         ggtitle("Observed species per village by sex")
+
+# make a plot of village split by sex
+malt_species.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Shannon index") +
+         xlab("Sex") +
+         ggtitle("Species Shannon index per village by sex")
+
+# make a plot of village split by sex
+malt_species.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Pileou_evenness, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Evenness") +
+         xlab("Sex") +
+         ggtitle("Species evenness per village by sex")
+
+```
+The only significant difference in species-level diversity between females and
+males in each village is in village 206 by Shannon index (p = 0.029), and
+Pileou's evenness (p = 0.029). However, there is a lot of spread in the points
+of these groups, so it may not be significant if more samples are added.
+
+```{r sex_by_village_species}
+
+malt_genus.decontam_filtered.alpha_meta %>%
+  group_by(Village) %>%
+  pairwise_wilcox_test(Observed_genera ~ Sex, p.adjust.method = "fdr") %>%
+  bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            pairwise_wilcox_test(Shannon_index ~ Sex, p.adjust.method = "fdr")) %>%
+  bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            pairwise_wilcox_test(Pileou_evenness ~ Sex, p.adjust.method = "fdr")) %>%
+  arrange(p.adj)
+
+# make a plot of village split by sex
+malt_genus.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Observed_genera, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Observed genera") +
+         xlab("Sex") +
+         ggtitle("Observed genera per village by sex")
+
+# make a plot of village split by sex
+malt_genus.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Shannon index") +
+         xlab("Sex") +
+         ggtitle("genus Shannon index per village by sex")
+
+# make a plot of village split by sex
+malt_genus.decontam_filtered.alpha_meta %>%
+  ggplot(., aes(x = Village, y = Pileou_evenness, fill = Sex)) +
+         geom_boxplot(outlier.size = 0) +
+         geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
+         scale_fill_manual(values = Sex_colors) +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Evenness") +
+         xlab("Sex") +
+         ggtitle("Genus evenness per village by sex")
+
+```
+The only significant difference in genus-level diversity between females and
+males in each village is in village 206 by Observed genera (p = 0.0009), and
+Shannon index (p = 0.040). However, there is a lot of spread in the points
+of these groups, so it may not be significant if more samples are added.
+
+
+# Heatmaps
 ```{r metadata_heatmaps}
 # read in metadata again to get it without all the factors
 metadata_hm <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")

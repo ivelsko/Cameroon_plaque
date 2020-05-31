@@ -44,6 +44,8 @@ metadata <- metadata %>%
                                        "Li06_VE_2019-05-02","Li07_VE_2019-05-06","Li08_VE_2019-05-06","Li09_VE_2019-05-06"),
          Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial","ExtractionGauze","ExtractionBlank","LibraryBlank"),
+         Market_economy_split = fct_relevel(Market_economy_split, "Logging road","Forrest camp","Farming","Yanomami",
+                                      "Industrial plaque","Industrial calculus", "ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
          Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
@@ -118,6 +120,13 @@ Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 1
 Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
                            ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
+Market_economy_split_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Yanomami = "#C70E7B", `Industrial plaque` = "#737373",
+                           `Industrial calculus` = "#bdbdbd", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Market_economy_split_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, `Industrial plaque` = 15,
+                           `Industrial calculus` = 15, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
+Market_economy_split_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, `Industrial plaque` = 4,
+                           `Industrial calculus` = 4, ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
+
 Sex_colors <- c(Female = "#FF3200", Male = "#065FA3", Unknown = "#bdbdbd",
                 ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Sex_shapes <- c(Female = 19, Male = 17, Unknown = 16, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
@@ -154,6 +163,7 @@ save(metadata,
      Industry_shapes, Industry_size, Industry_colors,
      LibraryBatch_colors, LibraryBatch_shapes, LibraryBatch_size,
      Market_economy_colors, Market_economy_shapes, Market_economy_size,
+     Market_economy_split_colors, Market_economy_split_shapes, Market_economy_split_size,
      Sex_colors, Sex_shapes, Sex_size,
      Tooth_site_colors, Tooth_site_shapes, Tooth_site_size,
      Village_shapes, Village_colors, Village_size,

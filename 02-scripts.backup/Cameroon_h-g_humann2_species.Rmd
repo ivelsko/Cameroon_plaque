@@ -146,8 +146,8 @@ humann2_path_pcbi_bar_df <- humann2_path_pc1pws_stats_extra %>%
 # plot the values in a bar chart
 # **Note** PWY-5941 has no species-level designations, and therefore is a blank space instead of a bar
 humann2_path_pcbi_bar_df %>%
-  # filter(Direction == "PC1+") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Direction == "PC1+", Genus != "Other") %>% # removing Other plots all species/unassigned - no need to filter the pathways
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Centipeda","Corynebacterium","Prevotella","Propionibacterium","Selenomonas","Veillonella")) %>%
   ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -226,8 +226,8 @@ humann2_path_pcbi_bar_df <- humann2_path_pcbi_bar_df %>%
 
 # plot the values in a bar chart
 humann2_path_pcbi_bar_df %>%
-  filter(Direction == "PC1-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Direction == "PC1-", Genus != "Other") %>% # removing Other plots all species/unassigned - no need to filter the pathways
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Enterobacter","Kingella","Neisseria","Olsenella","Streptococcus")) %>%
   ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -240,7 +240,7 @@ humann2_path_pcbi_bar_df %>%
           axis.text.x = element_text(angle = 90, hjust = 0.5)) +
     # facet_wrap(~pathrtholog, nrow=2) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to KEGG Orthologs, PC1 negative") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC + Industrial, PC1 negative") +
     theme(title = element_text(size=10))
 
 
@@ -308,8 +308,8 @@ humann2_path_pcbi_bar_df <- humann2_path_pcbi_bar_df %>%
 # plot the values in a bar chart
 # Most of these come from 'unclassified'
 humann2_path_pcbi_bar_df %>%
-  filter(Direction == "PC2+") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Direction == "PC2+", Genus != "Other") %>%  # removing Other plots all species/unassigned - no need to filter the pathways
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Actinomyces")) %>%
   ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -322,7 +322,7 @@ humann2_path_pcbi_bar_df %>%
           axis.text.x = element_text(angle = 90, hjust = 0.5)) +
     # facet_wrap(~pathrtholog, nrow=2) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to KEGG Orthologs, PC2 positive") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC + Industrial, PC2 positive") +
     theme(title = element_text(size=10))
 
 
@@ -390,8 +390,8 @@ humann2_path_pcbi_bar_df <- humann2_path_pcbi_bar_df %>%
   
 # plot the values in a bar chart
 humann2_path_pcbi_bar_df %>%
-  filter(Direction == "PC2-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Direction == "PC2-", Genus != "Other") %>% # removing Other plots all species/unassigned - no need to filter the pathways
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Haemophilus","Prevotella")) %>%
   ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -404,20 +404,340 @@ humann2_path_pcbi_bar_df %>%
           axis.text.x = element_text(angle = 90, hjust = 0.5)) +
     # facet_wrap(~pathrtholog, nrow=2) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to KEGG Orthologs, PC2 negative") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC + Industrial, PC2 negative") +
     theme(title = element_text(size=10))
 
 
 ```
 
 ## CMC samples only
+```{r path_pc1pws_cmc}
+# list the 10 orthologs with strongest loading in PC1 + values
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC1+", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path) %>%
+  str_c(., collapse = "|") # need this format for filtering in the next step
+
+# select only those 10 orthologs from the list, and split the column with names into 3 (Ortholog, Genus, Species)
+humann2_path_cmc_pc1pws <- humann2_path %>%
+  filter(str_detect(Pathway, humann2_path_cmc_biplot_pc)) %>%
+  filter(str_detect(Pathway, "\\|")) %>%
+  gather("SampleID", "CPM", 2:ncol(.)) %>%
+  mutate(Pathway = str_replace_all(Pathway, "\\.s__", "|s__")) %>%
+  separate(., Pathway, into = c("Pathway", "Genus", "Species"), sep = "\\|") %>%
+  mutate(Species = replace_na(Species, "unclassified"),
+         Genus = str_replace_all(Genus, "g__", ""),
+         Species = str_replace_all(Species, "s__", "")) %>%
+  inner_join(., humann2_pathway_biplot_list %>%
+              select(Pathway, Path) %>%
+               distinct(.), by = "Pathway") %>%
+  select(-Pathway) %>%
+  select(Path, everything()) %>%
+  arrange(Path)
+
+# calculate the % for each ortholog contributed by each genus         
+humann2_path_cmc_pc1pws_stats <- humann2_path_cmc_pc1pws %>%
+  group_by(Path, Genus) %>%
+  summarize(Sum = sum(CPM)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+# create the list of 10 orthologs again, but don't collapse the list as above
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC1+", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path)
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+humann2_path_cmc_pc1pws_stats_extra <- lapply(humann2_path_cmc_biplot_pc, function(eclass) {
+ high_percent <- humann2_path_cmc_pc1pws_stats %>%
+   filter(Path == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Path = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.)
+
+# add this additional % to the main table
+humann2_path_cmc_pcbi_bar_df <- humann2_path_cmc_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., humann2_path_cmc_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Path, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+# **Note** PWY-5941 and PWY-7209 have no species-level designations, and therefore are blank spaces instead of bars
+humann2_path_cmc_pcbi_bar_df %>%
+  filter(Direction == "PC1+", Genus != "Other") %>%
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Centipeda","Corynebacterium","Prevotella","Propionibacterium","Selenomonas","Veillonella")) %>%
+  ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=18),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC only, PC1 positive") +
+    theme(title = element_text(size=10))
 
 
+```
+
+```{r path_pc1neg_cmc}
+# list the 10 orthologs with strongest loading in PC1 + values
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC1-", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path) %>%
+  str_c(., collapse = "|") # need this format for filtering in the next step
+
+# select only those 10 orthologs from the list, and split the column with names into 3 (Ortholog, Genus, Species)
+humann2_path_cmc_pc1neg <- humann2_path %>%
+  filter(str_detect(Pathway, humann2_path_cmc_biplot_pc)) %>%
+  filter(str_detect(Pathway, "\\|")) %>%
+  gather("SampleID", "CPM", 2:ncol(.)) %>%
+  mutate(Pathway = str_replace_all(Pathway, "\\.s__", "|s__")) %>%
+  separate(., Pathway, into = c("Pathway", "Genus", "Species"), sep = "\\|") %>%
+  mutate(Species = replace_na(Species, "unclassified"),
+         Genus = str_replace_all(Genus, "g__", ""),
+         Species = str_replace_all(Species, "s__", "")) %>%
+  inner_join(., humann2_pathway_biplot_list %>%
+              select(Pathway, Path) %>%
+               distinct(.), by = "Pathway") %>%
+  select(-Pathway) %>%
+  select(Path, everything()) %>%
+  arrange(Path)
+
+# calculate the % for each ortholog contributed by each genus         
+humann2_path_cmc_pc1neg_stats <- humann2_path_cmc_pc1neg %>%
+  group_by(Path, Genus) %>%
+  summarize(Sum = sum(CPM)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+# create the list of 10 orthologs again, but don't collapse the list as above
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC1-", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path)
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+humann2_path_cmc_pc1neg_stats_extra <- lapply(humann2_path_cmc_biplot_pc, function(eclass) {
+ high_percent <- humann2_path_cmc_pc1neg_stats %>%
+   filter(Path == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Path = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.)
+
+# add this additional % to the main table
+humann2_path_cmc_pcbi_bar_df <- humann2_path_cmc_pcbi_bar_df %>%
+  bind_rows(humann2_path_cmc_pc1neg_stats_extra %>%
+            rename(Percent = Remaining) %>%
+            bind_rows(., humann2_path_cmc_pc1neg_stats %>%
+                      select(-Sum)) %>% 
+            select(Path, Genus, Percent) %>%
+            mutate(Direction = "PC1-",
+                   Samples = "CMC"))
+
+# plot the values in a bar chart
+humann2_path_cmc_pcbi_bar_df %>%
+  filter(Direction == "PC1-", Genus != "Other") %>%
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Enterobacter","Kingella","Neisseria","Olsenella","Streptococcus")) %>%
+  ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=18),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    # facet_wrap(~pathrtholog, nrow=2) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC only, PC1 negative") +
+    theme(title = element_text(size=10))
 
 
+```
+
+```{r path_pc2pws_cmc}
+# list the 10 orthologs with strongest loading in PC1 + values
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC2+", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path) %>%
+  str_c(., collapse = "|") # need this format for filtering in the next step
+
+# select only those 10 orthologs from the list, and split the column with names into 3 (Ortholog, Genus, Species)
+humann2_path_cmc_pc2pws <- humann2_path %>%
+  filter(str_detect(Pathway, humann2_path_cmc_biplot_pc)) %>%
+  filter(str_detect(Pathway, "\\|")) %>%
+  gather("SampleID", "CPM", 2:ncol(.)) %>%
+  mutate(Pathway = str_replace_all(Pathway, "\\.s__", "|s__")) %>%
+  separate(., Pathway, into = c("Pathway", "Genus", "Species"), sep = "\\|") %>%
+  mutate(Species = replace_na(Species, "unclassified"),
+         Genus = str_replace_all(Genus, "g__", ""),
+         Species = str_replace_all(Species, "s__", "")) %>%
+  inner_join(., humann2_pathway_biplot_list %>%
+              select(Pathway, Path) %>%
+               distinct(.), by = "Pathway") %>%
+  select(-Pathway) %>%
+  select(Path, everything()) %>%
+  arrange(Path)
+
+# calculate the % for each ortholog contributed by each genus         
+humann2_path_cmc_pc2pws_stats <- humann2_path_cmc_pc2pws %>%
+  group_by(Path, Genus) %>%
+  summarize(Sum = sum(CPM)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+# create the list of 10 orthologs again, but don't collapse the list as above
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC2+", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path)
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+humann2_path_cmc_pc2pws_stats_extra <- lapply(humann2_path_cmc_biplot_pc, function(eclass) {
+ high_percent <- humann2_path_cmc_pc2pws_stats %>%
+   filter(Path == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Path = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.)
+
+# add this additional % to the main table
+humann2_path_cmc_pcbi_bar_df <- humann2_path_cmc_pcbi_bar_df %>%
+  bind_rows(humann2_path_cmc_pc2pws_stats_extra %>%
+            rename(Percent = Remaining) %>%
+            bind_rows(., humann2_path_cmc_pc2pws_stats %>%
+                      select(-Sum)) %>% 
+            select(Path, Genus, Percent) %>%
+            mutate(Direction = "PC2+",
+                   Samples = "CMC"))
+ 
+# plot the values in a bar chart
+# **Note** PWY-5941 and PWY-7209 have no species-level designations, and therefore are blank spaces instead of bars
+humann2_path_cmc_pcbi_bar_df %>%
+  filter(Direction == "PC2+", Genus != "Other") %>%
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","unclassified","Actinomyces")) %>%
+  ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=18),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    # facet_wrap(~pathrtholog, nrow=2) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC only, PC2 positive") +
+    theme(title = element_text(size=10))
 
 
-# KEGG Orthologs - Also try this at 2%, 1%
+```
+
+```{r path_pc2neg_cmc}
+# list the 10 orthologs with strongest loading in PC1 + values
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC2-", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path) %>%
+  str_c(., collapse = "|") # need this format for filtering in the next step
+
+# select only those 10 orthologs from the list, and split the column with names into 3 (Ortholog, Genus, Species)
+humann2_path_cmc_pc2neg <- humann2_path %>%
+  filter(str_detect(Pathway, humann2_path_cmc_biplot_pc)) %>%
+  filter(str_detect(Pathway, "\\|")) %>%
+  gather("SampleID", "CPM", 2:ncol(.)) %>%
+  mutate(Pathway = str_replace_all(Pathway, "\\.s__", "|s__")) %>%
+  separate(., Pathway, into = c("Pathway", "Genus", "Species"), sep = "\\|") %>%
+  mutate(Species = replace_na(Species, "unclassified"),
+         Genus = str_replace_all(Genus, "g__", ""),
+         Species = str_replace_all(Species, "s__", "")) %>%
+  inner_join(., humann2_pathway_biplot_list %>%
+              select(Pathway, Path) %>%
+               distinct(.), by = "Pathway") %>%
+  select(-Pathway) %>%
+  select(Path, everything()) %>%
+  arrange(Path)
+
+# calculate the % for each ortholog contributed by each genus         
+humann2_path_cmc_pc2neg_stats <- humann2_path_cmc_pc2neg %>%
+  group_by(Path, Genus) %>%
+  summarize(Sum = sum(CPM)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+# create the list of 10 orthologs again, but don't collapse the list as above
+humann2_path_cmc_biplot_pc <- humann2_pathway_biplot_list %>%
+  filter(Direction == "PC2-", Samples == "CMC") %>%
+  arrange(Path) %>%
+  pull(Path)
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+humann2_path_cmc_pc2neg_stats_extra <- lapply(humann2_path_cmc_biplot_pc, function(eclass) {
+ high_percent <- humann2_path_cmc_pc2neg_stats %>%
+   filter(Path == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Path = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.)
+
+# add this additional % to the main table
+humann2_path_cmc_pcbi_bar_df <- humann2_path_cmc_pcbi_bar_df %>%
+  bind_rows(humann2_path_cmc_pc2neg_stats_extra %>%
+            rename(Percent = Remaining) %>%
+            bind_rows(., humann2_path_cmc_pc2neg_stats %>%
+                      select(-Sum)) %>% 
+            select(Path, Genus, Percent) %>%
+            mutate(Direction = "PC2-",
+                   Samples = "CMC"))
+
+  
+# plot the values in a bar chart
+humann2_path_cmc_pcbi_bar_df %>%
+  filter(Direction == "PC2-", Genus != "Other") %>%
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","unclassified","Campylobacter","Haemophilus","Prevotella")) %>%
+  ggplot(., aes(x=Path, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=18),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    # facet_wrap(~pathrtholog, nrow=2) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to Metacyc pathways - CMC only, PC2 negative") +
+    theme(title = element_text(size=10))
+
+
+```
+
+
+# KEGG Orthologs
 ## CMC and industrial samples
 ```{r KO_pc1pws_cmc_indust}
 # list the 10 orthologs with strongest loading in PC1 + values
@@ -456,7 +776,7 @@ humann2_KOs_pc1pws_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) 
  high_percent <- humann2_KOs_pc1pws_stats %>%
    # group_by(Host_Genus) %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -474,7 +794,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pc1pws_stats_extra %>%
   
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Capnocytophaga","Fusobacterium","Haemophilus","Leptotrichia","Neisseria","Prevotella","Rothia","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -530,7 +850,7 @@ humann2_KOs_pc1neg_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) 
  high_percent <- humann2_KOs_pc1neg_stats %>%
    # group_by(Host_Genus) %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -543,7 +863,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc1neg_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC1-",
                    Samples = "CMC+Industrial")) %>%
@@ -552,7 +872,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Direction == "PC1-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Capnocytophaga","Eikenella","Haemophilus","Neisseria","Porphyromonas","Prevotella","Propionibacterium","Rothia","Streptococcus")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -607,7 +927,7 @@ humann2_KOs_pc2pws_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) 
  high_percent <- humann2_KOs_pc2pws_stats %>%
    # group_by(Host_Genus) %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -620,7 +940,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc2pws_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC2+",
                    Samples = "CMC+Industrial")) %>%
@@ -629,7 +949,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Direction == "PC2+") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Capnocytophaga","Fusobacterium","Leptotrichia","Porphyromonas","Prevotella","Propionibacterium","Rothia","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -684,7 +1004,7 @@ humann2_KOs_pc2neg_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) 
  high_percent <- humann2_KOs_pc2neg_stats %>%
    # group_by(Host_Genus) %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -697,7 +1017,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc2neg_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC2-",
                    Samples = "CMC+Industrial")) %>%
@@ -706,7 +1026,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Direction == "PC2-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Capnocytophaga","Fusobacterium","Haemophilus","Leptotrichia","Neisseria","Prevotella","Propionibacterium","Rothia","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -785,7 +1105,7 @@ humann2_KOs_pc1pws_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) 
  high_percent <- humann2_KOs_pc1pws_stats %>%
    # group_by(Host_Genus) %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -798,7 +1118,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc1pws_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC1+",
                    Samples = "CMC")) %>%
@@ -808,7 +1128,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Samples == "CMC", Direction == "PC1+") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Candidatus_Saccharibacteria_noname","Fusobacterium","Haemophilus","Leptotrichia","Neisseria","Rothia","Selenomonas","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -862,7 +1182,7 @@ humann2_KO_biplot_pc <- humann2_KO_biplot_list %>%
 humann2_KOs_pc1neg_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) {
  high_percent <- humann2_KOs_pc1neg_stats %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -875,7 +1195,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc1neg_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC1-",
                    Samples = "CMC")) %>%
@@ -884,7 +1204,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Samples == "CMC", Direction == "PC1-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Capnocytophaga","Eikenella","Haemophilus","Neisseria","Porphyromonas","Prevotella","Propionibacterium","Rothia","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -937,7 +1257,7 @@ humann2_KO_biplot_pc <- humann2_KO_biplot_list %>%
 humann2_KOs_pc2pws_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) {
  high_percent <- humann2_KOs_pc2pws_stats %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -950,7 +1270,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc2pws_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC2+",
                    Samples = "CMC")) %>%
@@ -959,7 +1279,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Samples == "CMC", Direction == "PC2+") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggretatibacter","Candidatus_Saccharibacteria_noname","Capnocytophaga","Fusobacterium","Haemophilus","Leptotrichia","Neisseria","Porphyromonas","Prevotella","Propionibacterium","Rhodopseudomonas","Selenomonas","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
@@ -1012,7 +1332,7 @@ humann2_KO_biplot_pc <- humann2_KO_biplot_list %>%
 humann2_KOs_pc2neg_stats_extra <- lapply(humann2_KO_biplot_pc, function(eclass) {
  high_percent <- humann2_KOs_pc2neg_stats %>%
    filter(Ortholog == eclass) %>%
-   filter(Percent < 5) %>%
+   filter(Percent < 2) %>%
    summarise(Remaining = sum(Percent)) %>%
    mutate(Ortholog = eclass,
           Genus = "Other")
@@ -1025,7 +1345,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
             rename(Percent = Remaining) %>%
             bind_rows(., humann2_KOs_pc2neg_stats %>%
               select(-Sum) %>% 
-              filter(Percent >= 5)) %>%
+              filter(Percent >= 2)) %>%
             select(Ortholog, Genus, Percent) %>%
             mutate(Direction = "PC2-",
                    Samples = "CMC")) %>%
@@ -1034,7 +1354,7 @@ humann2_KOs_pcbi_bar_df <- humann2_KOs_pcbi_bar_df %>%
 # plot the values in a bar chart
 humann2_KOs_pcbi_bar_df %>%
   filter(Samples == "CMC", Direction == "PC2-") %>%
-  filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  filter(Percent >= 2 | (Percent <= 2 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","unclassified","Aggregatibacter","Capnocytophaga","Fusobacterium","Haemophilus","Leptotrichia","Neisseria","Prevotella","Propionibacterium","Rothia","Streptococcus","Veillonella")) %>%
   ggplot(., aes(x=Ortholog, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +

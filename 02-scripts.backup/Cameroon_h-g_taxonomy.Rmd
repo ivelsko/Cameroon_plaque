@@ -1019,9 +1019,7 @@ metadata_noblanks <- metadata_noblanks %>%
 
 Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_noblanks_noyanomami_species}
-# use the CLR-transformed matrix from the mixOmics PCA in the last section
-
-# Euclidean distance
+# Euclidean distance, uses the clr-transformed matrix from the mixOmics PCA above
 malt_species.decontam_filtered_noblanks_noyanomami.euc <- vegdist(malt_species.decontam_filtered_noblanks_noyanomami.pca$X, method = "euclidean", na.rm = T)
 malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoa <- ape::pcoa(malt_species.decontam_filtered_noblanks_noyanomami.euc)
 
@@ -1042,7 +1040,10 @@ malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
 
 # test for difference between different metadata categories 
 # Sex can't be run b/c for JAE012 sex is unknown, and is NA
-adonis(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy + Village + ExtractionBatch + LibraryBatch, metadata_noblanks, perm=999)
+adonis2(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
 
@@ -1270,7 +1271,10 @@ malt_species.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(malt_species.decontam_filtered_cmc.euc ~ Tooth_site + Ethnic_Group + Market_economy + Sex + Village + Age_group + ExtractionBatch + LibraryBatch, metadata_cmc, perm=999)
+adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 
@@ -1882,6 +1886,11 @@ malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
 # Sex can't be run b/c for JAE012 sex is unknown, and is NA
 adonis(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy + Village + ExtractionBatch + LibraryBatch, metadata_noblanks, perm=999)
 
+adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+
 ```
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
@@ -2051,7 +2060,10 @@ malt_genus.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(malt_genus.decontam_filtered_cmc.euc ~ Tooth_site  + Ethnic_Group + Age_group + Sex + Village + Market_economy + ExtractionBatch + LibraryBatch, metadata_cmc, perm=999)
+adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 
