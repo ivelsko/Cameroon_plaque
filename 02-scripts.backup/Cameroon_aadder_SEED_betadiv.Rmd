@@ -283,7 +283,7 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle, pathways = c(
 ```
 
 First look at the total number of reads assigned to a SEED category
-```{r}
+```{r percent_assigned}
 
 seed_assignments <- seed_full %>%
   filter(Pathway == "SEED;" | Pathway == "SEED;Not assigned;") %>%
@@ -328,6 +328,74 @@ assignments at levels higher than L4 are summs of the levels directly underneath
 path, to get the total counts for a specific L2 path, sum all L3 paths under
 that L2 path). All analysis here is on the protein level, L4, and this is the
 abbreviation I use throughout. 
+
+```{r number_proteins}
+# start with the full table and pull out only the level 4 entries
+seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+
+seed_full_L4 <- seed_full_L4 %>%
+  select(-CMC032.B0101)  # this sample has very few reads
+
+seed_counts <- seed_full_L4 %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  group_by(SampleID) %>%
+  summarize(Total_detected = sum(Counts)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Village), by = "SampleID")
+
+# make a box plot of the total number of proteins assigned in each group
+seed_counts_box <- seed_counts %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  ggplot(., aes(Village, Total_detected, fill = Village)) +
+    geom_boxplot() +
+    scale_fill_manual(values = Village_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Total number of proteins") +
+    ggtitle("Total number of SEED proteins identified in samples")
+seed_counts_box
+
+# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+seed_counts_w <- seed_counts %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
+pairwise.wilcox.test(seed_counts_w$Total_detected, seed_counts_w$Village, p.adjust.method = "fdr")
+
+```
+
+```{r number_proteins_decontam}
+# start with the decontaminated table that has only the level 4 entries
+seed_counts_decontam <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  group_by(SampleID) %>%
+  summarize(Total_detected = sum(Counts)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Village), by = "SampleID")
+
+# make a box plot of the total number of proteins assigned in each group
+seed_counts_decontam_box <- seed_counts_decontam %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  ggplot(., aes(Village, Total_detected, fill = Village)) +
+    geom_boxplot() +
+    scale_fill_manual(values = Village_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Total number of proteins") +
+    ggtitle("Number of SEED proteins remaining after filtering contaminants")
+seed_counts_decontam_box
+
+# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+seed_counts_decontam_w <- seed_counts_decontam %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
+pairwise.wilcox.test(seed_counts_decontam_w$Total_detected, seed_counts_decontam_w$Village, p.adjust.method = "fdr")
+
+```
 
 Start with a PCA to see if any of the samples fall with the controls based on
 functional profile.

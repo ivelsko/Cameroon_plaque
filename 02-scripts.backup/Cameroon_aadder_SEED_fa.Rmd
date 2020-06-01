@@ -1,0 +1,1046 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque SEED factor analysis"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(vegan)
+library(ape)
+library(compositions)
+library(MASS)
+library(janitor)
+library(rstatix)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+## load the species and genus tables generated with HUMAnN2
+load("./05-results.backup/CMC_seed_tables.RData")
+
+```
+
+```{r load_metadata}
+
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+
+Do a factor analysis to reduce the number of proteins we're working with
+First create input tables
+```{r input_tables}
+# Determine the prevalence of SEED proteins in each group
+seed_L4.decontam_noblanks_presence_less_30 <- seed_L4.decontam %>%
+  select(-matches("EXB|LIB|10M")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence <= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
+
+# SEED proteins, no blanks 
+seed_L4.decontam_noblanks <- seed_L4.decontam %>%
+                               select(-matches("EXB|LIB|10M")) %>%
+                               separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+                               select(-c("SEED","L2","L3")) %>%
+                               anti_join(., seed_L4.decontam_noblanks_presence_less_30, by = "Pathway") %>%
+                               gather("SampleID","Counts",2:ncol(.)) %>%
+                               spread(Pathway,Counts)
+
+rownames(seed_L4.decontam_noblanks) <- seed_L4.decontam_noblanks$SampleID
+
+seed_L4.decontam_noblanks <- seed_L4.decontam_noblanks %>% select(-SampleID)
+
+seed_L4.decontam_noblanks = seed_L4.decontam_noblanks+1
+
+# perform PCA to get a clr-transformed species table
+seed_L4.decontam_noblanks.pca <- mixOmics::pca(seed_L4.decontam_noblanks, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+seed_L4.decontam_noblanks_clr <- as.data.frame.matrix(seed_L4.decontam_noblanks.pca$X)
+
+
+# SEED proteins, CMC only 
+# Determine the prevalence of SEED proteins in each group
+seed_L4.decontam_cmc_presence_less_30 <- seed_L4.decontam %>%
+  select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence <= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
+
+seed_L4.decontam_cmc <- seed_L4.decontam %>%
+                                         select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
+                               separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+                               select(-c("SEED","L2","L3")) %>%
+                               anti_join(., seed_L4.decontam_cmc_presence_less_30, by = "Pathway") %>%
+                               gather("SampleID","Counts",2:ncol(.)) %>%
+                               spread(Pathway,Counts)
+
+rownames(seed_L4.decontam_cmc) <- seed_L4.decontam_cmc$SampleID
+
+seed_L4.decontam_cmc <- seed_L4.decontam_cmc %>% select(-SampleID)
+
+seed_L4.decontam_cmc = seed_L4.decontam_cmc+1
+
+# perform PCA to get a clr-transformed species table
+seed_L4.decontam_cmc.pca <- mixOmics::pca(seed_L4.decontam_cmc, ncomp = 3, logratio = 'CLR')
+# save the clr-transformed species table
+seed_L4.decontam_cmc_clr <- as.data.frame.matrix(seed_L4.decontam_cmc.pca$X)
+
+
+```
+
+# All samples
+
+Run the factor analysis
+```{r fa_species_decontam_noblanks, eval = F}
+# fa.parallel(seed_L4.decontam_noblanks, fm = "minres", n.iter = 19)
+
+# from the graphs, I selected fm = minres and rotate = oblimin
+seed_L4.decontam_noblanks.fa <- fa(seed_L4.decontam_noblanks_clr, nfactors = 6, rotate = "oblimin", fm = "ols") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+# if using fm = "ols", the column titles will be 1, 2, etc and not M1, M2, etc as you get from using fm = "minres"
+
+print(seed_L4.decontam_noblanks.fa)
+# print(seed_L4.decontam_noblanks.fa$loadings,cutoff = 0.7)
+# print(seed_L4.decontam_noblanks.fa,sort=TRUE)
+
+seed_L4.decontam_noblanks.fa$values %>%
+  as.data.frame(.) %>%
+  rename(Eigenvalues = ".") %>%
+  arrange(desc(Eigenvalues))%>%
+  rownames_to_column("xvalue") %>%
+  mutate(xvalue = as.numeric(xvalue)) %>%
+  filter(xvalue <= 20) %>%
+  ggplot(., aes(xvalue, Eigenvalues)) +
+         geom_point() +
+         theme_minimal() +
+         geom_hline(yintercept = 10, linetype = "dashed", color = "red")
+
+# get the minimum residual values into a datatable
+graphinfo <- as.data.frame(factor2cluster(seed_L4.decontam_noblanks.fa))
+colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
+graphinfo <- graphinfo %>%
+  rownames_to_column("Species") %>%
+  as_tibble(.) 
+
+# now make loadings into a table and designate each species in the residual with the highest absolute value
+seed_L4.decontam_noblanks.fa.df <- as.data.frame.matrix(seed_L4.decontam_noblanks.fa$loadings)
+# b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
+colnames(seed_L4.decontam_noblanks.fa.df) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
+seed_L4.decontam_noblanks.fa.df <- seed_L4.decontam_noblanks.fa.df %>%
+  as_tibble(.) %>%
+  bind_cols(., graphinfo) %>%
+  mutate(MR11 = as.character(MR11),
+         MR21 = as.character(MR21),
+         MR31 = as.character(MR31),
+         MR41 = as.character(MR41),
+         MR51 = as.character(MR51)) %>%
+  mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
+         MR21 = replace(MR21, MR21 != "0", "MR2"),
+         MR31 = replace(MR31, MR31 != "0", "MR3"),
+         MR41 = replace(MR41, MR41 != "0", "MR4"),
+         MR51 = replace(MR51, MR51 != "0", "MR5")) %>%
+  select(Species,everything(.)) %>%
+  gather("Group","Residual", 7:ncol(.)) %>%
+  filter(Residual != "0") %>%
+  select(Residual, Species, MR1, MR2, MR3, MR4, MR5)
+
+head(seed_L4.decontam_noblanks.fa.df)
+
+# now run a discriminant analysis
+
+# save the species using in downstream discriminant analyses as a table
+seed_L4.decontam_noblanks.fa_seed <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  select(Species)
+
+# fwrite(seed_L4.decontam_noblanks.fa_seed, file = "./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv", quote = F, sep = "\t")
+
+```
+
+Now a linear discriminant analysis using the selected factors
+```{r lda_species_decontam_noblanks_eg, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Village, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Village ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_eg <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_eg
+
+```
+
+```{r lda_species_decontam_noblanks_age, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Age_group)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Age_group, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Age_group ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_age <- ggplot(lda.data, aes(LD1, LD2, colour = Age_group, shape = Age_group)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Age_group_colors) +
+                        scale_shape_manual(values = Age_group_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_age
+
+```
+
+```{r lda_species_decontam_noblanks_me, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Market_economy)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Market_economy, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Market_economy ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_me <- ggplot(lda.data, aes(LD1, LD2, colour = Market_economy, shape = Market_economy)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Market_economy_colors) +
+                        scale_shape_manual(values = Market_economy_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_me
+```
+
+```{r lda_species_decontam_noblanks_sex, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Sex)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Sex, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Sex ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_sex <- ggplot(lda.data, aes(LD1, LD2, colour = Sex, shape = Sex)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Sex_colors) +
+                        scale_shape_manual(values = Sex_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_sex
+
+```
+
+```{r lda_species_decontam_noblanks_ts, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Tooth_site)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Tooth_site, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Tooth_site ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_ts <- ggplot(lda.data, aes(LD1, LD2, colour = Tooth_site, shape = Tooth_site)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Tooth_site_colors) +
+                        scale_shape_manual(values = Tooth_site_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_ts
+
+```
+
+```{r lda_species_decontam_noblanks_vi, eval = F}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Village, everything())
+
+rownames(seed_L4.decontam_noblanks_lda_table) <- seed_L4.decontam_noblanks_lda_table$SampleID
+seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_noblanks_lda <- lda(Village ~ ., seed_L4.decontam_noblanks_lda_table)
+# seed_L4.decontam_noblanks_lda # show results
+seed_L4.decontam_noblanks_lda
+plot(seed_L4.decontam_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_noblanks_lda_table, predict(seed_L4.decontam_noblanks_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_vi <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_vi
+
+```
+
+```{r noblanks_images, eval = F}
+
+allplots_seed <- plot_grid(seed_eg, seed_age,
+          seed_me, seed_sex,
+          seed_ts, seed_vi,
+          nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
+
+
+ggsave("05-results.backup/presentation_pdfs/allplots_seed.pdf", plot = allplots_seed, device = "pdf",
+       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+```
+
+## Heatmaps
+Make a heat map of the species in MR1 and MR2 to see how they're different between the groups
+```{r metadata_heatmaps, eval = F}
+# minres_oblimin_nobl_noyano_fa_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv", sep = "\t")
+# minres_oblimin_cmc_fa_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv", sep = "\t")
+
+# read in metadata again to get it without all the factors
+metadata_hm <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
+# order the samples so they can be ordered this way in the heat maps
+
+# order the CMC samples by Village
+cmc_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
+  select(SampleID, Village) %>%
+  arrange(Village) %>%
+  pull(SampleID)
+
+# order the HMP samples by subplaque, supraplaque
+hmp_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "SRR")) %>%
+  filter(!str_detect(SampleID, "10M|SRR164")) %>%
+  mutate(Description = fct_relevel(Description, "HMP_subPlaque","HMP_supPlaque")) %>%
+  select(SampleID, Description) %>%
+  arrange(Description) %>%
+  pull(SampleID)
+
+# keep JAE samples in alphabetical order
+jae_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "JAE")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull(SampleID)
+
+# combine all 3 ordered vectors into a final ordered vector
+each_order <- c(cmc_order, jae_order, hmp_order)
+
+```
+
+Try changing the sample order to group them by the different metadata categories
+(currently have Industrialization/Ethnic group/Market economy/Village grouping).
+Need to look at: Tooth site, Age group, Sex, others? Also try clustering the
+samples to see if they fall into any recognizable categories.
+```{r heatmap_noblanks_noyanomami, eval = F}
+# select the SEED proteins in MR1 and MR2 for the FA
+seed_L4.decontam_FA_all <- malt_Pathway.decontam %>%
+                                  select(-one_of(outliers)) %>%
+                                  select(-matches("SRR164|10M|EXB|LIB")) %>%
+                                  inner_join(., minres_oblimin_nobl_noyano_fa_Pathway) %>%
+                                  gather("SampleID","Counts",2:ncol(.)) %>%
+                                  spread(Pathway,Counts)
+
+rownames(seed_L4.decontam_FA_all) <- seed_L4.decontam_FA_all$SampleID
+seed_L4.decontam_FA_all <- seed_L4.decontam_FA_all %>% select(-SampleID)
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_FA_all_clr = seed_L4.decontam_FA_all+1
+seed_L4.decontam_FA_all_clr <- clr(seed_L4.decontam_FA_all_clr)
+seed_L4.decontam_FA_all_clr <- as.matrix(seed_L4.decontam_FA_all_clr)
+
+# orient the matrix with correct rows/columns to run the distance calculation for the seed protein, not the samples (columns are SampleID, rows are proteins)
+seed_L4.decontam_FA_all_clr_sp <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts)
+
+#add the rownames back
+rownames(seed_L4.decontam_FA_all_clr_sp) <- seed_L4.decontam_FA_all_clr_sp$Pathway
+seed_L4.decontam_FA_all_clr_sp <- seed_L4.decontam_FA_all_clr_sp %>% select(-Pathway)
+
+# perform a distance calculation for hierarchical clustering for the protein ordering
+seed_L4.decontam_FA_all_clr_dist <- vegdist(seed_L4.decontam_FA_all_clr_sp, method = "euclidian")
+# cluster the data with hclust
+seed_L4.decontam_FA_all_clr_dist_hr <- hclust(seed_L4.decontam_FA_all_clr_dist)
+# seed_L4.decontam_FA_all_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+sp_all_order <- seed_L4.decontam_FA_all_clr_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the SEED protein in the correct order for the heatmap
+seed_L4.decontam_FA_all_clr_order <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(SpOrder = as.character(seq(1,137))) %>%
+  select(Pathway, SpOrder, everything()) %>%
+  mutate(SpOrder = fct_relevel(SpOrder, sp_all_order)) %>%
+  arrange(SpOrder) %>%
+  pull(Pathway)
+
+# make the protein a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_all_clr_long <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Pathway = fct_relevel(Pathway, seed_L4.decontam_FA_all_clr_order)) %>%
+  arrange(Pathway) %>%
+  gather("SampleID","CLR", 2:ncol(.))
+
+
+# now cluster by sample
+# convert the matrix to a data.frame
+seed_L4.decontam_FA_all_clr_smp <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame()
+
+# perform a distance calculation for hierarchical clustering for the Pathway ordering
+seed_L4.decontam_FA_all_clr_smp_dist <- vegdist(seed_L4.decontam_FA_all_clr_smp, method = "euclidian")
+# cluster the data with hclust
+seed_L4.decontam_FA_all_clr_smp_dist_hr <- hclust(seed_L4.decontam_FA_all_clr_smp_dist)
+# seed_L4.decontam_FA_all_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+smp_all_order <- seed_L4.decontam_FA_all_clr_smp_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the Pathway in the correct order for the heatmap
+seed_L4.decontam_FA_all_clr_smp_order <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(Pathway,CLR) %>%
+  mutate(SmpOrder = as.character(seq(1,110))) %>%
+  select(SampleID, SmpOrder, everything()) %>%
+  mutate(SmpOrder = fct_relevel(SmpOrder, smp_all_order)) %>%
+  arrange(SmpOrder) %>%
+  pull(SampleID)
+
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_all_clr_long <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Pathway = fct_relevel(Pathway, seed_L4.decontam_FA_all_clr_order)) %>%
+  arrange(Pathway) %>%
+  gather("SampleID","CLR", 2:ncol(.)) %>%
+  mutate(SampleID = fct_relevel(SampleID, seed_L4.decontam_FA_all_clr_smp_order)) %>%
+  arrange(SampleID) 
+
+
+# make a heatmap with ggplot
+heatmap_base <- ggplot(seed_L4.decontam_FA_all_clr_long, aes(SampleID, Pathway, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_base
+
+# ggsave("05-results.backuppresentation_pdfs/noblanks_fa_heatmap.pdf", plot = heatmap_base, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+How does a PCA using only the species in MR1 and MR2 look?
+```{r discriminant_taxa_pca, eval = F}
+# decontaminated and filtered
+seed_L4.decontam_FA <- seed_L4.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|SRR164|EXB|LIB")) %>%
+                                         inner_join(., minres_oblimin_nobl_noyano_fa_species) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         spread(Species,Counts)
+
+rownames(seed_L4.decontam_FA) <- seed_L4.decontam_FA$SampleID
+
+seed_L4.decontam_FA <- seed_L4.decontam_FA %>% select(-SampleID)
+
+seed_L4.decontam_FA = seed_L4.decontam_FA+1
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(seed_L4.decontam_FA, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+seed_L4.decontam_FA.pca <- pca(seed_L4.decontam_FA, ncomp = 3, logratio = 'CLR')
+
+# perform and plot a PCA to see how the data cluster
+# by Village
+noblanks_fa_pca <- plot_pca(seed_L4.decontam_FA.pca, "PC1", "PC2", "Tooth_site")
+noblanks_fa_pca
+plot_pca(seed_L4.decontam_FA.pca, "PC3", "PC2", "Tooth_site")
+
+# ggsave("05-results.backup/presentation_pdfs/noblanks_fa_pca.pdf", plot = noblanks_fa_pca, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+# CMC samples
+
+Run the factor analysis
+```{r fa_species_decontam_cmc}
+# fa.parallel(seed_L4.decontam_cmc, fm = "minres", n.iter = 19)
+
+# from the graphs, I selected fm = minres and rotate = oblimin
+seed_L4.decontam_cmc.fa <- fa(seed_L4.decontam_cmc_clr, nfactors = 6, rotate = "Varimax", fm = "minres") # rotate = "Varimax" "oblimin" # fm = "ols" "minres"
+# if using fm = "ols", the column titles will be 1, 2, etc and not M1, M2, etc as you get from using fm = "minres"
+
+print(seed_L4.decontam_cmc.fa)
+# print(seed_L4.decontam_cmc.fa$loadings,cutoff = 0.7)
+# print(seed_L4.decontam_cmc.fa,sort=TRUE)
+
+seed_L4.decontam_cmc.fa$values %>%
+  as.data.frame(.) %>%
+  rename(Eigenvalues = ".") %>%
+  arrange(desc(Eigenvalues))%>%
+  rownames_to_column("xvalue") %>%
+  mutate(xvalue = as.numeric(xvalue)) %>%
+  filter(xvalue <= 20) %>%
+  ggplot(., aes(xvalue, Eigenvalues)) +
+         geom_point() +
+         theme_minimal() +
+         geom_hline(yintercept = 10, linetype = "dashed", color = "red")
+
+# get the minimum residual values into a datatable
+graphinfo <- as.data.frame(factor2cluster(seed_L4.decontam_cmc.fa))
+colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
+graphinfo <- graphinfo %>%
+  rownames_to_column("Species") %>%
+  as_tibble(.) 
+
+# now make loadings into a table and designate each species in the residual with the highest absolute value
+seed_L4.decontam_cmc.fa.df <- as.data.frame.matrix(seed_L4.decontam_cmc.fa$loadings)
+# b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
+colnames(seed_L4.decontam_cmc.fa.df) <- c("MR1","MR2","MR3","MR4","MR5","MR6")
+seed_L4.decontam_cmc.fa.df <- seed_L4.decontam_cmc.fa.df %>%
+  as_tibble(.) %>%
+  bind_cols(., graphinfo) %>%
+  mutate(MR11 = as.character(MR11),
+         MR21 = as.character(MR21),
+         MR31 = as.character(MR31),
+         MR41 = as.character(MR41),
+         MR51 = as.character(MR51)) %>%
+  mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
+         MR21 = replace(MR21, MR21 != "0", "MR2"),
+         MR31 = replace(MR31, MR31 != "0", "MR3"),
+         MR41 = replace(MR41, MR41 != "0", "MR4"),
+         MR51 = replace(MR51, MR51 != "0", "MR5")) %>%
+  select(Species,everything(.)) %>%
+  gather("Group","Residual", 7:ncol(.)) %>%
+  filter(Residual != "0") %>%
+  select(Residual, Species, MR1, MR2, MR3, MR4, MR5)
+
+head(seed_L4.decontam_cmc.fa.df)
+
+# now run a discriminant analysis
+
+# save the species using in downstream discriminant analyses as a table
+seed_L4.decontam_cmc.fa_seed <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2")) %>%
+  select(Species)
+
+# fwrite(seed_L4.decontam_cmc.fa_seed, file = "./05-results.backup/minres_oblimin_cmc.fa_seed.tsv", quote = F, sep = "\t")
+
+```
+
+Now a linear discriminant analysis using the selected factors
+```{r lda_species_decontam_cmc_eg}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Village, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Village ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_cmc_eg <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_cmc_eg
+
+```
+
+```{r lda_species_decontam_cmc_age}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Age_group)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Age_group, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Age_group ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_cmc_age <- ggplot(lda.data, aes(LD1, LD2, colour = Age_group, shape = Age_group)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Age_group_colors) +
+                        scale_shape_manual(values = Age_group_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_cmc_age
+
+```
+
+```{r lda_species_decontam_cmc_me}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Market_economy)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Market_economy, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Market_economy ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_cmc_me <- ggplot(lda.data, aes(LD1, LD2, colour = Market_economy, shape = Market_economy)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Market_economy_colors) +
+                        scale_shape_manual(values = Market_economy_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_cmc_me
+```
+
+```{r lda_species_decontam_cmc_sex}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Sex)) %>%
+  select(SampleID, Sex, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Sex ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+seed_cmc_sex <- ggplot(lda.data, aes(x = Sex, y = LD1, group = Sex, fill = Sex)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Sex)) +
+                        scale_fill_manual(values = Sex_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("Ethnic Group") +
+                        ylab("LD1") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+seed_cmc_sex
+
+```
+
+```{r lda_species_decontam_cmc_ts}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Tooth_site)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Tooth_site, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Tooth_site ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_cmc_ts <- ggplot(lda.data, aes(x = Tooth_site, y = LD1, group = Tooth_site, fill = Tooth_site)) +
+                        geom_boxplot() + 
+                        geom_jitter(size = 2, aes(shape = Tooth_site)) +
+                        scale_fill_manual(values = Tooth_site_colors) +
+                        scale_shape_manual(values = c(3,4)) +
+                        xlab("Ethnic Group") +
+                        ylab("LD1") +
+                        geom_hline(yintercept = 0, linetype = "dashed") +
+                        coord_flip() +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+
+seed_cmc_ts
+
+```
+
+```{r lda_species_decontam_cmc_vi}
+
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  pull(Species)
+
+# sub-sample the species table for only those species
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+               select(SampleID, Village)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_economy, Sex, Tooth_site, Village
+  select(SampleID, Village, everything())
+
+rownames(seed_L4.decontam_cmc_lda_table) <- seed_L4.decontam_cmc_lda_table$SampleID
+seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_L4.decontam_cmc_lda <- lda(Village ~ ., seed_L4.decontam_cmc_lda_table)
+# seed_L4.decontam_cmc_lda # show results
+seed_L4.decontam_cmc_lda
+plot(seed_L4.decontam_cmc_lda, dimen = 2)
+
+lda.data <- cbind(seed_L4.decontam_cmc_lda_table, predict(seed_L4.decontam_cmc_lda)$x)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_economy, Sex, Tooth_site, Village
+seed_cmc_vi <- ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
+                        geom_point(size = 4) +
+                        scale_colour_manual(values = Village_colors) +
+                        scale_shape_manual(values = Village_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
+seed_cmc_vi
+
+```
+
+```{r noblanks_images}
+
+cmcplots_seed_fada <- plot_grid(seed_cmc_eg, seed_cmc_age,
+          seed_cmc_me, seed_cmc_sex,
+          seed_cmc_ts, seed_cmc_vi,
+          nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
+
+
+ggsave("05-results.backup/presentation_pdfs/cmcplots_seed_fada.pdf", plot = cmcplots_seed_fada, device = "pdf",
+       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

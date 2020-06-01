@@ -1039,7 +1039,6 @@ malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
   ggtitle("Industry")
 
 # test for difference between different metadata categories 
-# Sex can't be run b/c for JAE012 sex is unknown, and is NA
 adonis2(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
@@ -1883,7 +1882,6 @@ malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-# Sex can't be run b/c for JAE012 sex is unknown, and is NA
 adonis(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy + Village + ExtractionBatch + LibraryBatch, metadata_noblanks, perm=999)
 
 adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")

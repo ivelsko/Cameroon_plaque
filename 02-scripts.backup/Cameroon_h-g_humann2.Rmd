@@ -531,6 +531,10 @@ humann2_path_noblanks_mat.euc.vecmet %>%
 # test for difference between different metadata categories 
 adonis(humann2_path_noblanks_mat.euc ~ Tooth_site, humann2_path_noblanks_mat.euc.vecmet, perm=999)
 
+adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = humann2_path_noblanks_mat.euc.vecmet$Tooth_site)
 
 ```
 
@@ -605,6 +609,10 @@ humann2_path_noyanomami_mat.euc.vecmet %>%
 # test for difference between different metadata categories 
 adonis(humann2_path_noyanomami_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, perm=999)
 
+adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
 
@@ -682,6 +690,11 @@ humann2_path_cmc_mat.euc.vecmet %>%
 
 # test for difference between different metadata categories 
 adonis(humann2_path_cmc_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_path_cmc_mat.euc.vecmet, perm=999)
+
+adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
 
 ```
 
@@ -1123,6 +1136,11 @@ humann2_KO_mat.euc.vecmet %>%
 # test for difference between different metadata categories 
 adonis(humann2_KO_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_KO_mat.euc.vecmet, perm=999)
 
+adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_mat.euc.vecmet$Tooth_site)
+
 ```
 
 
@@ -1202,6 +1220,11 @@ humann2_KO_mat.euc.vecmet %>%
 
 # test for difference between different metadata categories 
 adonis(humann2_KO_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_KO_mat.euc.vecmet, perm=999)
+
+adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_mat.euc.vecmet$Tooth_site)
 
 ```
 
