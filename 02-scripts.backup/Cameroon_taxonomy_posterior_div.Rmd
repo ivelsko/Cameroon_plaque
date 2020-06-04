@@ -364,7 +364,7 @@ What is the relationship of the groups in a PCA without the blanks?
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -434,13 +434,14 @@ pca_malt_species_pc1pc2
 #        dpi = 300)
 
 ```
-_Anterior samples only:_ The CM anterior samples are spread across the plot, but
-generally plot closer to the JAE samples than the posterior samples do, and plot
-between the HMP and JAE samples, rather than clustering away from both like the
-posterior samples. Although the Yanomami samples appear to fall within the
-variation of the HMP samples in PC1/CP2 figures, they are clearly separated from
-all plaque/calculus in PC3. The CMC samples do not plot with the Yanomami
-samples.
+_Posterior samples only:_ The CMC posterior samples tend to separate out on PC1
+from HMP and JAE samples. Plaque and calculus samples separate along PC2, which
+is similar to the difference reported in Velsko, *et al.* 2019 *Microbiome*. The
+CMC samples fall between the calculus and buccal swabs, but fall in line with
+plaque, suggesting they are more similar to plaque than to calculus. Although
+the Yanomami samples appear to fall within the variation of the HMP samples in
+PC1/CP2 figures, they are clearly separated from all plaque/calculus in PC3. The
+CMC samples do not plot with the Yanomami samples.
 
 
 ```{r pca_noyanomami_species}
@@ -448,7 +449,7 @@ samples.
 malt_species.decontam_filtered_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -526,7 +527,7 @@ metadata_noblanks <- metadata_noblanks %>%
   rename(SampleID = `#SampleID`)  %>%
   filter(!SampleID %in% outliers) %>%
   filter(!str_detect(SampleID, "SRR16460|EXB|LIB|10M")) %>%
-  filter(!SampleID %in% posterior) %>% # this is the group to remove
+  filter(!SampleID %in% anterior) %>% # this is the group to remove
   as_tibble() %>%
   mutate(Market_economy = str_replace(Market_economy, "HMP","Industrial"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","HMP","JAE"),
@@ -547,7 +548,7 @@ Run a permanova with function adonis to test if the clusters are significantly d
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -598,7 +599,7 @@ clustering have different dispersion ("tight" vs. "loose" clustering of groups)
 - is one group more variable than the other(s)?
 ```{r betadisper_noblanks_noyanomami_species, eval = F}
 # Test the metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
-# When only including anterior samples, none are significantly different
+# When only including posterior samples, none are significantly different
 
 # Industry
 groups_industry <- metadata_noblanks %>%
@@ -626,33 +627,8 @@ plot(industry_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 
 boxplot(industry_betadisper_noblanks_noyanomami)
 
 
-# Ethnic group
-groups_ethnicity <- metadata_noblanks %>%
-  select(Ethnic_Group) %>% 
-  pull()
-
-## Calculate multivariate dispersions
-ethnicity_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_ethnicity, bias.adjust =TRUE)
-ethnicity_betadisper_noblanks_noyanomami
-
-## Perform test
-anova(ethnicity_betadisper_noblanks_noyanomami)
-
-## Permutation test for F
-permutest(ethnicity_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
-
-## Tukey's Honest Significant Differences
-ethnicity_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(ethnicity_betadisper_noblanks_noyanomami)
-plot(ethnicity_betadisper_noblanks_noyanomami.HSD)
-
-## Plot with data ellipses instead of hulls
-plot(ethnicity_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-
-## Draw a boxplot of the distances to centroid for each group
-boxplot(ethnicity_betadisper_noblanks_noyanomami)
-
-
 ```
+
 
 Now we will look at the species that have strongest loadings in PC1, PC2, and
 PC3, to see what appears to drive differences between the sample groups. We will
@@ -718,25 +694,28 @@ pandoc.table(malt_species_decontam_filtered_biplot_323$plot_env$neg_10 %>% arran
 
 
 ```
-_Anterior samples only:_ n PC1, the negative loading taxa are all anaerobic,
-while the positive loading taxa are *Neisseria*, *Streptococcus*, and *Rothia*,
-wich are aerobic/facultative. The negative loading taxa are anaerobic. This
-distinction doesn't clearly match any of the group plotting areas. In PC2
-positive loadings, the taxa are mostly *Prevotella* and *Veillonella*, while in
-the negative loadings the taxa are mostly anaerobes - this distinction matches
-with the split of plaqe in PC2 positive values and calclus in PC2 negative
-values. In PC3, the positivce loading taxa are mostly *Rothia* and
-*Actinomyces*, while the negative values are mostly *Neisseria*. This
-corresponds with the Yanomami buccal samples plotting in PC3 negative values, as
-buccal samples have higher proportions of *Neisseria* than plaque.
-
+_Posterior samples only:_ There are some clear biological differences in the taxa with highest loadings in
+each component, positive and negative. In PC1, the negative loading taxa are all
+anaerobic, while the positive loading taxa are *Neisseria*, *Streptococcus*, and
+*Rothia*, wich are aerobic. The HMP samples that fall farther to the right are
+mostly supragingival plaque, which is consistent with the aerobic species
+driving separation this direction. Supragingival plaque samples have higher
+levels of aerobes than subgingival plaque samples. All Yanomami buccal swab
+samples have negative PC2 values, and it makes sense that *Neisseria* and other
+aerobic taxa characterize this direction, as they are more abundant on buccal
+epithelia. In PC2, the positive loading taxa are anaerobic, later colonizers,
+which corresponds with the calculus samples that plot in positice PC2 values.
+The PC2 negative loading taxa are *Prevotella*, *Veillonella*, and *Haemophilus*
+(which points towards the Yanomami samples). In PC3, the negative loading taxa
+are mostly *Rothia*, with one *Actinomyces* & one *Actinobaculum*, while the
+positive loading taxa are mostly anaerobic.
 
 ```{r biplot_noblanks_noyanomami_species}
 # remove the Yanomami samples from the input table
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -811,28 +790,38 @@ pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_323$plot_env$neg_1
              caption = "PC3 negative loadings")
 
 ```
-_Anterior samples only:_ In PC1 positive values, the taxa with strongest
-loadings are 9 *Rothio* and 1 *Streptococcus*, and the arrows point mostly up
-into the PC1 positive/PC2 positive quadrant, where the HMP samples plot. The
-taxa with strongest PC1 negative loading values are anaerobic. The taxa with
-strongest loadings in PC2 positive values are mostly *Prevotella*, which point
-into the PC1 negative/PC2 positive quadrant, away from most HMP samples, and
-*Veillonella*, which point into the PC1 positive/PC2 positive quadrant, towards
-the HMP samples. The PC2 negative loading taxa are mostly anaerobes. In PC3, the
-taxa with strongest positive loadings are a combination of aerobes, facultative
-anaerobes, and anaerobes, while the taxa with strongest negative loading values
-are 7 *Neisseria* and the rest anaerobes.
+_Posterior samples only:_  When we look only at samples from one tooth surface, we still see some biological
+differences between the taxa in the different PCs with positive and negative
+loadings. In PC1, the positive loading taxa are *Niesseria*, *Rothia*, and *Strep*,
+suggesting these samples are less mature biofilms, or are exposed to higher
+oxygen tension. The negative loading taxa are a mix of anaerobic species,
+suggesting they are more mature or exposed to lower oxygen tension. The CMC posterior
+samples separate from HMP along PC1, where HMP is in positive
+loadings and CMC posterior is to the left (negative loadings), which corresponds with
+the species loading in these directions. The HMP samples also separate this way,
+with the supragingival plaque samples plotting farther to the right (more
+positive) and subgingival plaque samples plotting more to the left (less
+positive), which also corresponds with the species that load in positive and
+negative values.
+
+In PC2 positive loadings there is a mix of facultative anaerobes and anaerobic
+taxa, while the negative loading taxa are mostly facultative anaerobes
+(*Prevotella*, *Streptococcus*). This distinction corresponds to the separation
+of plaque in positive values and calculus in negative values. The CMC posterior
+samples plot in both positive and negative values in PC2, but mostly in PC3
+negative values. PC3 positive values are characterized by a variety of species,
+and PC3 negative values mostly by *Neisseria*.
 
 
 
-## Species-level analyses with only Cameroon samples
+## Species-level analyses with only samples
 What is the relationship of Cameroon plaque samples to eachother without any
 other sample types? Do they cluster by any of the metadata categories?
 ```{r pca_cmc_species}
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -910,14 +899,13 @@ age group, or market economy for either the posterior samples only or the
 anterior samples only. Clustering also doesn't seem to be related to sequencing
 depth, extraction batch, or library batch.
 
-
 ```{r metadata_betadisper_cmc}
 # Need special metadata that has only the categories of CMC samples, b/c of issues w/ extra factors from removed groups
 metadata_cmc <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 metadata_cmc <- metadata_cmc %>%
   rename(SampleID = `#SampleID`) %>%
   filter(!SampleID %in% outliers) %>%
-  filter(!SampleID %in% posterior) %>%
+  filter(!SampleID %in% anterior) %>%
   filter(Description == "HunterGatherer") %>%
   select(SampleID, ExtractionBatch, LibraryBatch, Age_group, Ethnic_Group, Market_economy, Sex, Tooth_site, Village) %>%
   as_tibble() %>%
@@ -954,7 +942,7 @@ malt_species.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-# adonis(malt_species.decontam_filtered_cmc.euc ~ Ethnic_Group + Market_economy + Sex + Village + Age_group, metadata_cmc, perm=999)
+adonis(malt_species.decontam_filtered_cmc.euc ~ Ethnic_Group + Market_economy + Sex + Village + Age_group, metadata_cmc, perm=999)
 
 adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
@@ -963,9 +951,9 @@ adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex
 Then run betadisper to see if the groups with significant differences in
 clustering have different dispersion ("tight" vs. "loose" clustering of groups)
 - is one group more variable than the other(s)?
-```{r betadisper_cmc_species}
-# Test the 1 metadata category that are significant (p < 0.05) based on adonis2 for significant differences in dispersion
-# When including only anterior samples, only Sex is significantly different
+```{r betadisper_cmc_species, eval = F}
+# Test the 4 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+# When including only posterior sampels, none of the groups are significantly different
 
 # Sex
 groups_sex <- metadata_cmc %>%
@@ -992,17 +980,15 @@ plot(sex_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 ## Draw a boxplot of the distances to centroid for each group
 boxplot(sex_betadisper_cmc)
 
-
-
 ```
-Point dispersion from the centroids is not significantly different between Males and Females. 
+
 
 ```{r biplots_cmc_species}
 
 malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>% # leave only the anterior samples
+                                         select(-one_of(anterior)) %>% # leave only the posterior samples
                                          adorn_totals(where = "col", name = "Sum_species") %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1076,15 +1062,13 @@ pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_323$plot_env$neg_1
              caption = "PC3 negative loadings")
 
 ```
-_Anterior samples only:_ In PC1, the taxa with strongest positive loadings are
-mostly *Prevotella* and other anaerobes, and the taxa with strongest negative
-loadings are mostly aerobes including *Neisseria* and *Rothia*. In PC2, the taxa
-with strongest positive loadings are all *Rothia*, while the taxa with strongest
-negative loadings are all anaerobes. In PC3, the taxa with the strongest
-positive loadings are a variety of early colonizer aerobes/facultative anaerobes
-and odd species (*Xylanimonas*, *Sanguibacter*), while the taxa with strongest
-negative loadings are a variety of facultative anaerobes and anaerobes.
-
+_Posterior samples only:_ In PC1, the positive loading taxa are mostly anaerobic
+taxa, while the negative loading taxa are a mix of aerobic, facultative, and
+anaerobic taxa. In PC2, the positive loading taxa are largely aerobic, 8
+*Neisseria*, while the negative loading taxa are mostly anaerobic. In PC3, the
+positive loading taxa are mostly anaerobic taxa, while in negatice PC3 values
+mostly facultative *Actinomyces*, along with some odd ones
+(*Kytococcus*,*Cellulomonas*).
 
 
 ## Genus-level analyses with industrial samples
@@ -1092,11 +1076,11 @@ negative loadings are a variety of facultative anaerobes and anaerobes.
 What is the relationship of the groups in a PCA without the blanks? Are
 relationships similar to those observed using species data? Is there better
 resolution with genus data?
-```{r pca_noblanks_genus, eval = F}
+```{r pca_noblanks_genus}
 malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
@@ -1168,90 +1152,11 @@ pca_malt_genus_pc1pc2
 
 
 ```
-_Anterior samples only:_ Similar to the plots using species assignments, the CMC
-anterior samples plot more with JAE than with HMP. It's more of a distinction
-here, where the CMC samples fall within the variation of the JAE sampels along
-PC1, but only fall within the variation of subgingival plaque of the HMP
-samples. Here the HMP supragingival plaque cluster farther away in PC1 negative
-values. The CMC samples fall within the variation of both HMP and JAE in PC2. In
-PC3, the Yanomami samples separate out from HMP along PC2.
-
-```{r pca_noyanomami_genus}
-malt_genus.decontam_filtered <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus") %>%
-                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
-                                         filter(Percent > 0.01) %>%
-                                         select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-
-malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-
-malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
-
-# prepare to run a PCA
-# check the number of components to retain by tuning the PCA
-tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
-
-# perform and plot a PCA to see how the data cluster
-# by Village
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Sex
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Age group
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Market economy
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Tooth site
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Description (do HMP supragingial and HMP subgingival plaque separate?)
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Description", "Description", "Description", 3)
-plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Description", "Description", "Description", 3)
-
-# by Individual sequencing depth
-# perform a PCA to see how the data cluster
-malt_genus.decontam_filtered_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered, ncomp = 3, logratio = 'CLR')
-plot(malt_genus.decontam_filtered_noyanomami.pca)
-
-# Select out the PC variates into a new table and add the metadata for plotting
-malt_genus.decontam_filtered_noyanomami.pca.variates <- as.data.frame(malt_genus.decontam_filtered_noyanomami.pca$variates$X)
-malt_genus.decontam_filtered_noyanomami.pca.variates <- malt_genus.decontam_filtered_noyanomami.pca.variates %>%
-  rownames_to_column("SampleID")
-  
-malt_genus.decontam_filtered_noyanomami.pca.varmet <- inner_join(malt_genus.decontam_filtered_noyanomami.pca.variates, metadata, by = "SampleID")
-
-pca_malt_genus_pc1pc2 <- ggplot(malt_genus.decontam_filtered_noyanomami.pca.varmet, aes(PC1, PC2, colour = Individual_Seq_Depth_NonHuman, shape = Ethnic_Group)) +
-  geom_point(size = 4) +
-  scale_shape_manual(values = Ethnic_Group_shapes) +
-  xlab(paste("PC1 - ", 100*(round(malt_genus.decontam_filtered_noyanomami.pca$explained_variance[1], 2)), "%", sep = "")) +
-  ylab(paste("PC2 - ", 100*(round(malt_genus.decontam_filtered_noyanomami.pca$explained_variance[2], 2)), "%", sep = "")) +
-  theme_minimal(base_size = 14) +
-  labs(colour = "Seq. depth\n(reads)", shape = "Ethnic group")
-
-pca_malt_genus_pc1pc2
-
-
-# ggsave("05-results.backup/pca_malt_genus_pc1pc2.pdf", plot = pca_malt_genus_pc1pc2, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
-
-
-```
+_Posterior samples only:_  Just like we saw in the species PCA plots, the CMC
+posterior samples separate out from HMP along PC1, and from JAE along PC2.
+Several CMC samples though do plot with HMP, or close to JAE. The Yanomami
+samples separate out from the other group along PC3. Plaque and calculus samples
+still separate along PC2.
 
 Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_noblanks_noyanomami_genus}
@@ -1259,7 +1164,7 @@ Run a permanova with function adonis to test if the clusters are significantly d
 malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1275,6 +1180,7 @@ malt_genus.decontam_filtered_noblanks_noyanomami = malt_genus.decontam_filtered_
 
 # perform PCA
 malt_genus.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
+
 
 # use the CLR-transformed matrix from the mixOmics PCA above
 # Euclidean distance
@@ -1304,13 +1210,10 @@ adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch +
 
 ```
 
-
-Then run betadisper to see if the groups have different dispersion ("tight" vs.
-"loose" clustering of groups) - is one group more variable than the other(s)?
+Then run betadisper to see if the groups have different dispersion ("tight" vs. "loose" clustering of groups) - is one group more variable than the other(s)?
 ```{r betadisper_noblanks_noyanomami_genus, eval = F}
-# Test the metadata categories that are significant (p < 0.05) based on adonis2 for significant differences in dispersion
-# When including only anterior samples, none are significantly different
-
+# Test the 2 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+# When including only posterior sampels, none are significantly different
 
 # Industry
 groups_industry <- metadata_noblanks %>%
@@ -1336,7 +1239,6 @@ plot(industry_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALSE
 
 ## Draw a boxplot of the distances to centroid for each group
 boxplot(industry_betadisper_noblanks_noyanomami_genus)
-
 
 ```
 
@@ -1408,16 +1310,17 @@ pandoc.table(malt_genus.decontam_filtered_biplot_323$plot_env$neg_10 %>% arrange
              caption = "PC3 negative loadings")
 
 ```
-_Anterior samples only:_ In PC1, the taxa with the strongest positive loadings
-are mostly strict anaerobes, while the taxa with strongest negative loadings are
-a mix of aerobes and facultative anaerobes, including *Neisseria* and relatives
-*Eikenella*, *Haemophilus*, *Kingella*, and *Aggregatibacter*. In PC2, the taxa
-with strongest positive loadings are split, mostly pointing either strongly into
-the PC1 negative quadrant (anaerobes/unusual oral) or the PC1 positive quadrant
-(anaerobes). In PC3, the taxa with the strongest postive loadings are anaerobes,
-but also genera that are less common in the mouth, as are the taxa with
-strongest negative loadings. The Yanomami samples again separate from JAE and
-CMC along PC3, but separate from HMP on PC2.
+_Posterior samples only:_ In PC1, the positive loading taxa are mostly
+anaerobic, while the negative loading taxa are a mix of aerobic and anaerobic.
+Negative value genera include *Neisseria* and relatives *Eikenella*,
+*Haemophilus*, *Kingella*, and *Aggregatibacter*. In PC2, the postive loading
+taxa are a mix of later colonizer anaerobes, while the negative loading taxa are
+a mix of aerobes and anaerobes. This corresponds with the separation of plaque
+in positive PC2 values (less mature community) and calculus on negative values
+(more mature community). In PC3, the positive loading taxa are mostly later
+colonizing anaerobes, while the negative loading taxa are unusual, rare, or
+poorly characterized in the oral biofilm. The Yanomami samples again separate
+from JAE and CMC along PC3, but separate from HMP on PC2.
 
 
 ```{r biplot_samples_no_yanomami_genus}
@@ -1426,7 +1329,7 @@ CMC along PC3, but separate from HMP on PC2.
 malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|10M|SRR164")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1501,16 +1404,24 @@ pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_323$plot_env$neg_10 
              caption = "PC3 negative loadings")
 
 ```
-_Anterior samples only:_ In PC1, the taxa with the strongest positive loadings
-are mostly anaerobes, and the taxa with the strongest negative loadings are more
-aerobes/facultative (*Haemophilus, Kingella, Rothia, Neisseria, Eikenella*).
-Most of the arrows in PC1 negative point into the PC2 negative quadrant. In PC2,
-the taxa with strongest positive loadings are mostly anaerobes with arrows
-directed away from HMP, but *Veillonella* and *Actinobaculum* point towards the
-HMP samples. The taxa with strongest PC2 negative loadings are mostly anaerobes.
-In PC3, the taxa with the strongest positive loadings are mostly anaerobes,
-while the taxa with strongest negative loadings are unusual, rare, or poorly
-characterized in the oral biofilm.
+_Posterior samples only:_ When excluding Yanomami samples, the patterns of taxa
+characterizing sample group separation are still less clear at the genus level
+than they are at the species level. In PC1, the negative loading taxa are mostly
+later colonizing anaerobes, while the positive loading taxa are more aerobic
+(*Haemophilus, Kingella, Rothia, Neisseria, Eikenella*) and facultative
+anaerobic genera. The taxa characterizing this direction corresond with the HMP
+plaque samples, which would have a less mature biofilm community, mostly
+plotting in positive PC1 values. The HMP samples furtheset to the left are
+subgingival plaque, while the ones to the right are supragingival plaque. The
+CMC posterior samples tend to plot in PC1 negative values. This also corresponds
+with the genera loading in negative values as more aerobic and genera loading in
+positive values more anaerotolerant.
+
+In PC2, the positive loading taxa are a mix of aerobes and anaerobes. The
+negative loading taxa are more anaerobes, but also some odd, not typiclly oral,
+ones. In PC3, the positive loading taxa are mostly later colonizer, anaerobes,
+while the negative loading taxa are unusual, rare, or poorly characterized in
+the oral biofilm. In PC3 the CMC posterior samples again separate out from HMP.
 
 
 ## Genus-level analyses with only Cameroon samples
@@ -1520,7 +1431,7 @@ other sample types? Do they cluster by any of the metadata categories?
 malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|SRR|JAE")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1599,6 +1510,7 @@ age group, or market economy for either the posterior samples only or the
 anterior samples only. Clustering also doesn't seem to be related to sequencing
 depth, extraction batch, or library batch.
 
+
 Run a permanova with function adonis to test if the clusters are significantly different.
 ```{r adonis_cmc_genus}
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
@@ -1623,7 +1535,7 @@ malt_genus.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(malt_genus.decontam_filtered_cmc.euc ~ Ethnic_Group + Age_group + Sex + Village + Market_economy, metadata_cmc, perm=999)
+# adonis(malt_genus.decontam_filtered_cmc.euc ~ Ethnic_Group + Age_group + Sex + Village + Market_economy, metadata_cmc, perm=999)
 
 adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
@@ -1631,46 +1543,45 @@ adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex +
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs.
 "loose" clustering of groups) - is one group more variable than the other(s)?
-```{r betadisper_cmc_genus}
-# Test the 1 metadata category that is significant (p < 0.05) based on adonis2 for significant differences in dispersion
-# When including only anterior samples, Sex is significantly different
+```{r betadisper_cmc_genus, eval = F}
+# Test the 3 metadata categories that are significant (p < 0.05) based on adonis for significant differences in dispersion
+# When including only posterior sampels, none of the groups are significantly different
 
-# Sex
-groups_sex <- metadata_cmc %>%
-  select(Sex) %>% 
+# Village
+groups_village <- metadata_cmc %>%
+  select(Village) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-sex_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_sex, bias.adjust =TRUE)
-sex_betadisper_cmc_genus
+village_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_cmc_genus
 
 ## Perform test
-anova(sex_betadisper_cmc_genus)
+anova(village_betadisper_cmc_genus)
 
 ## Permutation test for F
-permutest(sex_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
+permutest(village_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-sex_betadisper_cmc_genus.HSD <- TukeyHSD(sex_betadisper_cmc_genus)
-plot(sex_betadisper_cmc_genus.HSD)
+village_betadisper_cmc_genus.HSD <- TukeyHSD(village_betadisper_cmc_genus)
+plot(village_betadisper_cmc_genus.HSD)
 
 ## Plot with data ellipses instead of hulls
-plot(sex_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(village_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(sex_betadisper_cmc_genus)
+boxplot(village_betadisper_cmc_genus)
 
 
 
 ```
-Point dispersion from the centroids is not significantly different between Males and Females. 
 
 ```{r biplots_cmc_genus}
 
 malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("EXB|LIB|JAE|SRR")) %>%
-                                         select(-one_of(posterior)) %>%
+                                         select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
@@ -1745,15 +1656,12 @@ pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_323$plot_env$neg_10 
              caption = "PC3 negative loadings")
 
 ```
-_Anterior samples only:_ In PC1, the positive loading taxa are more unusual or
-poorly characterized in the oral biofilm, and anaerobes, while the negative
-loading taxa are a mix of anaerobes and aerobes. In PC2, the taxa with strongest
-positive loadings are more anerobes (*Haemophilus, Kingella, Rothia, Neisseria,
-Eikenella*), while the taxa with strongest negative loadings are more anaerobes.
-In PC3, the taxa with strongest positive loadings are these unusual taxa again
-(*Xylanimonas*, *Sanguibacter*, *Cellulomonas*, *Kytococus*) but also some
-expected oral taxa, while the taxa with the strongest negative loadings are a
-variety of anaerobes and other unusual oral taxa.
+_Posterior samples only:_ In PC1, the positive loading taxa are more aerobes and
+facultative anaerobes, while the negative loading taxa are anaerobes. In PC2,
+the positive loading taxa are mostly aerobes and facultative anaerobes, while
+the  negative loading taxa are more anaerobes. In PC3, the positive loading taxa
+are mostly late colonizing anaerobes, while the negative loading taxa are a mix
+of genera that are unusual, rare, or poorly characterized in the oral biofilm.
 
 
 ```{r uky_graphs, eval = F}

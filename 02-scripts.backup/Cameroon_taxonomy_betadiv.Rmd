@@ -620,10 +620,53 @@ The 10M read subsampled HMP and JAE samples behave similarly to their equivalent
 full samples once the data have been decontaminated and filtered, so for
 downstream genus analysis we will use the full samples.
 
-## Species-level analyses
 
-What is the relationship of the groups in a PCA without the blanks?
-```{r pca_noblanks_species}
+## Species-level analyses
+What is the relationship of the groups in a PCA without the blanks? Let's try
+the PCA using only the species that are present in at least 1/3 of at least one
+sample group (CMC, HMP, JAE)
+```{r pct_30, eval = F}
+
+# Determine the prevalence of SEED proteins in each group
+malt_species.decontam_noblanks_presence_more_10 <- malt_species.decontam %>%
+  select(-matches("EXB|LIB|10M")) %>%
+  select(-one_of(outliers)) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Species) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the species that are present in at least 10% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 10) %>%
+  distinct(Species) %>%
+  select(Species)
+
+
+# Species, no blanks 
+malt_species.decontam_noblanks <- malt_species.decontam %>%
+                               select(-matches("EXB|LIB|10M")) %>%
+                               select(-one_of(outliers)) %>%
+                               inner_join(., malt_species.decontam_noblanks_presence_more_10, by = "Species") %>%
+                               gather("SampleID","Counts",2:ncol(.)) %>%
+                               spread(Species,Counts)
+
+rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
+
+malt_species.decontam_noblanks <- malt_species.decontam_noblanks %>% select(-SampleID)
+
+malt_species.decontam_noblanks = malt_species.decontam_noblanks+1
+
+# perform PCA
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC3", "PC2", "Description", "Env", "Env", 3)
+
+```
+
+
+
+```{r pca_noblanks_species, eval = F}
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-starts_with("EXB")) %>%
@@ -717,7 +760,7 @@ Now we will look at the species that have strongest loadings in PC1, PC2, and
 PC3, to see what appears to drive differences between the sample groups. We will
 visualize the loadings of these species with biplots. In the first set we
 include the Yanomami samples, and in the second set we exclude them.
-```{r biplot_noblanks_species}
+```{r biplot_noblanks_species, eval = F}
 
 malt_species_decontam_filtered_biplot_121 <- plot_pca_bi(malt_species_decontam_filtered_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1)
 malt_species_decontam_filtered_biplot_121
@@ -796,7 +839,65 @@ with one *Strep* & one *Rothia*, while the negative loading taxa are mostly
 suggests that *Rothia* are more predominant in plaque than *Neisseria*, while
 *Neisseria* are more predominant in buccal swabs.
 
-What is the relationship of the groups in a PCA without the blanks or the Yanomami samples?
+
+
+What is the relationship of the groups in a PCA without the blanks or the
+Yanomami samples? Here we'll use a cut-off of 10% prevalence in any group to
+keep the species (this means that a species must be present in at least one of
+the following: 6 Baka, 3 Nzime, 2 HMP, 1 JAE). If a species is not present in at
+least 10% of at least 1 group, it will be removed from analysis.
+```{r pct_10_noyanomami}
+
+# Determine the prevalence of species in each group
+malt_species.decontam_noblanks_presence_more_10 <- malt_species.decontam %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
+  select(-one_of(outliers)) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Species) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the species that are present in at least 10% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 10) %>%
+  distinct(Species) %>%
+  select(Species)
+
+
+# Species, no blanks 
+malt_species.decontam_noblanks <- malt_species.decontam %>%
+                               select(-matches("EXB|LIB|10M|SRR164")) %>%
+                               select(-one_of(outliers)) %>%
+                               inner_join(., malt_species.decontam_noblanks_presence_more_10, by = "Species") %>%
+                               gather("SampleID","Counts",2:ncol(.)) %>%
+                               spread(Species,Counts)
+
+rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
+
+malt_species.decontam_noblanks <- malt_species.decontam_noblanks %>% select(-SampleID)
+
+malt_species.decontam_noblanks = malt_species.decontam_noblanks+1
+
+# perform PCA
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Description", "Env", "Env", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC3", "PC2", "Description", "Env", "Env", 3)
+
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "ExtractionBatch", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "LibraryBatch", "Ethnic_Group", "Ethnic_Group", 3)
+
+```
+
+Here we use a cut-off of 0.001% abundance across all samples. This leaves 400
+species, only slightly fewer than the 438 kept by filtering based on prevalence.
+The PCA plots are indistinguishable to me. Is one necessarily better than the
+other to use?
 ```{r pca_noblanks_species}
 malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
