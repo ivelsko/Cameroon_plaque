@@ -45,9 +45,9 @@ rule noblanks_oblimin_ols:
           library(tidyverse)
           library(gplots)
           
-          load({params.seed_tables})
+          load("{params.seed_tables}")
           
-          load({params.metadata})
+          load("{params.metadata}")
           
           # Determine the prevalence of SEED proteins in each group
           seed_L4.decontam_noblanks_presence_less_30 <- seed_L4.decontam %>%
@@ -162,9 +162,9 @@ rule noblanks_Varimax_ols:
           library(tidyverse)
           library(gplots)
           
-          load({params.seed_tables})
+          load("{params.seed_tables}")
           
-          load({params.metadata})
+          load("{params.metadata}")
           
           # Determine the prevalence of SEED proteins in each group
           seed_L4.decontam_noblanks_presence_less_30 <- seed_L4.decontam %>%
@@ -278,9 +278,9 @@ rule cmc_oblimin_ols:
           library(tidyverse)
           library(gplots)
           
-          load({params.seed_tables})
+          load("{params.seed_tables}")
           
-          load({params.metadata})
+          load("{params.metadata}")
           
           # SEED proteins, CMC only 
           # Determine the prevalence of SEED proteins in each group
@@ -393,9 +393,9 @@ rule cmc_Varimax_ols:
           library(tidyverse)
           library(gplots)
           
-          load({params.seed_tables})
+          load("{params.seed_tables}")
           
-          load({params.metadata})
+          load("{params.metadata}")
           
           # SEED proteins, CMC only 
           # Determine the prevalence of SEED proteins in each group
