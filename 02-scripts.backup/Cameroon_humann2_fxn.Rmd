@@ -37,7 +37,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 
 # HUMAnN2 assignment stats
-```{r load_data}
+```{r load_data, eval = F}
 ## load the species and genus tables generated with HUMAnN2
 humann2_path <- fread("./05-results.backup/humann2.pathabundance.all.tss.tsv")
 humann2_path <- as_tibble(humann2_path)
@@ -61,14 +61,15 @@ colnames(humann2_path) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.e
 colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
 colnames(humann2_path) <- gsub(".fastq.truncated_Abundance","", colnames(humann2_path))
 
-# remove unmapped and ungrouped reads
-humann2_KOs <- humann2_KOs_full %>% filter(Ortholog != "UNMAPPED") %>% filter(!str_detect(Ortholog, "UNGROUPED"))
 
 ```
 
 ```{r load_metadata}
-
+load("./05-results.backup/CMC_humann2_tables.RData")
 load("./05-results.backup/CMC_metadata.RData")
+
+# remove unmapped and ungrouped reads
+humann2_KOs <- humann2_KOs_full %>% filter(Ortholog != "UNMAPPED") %>% filter(!str_detect(Ortholog, "UNGROUPED"))
 
 ```
 
@@ -345,8 +346,8 @@ humann2_alignment_stats_box <- humann2_alignment_stats %>%
     ggtitle("Percent of reads aligned by HUMAnN2")
 humann2_alignment_stats_box
 
-ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_alignment_stats_w <- humann2_alignment_stats %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
@@ -442,21 +443,69 @@ humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
     scale_fill_manual(values = Village_colors) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of pathways detected")
+    ylab("Number of pathways detected") +
     ggtitle("Total number of pathways ID'd by HUMAnN2")
 humann2_path_noblanks_long_box
 
-ggsave("./05-results.backup/humann2_path_noblanks_box.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/humann2_path_noblanks_box.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
 pairwise.wilcox.test(humann2_path_noblanks_long_w$Paths, humann2_path_noblanks_long_w$Village, p.adjust.method = "fdr")
 
+h2_path_test <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","CPM",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(CPM)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  select(Pathway)
+
+humann2_path_noblanks_long <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
+  inner_join(., h2_path_test, by = "Pathway") %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Paths = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
+
+humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  ggplot(., aes(Village, Paths, fill = Village)) +
+    geom_boxplot() +
+    scale_fill_manual(values = Village_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Number of pathways detected") +
+    ggtitle("Total number of pathways ID'd by HUMAnN2")
+humann2_path_noblanks_long_box
+
+# ggsave("./05-results.backup/humann2_path_noblanks_box.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
+pairwise.wilcox.test(humann2_path_noblanks_long_w$Paths, humann2_path_noblanks_long_w$Village, p.adjust.method = "fdr")
+
+
 ```
+HMP and JAE both have significantly more pathways identified than each of the
+villages. There are no differences between the villages.
 
-
-```{r pca_paths_noblanks_metadata}
+```{r pca_paths_noblanks_metadata, eval = F}
 # create the input matrix
 humann2_path_noblanks_mat <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
@@ -487,7 +536,6 @@ pca_AG_plot
 pca_ME_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 pca_ME_plot
 
-### there's a problem with this one about the size of the points. Using a different size_group lets it work
 pca_S_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
 
@@ -507,7 +555,7 @@ Only the tooth site (anterior vs posterior) appears to be separating along PC1.
 Let's also run these without the HMP and JAE samples to see how the CMC samples
 cluster without industrialized samples included.
 
-```{r adonis_paths_samples}
+```{r adonis_paths_samples, eval = F}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
 humann2_path_noblanks_mat.euc <- vegdist(humann2_path_noblanks.pca$X, method = "euclidean", na.rm = T)
@@ -607,15 +655,14 @@ humann2_path_noyanomami_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(humann2_path_noyanomami_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, perm=999)
-
-adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
-
+Tooth site (p < 0.05) and village (p < 0.01) are significantly different. When
+controlling for tooth site, village is significant (p < 0.05).
 
 ```{r pca_paths_cmc_metadata}
 humann2_path_cmc_mat <- humann2_path %>%
@@ -658,9 +705,8 @@ pca_TS_plot
 pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
-ggsave("./05-results.backup/pca_EG_cmc_paths.pdf", plot = pca_EG_plot, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-        dpi = 300)
+# ggsave("./05-results.backup/pca_EG_cmc_paths.pdf", plot = pca_EG_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 Again the only sort-of clustering that we see is by tooth site (anterior or
@@ -694,10 +740,11 @@ adonis(humann2_path_cmc_mat.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + 
 adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
+adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
 
 ```
-
+Tooth site (p < 0.01) is significantly different, but when controlling for tooth
+site none are significantly different.
 
 Now to see which of the pathways have the strongest loadings in PC1 and PC2
 ```{r pca_path_biplot}
@@ -705,9 +752,8 @@ Now to see which of the pathways have the strongest loadings in PC1 and PC2
 pca_EG_biplot_pc1 <- plot_pca_bi(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-        dpi = 300)
+# ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
@@ -758,8 +804,8 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_cmc_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
@@ -937,8 +983,8 @@ humann2_KO_box <- humann2_KO_long %>%
     ggtitle("Total number of KEGG orthologs ID'd by HUMAnN2 (no filtering)")
 humann2_KO_box
 
-ggsave("./05-results.backup/humann2_KO_box.pdf", plot = humann2_KO_box, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/humann2_KO_box.pdf", plot = humann2_KO_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_KO_long_w <- humann2_KO_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
@@ -1192,8 +1238,8 @@ pca_TS_plot
 pca_V_plot <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
 pca_V_plot
 
-ggsave("./05-results.backup/pca_EG_KOs_cmc.pdf", plot = pca_EG_plot, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/pca_EG_KOs_cmc.pdf", plot = pca_EG_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 
@@ -1235,8 +1281,8 @@ Now to see which of the orthologs have the strongest loadings in PC1 and PC2
 pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KO_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_KO_biplot_pc1
 
-ggsave("./05-results.backup/humann2_KO_bi_noyanomami.pdf", plot = pca_EG_KO_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/humann2_KO_bi_noyanomami.pdf", plot = pca_EG_KO_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1285,8 +1331,8 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
 
-ggsave("./05-results.backup/humann2_KO_bi_cmc.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/humann2_KO_bi_cmc.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),

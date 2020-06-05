@@ -14,10 +14,15 @@ library(knitr)
 library(data.table)
 library(janitor)
 library(pander)
+library(exactRankTests)
+library(nlme)
+library(compositions)
 library(tidyverse)
 library(gplots)
 library(viridis)
 library(cowplot)
+# source("./02-scripts.backup/ancom.R")
+source("./02-scripts.backup/ancom_v2.1.R") # source the ancom2 script to be able to use it here
 opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 ```
 
@@ -36,17 +41,10 @@ load("./05-results.backup/CMC_taxonomy_tables.RData")
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData") # this sets the metadata as factors. Check if it works before deleting the commented out section below
 
-metadata <- metadata %>%
+metadata_factors <- metadata %>%
   rename(Sample.ID = SampleID)  %>%
   as_data_frame() %>%
-  select(`Sample.ID`, Description, Industry, Age_group, Env, Ethnic_Group, Market_economy, Sex, Tooth_site, Village)
-
-
-# metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
-# metadata <- metadata %>%
-#   rename(Sample.ID = `#SampleID`)  %>%
-#   as_data_frame() %>%
-#   select(`Sample.ID`, Description, Industry, Age_group, Env, Ethnic_Group, Market_economy, Sex, Tooth_site, Village)
+  select(`Sample.ID`, Description, Industry, Age_group, Env, Ethnic_Group, Market_economy, Sex, Tooth_site, Village, ExtractionBatch, LibraryBatch)
 
 ```
 
@@ -63,149 +61,150 @@ outliersF <- str_c(outliers, collapse = "|")
 
 
 ```{r input_tables}
-# species, no blanks 
-malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-contains("10M")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species") %>%
-                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
-
-malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblanks %>% select(-SampleID)
-
-malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
+# new metadata table without factors, in case that's messing this up (Baka isn't appearing)
+metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(!SampleID %in% outliers,
+         !str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+  rename(Sample.ID = SampleID) %>%
+  as_data_frame() %>%
+  select(`Sample.ID`, Description, Industry, Age_group, Env, Ethnic_Group, Market_economy, Sex, Tooth_site, Village, ExtractionBatch, LibraryBatch)
 
 
 # species, no blanks, no Yanomami
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-contains("10M")) %>%
-                                         select(-starts_with("SRR16460")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species") %>%
-                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noblanks_noyanomami) <- malt_species.decontam_filtered_noblanks_noyanomami$SampleID
-
-malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-
-malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filtered_noblanks_noyanomami+1
-
+                                         select(-matches("EXB|LIB|10M|SRR164")) 
 
 # species, CMC samples only
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-starts_with("SRR")) %>%
-                                         select(-starts_with("JAE")) %>%
-                                         select(-contains("10M")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species") %>%
-                                         mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
-
-malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% select(-SampleID)
-
-malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
+                                         select(-matches("EXB|LIB|JAE|SRR")) 
 
 
-# genus, no blanks
-malt_genus.decontam_filtered <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-contains("10M")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus") %>%
-                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
-                                         filter(Percent > 0.01) %>%
-                                         select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-
-malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-
-malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
+# malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
+#                                          select(-one_of(outliers)) %>%
+#                                          select(-starts_with("EXB")) %>%
+#                                          select(-starts_with("LIB")) %>%
+#                                          select(-starts_with("SRR")) %>%
+#                                          select(-starts_with("JAE")) %>%
+#                                          select(-contains("10M")) %>%
+#                                          adorn_totals(where = "col", name = "Sum_species") %>%
+#                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
+#                                          filter(Percent > 0.001) %>%
+#                                          select(-one_of(c("Sum_species","Percent"))) %>%
+#                                          gather("SampleID","Counts",2:ncol(.)) %>%
+#                                          spread(Species,Counts)
+# 
+# rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
+# malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% select(-SampleID)
+# malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
 
 
 # genus, no blanks, no Yanomami
-malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-contains("10M")) %>%
-                                         # select(-one_of(fullSRR)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus") %>%
-                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
-                                         filter(Percent > 0.01) %>%
-                                         select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered_noyanomami) <- malt_genus.decontam_filtered_noyanomami$SampleID
-
-malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam_filtered_noyanomami %>% select(-SampleID)
-
-malt_genus.decontam_filtered_noyanomami = malt_genus.decontam_filtered_noyanomami+1
+# malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam %>%
+#                                          select(-one_of(outliers)) %>%
+#                                          select(-starts_with("EXB")) %>%
+#                                          select(-starts_with("LIB")) %>%
+#                                          select(-contains("10M")) %>%
+#                                          # select(-one_of(fullSRR)) %>%
+#                                          adorn_totals(where = "col", name = "Sum_genus") %>%
+#                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+#                                          filter(Percent > 0.01) %>%
+#                                          select(-one_of(c("Sum_genus","Percent"))) %>%
+#                                          gather("SampleID","Counts",2:ncol(.)) %>%
+#                                          spread(Species,Counts)
+# 
+# rownames(malt_genus.decontam_filtered_noyanomami) <- malt_genus.decontam_filtered_noyanomami$SampleID
+# malt_genus.decontam_filtered_noyanomami <- malt_genus.decontam_filtered_noyanomami %>% select(-SampleID)
+# malt_genus.decontam_filtered_noyanomami = malt_genus.decontam_filtered_noyanomami+1
 
 
 # genus, CMC samples only
-malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-starts_with("EXB")) %>%
-                                         select(-starts_with("LIB")) %>%
-                                         select(-starts_with("SRR")) %>%
-                                         select(-starts_with("JAE")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus") %>%
-                                         mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
-
-malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(-SampleID)
-
-malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
+# malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
+#                                          select(-one_of(outliers)) %>%
+#                                          select(-starts_with("EXB")) %>%
+#                                          select(-starts_with("LIB")) %>%
+#                                          select(-starts_with("SRR")) %>%
+#                                          select(-starts_with("JAE")) %>%
+#                                          adorn_totals(where = "col", name = "Sum_genus") %>%
+#                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
+#                                          filter(Percent > 0.001) %>%
+#                                          select(-one_of(c("Sum_genus","Percent"))) %>%
+#                                          gather("SampleID","Counts",2:ncol(.)) %>%
+#                                          spread(Species,Counts)
+# 
+# rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
+# malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(-SampleID)
+# malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
 
 ```
 
-```{r ancom_script, eval = F}
-# source the ancom script to be able to use it here
-source("./02-scripts.backup/ancom.R")
+#Ancom2
+```{r ancom2_example}
+otu_data <- malt_species.decontam_filtered_cmc
+otu_id = otu_data$Species
+otu_data <- otu_data %>%
+  column_to_rownames("Species")
+
+meta_data <- metadata
+
+# source("scripts/ancom_v2.1.R")
+
+# Step 1: Data preprocessing
+
+feature_table = otu_data
+sample_var = "Sample.ID"
+group_var = NULL
+out_cut = 0.05
+zero_cut = 0.90
+lib_cut = 0
+neg_lb = FALSE
+prepro = feature_table_pre_process(feature_table, meta_data, sample_var, group_var, 
+                                   out_cut, zero_cut, lib_cut, neg_lb)
+feature_table <-  prepro$feature_table # Preprocessed feature table
+meta_data <- prepro$meta_data # Preprocessed metadata
+struc_zero <- prepro$structure_zeros # Structural zero info
+
+# Step 2: ANCOM
+
+main_var = "Tooth_site" # for the CMC only table and tooth site, this takes 1hr11min
+adj_formula = NULL # this controls for tooth site, otherwise use NULL
+p_adj_method = "fdr"
+alpha = 0.05
+rand_formula = NULL
+t_start = Sys.time()
+res = ANCOM(feature_table, meta_data, struc_zero, main_var, p_adj_method, 
+            alpha, adj_formula, rand_formula)
+t_end = Sys.time()
+
+head(res$out)
+# write_csv(res$out, "outputs/res_moving_pics.csv")
+
+# Step 3: Volcano Plot
+
+# Number of taxa except structural zeros
+n_taxa = ifelse(is.null(struc_zero), nrow(feature_table), sum(apply(struc_zero, 1, sum) == 0))
+# Cutoff values for declaring differentially abundant taxa
+cut_off = c(0.9 * (n_taxa -1), 0.8 * (n_taxa -1), 0.7 * (n_taxa -1), 0.6 * (n_taxa -1))
+names(cut_off) = c("detected_0.9", "detected_0.8", "detected_0.7", "detected_0.6")
+
+# Annotation data
+dat_ann = data.frame(x = min(res$fig$data$x), y = cut_off["detected_0.7"], label = "W[0.7]")
+
+fig = res$fig +  
+  geom_hline(yintercept = cut_off["detected_0.7"], linetype = "dashed") + 
+  geom_text(data = dat_ann, aes(x = x, y = y, label = label), 
+            size = 4, vjust = -0.5, hjust = 0, color = "orange", parse = TRUE)
+fig
 
 ```
 
-Update the metadata to include only the same samples as in the OTU table
-```{r metadata_ancom}
-metadata_new <- metadata %>%
-  # filter(`Sample.ID` %in% outliers) %>% 
-  filter(!str_detect(`Sample.ID`, outliersF)) %>%
-  filter(!str_detect(`Sample.ID`, "EXB")) %>% 
-  filter(!str_detect(`Sample.ID`, "LIB")) %>% 
-  filter(!str_detect(`Sample.ID`, "10M"))
 
-```
 
+
+## Ancom1
 
 ```{r input_tables_ancom}
 # this works

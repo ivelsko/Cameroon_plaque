@@ -16,7 +16,7 @@ library(data.table)
 library(psych)
 library(vegan)
 library(ape)
-library(mixOMics)
+library(mixOmics)
 library(compositions)
 library(MASS)
 library(janitor)
@@ -112,7 +112,7 @@ Do a factor analysis to reduce the number of proteins we're working with
 First create input tables
 ```{r input_tables}
 # Determine the prevalence of SEED proteins in each group
-seed_L4.decontam_noblanks_presence_less_30 <- seed_L4.decontam %>%
+seed_L4.decontam_noblanks_presence_more_30 <- seed_L4.decontam %>%
   select(-matches("EXB|LIB|10M")) %>%
   mutate_if(is.numeric, ~1 * (. > 0)) %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
@@ -122,7 +122,7 @@ seed_L4.decontam_noblanks_presence_less_30 <- seed_L4.decontam %>%
   summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
   # select the SEED proteins that are present in at least 30% of at least one group
   ungroup() %>%
-  filter(Percent_presence <= 33.33) %>%
+  filter(Percent_presence >= 33.33) %>%
   distinct(Pathway) %>%
   # pull out these proteins to keep
   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
@@ -133,7 +133,7 @@ seed_L4.decontam_noblanks <- seed_L4.decontam %>%
                                select(-matches("EXB|LIB|10M")) %>%
                                separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
                                select(-c("SEED","L2","L3")) %>%
-                               anti_join(., seed_L4.decontam_noblanks_presence_less_30, by = "Pathway") %>%
+                               inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
                                gather("SampleID","Counts",2:ncol(.)) %>%
                                spread(Pathway,Counts)
 
@@ -151,7 +151,7 @@ seed_L4.decontam_noblanks_clr <- as.data.frame.matrix(seed_L4.decontam_noblanks.
 
 # SEED proteins, CMC only 
 # Determine the prevalence of SEED proteins in each group
-seed_L4.decontam_cmc_presence_less_30 <- seed_L4.decontam %>%
+seed_L4.decontam_cmc_presence_more_30 <- seed_L4.decontam %>%
   select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
   mutate_if(is.numeric, ~1 * (. > 0)) %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
@@ -161,7 +161,7 @@ seed_L4.decontam_cmc_presence_less_30 <- seed_L4.decontam %>%
   summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
   # select the SEED proteins that are present in at least 30% of at least one group
   ungroup() %>%
-  filter(Percent_presence <= 33.33) %>%
+  filter(Percent_presence >= 33.33) %>%
   distinct(Pathway) %>%
   # pull out these proteins to keep
   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
@@ -171,7 +171,7 @@ seed_L4.decontam_cmc <- seed_L4.decontam %>%
                                          select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
                                separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
                                select(-c("SEED","L2","L3")) %>%
-                               anti_join(., seed_L4.decontam_cmc_presence_less_30, by = "Pathway") %>%
+                               inner_join(., seed_L4.decontam_cmc_presence_more_30, by = "Pathway") %>%
                                gather("SampleID","Counts",2:ncol(.)) %>%
                                spread(Pathway,Counts)
 
@@ -220,7 +220,7 @@ scree_plot <- seed_L4.decontam_noblanks.fa$values %>%
 
 scree_plot
 
-ggsave("./05-results.backup/presentation_pdfs/scree_seed_noblanks_Varimax_minres.pdf", plot = scree_plot, device = "pdf",
+ggsave("./05-results.backup/presentation_pdfs/scree_seed_noblanks_oblimin_minres.pdf", plot = scree_plot, device = "pdf",
        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # get the minimum residual values into a datatable
@@ -291,7 +291,7 @@ Now a linear discriminant analysis using the selected factors
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -335,7 +335,7 @@ seed_eg
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -379,7 +379,7 @@ seed_age
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -422,7 +422,7 @@ seed_me
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -466,7 +466,7 @@ seed_sex
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -510,7 +510,7 @@ seed_ts
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_noblanks <- seed_L4.decontam_noblanks.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_noblanks_lda_table <- seed_L4.decontam_noblanks_clr %>%
@@ -618,7 +618,7 @@ seed_L4.decontam_FA_all <- seed_L4.decontam %>%
                                   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
                                   select(-c("SEED","L2","L3")) %>%
                                   inner_join(., seed_L4.decontam_noblanks.fa_seed %>%
-                                               filter(Residual == "MR1") %>%
+                                               filter(Residual == "MR2") %>%
                                                select(-Residual)) %>%
                                   gather("SampleID","Counts",2:ncol(.)) %>%
                                   spread(Pathway,Counts)
@@ -658,7 +658,7 @@ seed_L4.decontam_FA_all_clr_order <- seed_L4.decontam_FA_all_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Pathway","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(SpOrder = as.character(seq(1,11070))) %>% # MR1 - 1070; MR2 - 637
+  mutate(SpOrder = as.character(seq(1,869))) %>% # MR1 - 700; MR2 - 869
   select(Pathway, SpOrder, everything()) %>%
   mutate(SpOrder = fct_relevel(SpOrder, sp_all_order)) %>%
   arrange(SpOrder) %>%
@@ -798,7 +798,7 @@ scree_plot <- seed_L4.decontam_cmc.fa$values %>%
          geom_hline(yintercept = 10, linetype = "dashed", color = "red")
 scree_plot
 
-ggsave("./05-results.backup/presentation_pdfs/scree_seed_cmc_Varimax_minres.pdf", plot = scree_plot, device = "pdf",
+ggsave("./05-results.backup/presentation_pdfs/scree_seed_cmc_oblimin_minres.pdf", plot = scree_plot, device = "pdf",
        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # get the minimum residual values into a datatable
@@ -868,7 +868,7 @@ Now a linear discriminant analysis using the selected factors
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -912,7 +912,7 @@ seed_cmc_eg
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -956,7 +956,7 @@ seed_cmc_age
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -999,7 +999,7 @@ seed_cmc_me
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -1042,7 +1042,7 @@ seed_cmc_sex
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -1090,7 +1090,7 @@ seed_cmc_ts
 # select only the species that make up the 1st 3 residuals, based on the scree plot above
 fa_proteins_cmc <- seed_L4.decontam_cmc.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
-  pull(Species)
+  pull(Pathway)
 
 # sub-sample the species table for only those species
 seed_L4.decontam_cmc_lda_table <- seed_L4.decontam_cmc_clr %>%
@@ -1150,7 +1150,7 @@ seed_L4.decontam_FA_cmc <- seed_L4.decontam %>%
                                   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
                                   select(-c("SEED","L2","L3")) %>%
                                   inner_join(., seed_L4.decontam_cmc.fa_seed %>%
-                                               filter(Residual == "MR1") %>%
+                                               filter(Residual == "MR2") %>%
                                                select(-Residual)) %>%
                                   gather("SampleID","Counts",2:ncol(.)) %>%
                                   spread(Pathway,Counts)
@@ -1190,7 +1190,7 @@ seed_L4.decontam_FA_cmc_clr_order <- seed_L4.decontam_FA_cmc_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Pathway","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(SpOrder = as.character(seq(1,938))) %>% # MR1 - 938; MR2 - 686
+  mutate(SpOrder = as.character(seq(1,712))) %>% # MR1 - 968; MR2 - 712
   select(Pathway, SpOrder, everything()) %>%
   mutate(SpOrder = fct_relevel(SpOrder, sp_cmc_order)) %>%
   arrange(SpOrder) %>%

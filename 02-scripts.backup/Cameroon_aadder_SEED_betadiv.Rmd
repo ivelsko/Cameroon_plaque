@@ -364,6 +364,10 @@ seed_counts_w <- seed_counts %>%
 pairwise.wilcox.test(seed_counts_w$Total_detected, seed_counts_w$Village, p.adjust.method = "fdr")
 
 ```
+HMP samples have more proteins assigned than all villages, and JAE samples have
+more proteins assigned than all villages and HMP. There are no significant
+differences in the number of proteins assigned between any of the villages.
+
 
 ```{r number_proteins_decontam}
 # start with the decontaminated table that has only the level 4 entries
@@ -396,6 +400,12 @@ seed_counts_decontam_w <- seed_counts_decontam %>%
 pairwise.wilcox.test(seed_counts_decontam_w$Total_detected, seed_counts_decontam_w$Village, p.adjust.method = "fdr")
 
 ```
+HMP samples have significantly more proteins assigned than all villages after
+removing potential contaminants identified by decontam. JAE samples have
+significantly more proteins assigned than all villages and HMP after removing
+potential contaminants identified by decontam. There are no significant
+differences in the number of proteins assigned between any of the villages.
+
 
 Start with a PCA to see if any of the samples fall with the controls based on
 functional profile.
@@ -461,7 +471,7 @@ however, since that's what we used for taxonomy and HUMAnN2 analyses.
 How do the samples plot when the controls are removed? What's the relationship
 of the samples to eachother? Let's also look at how filtering and
 decontaminating affects the relationships of the samples.
-```{r pca_L4_filt_decontam}
+```{r pca_L4_full_filt}
 # Start with a full table that is not filtered or decontaminated
 seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
 
@@ -476,7 +486,7 @@ seed_full_L4 <- as.matrix(seed_full_L4 %>%
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
+tune.pca(seed_full_L4, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 
@@ -501,7 +511,7 @@ seed_full_L4 <- as.matrix(seed_full_L4 %>%
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
+tune.pca(seed_full_L4, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 
@@ -509,6 +519,80 @@ seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 pca_L4_filt_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
 
+# Now filter the full table for only proteins present in at least 1/3 of samples from any ethnic group, but don't decontaminate it
+# Determine the prevalence of SEED proteins in each group
+seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+
+seed_full_L4_more_33 <- seed_full_L4 %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_full_L4_33 <- seed_full_L4 %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., seed_full_L4_more_33, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
+
+rownames(seed_full_L4_33) <- seed_full_L4_33$SampleID
+seed_full_L4_33 <- as.matrix(seed_full_L4_33 %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.pca(seed_full_L4_33, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_full_L4_33.pca <- pca(seed_full_L4_33, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_33_plot <- plot_pca(seed_full_L4_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+
+# Now keep only the proteins that are in MR1 from the factor analysis
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+
+seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
+
+seed_full_L4_mr1 <- seed_full_L4 %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., mr1_proteins %>%
+               select(Pathway), by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
+  
+rownames(seed_full_L4_mr1) <- seed_full_L4_mr1$SampleID
+seed_full_L4_mr1 <- as.matrix(seed_full_L4_mr1 %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.pca(seed_full_L4_mr1, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_full_L4_mr1.pca <- pca(seed_full_L4_mr1, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_L4_mr1_plot <- plot_pca(seed_full_L4_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+```
+
+```{r pca_L4_decontam_filt}
 # Now with the decontaminated table
 seed_L4.decontam_filt <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
@@ -545,83 +629,183 @@ seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>%
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_L4.decontam_filt_pca <- tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
+tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 seed_L4.decontam_filt.pca <- pca(seed_L4.decontam_filt, ncomp = 3, logratio = 'CLR')
 
-# plot the PCA
+# plot the PCAs
 pca_L4_decontam_filt_plot <- plot_pca(seed_L4.decontam_filt.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-L4_pca_filtering <- plot_grid(pca_L4_plot, pca_L4_filt_plot,
-                              pca_L4_decontam_plot, pca_L4_decontam_filt_plot,
-                              nrow=2, labels = c("A", "B", "C", "D"), rel_widths = c(1, 1))
+
+# Now filter the full table for only proteins present in at least 1/3 of samples from any ethnic group, but don't decontaminate it
+# Determine the prevalence of SEED proteins in each group
+seed_L4.decontam_noblanks_presence_more_30 <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_noblanks_33 <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
+
+rownames(seed_L4.decontam_noblanks_33) <- seed_L4.decontam_noblanks_33$SampleID
+seed_L4.decontam_noblanks_33 <- seed_L4.decontam_noblanks_33 %>% select(-SampleID)
+seed_L4.decontam_noblanks_33 = seed_L4.decontam_noblanks_33+1
+# check the number of components to retain by tuning the PCA
+tune.pca(seed_L4.decontam_noblanks_33, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_noblanks_33.pca <- pca(seed_L4.decontam_noblanks_33, ncomp = 3, logratio = 'CLR')
+
+# plot the PCAs
+pca_L4_decontam_33_plot <- plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+
+# now filter for only the proteins in MR1
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_noblanks_mr1 <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., mr1_proteins %>%
+               select(Pathway), by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
+
+
+rownames(seed_L4.decontam_noblanks_mr1) <- seed_L4.decontam_noblanks_mr1$SampleID
+seed_L4.decontam_noblanks_mr1 <- as.matrix(seed_L4.decontam_noblanks_mr1 %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.pca(seed_L4.decontam_noblanks_mr1, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4.decontam_noblanks_mr1.pca <- pca(seed_L4.decontam_noblanks_mr1, ncomp = 3, logratio = 'CLR')
+
+# plot the PCAs
+pca_L4_decontam_mr1_plot <- plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+```
+
+
+```{r filteringPCA_plots}
+
+L4_pca_filtering <- plot_grid(pca_L4_plot, pca_L4_filt_plot, pca_L4_33_plot, pca_L4_mr1_plot,
+                              pca_L4_decontam_plot, pca_L4_decontam_filt_plot, pca_L4_decontam_33_plot, pca_L4_decontam_mr1_plot,
+                              nrow=2, labels = c("Full", "Full-filtered", "Full-33", "Full-MR1", "Decontam", "Decontam-filtered", "Decontam-33", "Decontam-MR1"), rel_widths = c(1, 1))
 
 L4_pca_filtering
-
 
 ```
 The full table and the decontaminated table plots look very similar, as do the
 full-filtered and decontaminated-filtered plots. Clearly removing the
 "contaminant" proteins a doesn't remove proteins that strongly influence the
 relationship of the industrial and non-industrial samples to eachother.
-Filtering out the low abundance proteins (<0.0001%, <0.00005%) does cause the CMC and industrial
-samples to plot more closely, and in some cases overlap, suggesting that the low
-abundance proteins are what are distinct between the two sample types. Is this
-related to the pan-genome/accessory genome differences that may exist between
-strains of species found in each sample group? The HMP and JAE samples separate
-from eachother on PC2, which is more visible in the PC3-PC2 plots than in the
-PC1-PC2 plots.
+Filtering out the low abundance proteins (<0.0001%, <0.00005%) does cause the
+CMC and industrial samples to plot more closely, and in some cases overlap,
+suggesting that the low abundance proteins are what are distinct between the two
+sample types. Is this related to the pan-genome/accessory genome differences
+that may exist between strains of species found in each sample group? The HMP
+and JAE samples separate from eachother on PC2, which is more visible in the
+PC3-PC2 plots than in the PC1-PC2 plots. The PCAs with only proteins present in
+at least 1/3 of at least one ethnic group look similar to the filtered PCAs,
+with overlap of JAE and HMP with CMC, although the JAE/HMP look a little more
+separated than in the abundance filtered plot. The PCAs using only proteins in
+MR1 from factor analysis maintain more separation between the HMP/JAE and CMC
+samples.
 
-So which table to use, the decontaminated table, or the decontaminated and
-filtered table? Maybe try both to see what the differences are. Filtering
-proteins present at <0.0001% abundance from the decontaminated table removes
-~1000 proteins. Might be important for the biplot visualizations to filter the
-table to be able to see the arrows, otherwise, they'll all cluster tightly
-around the center of the plot.
+So which table to use, the decontaminated and prevalence-filtered table
+(Decontam-33 plot above), or the decontaminated and MR1 protein-filtered table
+(Decontam-MR1 plot above)? I'lll try both to see what the differences are.
+Additional filtering proteins based on abundance might be important for the
+biplot visualizations to be able to see the arrows, otherwise, they'll all
+cluster tightly around the center of the plot.
 
-# Decontaminated table
-```{r pca_decontam_noblanks_metadata}
+# Decontaminated and prevalence-filtered table
 
-seed_L4.decontam_noblanks <- seed_L4.decontam %>%
+## Cameroon and industrial samples
+```{r pca_decontam_33_noblanks_metadata}
+
+# Determine the prevalence of SEED proteins in each group
+seed_L4.decontam_noblanks_presence_more_30 <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
   select(-matches("EXB|LIB|10M")) %>%
-  gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
 
-rownames(seed_L4.decontam_noblanks) <- seed_L4.decontam_noblanks$SampleID
-seed_L4.decontam_noblanks <- as.matrix(seed_L4.decontam_noblanks %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_noblanks_33 <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
 
+rownames(seed_L4.decontam_noblanks_33) <- seed_L4.decontam_noblanks_33$SampleID
+seed_L4.decontam_noblanks_33 <- seed_L4.decontam_noblanks_33 %>% select(-SampleID)
+seed_L4.decontam_noblanks_33 = seed_L4.decontam_noblanks_33+1
 # check the number of components to retain by tuning the PCA
-tune.seed_L4.decontam_noblanks_pca <- tune.pca(seed_L4.decontam_noblanks, logratio = 'CLR')
+tune.pca(seed_L4.decontam_noblanks_33, logratio = 'CLR')
 # perform a PCA to see how the data cluster
-seed_L4.decontam_noblanks.pca <- pca(seed_L4.decontam_noblanks, ncomp = 3, logratio = 'CLR')
+seed_L4.decontam_noblanks_33.pca <- pca(seed_L4.decontam_noblanks_33, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
-
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Village", "Village", "Village")
 
 
 ```
 
-```{r adonis_decontam_noblanks}
+```{r adonis_decontam_33_noblanks}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-seed_L4.decontam_noblanks.euc <- vegdist(seed_L4.decontam_noblanks.pca$X, method = "euclidean", na.rm = T)
-seed_L4.decontam_noblanks.euc.pcoa <- ape::pcoa(seed_L4.decontam_noblanks.euc)
+seed_L4.decontam_noblanks_33.euc <- vegdist(seed_L4.decontam_noblanks_33.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_noblanks_33.euc.pcoa <- ape::pcoa(seed_L4.decontam_noblanks_33.euc)
 
-seed_L4.decontam_noblanks.euc.pcoavectors <- as.data.frame(seed_L4.decontam_noblanks.euc.pcoa$vectors)
-seed_L4.decontam_noblanks.euc.pcoavectors <- seed_L4.decontam_noblanks.euc.pcoavectors %>%
+seed_L4.decontam_noblanks_33.euc.pcoavectors <- as.data.frame(seed_L4.decontam_noblanks_33.euc.pcoa$vectors)
+seed_L4.decontam_noblanks_33.euc.pcoavectors <- seed_L4.decontam_noblanks_33.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_noblanks.euc.vecmet <- inner_join(seed_L4.decontam_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4.decontam_noblanks_33.euc.vecmet <- inner_join(seed_L4.decontam_noblanks_33.euc.pcoavectors, metadata, by = "SampleID")
 
-seed_L4.decontam_noblanks.euc.vecmet %>%
+seed_L4.decontam_noblanks_33.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -631,14 +815,20 @@ seed_L4.decontam_noblanks.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(seed_L4.decontam_noblanks.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_noblanks.euc.vecmet, perm=999)
+adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_33.euc.vecmet, permutations = 999, by = "margin")
 
+# controlled for tooth site
+adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks_33$Tooth_site)
 
 ```
+Tooth site is the only category that is significantly different (p < 0.01). When
+controlling for tooth site, sex is the only category that is significantly
+different (p < 0.05).
 
-```{r biplots_decontam_noblanks}
+
+```{r biplots_decontam_33_noblanks_33}
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_biplot_pc1
 
 ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
@@ -646,48 +836,73 @@ ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplo
         dpi = 300)
 
 # what are those pathways?
-pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 positive loadings")
 
-pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
 # make a table of the pathways to save, to use again later in another R notebook
-# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_biplot_pc2
 
 # what are those pathways?
-pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC2 positive loadings")
 
-pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+
+
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_noblanks_33.pca, "PC3", "PC2", "Ethnic_Group", PC2, pathways = F)
+pca_EG_biplot_pc3
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "Industrial+CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "Industrial+CMC"))
 
 
 ```
@@ -704,48 +919,76 @@ _PC2-_
 
 
 
+## Cameroon samples only
+```{r pca_decontam_33_cmc_categories}
 
-```{r pca_decontam_cmc_categories}
-
-seed_L4.decontam_cmc <- seed_L4.decontam %>%
+# Determine the prevalence of SEED proteins in each group
+seed_L4.decontam_cmc_presence_more_30 <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
-  select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
-  gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
+  select(-matches("EXB|LIB|JAE|SRR")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Pathway) %>%
+  # pull out these proteins to keep
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(Pathway)
 
-rownames(seed_L4.decontam_cmc) <- seed_L4.decontam_cmc$SampleID
-seed_L4.decontam_cmc <- as.matrix(seed_L4.decontam_cmc %>% 
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_cmc_33 <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|JAE|SRR")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., seed_L4.decontam_cmc_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
+
+rownames(seed_L4.decontam_cmc_33) <- seed_L4.decontam_cmc_33$SampleID
+seed_L4.decontam_cmc_33 <- as.matrix(seed_L4.decontam_cmc_33 %>% 
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_L4.decontam_cmc_pca <- tune.pca(seed_L4.decontam_cmc, logratio = 'CLR')
+tune.seed_L4.decontam_cmc_33_pca <- tune.pca(seed_L4.decontam_cmc_33, logratio = 'CLR')
 # perform a PCA to see how the data cluster
-seed_L4.decontam_cmc.pca <- pca(seed_L4.decontam_cmc, ncomp = 3, logratio = 'CLR')
+seed_L4.decontam_cmc_33.pca <- pca(seed_L4.decontam_cmc_33, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Village", "Village", "Village")
 
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Village", "Village", "Village")
 
 ```
 
-```{r adonis_decontam_noblanks}
+```{r adonis_decontam_33_cmc}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-seed_L4.decontam_cmc.euc <- vegdist(seed_L4.decontam_cmc.pca$X, method = "euclidean", na.rm = T)
-seed_L4.decontam_cmc.euc.pcoa <- ape::pcoa(seed_L4.decontam_cmc.euc)
+seed_L4.decontam_cmc_33.euc <- vegdist(seed_L4.decontam_cmc_33.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_cmc_33.euc.pcoa <- ape::pcoa(seed_L4.decontam_cmc_33.euc)
 
-seed_L4.decontam_cmc.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc.euc.pcoa$vectors)
-seed_L4.decontam_cmc.euc.pcoavectors <- seed_L4.decontam_cmc.euc.pcoavectors %>%
+seed_L4.decontam_cmc_33.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc_33.euc.pcoa$vectors)
+seed_L4.decontam_cmc_33.euc.pcoavectors <- seed_L4.decontam_cmc_33.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_cmc.euc.vecmet <- inner_join(seed_L4.decontam_cmc.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4.decontam_cmc_33.euc.vecmet <- inner_join(seed_L4.decontam_cmc_33.euc.pcoavectors, metadata, by = "SampleID")
 
-seed_L4.decontam_cmc.euc.vecmet %>%
+seed_L4.decontam_cmc_33.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -755,62 +998,91 @@ seed_L4.decontam_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(seed_L4.decontam_cmc.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_cmc.euc.vecmet, perm=999)
+adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin")
 
+# controlled for tooth site
+adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc_33$Tooth_site)
 
 ```
+Only tooth site is significantly different (p < 0.001). When controlling for
+tooth site, only sex is significantly different (p < 0.05).
 
-```{r biplots_decontam_noblanks}
+
+```{r biplots_decontam_33_cmc}
 # which paths distinguish sample groups when only CMC samples are included?
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
-pca_EG_cmc_biplot_pc1
+pca_EG_cmc_33_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
+pca_EG_cmc_33_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+ggsave("./05-results.backup/pca_EG_bi_cmc_33_paths.pdf", plot = pca_EG_cmc_33_biplot_pc1, device = "pdf",
        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+pandoc.table(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 positive loadings")
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+pandoc.table(pca_EG_cmc_33_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "cmc_33"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "cmc_33"))
 
-pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
-pca_EG_cmc_biplot_pc2
+pca_EG_cmc_33_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
+pca_EG_cmc_33_biplot_pc2
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+pandoc.table(pca_EG_cmc_33_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 positive loadings")
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+pandoc.table(pca_EG_cmc_33_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "cmc_33"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "cmc_33"))
 # 
-# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+
+pca_EG_cmc_33_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Ethnic_Group", PC3, pathways = F)
+pca_EG_cmc_33_biplot_pc3
+
+pandoc.table(pca_EG_cmc_33_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_33_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "cmc_33"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "cmc_33"))
+# 
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
 
 
 ```
@@ -828,53 +1100,67 @@ _PC2-_
 
 
 
-# Decontaminated and filtered table
-```{r pca_decontam_filt_noblanks_metadata}
+# Decontaminated and MR1 protein only-filtered table
 
-seed_L4.decontam_filt_noblanks <- seed_L4.decontam %>%
+## Cameroon and idustrial samples
+```{r pca_decontam_mr1_noblanks_metadata}
+
+# now filter for only the proteins in MR1
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_noblanks_mr1 <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
   select(-matches("EXB|LIB|10M")) %>%
-  adorn_totals(where = "col", name = "Total") %>%
-  mutate(Percent = Total/(sum(Total))*100) %>%
-  filter(Percent >= 0.001) %>%
-  select(-c("Total","Percent")) %>%
-  gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Pathway), by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
 
-rownames(seed_L4.decontam_filt_noblanks) <- seed_L4.decontam_filt_noblanks$SampleID
-seed_L4.decontam_filt_noblanks <- as.matrix(seed_L4.decontam_filt_noblanks %>% 
+rownames(seed_L4.decontam_noblanks_mr1) <- seed_L4.decontam_noblanks_mr1$SampleID
+seed_L4.decontam_noblanks_mr1 <- as.matrix(seed_L4.decontam_noblanks_mr1 %>% 
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_L4.decontam_filt_noblanks_pca <- tune.pca(seed_L4.decontam_filt_noblanks, logratio = 'CLR')
+tune.seed_L4.decontam_noblanks_mr1_pca <- tune.pca(seed_L4.decontam_noblanks_mr1, logratio = 'CLR')
 # perform a PCA to see how the data cluster
-seed_L4.decontam_filt_noblanks.pca <- pca(seed_L4.decontam_filt_noblanks, ncomp = 3, logratio = 'CLR')
+seed_L4.decontam_noblanks_mr1.pca <- pca(seed_L4.decontam_noblanks_mr1, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
 
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Village", "Village", "Village")
 
 
 ```
 
-```{r adonis_decontam_filt_noblanks}
+
+```{r adonis_decontam_mr1_noblanks}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-seed_L4.decontam_filt_noblanks.euc <- vegdist(seed_L4.decontam_filt_noblanks.pca$X, method = "euclidean", na.rm = T)
-seed_L4.decontam_filt_noblanks.euc.pcoa <- ape::pcoa(seed_L4.decontam_filt_noblanks.euc)
+seed_L4.decontam_noblanks_mr1.euc <- vegdist(seed_L4.decontam_noblanks_mr1.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_noblanks_mr1.euc.pcoa <- ape::pcoa(seed_L4.decontam_noblanks_mr1.euc)
 
-seed_L4.decontam_filt_noblanks.euc.pcoavectors <- as.data.frame(seed_L4.decontam_filt_noblanks.euc.pcoa$vectors)
-seed_L4.decontam_filt_noblanks.euc.pcoavectors <- seed_L4.decontam_filt_noblanks.euc.pcoavectors %>%
+seed_L4.decontam_noblanks_mr1.euc.pcoavectors <- as.data.frame(seed_L4.decontam_noblanks_mr1.euc.pcoa$vectors)
+seed_L4.decontam_noblanks_mr1.euc.pcoavectors <- seed_L4.decontam_noblanks_mr1.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_filt_noblanks.euc.vecmet <- inner_join(seed_L4.decontam_filt_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4.decontam_noblanks_mr1.euc.vecmet <- inner_join(seed_L4.decontam_noblanks_mr1.euc.pcoavectors, metadata, by = "SampleID")
 
-seed_L4.decontam_filt_noblanks.euc.vecmet %>%
+seed_L4.decontam_noblanks_mr1.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -884,64 +1170,95 @@ seed_L4.decontam_filt_noblanks.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(seed_L4.decontam_filt_noblanks.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_filt_noblanks.euc.vecmet, perm=999)
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin")
 
+# controlled for tooth site
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc_33$Tooth_site)
 
 ```
+When using proteins from both MR1 and MR2, only tooth site is significantly
+different (p < 0.05), and further controlling for tooth site shows no categories
+are significantly different. When using only proteins in MR1, no categories are
+significantly different, but further controlling for tooth site shows that sex
+is significantly different (p < 0.05).
 
-```{r biplots_decontam_filt_noblanks}
+
+```{r biplots_decontam_mr1_noblanks}
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-        dpi = 300)
+# ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#         dpi = 300)
 
 # what are those pathways?
-pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 positive loadings")
 
-pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
 # make a table of the pathways to save, to use again later in another R notebook
-# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_filt_noblanks.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_biplot_pc2
 
 # what are those pathways?
-pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC2 positive loadings")
 
-pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
 
+# which paths distinguish sample types when HMP and JAE are included?
+pca_EG_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Ethnic_Group", PC3, pathways = F)
+pca_EG_biplot_pc3
+
+# what are those pathways?
+pandoc.table(pca_EG_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(pca_EG_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
 
 ```
 _PC1+_
@@ -957,53 +1274,65 @@ _PC2-_
 
 
 
+## Cameroon samples only
 
-```{r pca_decontam_filt_cmc_categories}
+```{r pca_decontam_mr1_cmc_categories}
 
-seed_L4.decontam_filt_cmc <- seed_L4.decontam %>%
+# now filter for only the proteins in MR1
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4.decontam_cmc_mr1 <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
-  select(-matches("EXB|LIB|10M|SRR|JAE")) %>%
-  adorn_totals(where = "col", name = "Total") %>%
-  mutate(Percent = Total/(sum(Total))*100) %>%
-  filter(Percent >= 0.001) %>%
-  select(-c("Total","Percent")) %>%
-  gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
+  select(-matches("EXB|LIB|JAE|SRR")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Pathway), by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Pathway,Counts)
 
-rownames(seed_L4.decontam_filt_cmc) <- seed_L4.decontam_filt_cmc$SampleID
-seed_L4.decontam_filt_cmc <- as.matrix(seed_L4.decontam_filt_cmc %>% 
+rownames(seed_L4.decontam_cmc_mr1) <- seed_L4.decontam_cmc_mr1$SampleID
+seed_L4.decontam_cmc_mr1 <- as.matrix(seed_L4.decontam_cmc_mr1 %>% 
   select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
 
 # check the number of components to retain by tuning the PCA
-tune.seed_L4.decontam_filt_cmc_pca <- tune.pca(seed_L4.decontam_filt_cmc, logratio = 'CLR')
+tune.seed_L4.decontam_cmc_mr1_pca <- tune.pca(seed_L4.decontam_cmc_mr1, logratio = 'CLR')
 # perform a PCA to see how the data cluster
-seed_L4.decontam_filt_cmc.pca <- pca(seed_L4.decontam_filt_cmc, ncomp = 3, logratio = 'CLR')
+seed_L4.decontam_cmc_mr1.pca <- pca(seed_L4.decontam_cmc_mr1, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
 
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Village", "Village", "Village")
 
 ```
 
 
-```{r adonis_decontam_filt_noblanks}
+```{r adonis_decontam_mr1_cmc}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-seed_L4.decontam_filt_cmc.euc <- vegdist(seed_L4.decontam_filt_cmc.pca$X, method = "euclidean", na.rm = T)
-seed_L4.decontam_filt_cmc.euc.pcoa <- ape::pcoa(seed_L4.decontam_filt_cmc.euc)
+seed_L4.decontam_cmc_mr1.euc <- vegdist(seed_L4.decontam_cmc_mr1.pca$X, method = "euclidean", na.rm = T)
+seed_L4.decontam_cmc_mr1.euc.pcoa <- ape::pcoa(seed_L4.decontam_cmc_mr1.euc)
 
-seed_L4.decontam_filt_cmc.euc.pcoavectors <- as.data.frame(seed_L4.decontam_filt_cmc.euc.pcoa$vectors)
-seed_L4.decontam_filt_cmc.euc.pcoavectors <- seed_L4.decontam_filt_cmc.euc.pcoavectors %>%
+seed_L4.decontam_cmc_mr1.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc_mr1.euc.pcoa$vectors)
+seed_L4.decontam_cmc_mr1.euc.pcoavectors <- seed_L4.decontam_cmc_mr1.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_filt_cmc.euc.vecmet <- inner_join(seed_L4.decontam_filt_cmc.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4.decontam_cmc_mr1.euc.vecmet <- inner_join(seed_L4.decontam_cmc_mr1.euc.pcoavectors, metadata, by = "SampleID")
 
-seed_L4.decontam_filt_cmc.euc.vecmet %>%
+seed_L4.decontam_cmc_mr1.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -1013,63 +1342,98 @@ seed_L4.decontam_filt_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(seed_L4.decontam_filt_cmc.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_filt_cmc.euc.vecmet, perm=999)
+adonis(seed_L4.decontam_cmc_mr1.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, perm=999)
 
+# test for difference between different metadata categories 
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
+When including proteins from both MR1 and MR2, only tooth site is significantly
+different (p < 0.01), and further controlling for tooth site shows none of the
+categories are significantly different. When including proteins from only MR1,
+both tooth site (p < 0.01) and sex (p < 0.05) are significantly different, and
+further controlling for tooth site shows sex (p < 0.05) is significantly
+different.
 
-```{r biplots_decontam_filt_noblanks}
+
+```{r biplots_decontam_mr1_noblanks}
 # which paths distinguish sample groups when only CMC samples are included?
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)),
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 positive loadings")
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC1),
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
 #   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
 
-pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_filt_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_biplot_pc2
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
+pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
-             caption = "PC1 positive loadings")
+             caption = "PC2 positive loadings")
 
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(PC2),
+pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$neg_10 %>% arrange(PC2),
              digits = 5,
              keep.trailing.zeros = T,
-             justify = "lccr",
+             justify = "lrrr",
              split.tables = Inf,
-             caption = "PC1 negative loadings")
+             caption = "PC2 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
 #   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
 #   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
 # 
-# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
 
+pca_EG_cmc_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Sex", PC3, pathways = F)
+pca_EG_cmc_biplot_pc3
+
+pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
+# 
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
 
 ```
 _PC1+_
@@ -1083,6 +1447,48 @@ _PC2+_
 
 _PC2-_
 
+# MR1 protein pathway check
+```{r protein_difference_stats}
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+
+# keep only the proteins in at least 1/3 of at least one ethnic group 
+seed_L4_mr1_proteins <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Pathway), by = "Pathway")
+
+# how many proteins in each metabolic pathway
+L3_counts <- seed_L4_mr1_proteins %>%
+  group_by(L3) %>%
+  summarize(ProteinCount = length(Pathway))
+
+# how many proteins in each higher-level processing pathway?  
+L2_counts <- seed_L4_mr1_proteins %>%
+  group_by(L2) %>%
+  summarize(ProteinCount = length(Pathway))
+
+
+# convert to a long table
+seed_L4_mr1_proteinsL <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%  # this sample has very few reads
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Pathway), by = "Pathway") %>%
+  gather("SampleID","Counts", 5:ncol(.)) %>%
+  full_join(., metadata %>%
+              select(SampleID, Ethnic_Group), by = "SampleID")
+
+seed_L4_mr1_proteinsL %>% group_by(Ethnic_Group, L3) %>% summarize(Totals = sum(Counts)) # total counts at L3 by Ethnic group
+seed_L4_mr1_proteinsL %>% group_by(Ethnic_Group, L3) %>% filter(Counts > 0) %>% summarize(Totals = length(unique(SampleID))) # number of samples in each ethnic group with each L3 pathway
+seed_L4_mr1_proteinsL %>% group_by(Ethnic_Group, L3) %>% filter(Counts > 0) %>% summarize(Totals = length(unique(Pathway))) # total number of proteins in each L3 by ethnic group
+seed_L4_mr1_proteinsL %>% group_by(Ethnic_Group, L2) %>% filter(Counts > 0) %>% summarize(Totals = length(unique(Pathway))) # total number of proteins in each L2 by ethnic group
+
+```
 
 
 
