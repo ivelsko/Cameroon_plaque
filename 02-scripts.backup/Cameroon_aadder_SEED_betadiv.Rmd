@@ -1390,14 +1390,14 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_biplot_pc2
 
-pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC2)),
+pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
              keep.trailing.zeros = T,
              justify = "lrrr",
              split.tables = Inf,
              caption = "PC2 positive loadings")
 
-pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$neg_10 %>% arrange(PC2),
+pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              digits = 5,
              keep.trailing.zeros = T,
              justify = "lrrr",
@@ -1491,17 +1491,278 @@ seed_L4_mr1_proteinsL %>% group_by(Ethnic_Group, L2) %>% filter(Counts > 0) %>% 
 ```
 
 
+# Carbohydrate pathway proteins only
+Now we'll look at whether there are differences in the sample groups based only
+on proteins in carbohydrate processing pathways. There are differences in the
+carbohydrates consumed by each group, and bacteria are able to process a wide
+variety of carbohydrates. 
+```{r carb_proteins}
+
+# select only proteins in the Carbohydrates pathway
+seed_L4_carbohydrates <- seed_L4.decontam %>%
+  select(-matches("EXB|LIB|SRR164|10M")) %>%
+  filter(str_detect(Pathway, "Carbohydrates")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>% # remove any that are not found in the remaining samples (HMP, JAE, CMC)
+  select(-Total) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway,Counts)
 
 
+rownames(seed_L4_carbohydrates) <- seed_L4_carbohydrates$SampleID
+seed_L4_carbohydrates <- as.matrix(seed_L4_carbohydrates %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4_carbohydrates_pca <- tune.pca(seed_L4_carbohydrates, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4_carbohydrates.pca <- pca(seed_L4_carbohydrates, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Village", "Village", "Village")
+
+```
+There is a clear separation between the Cameroon plaque samples and the
+industrial plaque and calculus samples along PC1. The CMC samples separate by
+tooth site along PC2, with posterior samples plotting in more positive values
+and anterior samples plotting in more negative values. This is a little
+unexpected, b/c the HMP samples plot in more positice PC2 values and the JAE
+samples plot in more negative PC2 values, and I'd expect the posterior samples
+to plot more with the JAE samples.
+
+Are there significant differences between the groups?
+```{r adonis_carbohydrates_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4_carbohydrates_noblanks.euc <- vegdist(seed_L4_carbohydrates.pca$X, method = "euclidean", na.rm = T)
+seed_L4_carbohydrates_noblanks.euc.pcoa <- ape::pcoa(seed_L4_carbohydrates_noblanks.euc)
+
+seed_L4_carbohydrates_noblanks.euc.pcoavectors <- as.data.frame(seed_L4_carbohydrates_noblanks.euc.pcoa$vectors)
+seed_L4_carbohydrates_noblanks.euc.pcoavectors <- seed_L4_carbohydrates_noblanks.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4_carbohydrates_noblanks.euc.vecmet <- inner_join(seed_L4_carbohydrates_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4_carbohydrates_noblanks.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+metadata_noblanks <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site)
+
+# test for difference between different metadata categories 
+adonis2(seed_L4_carbohydrates_noblanks.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(seed_L4_carbohydrates_noblanks.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+
+```
+Only tooth site is significantly different (p < 0.01). When controlling for
+tooth site, none of the groups are significantly different.
+
+What are the differences if we look only within the Cameroon plaque samples?
+```{r carb_proteins_cmc}
+# select only proteins in the Carbohydrates pathway
+seed_L4_carbohydrates_cmc <- seed_L4.decontam %>%
+  select(-matches("EXB|LIB|SRR|JAE")) %>%
+  filter(str_detect(Pathway, "Carbohydrates")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>% # remove any that are not found in the remaining samples (HMP, JAE, CMC)
+  select(-Total) %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Pathway,Counts)
 
 
+rownames(seed_L4_carbohydrates_cmc) <- seed_L4_carbohydrates_cmc$SampleID
+seed_L4_carbohydrates_cmc <- as.matrix(seed_L4_carbohydrates_cmc %>% 
+  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+
+# check the number of components to retain by tuning the PCA
+tune.seed_L4_carbohydrates_cmc_pca <- tune.pca(seed_L4_carbohydrates_cmc, logratio = 'CLR')
+# perform a PCA to see how the data cluster
+seed_L4_carbohydrates_cmc.pca <- pca(seed_L4_carbohydrates_cmc, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Market_economy", "Market_economy", "Market_economy")
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Sex", "Sex", "Sex")
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+# plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Village", "Village", "Village")
+
+```
+The samples separate by tooth site along PC1, but no other potential clusterings are clear. 
+
+Are there significant differences between the groups?
+```{r adonis_carbohydrates_noblanks}
+# Use the CLR-transformed matrix from the mixOmics PCA in the section above
+# Euclidean distance
+seed_L4_carbohydrates_cmc.euc <- vegdist(seed_L4_carbohydrates_cmc.pca$X, method = "euclidean", na.rm = T)
+seed_L4_carbohydrates_cmc.euc.pcoa <- ape::pcoa(seed_L4_carbohydrates_cmc.euc)
+
+seed_L4_carbohydrates_cmc.euc.pcoavectors <- as.data.frame(seed_L4_carbohydrates_cmc.euc.pcoa$vectors)
+seed_L4_carbohydrates_cmc.euc.pcoavectors <- seed_L4_carbohydrates_cmc.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+seed_L4_carbohydrates_cmc.euc.vecmet <- inner_join(seed_L4_carbohydrates_cmc.euc.pcoavectors, metadata, by = "SampleID")
+
+seed_L4_carbohydrates_cmc.euc.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Tooth_site_colors) +
+  scale_shape_manual(values = Tooth_site_shapes) +
+  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  theme_minimal(base_size = 7) +
+  ggtitle("Tooth site")
+
+metadata_cmc <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site)
+
+# test for difference between different metadata categories 
+adonis2(seed_L4_carbohydrates_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+
+# controlled for tooth site
+adonis2(seed_L4_carbohydrates_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+
+```
+Only tooth site is significantly different (p < 0.01). When controlling for
+tooth site, sex is significantly different (p < 0.05).
 
 
+Which carbohydrate processing pathway proteins are contributing most to the
+separation of samples?
+```{r biplots_decontam_mr1_noblanks}
+# which paths distinguish sample groups when only CMC samples are included?
+pca_EG_noblanks_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
+pca_EG_noblanks_biplot_pc1
+
+# ggsave("./05-results.backup/pca_EG_bi_noblanks_paths.pdf", plot = pca_EG_noblanks_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+# what are those pathways?
+pandoc.table(pca_EG_noblanks_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_noblanks_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_noblanks_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_noblanks_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+
+pca_EG_noblanks_biplot_pc2 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
+pca_EG_noblanks_biplot_pc2
+
+pandoc.table(pca_EG_noblanks_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(pca_EG_noblanks_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+# 
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", PC1, pathways = F)
+pca_EG_cmc_biplot_pc1
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
+# 
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
 
 
+pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", PC2, pathways = F)
+pca_EG_cmc_biplot_pc2
 
+pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
 
+pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lrrr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
 
+# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
+#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
+# 
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+
+```
 
 
 

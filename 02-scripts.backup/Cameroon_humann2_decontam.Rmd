@@ -296,12 +296,15 @@ load("./05-results.backup/CMC_metadata.RData")
 ```
 
 # Pathways
+
+First perform a PCA to see if there are any samples that plot with the controls
+and should be removed as outliers.
 ```{r pca_paths_with_controls}
 # create the input matrix
 humann2_path_mat <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
-  select(!contains("SRR164")) %>%
+  # select(!contains("SRR164")) %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
   spread(Pathway, CPM)
 
@@ -318,12 +321,53 @@ humann2_path_allsamples.pca <- pca(humann2_path_mat, ncomp = 4, logratio = 'CLR'
 # plot the PCA
 plot_pca(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-plot_pca_names(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group")
-
+# plot_pca_names(humann2_path_allsamples.pca, "PC1", "PC2", "Ethnic_Group")
 
 ```
+None of the samples plot with controls, so there are no outliers to remove. 
+Four of the gauze extraction blanks look like they are oral, and probably had
+saliva or plaque that wasn't visible on the control strip that was cut. Now
+repeat the PCA without any of the controls to compare the samples to known oral
+plaque and calculus profiles. If the sub-sampled plaque (HMP) and calculus (JAE)
+samples are similar (10M), then use just the full samples and not the
+sub-sampled ones for all further analysis.
 
-We want to know if there are any species that can be removed b/c they appear to be contaminants. Use the package decontam to determine which species may be contaminants. Prepare the matrix for decontam. 
+```{r pca_paths_no_blanks}
+
+# create the input matrix
+humann2_path_mat <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  spread(Pathway, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB"))
+
+rownames(humann2_path_mat) <- humann2_path_mat$SampleID
+humann2_path_mat <- as.matrix(humann2_path_mat %>%
+  select(-SampleID)) + 1
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_pca <- tune.pca(humann2_path_mat, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path.pca <- pca(humann2_path_mat, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(humann2_path.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+```
+There is more overlap in functional profiles of CMC and JAE samples than with
+HMP. The sub-sampled HMP and JAE samples are plotting in the same space as their
+full samples, so we'll continue with the full samples. The Yanomami samples are
+plotting by themselves - they were processed differently (MDA treatment before
+sequencing) and that's probably why.
+
+
+
+We want to know if there are any species that can be removed b/c they appear to
+be contaminants. Use the package decontam to determine which species may be
+contaminants. Prepare the matrix for decontam.
 ```{r decontam_path_data_prep}
 # list out the samples that have all 0 or NA values to remove from the input matrix
 NA_filter_list <- metadata %>% filter((is.na(SumLibraryConcentration_copies_ul) | SumLibraryConcentration_copies_ul <= 0)) %>% select(SampleID)
@@ -423,7 +467,7 @@ contam.prev.species <- isContaminant(humann2_path_mat.matrix, method="prevalence
 table(contam.prev.species$contaminant)
 
 # List of contaminants
-cont_prev_species_list <- contam.prev.species[which(contam.prev.species$contaminant=="TRUE"), ]
+cont_prev_path_list <- contam.prev.species[which(contam.prev.species$contaminant=="TRUE"), ]
 
 # Look at the histogram - does the probability threshold need to be changed?
 ggplot(contam.prev.species, aes(x=p)) +
@@ -443,7 +487,7 @@ changes the tail. This set of plots removes the proteins determined to be
 selected.
 ```{r decontam_path_rank_abund_curve}
 
-contaminants_h2_path <- cont_prev_species_list %>% rownames_to_column("Pathway") %>% select(Pathway) # this uses the prevalence method contaminant list
+contaminants_h2_path <- cont_prev_path_list %>% rownames_to_column("Pathway") %>% select(Pathway) # this uses the prevalence method contaminant list
 humann2_path.decontam <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
@@ -633,7 +677,7 @@ contam.prev.species <- isContaminant(humann2_KO_mat.matrix, method="prevalence",
 table(contam.prev.species$contaminant)
 
 # List of contaminants
-cont_prev_species_list <- contam.prev.species[which(contam.prev.species$contaminant=="TRUE"), ]
+cont_prev_KO_list <- contam.prev.species[which(contam.prev.species$contaminant=="TRUE"), ]
 
 # Look at the histogram - does the probability threshold need to be changed?
 ggplot(contam.prev.species, aes(x=p)) +
@@ -653,7 +697,7 @@ changes the tail. This set of plots removes the proteins determined to be
 selected.
 ```{r decontam_KO_rank_abund_curve}
 
-contaminants_h2_KO <- cont_prev_species_list %>% rownames_to_column("Ortholog") %>% select(Ortholog) # this uses the prevalence method contaminant list
+contaminants_h2_KO <- cont_prev_KO_list %>% rownames_to_column("Ortholog") %>% select(Ortholog) # this uses the prevalence method contaminant list
 humann2_KO.decontam <- humann2_KOs %>%
   filter(!str_detect(Ortholog, "\\|")) %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
@@ -717,22 +761,22 @@ plot_grid(h2path_decontam_curve_HG, h2path_decontam_curve_EG, h2path_decontam_cu
 
 
 ```{r decontam_objects}
-contaminants_h2_path <- cont_prev_species_list %>% rownames_to_column("Pathway") %>% select(Pathway) # this uses the prevalence method contaminant list
+contaminants_h2_path <- cont_prev_path_list %>% rownames_to_column("Pathway") %>% select(Pathway) # this uses the prevalence method contaminant list
 humann2_path.decontam <- humann2_path %>%
   filter(!str_detect(Pathway, "\\|")) %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
   select(!contains("SRR164")) %>%
   anti_join(., contaminants_h2_path)
 
-contaminants_h2_KO <- cont_prev_species_list %>% rownames_to_column("Ortholog") %>% select(Ortholog) # this uses the prevalence method contaminant list
-humann2_KO.decontam <- humann2_KOs %>%
+contaminants_h2_KO <- cont_prev_KO_list %>% rownames_to_column("Ortholog") %>% select(Ortholog) # this uses the prevalence method contaminant list
+humann2_KOs.decontam <- humann2_KOs %>%
   filter(!str_detect(Ortholog, "\\|")) %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
   select(!contains("SRR164")) %>%
   anti_join(., contaminants_h2_KO)
 
 
-save(humann2_path, humann2_path.decontam, humann2_KOs_full, humann2_KO.decontam,
+save(humann2_path, humann2_path.decontam, humann2_KOs_full, humann2_KOs.decontam,
      file = "./05-results.backup/CMC_humann2_tables.RData")
 
 ```
