@@ -1001,7 +1001,7 @@ seed_L4.decontam_cmc_33.euc.vecmet %>%
 adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc_33$Tooth_site)
+adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 Only tooth site is significantly different (p < 0.001). When controlling for
@@ -1173,7 +1173,7 @@ seed_L4.decontam_noblanks_mr1.euc.vecmet %>%
 adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc_33$Tooth_site)
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 When using proteins from both MR1 and MR2, only tooth site is significantly
@@ -1318,6 +1318,8 @@ plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Tooth_site", "Tooth_site",
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Village", "Village", "Village")
 
 ```
+PC1 separates by tooth site (anterior/posterior) and PC3 separates by sex
+(male/female). It's not clear to me what PC2 is separating by.
 
 
 ```{r adonis_decontam_mr1_cmc}
@@ -1341,14 +1343,26 @@ seed_L4.decontam_cmc_mr1.euc.vecmet %>%
   theme_minimal(base_size = 7) +
   ggtitle("Tooth site")
 
+metadata_cmc <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site) %>%
+  as_tibble()
+
 # test for difference between different metadata categories 
 adonis(seed_L4.decontam_cmc_mr1.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, perm=999)
 
 # test for difference between different metadata categories 
-adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch +  LibraryBatch, metadata_cmc, permutations = 999, by = "margin")
+
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ Ethnic_Group, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 When including proteins from both MR1 and MR2, only tooth site is significantly
@@ -1646,6 +1660,7 @@ seed_L4_carbohydrates_cmc.euc.vecmet %>%
 
 metadata_cmc <- metadata %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  filter(Sample == "CMC032.B0101") %>%  # this sample has very few reads
   select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site)
 
 # test for difference between different metadata categories 
