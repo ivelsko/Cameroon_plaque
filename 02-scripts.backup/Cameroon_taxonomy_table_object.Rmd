@@ -84,4 +84,9 @@ save(malt_species_raw,
      malt_genus.decontam,
      file = "./05-results.backup/CMC_taxonomy_tables.RData")
 
+
+# fwrite(malt_species.decontam, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
+# fwrite(malt_genus.decontam, "05-results.backup/malt_genus_decontam.tsv", sep = "\t", quote = F)
+
+
 ```
