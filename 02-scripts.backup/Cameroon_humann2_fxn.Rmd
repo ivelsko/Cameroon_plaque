@@ -479,12 +479,10 @@ humann2_path_noblanks_mat <- humann2_path %>%
   select(-CMC032.B0101) %>% # this sample has very few reads
   select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
   gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M"))
-
-rownames(humann2_path_noblanks_mat) <- humann2_path_noblanks_mat$SampleID
-humann2_path_noblanks_mat <- as.matrix(humann2_path_noblanks_mat %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_path_pca <- tune.pca(humann2_path_noblanks_mat, logratio = 'CLR')
@@ -546,10 +544,11 @@ humann2_path_noblanks_mat.euc.vecmet %>%
 # test for difference between different metadata categories 
 adonis(humann2_path_noblanks_mat.euc ~ Tooth_site, humann2_path_noblanks_mat.euc.vecmet, perm=999)
 
-adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_noblanks_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = humann2_path_noblanks_mat.euc.vecmet$Tooth_site)
+adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_noblanks_mat.euc.vecmet$Tooth_site)
 
 ```
 
@@ -559,12 +558,10 @@ plaque or industrial calculus?
 # create the input matrix
 humann2_path_noyanomami_mat <- humann2_path.decontam %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164"))
-
-rownames(humann2_path_noyanomami_mat) <- humann2_path_noyanomami_mat$SampleID
-humann2_path_noyanomami_mat <- as.matrix(humann2_path_noyanomami_mat %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_path_pca <- tune.pca(humann2_path_noyanomami_mat, logratio = 'CLR')
@@ -640,12 +637,10 @@ the industrial samples?
 ```{r pca_paths_cmc_metadata}
 humann2_path_cmc_mat <- humann2_path.decontam %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE"))
-
-rownames(humann2_path_cmc_mat) <- humann2_path_cmc_mat$SampleID
-humann2_path_cmc_mat <- as.matrix(humann2_path_cmc_mat %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_path_pca <- tune.pca(humann2_path_cmc_mat, logratio = 'CLR')
@@ -997,11 +992,9 @@ based on any of the metadata categories than we see with the pathways.
 # create the input matrix
 humann2_KO_mat <- humann2_KOs.decontam %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
-  spread(Ortholog, CPM)
-
-rownames(humann2_KO_mat) <- humann2_KO_mat$SampleID
-humann2_KO_mat <- as.matrix(humann2_KO_mat %>%
-  select(-SampleID)) + 1
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog, CPM) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
@@ -1029,12 +1022,10 @@ Plot a PCA without the blanks.
 # create the input matrix
 humann2_KO_noblanks_mat <- humann2_KOs.decontam %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Ortholog, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB"))
-
-rownames(humann2_KO_noblanks_mat) <- humann2_KO_noblanks_mat$SampleID
-humann2_KO_noblanks_mat <- as.matrix(humann2_KO_noblanks_mat %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_path_pca <- tune.pca(humann2_KO_noblanks_mat, logratio = 'CLR')
@@ -1067,11 +1058,9 @@ humann2_KO_mat <- humann2_KOs.decontam %>%
   filter(Percent > 0.01) %>%
   select(-c("Sum","Percent")) %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
-  spread(Ortholog, CPM)
-
-rownames(humann2_KO_mat) <- humann2_KO_mat$SampleID
-humann2_KO_mat <- as.matrix(humann2_KO_mat %>%
-  select(-SampleID)) + 1
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog, CPM) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
@@ -1102,12 +1091,10 @@ h2_KO_lowprev <- humann2_KOs.decontam %>%
 humann2_KOs.decontam_noblanks_33 <- humann2_KOs.decontam %>%
   inner_join(., h2_KO_lowprev, by = "Ortholog") %>%
   gather("SampleID","CPM",2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Ortholog,CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M"))
-
-rownames(humann2_KOs.decontam_noblanks_33) <- humann2_KOs.decontam_noblanks_33$SampleID
-humann2_KOs.decontam_noblanks_33 <- as.matrix(humann2_KOs.decontam_noblanks_33 %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KOs.decontam_noblanks_33, logratio = 'CLR')
@@ -1150,11 +1137,9 @@ humann2_KOs.decontam_mr1 <- humann2_KOs.decontam %>%
                filter(Residual == "MR1") %>%
                select(Ortholog), by = "Ortholog") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Ortholog,Counts)
-
-rownames(humann2_KOs.decontam_mr1) <- humann2_KOs.decontam_mr1$SampleID
-humann2_KOs.decontam_mr1 <- as.matrix(humann2_KOs.decontam_mr1 %>%
-  select(-SampleID)) + 1
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KOs.decontam_mr1, logratio = 'CLR')
@@ -1224,12 +1209,9 @@ humann2_KO_cmc_mat <- humann2_KOs.decontam %>%
   filter(Percent > 0.01) %>%
   select(-c("Sum","Percent")) %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
-  spread(Ortholog, CPM)
-
-
-rownames(humann2_KO_cmc_mat) <- humann2_KO_cmc_mat$SampleID
-humann2_KO_cmc_mat <- as.matrix(humann2_KO_cmc_mat %>%
-  select(-SampleID)) + 1
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog, CPM) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KO_cmc_mat, logratio = 'CLR')
@@ -1263,12 +1245,10 @@ h2_KO_lowprev <- humann2_KOs.decontam %>%
 humann2_KOs.decontam_cmc_33 <- humann2_KOs.decontam %>%
   inner_join(., h2_KO_lowprev, by = "Ortholog") %>%
   gather("SampleID","CPM",2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
   spread(Ortholog,CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|JAE|SRR"))
-
-rownames(humann2_KOs.decontam_cmc_33) <- humann2_KOs.decontam_cmc_33$SampleID
-humann2_KOs.decontam_cmc_33 <- as.matrix(humann2_KOs.decontam_cmc_33 %>%
-  select(-SampleID)) + 1
+  filter(!str_detect(SampleID, "EXB|LIB|JAE|SRR")) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KOs.decontam_cmc_33, logratio = 'CLR')
@@ -1311,11 +1291,9 @@ humann2_KOs.decontam_cmc_mr1 <- humann2_KOs.decontam %>%
                filter(Residual == "MR1") %>%
                select(Ortholog), by = "Ortholog") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Ortholog,Counts)
-
-rownames(humann2_KOs.decontam_cmc_mr1) <- humann2_KOs.decontam_cmc_mr1$SampleID
-humann2_KOs.decontam_cmc_mr1 <- as.matrix(humann2_KOs.decontam_cmc_mr1 %>%
-  select(-SampleID)) + 1
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KOs.decontam_cmc_mr1, logratio = 'CLR')
@@ -1620,11 +1598,9 @@ humann2_KO_carbs <- humann2_KOs.decontam %>%
   inner_join(., kegg_carbohydrate_KOs %>%
                select(Ortholog) %>% distinct(), by = "Ortholog") %>%
   gather("SampleID","CPM",2:ncol(.)) %>%
-  spread(Ortholog,CPM)
-
-rownames(humann2_KO_carbs) <- humann2_KO_carbs$SampleID
-humann2_KO_carbs <- as.matrix(humann2_KO_carbs %>%
-  select(-SampleID)) + 1
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog,CPM) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KO_carbs, logratio = 'CLR')
@@ -1683,11 +1659,9 @@ humann2_KO_cmc_carbs <- humann2_KOs.decontam %>%
   inner_join(., kegg_carbohydrate_KOs %>%
                select(Ortholog) %>% distinct(), by = "Ortholog") %>%
   gather("SampleID","CPM",2:ncol(.)) %>%
-  spread(Ortholog,CPM)
-
-rownames(humann2_KO_cmc_carbs) <- humann2_KO_cmc_carbs$SampleID
-humann2_KO_cmc_carbs <- as.matrix(humann2_KO_cmc_carbs %>%
-  select(-SampleID)) + 1
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog,CPM) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(humann2_KO_cmc_carbs, logratio = 'CLR')
@@ -1851,4 +1825,31 @@ humann2_KO_carbs_biplot_list %>%
   arrange(Pathway_name)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -47,6 +47,22 @@ load("./05-results.backup/CMC_seed_tables.RData")
 
 load("./05-results.backup/CMC_metadata.RData")
 
+
+# make a separate table for adonis2 stats later
+metadata_noblanks <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site) %>%
+  as_tibble()
+
+metadata_cmc <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Tooth_site) %>%
+  as_tibble()
+
+
+
 ```
 
 ```{r pca_functions}
@@ -112,6 +128,11 @@ plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
 
     return(pca_plot)
 }
+
+# example: 
+# pca_L4_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+
 
 # this function plots the PCA with the sample names instead of points
 plot_pca_names <- function(df, pc1, pc2, metadata_group) {
@@ -414,14 +435,13 @@ functional profile.
 # start with the full table and pull out only the level 4 entries
 seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
 
+# add +1 to all count cells and transpose
 seed_full_L4 <- seed_full_L4 %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
-
-rownames(seed_full_L4) <- seed_full_L4$SampleID
-seed_full_L4 <- as.matrix(seed_full_L4 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway, Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.seed_full_L4_pca <- tune.pca(seed_full_L4, logratio = 'CLR')
@@ -430,9 +450,10 @@ seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
 pca_L4_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_L4_plot
 
-# pca_L4_plot_names <- plot_pca_names(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group")
-# pca_L4_plot_names
+pca_L4_plot_names <- plot_pca_names(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group")
+pca_L4_plot_names
 
 # Now with the decontaminated table
 seed_L4.decontam_filt <- seed_L4.decontam %>%
@@ -479,11 +500,9 @@ seed_full_L4 <- seed_full_L4 %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
   select(-matches("EXB|LIB|10M")) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
-
-rownames(seed_full_L4) <- seed_full_L4$SampleID
-seed_full_L4 <- as.matrix(seed_full_L4 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway, Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_full_L4, logratio = 'CLR')
@@ -492,6 +511,7 @@ seed_full_L4.pca <- pca(seed_full_L4, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
 pca_L4_plot <- plot_pca(seed_full_L4.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
 
 # Now filter the full table, but don't decontaminate it
 seed_full_L4 <- seed_full[str_count(seed_full$Pathway, ";") == 4, ]
@@ -504,11 +524,9 @@ seed_full_L4 <- seed_full_L4 %>%
   filter(Percent >= 0.0001) %>%
   select(-c("Total","Percent")) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
-
-rownames(seed_full_L4) <- seed_full_L4$SampleID
-seed_full_L4 <- as.matrix(seed_full_L4 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway, Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_full_L4, logratio = 'CLR')
@@ -548,11 +566,9 @@ seed_full_L4_33 <- seed_full_L4 %>%
   select(-c("SEED","L2","L3")) %>%
   inner_join(., seed_full_L4_more_33, by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-rownames(seed_full_L4_33) <- seed_full_L4_33$SampleID
-seed_full_L4_33 <- as.matrix(seed_full_L4_33 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_full_L4_33, logratio = 'CLR')
@@ -576,11 +592,9 @@ seed_full_L4_mr1 <- seed_full_L4 %>%
   inner_join(., mr1_proteins %>%
                select(Pathway), by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-  
-rownames(seed_full_L4_mr1) <- seed_full_L4_mr1$SampleID
-seed_full_L4_mr1 <- as.matrix(seed_full_L4_mr1 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_full_L4_mr1, logratio = 'CLR')
@@ -590,6 +604,7 @@ seed_full_L4_mr1.pca <- pca(seed_full_L4_mr1, ncomp = 3, logratio = 'CLR')
 # plot the PCA
 pca_L4_mr1_plot <- plot_pca(seed_full_L4_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
+
 ```
 
 ```{r pca_L4_decontam_filt}
@@ -598,11 +613,9 @@ seed_L4.decontam_filt <- seed_L4.decontam %>%
   select(-CMC032.B0101) %>%  # this sample has very few reads
   select(-matches("EXB|LIB|10M")) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
-
-rownames(seed_L4.decontam_filt) <- seed_L4.decontam_filt$SampleID
-seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway, Counts) %>%
+  column_to_rownames("SampleID") 
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4.decontam_filt_pca <- tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
@@ -622,11 +635,9 @@ seed_L4.decontam_filt <- seed_L4.decontam %>%
   filter(Percent >= 0.0001) %>%
   select(-c("Total","Percent")) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway, Counts)
-
-rownames(seed_L4.decontam_filt) <- seed_L4.decontam_filt$SampleID
-seed_L4.decontam_filt <- as.matrix(seed_L4.decontam_filt %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway, Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_L4.decontam_filt, logratio = 'CLR')
@@ -664,11 +675,10 @@ seed_L4.decontam_noblanks_33 <- seed_L4.decontam %>%
   select(-c("SEED","L2","L3")) %>%
   inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
-rownames(seed_L4.decontam_noblanks_33) <- seed_L4.decontam_noblanks_33$SampleID
-seed_L4.decontam_noblanks_33 <- seed_L4.decontam_noblanks_33 %>% select(-SampleID)
-seed_L4.decontam_noblanks_33 = seed_L4.decontam_noblanks_33+1
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_L4.decontam_noblanks_33, logratio = 'CLR')
 # perform a PCA to see how the data cluster
@@ -690,12 +700,9 @@ seed_L4.decontam_noblanks_mr1 <- seed_L4.decontam %>%
   inner_join(., mr1_proteins %>%
                select(Pathway), by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-
-rownames(seed_L4.decontam_noblanks_mr1) <- seed_L4.decontam_noblanks_mr1$SampleID
-seed_L4.decontam_noblanks_mr1 <- as.matrix(seed_L4.decontam_noblanks_mr1 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_L4.decontam_noblanks_mr1, logratio = 'CLR')
@@ -772,11 +779,10 @@ seed_L4.decontam_noblanks_33 <- seed_L4.decontam %>%
   select(-c("SEED","L2","L3")) %>%
   inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
-rownames(seed_L4.decontam_noblanks_33) <- seed_L4.decontam_noblanks_33$SampleID
-seed_L4.decontam_noblanks_33 <- seed_L4.decontam_noblanks_33 %>% select(-SampleID)
-seed_L4.decontam_noblanks_33 = seed_L4.decontam_noblanks_33+1
 # check the number of components to retain by tuning the PCA
 tune.pca(seed_L4.decontam_noblanks_33, logratio = 'CLR')
 # perform a PCA to see how the data cluster
@@ -803,22 +809,37 @@ seed_L4.decontam_noblanks_33.euc.pcoavectors <- as.data.frame(seed_L4.decontam_n
 seed_L4.decontam_noblanks_33.euc.pcoavectors <- seed_L4.decontam_noblanks_33.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_noblanks_33.euc.vecmet <- inner_join(seed_L4.decontam_noblanks_33.euc.pcoavectors, metadata, by = "SampleID")
+# seed_L4.decontam_noblanks_33.euc.vecmet <- seed_L4.decontam_noblanks_33.euc.pcoavectors %>%
+#   select(1:11) %>%
+#   inner_join(., metadata, by = "SampleID")
 
-seed_L4.decontam_noblanks_33.euc.vecmet %>%
+seed_L4.decontam_noblanks_33.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID")  %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 4) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
+    geom_point(size = 4) +
+    scale_colour_manual(values = Tooth_site_colors) +
+    scale_shape_manual(values = Tooth_site_shapes) +
+    stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+    theme_minimal(base_size = 7) +
+    ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_33.euc.vecmet, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Age_group, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Ethnic_Group, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Tooth_site, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Sex, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Industry, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999)
+
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, data = metadata_noblanks, permutations = 999, method = "euclidean", by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks_33$Tooth_site)
+adonis2(seed_L4.decontam_noblanks_33.pca$X ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks_33$Tooth_site)
 
 ```
 Tooth site is the only category that is significantly different (p < 0.01). When
@@ -948,11 +969,9 @@ seed_L4.decontam_cmc_33 <- seed_L4.decontam %>%
   select(-c("SEED","L2","L3")) %>%
   inner_join(., seed_L4.decontam_cmc_presence_more_30, by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_cmc_33) <- seed_L4.decontam_cmc_33$SampleID
-seed_L4.decontam_cmc_33 <- as.matrix(seed_L4.decontam_cmc_33 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4.decontam_cmc_33_pca <- tune.pca(seed_L4.decontam_cmc_33, logratio = 'CLR')
@@ -986,7 +1005,9 @@ seed_L4.decontam_cmc_33.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc_33
 seed_L4.decontam_cmc_33.euc.pcoavectors <- seed_L4.decontam_cmc_33.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_cmc_33.euc.vecmet <- inner_join(seed_L4.decontam_cmc_33.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4.decontam_cmc_33.euc.vecmet <- seed_L4.decontam_cmc_33.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID")
 
 seed_L4.decontam_cmc_33.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
@@ -998,10 +1019,12 @@ seed_L4.decontam_cmc_33.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch +  LibraryBatch, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin")
+
+adonis2(seed_L4.decontam_cmc_33.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_cmc_33.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_cmc_33.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+adonis2(seed_L4.decontam_cmc_33.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 Only tooth site is significantly different (p < 0.001). When controlling for
@@ -1118,11 +1141,9 @@ seed_L4.decontam_noblanks_mr1 <- seed_L4.decontam %>%
                filter(Residual == "MR1") %>%
                select(Pathway), by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_noblanks_mr1) <- seed_L4.decontam_noblanks_mr1$SampleID
-seed_L4.decontam_noblanks_mr1 <- as.matrix(seed_L4.decontam_noblanks_mr1 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4.decontam_noblanks_mr1_pca <- tune.pca(seed_L4.decontam_noblanks_mr1, logratio = 'CLR')
@@ -1158,22 +1179,24 @@ seed_L4.decontam_noblanks_mr1.euc.pcoavectors <- as.data.frame(seed_L4.decontam_
 seed_L4.decontam_noblanks_mr1.euc.pcoavectors <- seed_L4.decontam_noblanks_mr1.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_noblanks_mr1.euc.vecmet <- inner_join(seed_L4.decontam_noblanks_mr1.euc.pcoavectors, metadata, by = "SampleID")
-
-seed_L4.decontam_noblanks_mr1.euc.vecmet %>%
+seed_L4.decontam_noblanks_mr1.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID") %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 4) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
+    geom_point(size = 4) +
+    scale_colour_manual(values = Tooth_site_colors) +
+    scale_shape_manual(values = Tooth_site_shapes) +
+    stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+    theme_minimal(base_size = 7) +
+    ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin")
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
+
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_noblanks_mr1.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, seed_L4.decontam_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+adonis2(seed_L4.decontam_noblanks_mr1.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 When using proteins from both MR1 and MR2, only tooth site is significantly
@@ -1291,11 +1314,9 @@ seed_L4.decontam_cmc_mr1 <- seed_L4.decontam %>%
                filter(Residual == "MR1") %>%
                select(Pathway), by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_cmc_mr1) <- seed_L4.decontam_cmc_mr1$SampleID
-seed_L4.decontam_cmc_mr1 <- as.matrix(seed_L4.decontam_cmc_mr1 %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts +1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4.decontam_cmc_mr1_pca <- tune.pca(seed_L4.decontam_cmc_mr1, logratio = 'CLR')
@@ -1332,25 +1353,16 @@ seed_L4.decontam_cmc_mr1.euc.pcoavectors <- as.data.frame(seed_L4.decontam_cmc_m
 seed_L4.decontam_cmc_mr1.euc.pcoavectors <- seed_L4.decontam_cmc_mr1.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4.decontam_cmc_mr1.euc.vecmet <- inner_join(seed_L4.decontam_cmc_mr1.euc.pcoavectors, metadata, by = "SampleID")
-
-seed_L4.decontam_cmc_mr1.euc.vecmet %>%
+seed_L4.decontam_cmc_mr1.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID") %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 4) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
-
-metadata_cmc <- metadata %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
-  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
-  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site) %>%
-  as_tibble()
-
-# test for difference between different metadata categories 
-adonis(seed_L4.decontam_cmc_mr1.euc ~ Tooth_site + Ethnic_Group + Age_group + Sex + Village + Market_economy, seed_L4.decontam_cmc_mr1.euc.vecmet, perm=999)
+    geom_point(size = 4) +
+    scale_colour_manual(values = Tooth_site_colors) +
+    scale_shape_manual(values = Tooth_site_shapes) +
+    stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+    theme_minimal(base_size = 7) +
+    ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
 adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
@@ -1514,6 +1526,7 @@ variety of carbohydrates.
 
 # select only proteins in the Carbohydrates pathway
 seed_L4_carbohydrates <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%
   select(-matches("EXB|LIB|SRR164|10M")) %>%
   filter(str_detect(Pathway, "Carbohydrates")) %>%
   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
@@ -1522,12 +1535,9 @@ seed_L4_carbohydrates <- seed_L4.decontam %>%
   filter(Total > 0) %>% # remove any that are not found in the remaining samples (HMP, JAE, CMC)
   select(-Total) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-
-rownames(seed_L4_carbohydrates) <- seed_L4_carbohydrates$SampleID
-seed_L4_carbohydrates <- as.matrix(seed_L4_carbohydrates %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4_carbohydrates_pca <- tune.pca(seed_L4_carbohydrates, logratio = 'CLR')
@@ -1569,7 +1579,9 @@ seed_L4_carbohydrates_noblanks.euc.pcoavectors <- as.data.frame(seed_L4_carbohyd
 seed_L4_carbohydrates_noblanks.euc.pcoavectors <- seed_L4_carbohydrates_noblanks.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4_carbohydrates_noblanks.euc.vecmet <- inner_join(seed_L4_carbohydrates_noblanks.euc.pcoavectors, metadata, by = "SampleID")
+seed_L4_carbohydrates_noblanks.euc.vecmet <- seed_L4_carbohydrates_noblanks.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID")
 
 seed_L4_carbohydrates_noblanks.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
@@ -1580,15 +1592,13 @@ seed_L4_carbohydrates_noblanks.euc.vecmet %>%
   theme_minimal(base_size = 7) +
   ggtitle("Tooth site")
 
-metadata_noblanks <- metadata %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site)
-
 # test for difference between different metadata categories 
-adonis2(seed_L4_carbohydrates_noblanks.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(seed_L4_carbohydrates_noblanks.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
+
+adonis2(seed_L4_carbohydrates_noblanks.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4_carbohydrates_noblanks.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(seed_L4_carbohydrates_noblanks.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
 Only tooth site is significantly different (p < 0.01). When controlling for
@@ -1598,6 +1608,7 @@ What are the differences if we look only within the Cameroon plaque samples?
 ```{r carb_proteins_cmc}
 # select only proteins in the Carbohydrates pathway
 seed_L4_carbohydrates_cmc <- seed_L4.decontam %>%
+  select(-CMC032.B0101) %>%
   select(-matches("EXB|LIB|SRR|JAE")) %>%
   filter(str_detect(Pathway, "Carbohydrates")) %>%
   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
@@ -1606,12 +1617,9 @@ seed_L4_carbohydrates_cmc <- seed_L4.decontam %>%
   filter(Total > 0) %>% # remove any that are not found in the remaining samples (HMP, JAE, CMC)
   select(-Total) %>%
   gather("SampleID","Counts", 2:ncol(.)) %>%
-  spread(Pathway,Counts)
-
-
-rownames(seed_L4_carbohydrates_cmc) <- seed_L4_carbohydrates_cmc$SampleID
-seed_L4_carbohydrates_cmc <- as.matrix(seed_L4_carbohydrates_cmc %>% 
-  select(-SampleID)) + 1 # add +1 to all values to be able to do a CLR transformation before running PCA
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
 tune.seed_L4_carbohydrates_cmc_pca <- tune.pca(seed_L4_carbohydrates_cmc, logratio = 'CLR')
@@ -1637,7 +1645,7 @@ plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Village", "Village", "Vil
 The samples separate by tooth site along PC1, but no other potential clusterings are clear. 
 
 Are there significant differences between the groups?
-```{r adonis_carbohydrates_noblanks}
+```{r adonis_carbohydrates_cmc}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
 seed_L4_carbohydrates_cmc.euc <- vegdist(seed_L4_carbohydrates_cmc.pca$X, method = "euclidean", na.rm = T)
@@ -1647,27 +1655,22 @@ seed_L4_carbohydrates_cmc.euc.pcoavectors <- as.data.frame(seed_L4_carbohydrates
 seed_L4_carbohydrates_cmc.euc.pcoavectors <- seed_L4_carbohydrates_cmc.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-seed_L4_carbohydrates_cmc.euc.vecmet <- inner_join(seed_L4_carbohydrates_cmc.euc.pcoavectors, metadata, by = "SampleID")
-
-seed_L4_carbohydrates_cmc.euc.vecmet %>%
+seed_L4_carbohydrates_cmc.euc.pcoavectors %>%
+  select(1:11) %>%
+  inner_join(., metadata, by = "SampleID")%>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 4) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
-
-metadata_cmc <- metadata %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
-  filter(Sample == "CMC032.B0101") %>%  # this sample has very few reads
-  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site)
+    geom_point(size = 4) +
+    scale_colour_manual(values = Tooth_site_colors) +
+    scale_shape_manual(values = Tooth_site_shapes) +
+    stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+    theme_minimal(base_size = 7) +
+    ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
 adonis2(seed_L4_carbohydrates_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4_carbohydrates_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+adonis2(seed_L4_carbohydrates_cmc.euc ~ Village + Sex + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
 Only tooth site is significantly different (p < 0.01). When controlling for
@@ -1676,7 +1679,7 @@ tooth site, sex is significantly different (p < 0.05).
 
 Which carbohydrate processing pathway proteins are contributing most to the
 separation of samples?
-```{r biplots_decontam_mr1_noblanks}
+```{r biplots_decontam_mr1_cmc}
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_noblanks_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_noblanks_biplot_pc1

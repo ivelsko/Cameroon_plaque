@@ -369,14 +369,8 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
-
-malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblanks %>% select(-SampleID)
-
-malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -454,14 +448,8 @@ malt_species.decontam_filtered_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noyanomami) <- malt_species.decontam_filtered_noyanomami$SampleID
-
-malt_species.decontam_filtered_noyanomami <- malt_species.decontam_filtered_noyanomami %>% select(-SampleID)
-
-malt_species.decontam_filtered_noyanomami = malt_species.decontam_filtered_noyanomami+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -553,14 +541,8 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noblanks_noyanomami) <- malt_species.decontam_filtered_noblanks_noyanomami$SampleID
-
-malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-
-malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filtered_noblanks_noyanomami+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
 malt_species.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
@@ -720,14 +702,8 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_noblanks_noyanomami) <- malt_species.decontam_filtered_noblanks_noyanomami$SampleID
-
-malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-
-malt_species.decontam_filtered_noblanks_noyanomami = malt_species.decontam_filtered_noblanks_noyanomami+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
 malt_species.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
@@ -826,14 +802,8 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
-
-malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% select(-SampleID)
-
-malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -993,14 +963,8 @@ malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_species.decontam_filtered_nocontrols) <- malt_species.decontam_filtered_nocontrols$SampleID
-
-malt_species.decontam_filtered_nocontrols <- malt_species.decontam_filtered_nocontrols %>% select(-SampleID)
-
-malt_species.decontam_filtered_nocontrols = malt_species.decontam_filtered_nocontrols+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 malt_species.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_species.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
 plot(malt_species.decontam_filtered_nocontrols.pca)
@@ -1085,14 +1049,8 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-
-malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-
-malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -1169,14 +1127,8 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered_noblanks_noyanomami) <- malt_genus.decontam_filtered_noblanks_noyanomami$SampleID
-
-malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-
-malt_genus.decontam_filtered_noblanks_noyanomami = malt_genus.decontam_filtered_noblanks_noyanomami+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
 malt_genus.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
@@ -1334,14 +1286,8 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered_noblanks_noyanomami) <- malt_genus.decontam_filtered_noblanks_noyanomami$SampleID
-
-malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-
-malt_genus.decontam_filtered_noblanks_noyanomami = malt_genus.decontam_filtered_noblanks_noyanomami+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
 malt_genus.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
@@ -1436,14 +1382,9 @@ malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
-rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
-
-malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(-SampleID)
-
-malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -1586,14 +1527,8 @@ malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
-
-rownames(malt_genus.decontam_filtered_nocontrols) <- malt_genus.decontam_filtered_nocontrols$SampleID
-
-malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam_filtered_nocontrols %>% select(-SampleID)
-
-malt_genus.decontam_filtered_nocontrols = malt_genus.decontam_filtered_nocontrols+1
+                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 malt_genus.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_genus.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
 plot(malt_genus.decontam_filtered_nocontrols.pca)

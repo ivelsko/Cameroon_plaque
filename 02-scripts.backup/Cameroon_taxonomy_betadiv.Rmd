@@ -336,8 +336,8 @@ Before running decontam, let's plot the samples in a PCA to see if there are any
 ```{r raw_plot}
 
 malt_species_raw_pcain <- malt_species_raw %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species_raw_pcain) <- malt_species_raw_pcain$SampleID
 
@@ -398,8 +398,8 @@ malt_species_unfiltered <- malt_species_raw %>%
                                          # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species_unfiltered) <- malt_species_unfiltered$SampleID
 
@@ -429,8 +429,8 @@ malt_species_filtered <- malt_species_raw %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species_filtered) <- malt_species_filtered$SampleID
 
@@ -454,8 +454,8 @@ malt_species.decontam_unfilt <- malt_species.decontam %>%
                                          # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_unfilt) <- malt_species.decontam_unfilt$SampleID
 
@@ -479,8 +479,8 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered) <- malt_species.decontam_filtered$SampleID
 
@@ -513,8 +513,8 @@ malt_genus_unfiltered <- malt_genus_raw %>%
                                          # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus_unfiltered) <- malt_genus_unfiltered$SampleID
 
@@ -542,8 +542,8 @@ malt_genus_filtered <- malt_genus_raw %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus_filtered) <- malt_genus_filtered$SampleID
 
@@ -572,8 +572,8 @@ malt_genus.decontam_unfiltered <- malt_genus.decontam %>%
                                          # select(-contains("10M")) %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_unfiltered) <- malt_genus.decontam_unfiltered$SampleID
 
@@ -598,8 +598,8 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
 
@@ -632,7 +632,7 @@ malt_species.decontam_noblanks_presence_more_10 <- malt_species.decontam %>%
   select(-matches("EXB|LIB|10M")) %>%
   select(-one_of(outliers)) %>%
   mutate_if(is.numeric, ~1 * (. > 0)) %>%
-  gather("SampleID","Counts",2:ncol(.)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
   inner_join(., metadata %>%
                select(SampleID, Ethnic_Group), by = "SampleID") %>%
   group_by(Ethnic_Group, Species) %>%
@@ -649,8 +649,8 @@ malt_species.decontam_noblanks <- malt_species.decontam %>%
                                select(-matches("EXB|LIB|10M")) %>%
                                select(-one_of(outliers)) %>%
                                inner_join(., malt_species.decontam_noblanks_presence_more_10, by = "Species") %>%
-                               gather("SampleID","Counts",2:ncol(.)) %>%
-                               spread(Species,Counts)
+                               gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                               spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
 
@@ -677,8 +677,8 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
 
@@ -853,7 +853,7 @@ malt_species.decontam_noblanks_presence_more_10 <- malt_species.decontam %>%
   select(-matches("EXB|LIB|10M|SRR164")) %>%
   select(-one_of(outliers)) %>%
   mutate_if(is.numeric, ~1 * (. > 0)) %>%
-  gather("SampleID","Counts",2:ncol(.)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
   inner_join(., metadata %>%
                select(SampleID, Ethnic_Group), by = "SampleID") %>%
   group_by(Ethnic_Group, Species) %>%
@@ -870,8 +870,8 @@ malt_species.decontam_noblanks <- malt_species.decontam %>%
                                select(-matches("EXB|LIB|10M|SRR164")) %>%
                                select(-one_of(outliers)) %>%
                                inner_join(., malt_species.decontam_noblanks_presence_more_10, by = "Species") %>%
-                               gather("SampleID","Counts",2:ncol(.)) %>%
-                               spread(Species,Counts)
+                               gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                               spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
 
@@ -906,8 +906,8 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
 
@@ -995,8 +995,8 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered_noblanks_noyanomami) <- malt_species.decontam_filtered_noblanks_noyanomami$SampleID
 
@@ -1256,8 +1256,8 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
 
@@ -1485,8 +1485,8 @@ malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_species.decontam_filtered_nocontrols) <- malt_species.decontam_filtered_nocontrols$SampleID
 
@@ -1582,8 +1582,8 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
 
@@ -1765,8 +1765,8 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
 
@@ -1855,8 +1855,8 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered_noblanks_noyanomami) <- malt_genus.decontam_filtered_noblanks_noyanomami$SampleID
 
@@ -2069,8 +2069,8 @@ malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
 
@@ -2271,8 +2271,8 @@ malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts)
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts +1) %>%
+                                         spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 rownames(malt_genus.decontam_filtered_nocontrols) <- malt_genus.decontam_filtered_nocontrols$SampleID
 
