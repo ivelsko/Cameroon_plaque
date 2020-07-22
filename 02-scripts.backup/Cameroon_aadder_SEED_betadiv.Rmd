@@ -47,13 +47,24 @@ load("./05-results.backup/CMC_seed_tables.RData")
 
 load("./05-results.backup/CMC_metadata.RData")
 
+# try metadata w/o factors for pairwise.adonis2
+metadata_noblanks <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
 
 # make a separate table for adonis2 stats later
-metadata_noblanks <- metadata %>%
+metadata_noblanks <- metadata_noblanks %>%
+  rename(SampleID = `#SampleID`)  %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
   filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
-  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Industry, Tooth_site) %>%
-  as_tibble()
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Market_economy_split, Ethnic_Group, Sex, Industry, Tooth_site) %>%
+  as_tibble() %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206","HMP","JAE"),
+         ExtractionBatch = fct_relevel(ExtractionBatch, "Ex01_VE_2019-01-23","Ex04_VE_2019-02-18","Ex05_VE_2019-02-18","Ex06_VE_2019-02-21","Ex07_VE_2019-02-21","Ex08_VE_2019-02-25","Ex09_VE_2019-03-13"),
+         LibraryBatch = fct_relevel(LibraryBatch, "Li03_VE_2019-04-17","Li04_VE_2019-04-17","Li05_VE_2019-04-17","Li06_VE_2019-05-02","Li07_VE_2019-05-06","Li08_VE_2019-05-06","Li09_VE_2019-05-06"),
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Industrial"),
+         Market_economy_split = fct_relevel(Market_economy_split, "Logging road","Forrest camp","Farming","Industrial plaque","Industrial calculus"),
+         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
+         Sex = fct_relevel(Sex, "Male","Female"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP"))
 
 metadata_cmc <- metadata %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
@@ -836,10 +847,15 @@ adonis2(seed_L4.decontam_noblanks_33.euc ~ Market_economy, metadata_noblanks, pe
 adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999)
 
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, data = metadata_noblanks, permutations = 999, method = "euclidean", by = "margin")
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, data = metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(seed_L4.decontam_noblanks_33.pca$X ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks_33$Tooth_site)
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+
+adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+
+pairwise.adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, nperm = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+# Error in check(sn, control = control, quietly = quietly) : Number of observations and length of Block 'strata' do not match.
 
 ```
 Tooth site is the only category that is significantly different (p < 0.01). When
