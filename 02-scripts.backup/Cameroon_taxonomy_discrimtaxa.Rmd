@@ -454,6 +454,7 @@ malt_species_decontam_filtered_noblanks.plsda$loadings$X %>%
 
 ```
 
+# CMC + Industrial + Yanomami
 ```{r fa_species_decontam_noblanks, eval = F}
 # fa.parallel(malt_species.decontam_filtered_noblanks, fm = "minres", n.iter = 19)
 
@@ -562,7 +563,7 @@ ggplot(lda.data, aes(LD1, LD2, colour = Village, shape = Village)) +
 
 ```
 
-
+# CMC + Industrial
 Now without Yanomami samples
 ```{r fa_species_decontam_noblanks_noyanomami, eval = F}
 # from the graphs, I selected fm = minres and rotate = oblimin
@@ -624,7 +625,7 @@ fwrite(malt_species.decontam_filtered_noblanks_noyanomami.fa_species, file = "./
 
 ```
 
-```{r da_species_decontam_noblanks_noyanomami_eg, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_eg, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -665,7 +666,7 @@ noyanomami_eg
 ```
 
 
-```{r da_species_decontam_noblanks_noyanomami_age, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_age, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -702,7 +703,7 @@ noyanomami_ag
 ```
 
 
-```{r da_species_decontam_noblanks_noyanomami_me, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_me, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -740,7 +741,7 @@ noyanomami_me
 ```
 
 
-```{r da_species_decontam_noblanks_noyanomami_sex, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_sex, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -793,7 +794,7 @@ noyanomami_sex
 ```
 
 
-```{r da_species_decontam_noblanks_noyanomami_ts, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_ts, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -830,7 +831,7 @@ noyanomami_ts
 ```
 
 
-```{r da_species_decontam_noblanks_noyanomami_vi, eval = F}
+```{r lda_species_decontam_noblanks_noyanomami_vi, eval = F}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_species_noblanks_noyanomami <- malt_species.decontam_filtered_noblanks_noyanomami.fa.df %>% 
   filter(Residual %in% c("MR1","MR2")) %>%
@@ -880,6 +881,7 @@ ggsave("05-results.backup/allplots_noyanomami.pdf", plot = allplots_noyanomami, 
 
 ```
 
+## Heatmaps
 Make a heat map of the species in MR1 and MR2 to see how they're different between the groups
 ```{r metadata_heatmaps}
 minres_oblimin_nobl_noyano_fa_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv", sep = "\t")
@@ -1080,7 +1082,7 @@ ggsave("05-results.backup/noblanks_fa_pca.pdf", plot = noblanks_fa_pca, device =
 
 ```
 
-
+# CMC only
 Now only CMC samples
 ```{r fa_species_decontam_cmc, eval = F}
 # fa.parallel(malt_species.decontam_filtered_cmc, fm = "minres", n.iter = 19)
