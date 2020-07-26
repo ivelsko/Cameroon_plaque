@@ -173,7 +173,7 @@ scree_plot
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(humann2_KO_noblanks.fa))
-colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5")
+colnames(graphinfo) <- c("MR11","MR21","MR31","MR41","MR51")
 graphinfo <- graphinfo %>%
   rownames_to_column("Ortholog") %>%
   as_tibble(.) 
@@ -773,7 +773,7 @@ graphinfo <- graphinfo %>%
 # now make loadings into a table and designate each species in the residual with the highest absolute value
 humann2_KO_cmc.fa.df <- as.data.frame.matrix(humann2_KO_cmc.fa$loadings)
 # b/c of rotation, the MRs may not be in numerial order. Change the column titles to be in numerical order for downstream processing
-colnames(humann2_KO_cmc.fa.df) <- c("MR1","MR2","MR3","MR4","MR5")
+colnames(humann2_KO_cmc.fa.df) <- c("MR11","MR21","MR31","MR41","MR51")
 humann2_KO_cmc.fa.df <- humann2_KO_cmc.fa.df %>%
   as_tibble(.) %>%
   bind_cols(., graphinfo) %>%

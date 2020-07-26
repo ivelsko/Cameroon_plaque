@@ -790,7 +790,7 @@ and PC3 negative values mostly by *Neisseria*.
 
 
 
-## Species-level analyses with only samples
+## Species-level analyses with only Cameroon samples
 What is the relationship of Cameroon plaque samples to eachother without any
 other sample types? Do they cluster by any of the metadata categories?
 ```{r pca_cmc_species}

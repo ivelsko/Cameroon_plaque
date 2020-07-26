@@ -660,11 +660,10 @@ pca_ME_plot
 
 pca_S_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 pca_S_plot
+plot_pca(humann2_path_cmc.pca, "PC3", "PC1", "Sex", "Sex", "Sex")
+
 
 pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-pca_TS_plot
-
-pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC3", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
 pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
@@ -1109,7 +1108,7 @@ plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", "Et
 ```
 
 ```{r pca_filtering_plots}
-# decontam and abundance >0.005% filtered plots
+# decontam and abundance >0.01% filtered plots
 plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
@@ -1263,7 +1262,7 @@ plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_
 ```
 
 ```{r pca_filtering_plots}
-# decontam and abundance >0.005% filtered plots
+# decontam and abundance >0.01% filtered plots
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
@@ -1456,31 +1455,103 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10  %>% arrange(PC2),
 
 ```
 
-_*All samples*_
+_*All samples MR1 orthologs*_
 _PC1+_
-
+K17320 - putative aldouronate transport system permease protein lplC; membrane transport
+K04653 - hydrogenase expression/formation protein HypC
+K09777 - uncharacterized protein
+K08722 - 5'-deoxynucleotidase yfbR; nucleotide metabolism
+K17319 - putative aldouronate transport system permease protein lplB; membrane transport
+K11705 - iron/zinc/manganese/copper transport system permease protein mtsC; membrane transport
+K02471 - vitamin B12/bleomycin/antimicrobial peptide transport system ATP-binding/permease protein bacA; membrane transport
+K05352 - ribitol-5-phosphate 2-dehydrogenase (NADP+) tarJ; carbohydrate metabolism
+K04651 - hydrogenase nickel incorporation protein HypA/HybF; chaperones and folding catalysts
+K07015 - uncharacterized protein
 
 _PC1-_
-
+K09138 - uncharacterized protein
+K00096 - glycerol-1-phosphate dehydrogenase [NAD(P)+] [EC:1.1.1.261] araM, egsA; lipid metabolism
+K07131 - uncharacterized protein
+K02438 - glycogen debranching enzyme [EC:3.2.1.196] glgX; carbohydrate metabolism
+K13541 - cobalt-precorrin 5A hydrolase / precorrin-3B C17-methyltransferase [EC:3.7.1.12 2.1.1.131] cbiGH-cobJ; metabolism of cofactors and vitamins
+K03795 - sirohydrochlorin cobaltochelatase [EC:4.99.1.3] cbiX; metabolism of cofactors and vitamins
+K07101 - uncharacterized protein
+K07653 - two-component system, OmpR family, sensor histidine kinase MprB [EC:2.7.13.3] mprB; membrane transport
+K07979 - GntR family transcriptional regulator ytrA; transcription factors
+K05567 - multicomponent Na+:H+ antiporter subunit C mnhC, mrpC; membrane transport
 
 _PC2+_
-
+K09791 - uncharacterized protein
+K09858 - SEC-C motif domain protein; poorly characterized (?)
+K07062 - toxin FitB [EC:3.1.-.-]; hydrolase
+K02783 - glucitol/sorbitol PTS system EIIC component srlA; carbohydrate metabolism
+K00658 - 2-oxoglutarate dehydrogenase E2 component (dihydrolipoamide succinyltransferase) [EC:2.3.1.61] DLST, sucB; carbohydrate metabolism
+K06221 - 2,5-diketo-D-gluconate reductase A [EC:1.1.1.346] dkgA; Oxidoreductases
+K06980 - tRNA-modifying protein YgfZ; transfer RNA biogenesis
+K03684 - ribonuclease D [EC:3.1.13.5] rnd; transfer RNA biogenesis
+K00982 - [glutamine synthetase] adenylyltransferase / [glutamine synthetase]-adenylyl-L-tyrosine phosphorylase [EC:2.7.7.42 2.7.7.89] glnE; Nucleotidyltransferases
+K03578 - ATP-dependent helicase HrpA [EC:3.6.4.13]; DNA replication and repair
 
 _PC2-_
-
+K11784 - cyclic dehypoxanthinyl futalosine synthase [EC:1.21.98.1] mqnC; metabolism of cofactors and vitamins
+K18285 - aminodeoxyfutalosine synthase [EC:2.5.1.120] mqnE; metabolism of cofactors and vitamins
+K06001 - tryptophan synthase beta chain [EC:4.2.1.20] trpB; amino acid metabolism
+K02032 -  peptide/nickel transport system ATP-binding protein ddpF; membrane transport
+K00175 - 2-oxoglutarate/2-oxoacid ferredoxin oxidoreductase subunit beta [EC:1.2.7.3 1.2.7.11] korB, oorB, oforB; citrate cycle
+K00852 - ribokinase [EC:2.7.1.15] rbsK, RBKS; carbohydrate metabolism
+K02401 - flagellar biosynthetic protein FlhB; cell motility
+K16789 - thiamine transporter thiT; transport
+K15876 - cytochrome c nitrite reductase small subunit nrfH; energy metabolism
+K01950 - NAD+ synthase (glutamine-hydrolysing) [EC:6.3.5.1] NADSYN1, QNS1, nadE; metabolism of cofactors and vitamins
 
 _*CMC samples only*_
 _PC1+_
-
+K03406 - methyl-accepting chemotaxis protein mcp; signal transduction
+K00266 - glutamate synthase (NADPH) small chain [EC:1.4.1.13] gltD; energy metabolism (N fixation)
+K10206 - LL-diaminopimelate aminotransferase [EC:2.6.1.83]; amino acid metabolims
+K09777 - uncharacterized protein; poorly characterized (?)
+K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] fumB; carbon fixation
+K02499 - tetrapyrrole methylase family protein / MazG family protein yabN; DNA replication
+K11784 - cyclic dehypoxanthinyl futalosine synthase [EC:1.21.98.1] mqnC; metabolism of cofactors and vitamins
+K06409 - stage V sporulation protein B spoVB; transporter
+K18285 - aminodeoxyfutalosine synthase [EC:2.5.1.120] mqnE; metabolism of cofactors and vitamins
+K09691 - lipopolysaccharide transport system ATP-binding protein ABC-2.LPSE.A; membrane transport
 
 _PC1-_
-
+K09791 - uncharacterized protein
+K02783 - glucitol/sorbitol PTS system EIIC component srlA; carbohydrate metabolism
+K00096 - glycerol-1-phosphate dehydrogenase [NAD(P)+] [EC:1.1.1.261] araM, egsA; lipid metabolism
+K16163 - maleylpyruvate isomerase [EC:5.2.1.4]; amino acid metabolism
+K07101 - uncharacterized protein
+K07131 - uncharacterized protein
+K02438 - glycogen debranching enzyme [EC:3.2.1.196] glgX; carbohydrate metabolism
+K03795 - sirohydrochlorin cobaltochelatase [EC:4.99.1.3] cbiX; metabolism of cofactors and vitamins
+K09138 - uncharacterized protein
+K07979 - GntR family transcriptional regulator ytrA; transcription factor
 
 _PC2+_
-
+K03406 - methyl-accepting chemotaxis protein mcp; signal transduction
+K02406 - flagellin fliC; cell motility
+K02392 - flagellar basal-body rod protein FlgG; coll motility
+K07138 - uncharacterized protein
+K02385 - flagellar protein FlbD; cell motility
+K02241 - competence protein ComFB; competence
+K10907 - aminotransferase [EC:2.6.1.-]; amino acid transferrase
+K02588 - nitrogenase iron protein NifH; energy metabolism (N metabolism)
+K11358 - aspartate aminotransferase [EC:2.6.1.1] yhdR; amino acid metabolism
+K06284 - AbrB family transcriptional regulator, transcriptional pleiotropic regulator of transition state genes abrB; transcription factor
 
 _PC2-_
-
+K03571 - rod shape-determining protein MreD; DNA replication and repair
+K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194] ulaC, sgaA; carbohydrate metabolism
+K09780 - uncharacterized protein
+K05337 - ferredoxin fer; energy metabolism
+K02794 - mannose PTS system EIIAB component [EC:2.7.1.191] manX; carbohydrate metabolism
+K11072 - spermidine/putrescine transport system ATP-binding protein [EC:7.6.2.11] potA; membrane transport
+K07461 - putative endonuclease; DNA replication and repair
+K03801 - lipoyl(octanoyl) transferase [EC:2.3.1.181] lipB; metabolism of cofactors and vitamins
+K06920 - 7-cyano-7-deazaguanine synthase [EC:6.3.4.20] queC; metabolism of cofactors and vitamins
+K00991 - 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase [EC:2.7.7.60] ispd; metabolism of terpenoids and polyketides
 
 
 
@@ -1826,17 +1897,103 @@ humann2_KO_carbs_biplot_list %>%
 
 ```
 
+_*All samples*_
+_PC1+:_
+K01848
+K15633
+K00209
+K01678
+K01849
+K03737
+K00030
+K01711
+K01571
+K01858
 
+_PC1-:_
+K02821
+K02783
+K01433
+K03335
+K02782
+K00068
+K13788
+K07248
+K00010
+K09788
 
+_PC2+:_
+K00008
+K02438
+K17489
+K13922
+K16148
+K06044
+K03338
+K05341
+K03336
+K01236
 
+_PC2-:_
+K18369
+K00123
+K01792
+K01654
+K11258
+K03781
+K00246
+K01092
+K00127
+K01512
 
+_*CMC samples only*_
+_PC1+:_
+K01848
+K01849
+K15633
+K01678
+K03737
+K01220
+K00030
+K02787
+K02788
+K00209
 
+_PC1-:_
+K02783
+K02821
+K01433
+K00854
+K03079
+K00694
+K03078
+K02438
+K03335
+K02782
 
+_PC2+:_
+K00009
+K01006
+K17489
+K00008
+K01218
+K01580
+K03737
+K03336
+K00692
+K03416
 
-
-
-
-
+_PC2-:_
+K07248
+K01092
+K18369
+K01595
+K03777
+K00029
+K01690
+K00121
+K01069
+K09788
 
 
 

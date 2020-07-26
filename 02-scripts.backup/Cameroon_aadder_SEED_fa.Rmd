@@ -225,7 +225,7 @@ ggsave("./05-results.backup/presentation_pdfs/scree_seed_noblanks_oblimin_minres
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(seed_L4.decontam_noblanks.fa))
-colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5")
+colnames(graphinfo) <- c("MR11","MR21","MR31","MR41","MR51")
 graphinfo <- graphinfo %>%
   rownames_to_column("Pathway") %>%
   as_tibble(.) 
@@ -803,7 +803,7 @@ ggsave("./05-results.backup/presentation_pdfs/scree_seed_cmc_oblimin_minres.pdf"
 
 # get the minimum residual values into a datatable
 graphinfo <- as.data.frame(factor2cluster(seed_L4.decontam_cmc.fa))
-colnames(graphinfo) <- c("MR1","MR2","MR3","MR4","MR5")
+colnames(graphinfo) <- c("MR11","MR21","MR31","MR41","MR51")
 graphinfo <- graphinfo %>%
   rownames_to_column("Pathway") %>%
   as_tibble(.) 
