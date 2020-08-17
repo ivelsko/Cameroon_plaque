@@ -71,7 +71,8 @@ humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
                                   })) %>%
   select(Pathway, Path, everything())
 
-humann2_KO_biplot_list <- fread("./05-results.backup/humann2_KO_biplot_list.tsv") 
+# read in the list of orthologs that are the top 10 loading in PC1 and PC2, based on the MR1 orthologs
+humann2_KO_biplot_list <- fread("./05-results.backup/humann2_KO_biplot_list.tsv") # file "./05-results.backup/humann2_KO_biplot_list_abund.tsv" has the KOs from the abundance cut-off table
 humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
   rename(Ortholog = Function)
 

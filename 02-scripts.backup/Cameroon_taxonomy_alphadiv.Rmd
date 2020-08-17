@@ -358,7 +358,7 @@ In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these
 are the 2 samples that were removed in the warning notice (they end up with NA
 for the evenness calculation).
 
-## Stats for all samples without controls
+## Stats for Industrial + Cameroon samples without controls
 ```{r samples_stats_species_noyanomami}
 # Filtered species tables alpha-diversity stats
 # get the number of observed species
@@ -475,7 +475,7 @@ Envmt_sig <- species_kruskal_pvals %>%
   distinct(Category) %>%
   pull(Category)
 
-# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+# run a post-hoc test on those metadata categories to see which groups in them are significantly different
 species_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
 pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
   select(SampleID, Observed_species, !!enquo(envmt)) %>%
@@ -495,9 +495,42 @@ pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
 }) %>%
   bind_rows(.) %>%
   as_tibble( )%>%
-  arrange(p.adj)
+  # filter(p.adj <= 0.05) %>%
+  rename(Index = .y.) %>%
+  select(Index, Category, everything())
 
-species_wilcox_pvals
+
+# and check the effect size
+species_wilcox_effs <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  wilcox_effsize(Observed_species ~ lastone) %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( ) %>%
+  select(.y.,Category, everything()) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+
+IC_species_p_es <- species_wilcox_pvals %>%
+  full_join(., species_wilcox_effs, by = c("Index","Category","group1","group2","n1","n2")) %>%
+  select(Index, Category, everything()) %>%
+  arrange(p.adj)
+  
+IC_species_p_es
 
 ```
 Only Env (p = 0.0251), Ethnic group (p = 0.0379), and Market economy (p =
@@ -505,11 +538,12 @@ Only Env (p = 0.0251), Ethnic group (p = 0.0379), and Market economy (p =
 species (Observed species).  The Market economy with Industrial samples split
 into plaque and calculus does not have significant differences between groups (p
 = 0.0621). The post-hoc test show that the only significant difference in the
-Ethnic group category is between Baka and JAE (p.adj = 0.037) where Baka has a
-higher average, in the Env category is between HunterGatherer and JAE (p.adj =
-0.046) where HunterGatherer has a higher average, and in Market economy is
-between Industrial and Logging road (p.adj = 0.048) where Logging road has a
-higher average.
+Ethnic group category is between Baka and JAE (p.adj = 0.037, effect size
+0.34065458) where Baka has a higher average, in the Env category is between
+HunterGatherer and JAE (p.adj = 0.046, effect size 0.25585202) where
+HunterGatherer has a higher average, and in Market economy is between Industrial
+and Logging road (p.adj = 0.048, effect size 0.33224250) where Logging road has
+a higher average.
 
 ```{r samples_stats_genus_noyanomami}
 # Filtered genus tables alpha-diversity stats
@@ -643,7 +677,7 @@ Envmt_sig <- genus_kruskal_pvals %>%
   distinct(Category) %>%
   pull(Category)
 
-# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+# run a post-hoc test on those metadata categories to see which groups in them are significantly different
 genus_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
 pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
   select(SampleID, Observed_genera, !!enquo(envmt)) %>%
@@ -662,10 +696,40 @@ pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
             mutate(Category = !!enquo(envmt)))
 }) %>%
   bind_rows(.) %>%
+  as_tibble( ) %>%
+  rename(Index = .y.)
+
+# and check the effect size
+genus_wilcox_effs <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  wilcox_effsize(Observed_genera ~ lastone) %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
   as_tibble( )%>%
+  select(.y.,Category, everything()) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+
+IC_genus_p_es <- genus_wilcox_pvals %>%
+  full_join(., genus_wilcox_effs, by = c("Index","Category","group1","group2","n1","n2")) %>%
+  select(Index, Category, everything()) %>%
   arrange(p.adj)
 
-genus_wilcox_pvals
+IC_genus_p_es
 
 ```
 Six metadata categories have significant differences in diversity. Number of
@@ -674,26 +738,28 @@ genera: Env (p = 0.00000346), Tooth site (p = 0.00000382), Ethnic group (p =
 with Industrial split into plaque and calculus (p = 0.00000704), and Market
 economy (p = 0.0000974); Evenness: Tooth site (p = 0.0315). The post-hoc tests
 show significant differences in Age group between all age categories and HMP
-(18-29,40-49,50-59 p=0.000555; 30-39 p=0.00069; 60+ p=0.014) where HMP is always
-lower. Significant differences in Env between HMP and HunterGatherer (p =
-0.0000019) and HMP and JAE (p = 0.006) where HMP is lower than both HG and JAE.
-Significant differences in Ethnic group between HMP and Baka (p = 0.00000121),
-HMP and Nzime (p = 0.003), and HMP and JAE (p = 0.008), where is lower than all
+(18-29 es=0.64,40-49 es=0.61,50-59 es=0.57 p=0.000555; 30-39 p=0.00069 es=0.60;
+60+ p=0.014 es=0.56) where HMP is always lower. Significant differences in Env
+between HMP and HunterGatherer (p = 0.0000019 es=0.49) and HMP and JAE (p =
+0.006 es=0.53) where HMP is lower than both HG and JAE. Significant differences
+in Ethnic group between HMP and Baka (p = 0.00000121 es=0.6), HMP and Nzime (p =
+0.003 es=0.49), and HMP and JAE (p = 0.008 es=0.53), where is lower than all
 others. Significant differences in Market economy between Industrial and Forrest
-camp (p = 0.000163), Industrial and Logging road (p = 0.002), Industrial and
-Farming (p = 0.04), where Industrial is lower than all 3. Significant
-differences in Market economy with Industrial split into plaque and calculus
-between Forrest camp and Industrial plaque (p = 0.00000908), Logging road and
-Industrial plaque (p = 0.000056), Farming and Industrial plaque (p = 0.003), and
-between Industrial plaque and Industrial calculus (p = 0.01). Significant
-differences in Village between HMP and 204 (p = 0.0000191), HMP and 202 (p =
-0.001), HMP and 205 (p = 0.001), HMP and 203 (p = 0.002), HMP and JAE (p =
-0.016), 204 and 206 (p = 0.017), where HMP is lower than all others, and 206 is
-lower than 204. Significant differences in number of genera in Tooth site
-between HMP and Anterior (p = 0.0000097), and HMP and Posterior (p = 0.0000097),
-where HMP is lower than the others, and significnat differences in evenness of
-Tooth site between Anterior and Posterior (p = 0.026), where anterior is higher
-than posterior.
+camp (p = 0.000163 es=0.58), Industrial and Logging road (p = 0.002 es=0.43),
+Industrial and Farming (p = 0.04 es=0.31), where Industrial is lower than all 3.
+Significant differences in Market economy with Industrial split into plaque and
+calculus between Forrest camp and Industrial plaque (p = 0.00000908 es=0.76),
+Logging road and Industrial plaque (p = 0.000056 es=0.59), Farming and
+Industrial plaque (p = 0.003 es=0.49), and between Industrial plaque and
+Industrial calculus (p = 0.01 es=0.53). Significant differences in Village
+between HMP and 204 (p = 0.0000191 es=0.76), HMP and 202 (p = 0.001 es=0.62),
+HMP and 205 (p = 0.001 es=0.60), HMP and 203 (p = 0.002, es=0.65), HMP and JAE
+(p = 0.016 es=0.53), 204 and 206 (p = 0.017 es=0.47), where HMP is lower than
+all others, and 206 is lower than 204. Significant differences in number of
+genera in Tooth site between HMP and Anterior (p = 0.0000097 es=0.54), and HMP
+and Posterior (p = 0.0000097 es=0.59), where HMP is lower than the others, and
+significnat differences in evenness of Tooth site between Anterior and Posterior
+(p = 0.026 es = 0.27), where anterior is higher than posterior.
 
 ## Diversity of CMC samples only
 Let's also look at the CMC samples alone, without the HMP and JAE samples. Are
@@ -815,7 +881,7 @@ Envmt_sig <- species_kruskal_pvals %>%
   distinct(Category) %>%
   pull(Category)
 
-# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+# run a post-hoc test on those metadata categories to see which groups in them are significantly different
 species_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
 pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
   select(SampleID, Observed_species, !!enquo(envmt)) %>%
@@ -834,18 +900,49 @@ pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
             mutate(Category = !!enquo(envmt)))
 }) %>%
   bind_rows(.) %>%
-  as_tibble( )%>%
+  as_tibble( ) %>%
+  rename(Index = .y.)
+
+
+# and check the effect size
+species_wilcox_effs <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_species, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  wilcox_effsize(Observed_species ~ lastone) %>% # number of species
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_species.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( ) %>%
+  select(.y.,Category, everything()) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+
+IC_species_cmc_p_es <- species_wilcox_pvals %>%
+  full_join(., species_wilcox_effs, by = c("Index","Category","group1","group2","n1","n2")) %>%
+  select(Index, Category, everything()) %>%
   arrange(p.adj)
 
-species_wilcox_pvals
+IC_species_cmc_p_es
 
 ```
 Two metadata categories have significant differences in diversity, Sex (Shannon
 index (p = 0.0392), and Evenness (p = 0.00982)) and Tooth site (number of
 species (p = 0.0427)). The post-hoc test show that in the Tooth site category
-Anterior is significantly (p.adj = 0.043) is significnatly higher than
+Anterior is significantly (p.adj = 0.043 es=22) is significnatly higher than
 Posterior. In the sex category Females are significantly higher in Shannon index
-(p = 0.039) and Evenness (p = 0.009) than Males.
+(p = 0.039 es=0.23) and Evenness (p = 0.009 es=0.28) than Males.
 
 
 ```{r samples_stats_genus_cmc}
@@ -961,7 +1058,7 @@ Envmt_sig <- genus_kruskal_pvals %>%
   distinct(Category) %>%
   pull(Category)
 
-# and run a post-hoc test on those metadata categories to see which groups in them are significantly different
+# run a post-hoc test on those metadata categories to see which groups in them are significantly different
 genus_wilcox_pvals <- lapply(Envmt_sig, function(envmt) {
 pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
   select(SampleID, Observed_genera, !!enquo(envmt)) %>%
@@ -981,25 +1078,56 @@ pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
 }) %>%
   bind_rows(.) %>%
   as_tibble( )%>%
+  rename(Index = .y.)
+
+
+# run a post-hoc test on those metadata categories to see which groups in them are significantly different
+genus_wilcox_effs <- lapply(Envmt_sig, function(envmt) {
+pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
+  select(SampleID, Observed_genera, !!enquo(envmt)) %>%
+  rename(lastone = !!enquo(envmt)) %>% # this is the way I found to get the rstatix functions to recognize the column name
+  wilcox_effsize(Observed_genera ~ lastone) %>% # number of genus
+  mutate(Category = !!enquo(envmt)) %>% # adds the name of the metadata category as a new column
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Shannon_index, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Shannon_index ~ lastone) %>% # Shannon index
+            mutate(Category = !!enquo(envmt))) %>%
+  bind_rows(., malt_genus.decontam_filtered.alpha_meta %>% 
+              select(SampleID, Pileou_evenness, !!enquo(envmt)) %>%
+              rename(lastone = !!enquo(envmt)) %>%
+            wilcox_effsize(Pileou_evenness ~ lastone) %>% # Pileou's evenness
+            mutate(Category = !!enquo(envmt)))
+}) %>%
+  bind_rows(.) %>%
+  as_tibble( )%>%
+  select(.y.,Category, everything()) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+
+IC_genus_cmc_p_es <- genus_wilcox_pvals %>%
+  full_join(., genus_wilcox_effs, by = c("Index","Category","group1","group2","n1","n2")) %>%
+  select(Index, Category, everything()) %>%
   arrange(p.adj)
 
-genus_wilcox_pvals
+IC_genus_cmc_p_es
 
 ```
 Two metadata categories have significant differences in diversity, Tooth site
 (Shannon index (p = 0.0123), and Evenness (p = 0.00185)) and Village (number of
 genera (p = 0.0423)). The post-hoc test show that in the Tooth site category
-Anterior has higher Shannon index (p.adj = 0.012) and Evenness (p.adj = 0.002)
-than Posterior. In the village category 204 has significantly higher number of
-genera (p = 0.047) than 206.
+Anterior has higher Shannon index (p.adj = 0.012 es=0.28) and Evenness (p.adj =
+0.002 es=0.34) than Posterior. In the village category 204 has significantly
+higher number of genera (p = 0.047 es=0.47) than 206.
 
 
 There is a significant difference in species diversity between Females and
 Males. We'll split each village by sex to see if there are differences in alpha
 diversity between the sexes in each village
 ```{r sex_by_village_species}
-
-malt_species.decontam_filtered.alpha_meta %>%
+# pairwise wilcox test
+wilcox_sex <- malt_species.decontam_filtered.alpha_meta %>%
   group_by(Village) %>%
   pairwise_wilcox_test(Observed_species ~ Sex, p.adjust.method = "fdr") %>%
   bind_rows(malt_species.decontam_filtered.alpha_meta %>%
@@ -1008,10 +1136,32 @@ malt_species.decontam_filtered.alpha_meta %>%
   bind_rows(malt_species.decontam_filtered.alpha_meta %>%
             group_by(Village) %>%
             pairwise_wilcox_test(Pileou_evenness ~ Sex, p.adjust.method = "fdr")) %>%
+  arrange(p.adj) %>%
+  rename(Index = .y.)
+
+# check the effect size
+wilcox_es_sex <- malt_species.decontam_filtered.alpha_meta %>%
+  group_by(Village) %>%
+  wilcox_effsize(Observed_species ~ Sex) %>%
+  bind_rows(malt_species.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            wilcox_effsize(Shannon_index ~ Sex)) %>%
+  bind_rows(malt_species.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            wilcox_effsize(Pileou_evenness ~ Sex)) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+wilcox_sex_p_es <- wilcox_sex %>%
+  full_join(., wilcox_es_sex, by = c("Index","group1","group2","n1","n2")) %>%
+  select(Index, everything()) %>%
   arrange(p.adj)
 
+wilcox_sex_p_es
+
 # make a plot of village split by sex
-malt_species.decontam_filtered.alpha_meta %>%
+malt_species.decontam_filtered.alpha_meta %>% 
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Observed_species, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1024,6 +1174,7 @@ malt_species.decontam_filtered.alpha_meta %>%
 
 # make a plot of village split by sex
 malt_species.decontam_filtered.alpha_meta %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1036,6 +1187,7 @@ malt_species.decontam_filtered.alpha_meta %>%
 
 # make a plot of village split by sex
 malt_species.decontam_filtered.alpha_meta %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Pileou_evenness, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1048,13 +1200,13 @@ malt_species.decontam_filtered.alpha_meta %>%
 
 ```
 The only significant difference in species-level diversity between females and
-males in each village is in village 206 by Shannon index (p = 0.029), and
-Pileou's evenness (p = 0.029). However, there is a lot of spread in the points
+males in each village is in village 206 by Shannon index (p = 0.029 es=0.56), and
+Pileou's evenness (p = 0.029 es=0.56). However, there is a lot of spread in the points
 of these groups, so it may not be significant if more samples are added.
 
-```{r sex_by_village_species}
-
-malt_genus.decontam_filtered.alpha_meta %>%
+```{r sex_by_village_genus}
+# pairwise wilcox test
+wilcox_genus_sex <- malt_genus.decontam_filtered.alpha_meta %>%
   group_by(Village) %>%
   pairwise_wilcox_test(Observed_genera ~ Sex, p.adjust.method = "fdr") %>%
   bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
@@ -1063,10 +1215,32 @@ malt_genus.decontam_filtered.alpha_meta %>%
   bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
             group_by(Village) %>%
             pairwise_wilcox_test(Pileou_evenness ~ Sex, p.adjust.method = "fdr")) %>%
+  arrange(p.adj) %>%
+  rename(Index = .y.)
+
+# check the effect size 
+wilcox_genus_es_sex <- malt_genus.decontam_filtered.alpha_meta %>%
+  group_by(Village) %>%
+  wilcox_effsize(Observed_genera ~ Sex) %>%
+  bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            wilcox_effsize(Shannon_index ~ Sex)) %>%
+  bind_rows(malt_genus.decontam_filtered.alpha_meta %>%
+            group_by(Village) %>%
+            wilcox_effsize(Pileou_evenness ~ Sex)) %>%
+  arrange(desc(effsize)) %>%
+  rename(Index = .y.)
+
+wilcox_genus_sex_p_es <- wilcox_genus_sex %>%
+  full_join(., wilcox_genus_es_sex, by = c("Index","group1","group2","n1","n2")) %>%
+  select(Index, everything()) %>%
   arrange(p.adj)
+
+wilcox_genus_sex_p_es
 
 # make a plot of village split by sex
 malt_genus.decontam_filtered.alpha_meta %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Observed_genera, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1079,6 +1253,7 @@ malt_genus.decontam_filtered.alpha_meta %>%
 
 # make a plot of village split by sex
 malt_genus.decontam_filtered.alpha_meta %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1091,6 +1266,7 @@ malt_genus.decontam_filtered.alpha_meta %>%
 
 # make a plot of village split by sex
 malt_genus.decontam_filtered.alpha_meta %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Pileou_evenness, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
@@ -1103,9 +1279,9 @@ malt_genus.decontam_filtered.alpha_meta %>%
 
 ```
 The only significant difference in genus-level diversity between females and
-males in each village is in village 206 by Observed genera (p = 0.0009), and
-Shannon index (p = 0.040). However, there is a lot of spread in the points
-of these groups, so it may not be significant if more samples are added.
+males in each village is in village 206 by Observed genera (p = 0.0009 es=0.68),
+and Shannon index (p = 0.040 es=0.53). However, there is a lot of spread in the
+points of these groups, so it may not be significant if more samples are added.
 
 
 # Heatmaps

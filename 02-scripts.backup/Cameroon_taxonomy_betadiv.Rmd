@@ -45,6 +45,11 @@ load("./05-results.backup/CMC_taxonomy_tables.RData")
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData")
 
+# load the lists of species/genera that are in MR1-MR3 from the factor analysis
+mr_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv")
+mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
+mr_genus <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv")
+
 ```
 
 
@@ -341,12 +346,6 @@ malt_species_raw_pcain <- malt_species_raw %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_species_raw_pcain) <- malt_species_raw_pcain$SampleID
-# 
-# malt_species_raw_pcain <- malt_species_raw_pcain %>% select(-SampleID)
-# 
-# malt_species_raw_pcain = malt_species_raw_pcain+1
-
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_species_raw_pcain, logratio = 'CLR')
@@ -405,12 +404,6 @@ malt_species_unfiltered <- malt_species_raw %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_species_unfiltered) <- malt_species_unfiltered$SampleID
-# 
-# malt_species_unfiltered <- malt_species_unfiltered %>% select(-SampleID)
-# 
-# malt_species_unfiltered = malt_species_unfiltered+1
-
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_species_unfiltered, logratio = 'CLR')
@@ -438,12 +431,6 @@ malt_species_filtered <- malt_species_raw %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_species_filtered) <- malt_species_filtered$SampleID
-# 
-# malt_species_filtered <- malt_species_filtered %>% select(-SampleID)
-# 
-# malt_species_filtered = malt_species_filtered+1
-
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_species_filtered, logratio = 'CLR')
@@ -465,12 +452,6 @@ malt_species.decontam_unfilt <- malt_species.decontam %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_species.decontam_unfilt) <- malt_species.decontam_unfilt$SampleID
-# 
-# malt_species.decontam_unfilt <- malt_species.decontam_unfilt %>% select(-SampleID)
-# 
-# malt_species.decontam_unfilt = malt_species.decontam_unfilt+1
-
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_species.decontam_unfilt, logratio = 'CLR')
@@ -491,12 +472,6 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_species.decontam_filtered) <- malt_species.decontam_filtered$SampleID
-# 
-# malt_species.decontam_filtered <- malt_species.decontam_filtered %>% select(-SampleID)
-# 
-# malt_species.decontam_filtered = malt_species.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -528,12 +503,6 @@ malt_genus_unfiltered <- malt_genus_raw %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_genus_unfiltered) <- malt_genus_unfiltered$SampleID
-# 
-# malt_genus_unfiltered <- malt_genus_unfiltered %>% select(-SampleID)
-# 
-# malt_genus_unfiltered = malt_genus_unfiltered+1
-
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_genus_unfiltered, logratio = 'CLR')
@@ -558,12 +527,6 @@ malt_genus_filtered <- malt_genus_raw %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_genus_filtered) <- malt_genus_filtered$SampleID
-# 
-# malt_genus_filtered <- malt_genus_filtered %>% select(-SampleID)
-# 
-# malt_genus_filtered = malt_genus_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -591,12 +554,6 @@ malt_genus.decontam_unfiltered <- malt_genus.decontam %>%
                                          spread(Species,Counts) %>% 
                                          column_to_rownames("SampleID")
 
-# rownames(malt_genus.decontam_unfiltered) <- malt_genus.decontam_unfiltered$SampleID
-# 
-# malt_genus.decontam_unfiltered <- malt_genus.decontam_unfiltered %>% select(-SampleID)
-# 
-# malt_genus.decontam_unfiltered = malt_genus.decontam_unfiltered+1
-# 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_genus.decontam_unfiltered, logratio = 'CLR')
@@ -618,12 +575,6 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-# 
-# malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -672,12 +623,6 @@ malt_species.decontam_noblanks <- malt_species.decontam %>%
                                spread(Species,Counts) %>%
                                column_to_rownames("SampleID")
 
-# rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
-# 
-# malt_species.decontam_noblanks <- malt_species.decontam_noblanks %>% select(-SampleID)
-# 
-# malt_species.decontam_noblanks = malt_species.decontam_noblanks+1
-
 # perform PCA
 plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Description", "Env", "Env", 3)
 plot_pca_titles(malt_species.decontam_noblanks, "PC3", "PC2", "Description", "Env", "Env", 3)
@@ -701,12 +646,6 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
-# 
-# malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblanks %>% select(-SampleID)
-# 
-# malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -897,12 +836,6 @@ malt_species.decontam_noblanks <- malt_species.decontam %>%
                                spread(Species,Counts) %>%
                                column_to_rownames("SampleID")
 
-# rownames(malt_species.decontam_noblanks) <- malt_species.decontam_noblanks$SampleID
-# 
-# malt_species.decontam_noblanks <- malt_species.decontam_noblanks %>% select(-SampleID)
-# 
-# malt_species.decontam_noblanks = malt_species.decontam_noblanks+1
-# 
 # perform PCA
 plot_pca_titles(malt_species.decontam_noblanks, "PC1", "PC2", "Description", "Env", "Env", 3)
 plot_pca_titles(malt_species.decontam_noblanks, "PC3", "PC2", "Description", "Env", "Env", 3)
@@ -934,12 +867,6 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>% 
                                          column_to_rownames("SampleID")
-
-# rownames(malt_species.decontam_filtered_noblanks) <- malt_species.decontam_filtered_noblanks$SampleID
-# 
-# malt_species.decontam_filtered_noblanks <- malt_species.decontam_filtered_noblanks %>% select(-SampleID)
-# 
-# malt_species.decontam_filtered_noblanks = malt_species.decontam_filtered_noblanks+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -1013,13 +940,11 @@ Filter the species table by just the species in MR1 and MR2 from
 the factor analysis (`Cameroon_taxonomy_discrimspecies.Rmd`)
 ```{r pca_mr_noblanks_noyanomami_species}
 # Now keep only the proteins that are in MR1 from the factor analysis
-mr_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv")
-
 malt_species.decontam_filtered_noblanks_mr <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("10M|SRR164|EXB|LIB")) %>%
                                          inner_join(., mr_species %>%
-                                                      filter(str_detect(Residual, "MR1|MR2|MR3")) %>%
+                                                      filter(str_detect(Residual, "MR1")) %>%
                                                       select(-Residual)) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          mutate(Counts = as.numeric(Counts),
@@ -1101,7 +1026,7 @@ pca_malt_species_pc1pc2
 
 Make biplots of the top 10 loading species in positive and negative directions
 of PC1 and PC2, using the abundance filter.
-```{r biplot_noblanks_noyanomami_species}
+```{r biplot_noblanks_noyanomami_species, eval = F}
 # remove the Yanomami samples from the input table
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
@@ -1211,6 +1136,93 @@ in more negative values, corresponding with the species that drive plotting. In
 PC3, the positive loading taxa are a mix of aerobic and anaerobic taxa, while
 the negative loading taxa are also a mix, but *Neisseria* make up 6 of the 10.
 
+Make biplots of the top 10 loading species in positive and negative directions
+of PC1 and PC2, using the MR1 species only.
+```{r biplot_noblanks_noyanomami_species_mr}
+malt_species.decontam_filtered_noblanks_mr <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|SRR164|EXB|LIB")) %>%
+                                         inner_join(., mr_species %>%
+                                                      filter(str_detect(Residual, "MR1")) %>%
+                                                      select(-Residual)) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = as.numeric(Counts),
+                                                Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>%
+                                         column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_species.decontam_filtered_noblanks_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_species.decontam_filtered_noblanks_mr.pca <- pca(malt_species.decontam_filtered_noblanks_mr, ncomp = 3, logratio = 'CLR')
+
+# Then plot by Tooth_site (do anterior teeth and posterior teeth samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+# Now plot biplots, and make tables of the top 10 species in each loading
+malt_species_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_mr.pca, "PC1", "PC2", "Ethnic_Group", PC1)
+malt_species_decontam_filtered_noyanomami_biplot_121
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_121$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_121$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+
+malt_species_decontam_filtered_noyanomami_biplot_122 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_mr.pca, "PC1", "PC2", "Ethnic_Group", PC2)
+malt_species_decontam_filtered_noyanomami_biplot_122
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_122$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_122$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+
+malt_species_decontam_filtered_noyanomami_biplot_322 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_mr.pca, "PC3", "PC2", "Ethnic_Group", PC2)
+malt_species_decontam_filtered_noyanomami_biplot_322
+
+malt_species_decontam_filtered_noyanomami_biplot_323 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_mr.pca, "PC3", "PC2", "Ethnic_Group", PC3)
+malt_species_decontam_filtered_noyanomami_biplot_323
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_323$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_323$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+```
+
+
+
 Run a permanova with function adonis to test if the clusters are significantly
 different. First load the metadata again so the blanks and Yanomami samples can
 be removed and then make them factors.
@@ -1238,16 +1250,16 @@ metadata_noblanks <- metadata_noblanks %>%
 Run a PERMANOVA with adonis2 on the abundance-filtered clr-transformed species matrix.
 ```{r adonis_noblanks_noyanomami_species}
 # Euclidean distance, uses the clr-transformed matrix from the mixOmics PCA above
-malt_species.decontam_filtered_noblanks_noyanomami.euc <- vegdist(malt_species.decontam_filtered_noblanks_noyanomami.pca$X, method = "euclidean", na.rm = T)
-malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoa <- ape::pcoa(malt_species.decontam_filtered_noblanks_noyanomami.euc)
+malt_species.decontam_filtered_noblanks_mr.euc <- vegdist(malt_species.decontam_filtered_noblanks_mr.pca$X, method = "euclidean", na.rm = T)
+malt_species.decontam_filtered_noblanks_mr.euc.pcoa <- ape::pcoa(malt_species.decontam_filtered_noblanks_mr.euc)
 
-malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- as.data.frame(malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoa$vectors)
-malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors %>%
+malt_species.decontam_filtered_noblanks_mr.euc.pcoavectors <- as.data.frame(malt_species.decontam_filtered_noblanks_mr.euc.pcoa$vectors)
+malt_species.decontam_filtered_noblanks_mr.euc.pcoavectors <- malt_species.decontam_filtered_noblanks_mr.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet <- inner_join(malt_species.decontam_filtered_noblanks_noyanomami.euc.pcoavectors, metadata, by = "SampleID")
+malt_species.decontam_filtered_noblanks_mr.euc.vecmet <- inner_join(malt_species.decontam_filtered_noblanks_mr.euc.pcoavectors, metadata, by = "SampleID")
 
-malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
+malt_species.decontam_filtered_noblanks_mr.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Industry, shape = Industry)) +
   geom_point(size = 3) +
   scale_colour_manual(values = Industry_colors) +
@@ -1257,13 +1269,19 @@ malt_species.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
   ggtitle("Industry")
 
 # test for difference between different metadata categories 
-adonis2(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+
+# test for difference between different metadata categories excluding Village, which influences Ethnic_Group, Industry, and Market_economy
+# this still has Ethnic_Group and Indistry as -Inf
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(malt_species.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
-
+Village and tooth site are significantly different, unless controlling for tooth
+site, where nothing is significantly different.
 
 Then run betadisper to see if the groups with significant differences in
 clustering have different dispersion ("tight" vs. "loose" clustering of groups)
@@ -1279,55 +1297,29 @@ groups_tooth_site <- metadata_noblanks %>%
   pull()
 
 ## Calculate multivariate dispersions
-toothsite_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_tooth_site, bias.adjust =TRUE)
-toothsite_betadisper_noblanks_noyanomami
+toothsite_betadisper_noblanks_mr <- betadisper(malt_species.decontam_filtered_noblanks_mr.euc, groups_tooth_site, bias.adjust =TRUE)
+toothsite_betadisper_noblanks_mr
 
 ## Perform test
-anova(toothsite_betadisper_noblanks_noyanomami)
+anova(toothsite_betadisper_noblanks_mr)
 
 ## Permutation test for F
-permutest(toothsite_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
+permutest(toothsite_betadisper_noblanks_mr, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-toothsite_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(toothsite_betadisper_noblanks_noyanomami)
-plot(toothsite_betadisper_noblanks_noyanomami.HSD)
+toothsite_betadisper_noblanks_mr.HSD <- TukeyHSD(toothsite_betadisper_noblanks_mr)
+plot(toothsite_betadisper_noblanks_mr.HSD)
 
 ## Plot the groups and distances to centroids on the
 ## first two PCoA axes
 ## with data ellipses instead of hulls
-plot(toothsite_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(toothsite_betadisper_noblanks_mr, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## can also specify which axes to plot, ordering respected
-# plot(toothsite_betadisper_noblanks_noyanomami, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
+# plot(toothsite_betadisper_noblanks_mr, axes = c(3,1), seg.col = "forestgreen", seg.lty = "dashed")
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(toothsite_betadisper_noblanks_noyanomami)
-
-
-# Industry
-groups_industry <- metadata_noblanks %>%
-  select(Industry) %>% 
-  pull()
-
-## Calculate multivariate dispersions
-industry_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_industry, bias.adjust =TRUE)
-industry_betadisper_noblanks_noyanomami
-
-## Perform test
-anova(industry_betadisper_noblanks_noyanomami)
-
-## Permutation test for F
-permutest(industry_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
-
-## Tukey's Honest Significant Differences
-industry_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(industry_betadisper_noblanks_noyanomami)
-plot(industry_betadisper_noblanks_noyanomami.HSD)
-
-## Plot with data ellipses instead of hulls
-plot(industry_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-
-## Draw a boxplot of the distances to centroid for each group
-boxplot(industry_betadisper_noblanks_noyanomami)
+boxplot(toothsite_betadisper_noblanks_mr)
 
 
 # Village
@@ -1336,28 +1328,29 @@ groups_village <- metadata_noblanks %>%
   pull()
 
 ## Calculate multivariate dispersions
-village_betadisper_noblanks_noyanomami <- betadisper(malt_species.decontam_filtered_noblanks_noyanomami.euc, groups_village, bias.adjust =TRUE)
-village_betadisper_noblanks_noyanomami
+village_betadisper_noblanks_mr <- betadisper(malt_species.decontam_filtered_noblanks_mr.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_noblanks_mr
 
 ## Perform test
-anova(village_betadisper_noblanks_noyanomami)
+anova(village_betadisper_noblanks_mr)
 
 ## Permutation test for F
-permutest(village_betadisper_noblanks_noyanomami, pairwise = TRUE, permutations = 99)
+permutest(village_betadisper_noblanks_mr, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-village_betadisper_noblanks_noyanomami.HSD <- TukeyHSD(village_betadisper_noblanks_noyanomami)
-plot(village_betadisper_noblanks_noyanomami.HSD)
+village_betadisper_noblanks_mr.HSD <- TukeyHSD(village_betadisper_noblanks_mr)
+plot(village_betadisper_noblanks_mr.HSD)
 
 ## Plot with data ellipses instead of hulls
-plot(village_betadisper_noblanks_noyanomami, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(village_betadisper_noblanks_mr, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(village_betadisper_noblanks_noyanomami)
+boxplot(village_betadisper_noblanks_mr)
 
 
 ```
-
+Significant differences in disperson are between HMP and Posterior, and HMP and
+villages 202, 205, 205, 206, JAE.
 
 ## Cameroon samples only
 What is the relationship of Cameroon plaque samples to eachother without any
@@ -1378,12 +1371,6 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-# 
-# rownames(malt_species.decontam_filtered_cmc) <- malt_species.decontam_filtered_cmc$SampleID
-# 
-# malt_species.decontam_filtered_cmc <- malt_species.decontam_filtered_cmc %>% select(-SampleID)
-# 
-# malt_species.decontam_filtered_cmc = malt_species.decontam_filtered_cmc+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -1395,8 +1382,8 @@ pca_cmc_village <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "P
 pca_cmc_village
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
-ggsave("05-results.backup/pca_cmc_village.pdf", plot = pca_cmc_village, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("05-results.backup/pca_cmc_village.pdf", plot = pca_cmc_village, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -1453,13 +1440,11 @@ Filter the species table by just the species in MR1 and MR2 from
 the factor analysis (Cameroon_taxonomy_discrimspecies.Rmd)
 ```{r pca_mr_noblanks_noyanomami_species}
 # Now keep only the proteins that are in MR1 from the factor analysis
-mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
-
 malt_species.decontam_filtered_cmc_mr <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-matches("10M|SRR164|EXB|LIB")) %>%
+                                         select(-matches("10M|SRR|JAE|EXB|LIB")) %>%
                                          inner_join(., mr_cmc_species %>%
-                                                      filter(str_detect(Residual, "MR1|MR2")) %>%
+                                                      filter(str_detect(Residual, "MR1")) %>%
                                                       select(-Residual)) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          mutate(Counts = as.numeric(Counts),
@@ -1562,7 +1547,7 @@ Run a permanova with function adonis to test if the clusters are significantly d
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
 
 # Euclidean distance
-malt_species.decontam_filtered_cmc.euc <- vegdist(malt_species.decontam_filtered_cmc.pca$X, method = "euclidean", na.rm = T)
+malt_species.decontam_filtered_cmc.euc <- vegdist(malt_species.decontam_filtered_cmc_mr.pca$X, method = "euclidean", na.rm = T)
 malt_species.decontam_filtered_cmc.euc.pcoa <- ape::pcoa(malt_species.decontam_filtered_cmc.euc)
 
 malt_species.decontam_filtered_cmc.euc.pcoavectors <- as.data.frame(malt_species.decontam_filtered_cmc.euc.pcoa$vectors)
@@ -1581,12 +1566,16 @@ malt_species.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch +  LibraryBatch, metadata_cmc, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_cmc.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(malt_species.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+adonis2(malt_species.decontam_filtered_cmc.euc ~ Village + Sex + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
+Sex and tooth site are significantly different, unless controlling for tooth
+site and then only sex is significantly different.
+
 
 Then run betadisper to see if the groups with significant differences in
 clustering have different dispersion ("tight" vs. "loose" clustering of groups)
@@ -1627,63 +1616,36 @@ plot(toothsite_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 boxplot(toothsite_betadisper_cmc)
 
 
-# Market economy
-groups_market_economy <- metadata_cmc %>%
-  select(Market_economy) %>% 
+# Sex
+groups_sex <- metadata_cmc %>%
+  select(Sex) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-market_economy_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_market_economy, bias.adjust =TRUE)
-market_economy_betadisper_cmc
+sex_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_sex, bias.adjust =TRUE)
+sex_betadisper_cmc
 
 ## Perform test
-anova(market_economy_betadisper_cmc)
+anova(sex_betadisper_cmc)
 
 ## Permutation test for F
-permutest(market_economy_betadisper_cmc, pairwise = TRUE, permutations = 99)
+permutest(sex_betadisper_cmc, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-market_economy_betadisper_cmc.HSD <- TukeyHSD(market_economy_betadisper_cmc)
-plot(market_economy_betadisper_cmc.HSD)
+sex_betadisper_cmc.HSD <- TukeyHSD(sex_betadisper_cmc)
+plot(sex_betadisper_cmc.HSD)
 
 ## Plot with data ellipses instead of hulls
-plot(market_economy_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(sex_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(market_economy_betadisper_cmc)
-
-
-# Village
-groups_village <- metadata_cmc %>%
-  select(Village) %>% 
-  pull()
-
-## Calculate multivariate dispersions
-village_betadisper_cmc <- betadisper(malt_species.decontam_filtered_cmc.euc, groups_village, bias.adjust =TRUE)
-village_betadisper_cmc
-
-## Perform test
-anova(village_betadisper_cmc)
-
-## Permutation test for F
-permutest(village_betadisper_cmc, pairwise = TRUE, permutations = 99)
-
-## Tukey's Honest Significant Differences
-village_betadisper_cmc.HSD <- TukeyHSD(village_betadisper_cmc)
-plot(village_betadisper_cmc.HSD)
-
-## Plot with data ellipses instead of hulls
-plot(village_betadisper_cmc, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-
-## Draw a boxplot of the distances to centroid for each group
-boxplot(village_betadisper_cmc)
-
-
+boxplot(sex_betadisper_cmc)
 
 ```
+There is a significant difference in disperson between anterior and posterior
+sites and between male and female samples.
 
-
-```{r biplots_cmc_species}
+```{r biplots_cmc_species, eval = F}
 
 malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          select(-one_of(outliers)) %>%
@@ -1700,12 +1662,6 @@ malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_species.decontam_filtered_nocontrols) <- malt_species.decontam_filtered_nocontrols$SampleID
-# 
-# malt_species.decontam_filtered_nocontrols <- malt_species.decontam_filtered_nocontrols %>% select(-SampleID)
-# 
-# malt_species.decontam_filtered_nocontrols = malt_species.decontam_filtered_nocontrols+1
-# 
 malt_species.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_species.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
 plot(malt_species.decontam_filtered_nocontrols.pca)
 
@@ -1779,6 +1735,90 @@ positive taxa corresonds with the taxa loading in PC2 (aerobic in positive,
 anaerobic in negative).
 
 
+Now biplots on the MR1 species
+```{r biplots_cmc_species_mr}
+
+malt_species.decontam_filtered_cmc_mr <- malt_species.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|SRR|JAE|EXB|LIB")) %>%
+                                         inner_join(., mr_cmc_species %>%
+                                                      filter(str_detect(Residual, "MR1")) %>%
+                                                      select(-Residual)) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = as.numeric(Counts),
+                                                Counts = Counts + 1) %>%
+                                         spread(Species,Counts) %>%
+                                         column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_species.decontam_filtered_cmc_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_species.decontam_filtered_cmc_mr.pca <- pca(malt_species.decontam_filtered_cmc_mr, ncomp = 3, logratio = 'CLR')
+
+malt_species.decontam_filtered_nocontrols_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_cmc_mr.pca, "PC1", "PC2", "Tooth_site", PC1)
+malt_species.decontam_filtered_nocontrols_biplot_121
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_121$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_121$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+
+malt_species.decontam_filtered_nocontrols_biplot_122 <- plot_pca_bi(malt_species.decontam_filtered_cmc_mr.pca, "PC1", "PC2", "Tooth_site", PC2)
+malt_species.decontam_filtered_nocontrols_biplot_122
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_122$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_122$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+
+malt_species.decontam_filtered_nocontrols_biplot_322 <- plot_pca_bi(malt_species.decontam_filtered_cmc_mr.pca, "PC3", "PC2", "Tooth_site", PC2)
+malt_species.decontam_filtered_nocontrols_biplot_322
+
+malt_species.decontam_filtered_nocontrols_biplot_323 <- plot_pca_bi(malt_species.decontam_filtered_cmc_mr.pca, "PC3", "PC2", "Tooth_site", PC3)
+malt_species.decontam_filtered_nocontrols_biplot_323
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_323$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(malt_species.decontam_filtered_nocontrols_biplot_323$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+```
+Some of the PCs have overlapping species between the abundance filtered table
+and the MR12 table, while others don't. Those that don't tend to be nearly
+entirely one genus, but that genus differs.
+
+
 # Genus-level analyses
 
 What is the relationship of the groups in a PCA without the blanks? Are
@@ -1798,12 +1838,6 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-# 
-# malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -1985,12 +2019,6 @@ malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-# 
-# rownames(malt_genus.decontam_filtered) <- malt_genus.decontam_filtered$SampleID
-# 
-# malt_genus.decontam_filtered <- malt_genus.decontam_filtered %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered = malt_genus.decontam_filtered+1
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -2059,17 +2087,15 @@ pca_malt_genus_pc1pc2
 
 ```
 
-Filter the species table by just the species in MR1 and MR2 from
+Filter the genus table by just the genera in MR1 from
 the factor analysis (`Cameroon_taxonomy_discrimgenera.Rmd`)
 ```{r pca_mr_noblanks_noyanomami_genus}
 # Now keep only the proteins that are in MR1 from the factor analysis
-mr_proteins <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv")
-
 malt_genus.decontam_filtered_noblanks_mr <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
                                          select(-matches("10M|SRR164|EXB|LIB")) %>%
                                          rename(Genus = Species) %>%
-                                         inner_join(., mr_proteins %>%
+                                         inner_join(., mr_genus %>%
                                                       filter(Residual == "MR1") %>%
                                                       select(-Residual)) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
@@ -2152,7 +2178,7 @@ pca_malt_genus_pc1pc2
 
 Create biplots with the top 10 strongest loading genera in PC1 and PC2 positive
 and negative directions
-```{r biplot_samples_no_yanomami_genus}
+```{r biplot_samples_no_yanomami_genus, eval = F}
 
 # remove the Yanomami samples from the input table
 malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
@@ -2169,12 +2195,6 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_genus.decontam_filtered_noblanks_noyanomami) <- malt_genus.decontam_filtered_noblanks_noyanomami$SampleID
-# 
-# malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered_noblanks_noyanomami = malt_genus.decontam_filtered_noblanks_noyanomami+1
 
 # perform PCA
 malt_genus.decontam_filtered_noblanks_noyanomami.pca <- mixOmics::pca(malt_genus.decontam_filtered_noblanks_noyanomami, ncomp = 3, logratio = 'CLR')
@@ -2271,12 +2291,100 @@ suggests that there are some unusual, poorly characterized taxa in calculus that
 are not seen in plaque. In PC3 the CMC samples again separate out a bit by
 anterior (negative values)/posterior (posterior values) tooth site.
 
+Now biplots from the PCA with only MR1 proteins from the factor analysis
+```{r biplot_samples_no_yanomami_genus}
+
+malt_genus.decontam_filtered_noblanks_mr <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|SRR164|EXB|LIB")) %>%
+                                         rename(Genus = Species) %>%
+                                         inner_join(., mr_genus %>%
+                                                      filter(Residual == "MR1") %>%
+                                                      select(-Residual)) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = as.numeric(Counts),
+                                                Counts = Counts + 1) %>%
+                                         spread(Genus,Counts) %>%
+                                         column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_genus.decontam_filtered_noblanks_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_genus.decontam_filtered_noblanks_mr.pca <- pca(malt_genus.decontam_filtered_noblanks_mr, ncomp = 3, logratio = 'CLR')
+
+# Then plot by Tooth_site (do anterior teeth and posterior teeth samples separate?) to see what it looks like before adding the biplot over the points
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+plot_pca_titles(malt_genus.decontam_filtered_noblanks_noyanomami, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+
+
+# Now plot biplots, and make tables of the top 10 species in each loading
+malt_genus_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_genus.decontam_filtered_noblanks_mr.pca, "PC1", "PC2", "Ethnic_Group", PC1)
+malt_genus_decontam_filtered_noyanomami_biplot_121
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_121$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_121$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+
+malt_genus_decontam_filtered_noyanomami_biplot_122 <- plot_pca_bi(malt_genus.decontam_filtered_noblanks_mr.pca, "PC1", "PC2", "Ethnic_Group", PC2)
+malt_genus_decontam_filtered_noyanomami_biplot_122
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_122$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_122$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+
+malt_genus_decontam_filtered_noyanomami_biplot_322 <- plot_pca_bi(malt_genus.decontam_filtered_noblanks_mr.pca, "PC3", "PC2", "Ethnic_Group", PC2)
+malt_genus_decontam_filtered_noyanomami_biplot_322
+
+malt_genus_decontam_filtered_noyanomami_biplot_323 <- plot_pca_bi(malt_genus.decontam_filtered_noblanks_mr.pca, "PC3", "PC2", "Ethnic_Group", PC3)
+malt_genus_decontam_filtered_noyanomami_biplot_323
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_323$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_noyanomami_biplot_323$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+```
+The genera are quite different between the abundance filtered table and the MR1 genera. 
+
 Run a permanova with function adonis2 to test if the clusters are significantly different.
 ```{r adonis_noblanks_noyanomami_genus}
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
 
 # Euclidean distance
-malt_genus.decontam_filtered_noblanks_noyanomami.euc <- vegdist(malt_genus.decontam_filtered_noblanks_noyanomami.pca$X, method = "euclidean", na.rm = T)
+malt_genus.decontam_filtered_noblanks_noyanomami.euc <- vegdist(malt_genus.decontam_filtered_noblanks_mr.pca$X, method = "euclidean", na.rm = T)
 malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoa <- ape::pcoa(malt_genus.decontam_filtered_noblanks_noyanomami.euc)
 
 malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoavectors <- as.data.frame(malt_genus.decontam_filtered_noblanks_noyanomami.euc.pcoa$vectors)
@@ -2295,14 +2403,16 @@ malt_genus.decontam_filtered_noblanks_noyanomami.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy + Village + ExtractionBatch + LibraryBatch, metadata_noblanks, perm=999)
+adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
 
-adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(malt_genus.decontam_filtered_noblanks_noyanomami.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
+Village and tooth site are significantly different unless controlling for tooth
+site, when only village is significantly different.
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs.
 "loose" clustering of groups) - is one group more variable than the other(s)?
@@ -2340,33 +2450,33 @@ plot(toothsite_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALS
 boxplot(toothsite_betadisper_noblanks_noyanomami_genus)
 
 
-# Industry
-groups_industry <- metadata_noblanks %>%
-  select(Industry) %>% 
+# Village
+groups_village <- metadata_noblanks %>%
+  select(Village) %>% 
   pull()
 
 ## Calculate multivariate dispersions
-industry_betadisper_noblanks_noyanomami_genus <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups_industry, bias.adjust =TRUE)
-industry_betadisper_noblanks_noyanomami_genus
+village_betadisper_noblanks_noyanomami_genus <- betadisper(malt_genus.decontam_filtered_noblanks_noyanomami.euc, groups_village, bias.adjust =TRUE)
+village_betadisper_noblanks_noyanomami_genus
 
 ## Perform test
-anova(industry_betadisper_noblanks_noyanomami_genus)
+anova(village_betadisper_noblanks_noyanomami_genus)
 
 ## Permutation test for F
-permutest(industry_betadisper_noblanks_noyanomami_genus, pairwise = TRUE, permutations = 99)
+permutest(village_betadisper_noblanks_noyanomami_genus, pairwise = TRUE, permutations = 99)
 
 ## Tukey's Honest Significant Differences
-industry_betadisper_noblanks_noyanomami_genus.HSD <- TukeyHSD(industry_betadisper_noblanks_noyanomami_genus)
-plot(industry_betadisper_noblanks_noyanomami_genus.HSD)
+village_betadisper_noblanks_noyanomami_genus.HSD <- TukeyHSD(village_betadisper_noblanks_noyanomami_genus)
+plot(village_betadisper_noblanks_noyanomami_genus.HSD)
 
 ## Plot with data ellipses instead of hulls
-plot(industry_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+plot(village_betadisper_noblanks_noyanomami_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
 
 ## Draw a boxplot of the distances to centroid for each group
-boxplot(industry_betadisper_noblanks_noyanomami_genus)
+boxplot(village_betadisper_noblanks_noyanomami_genus)
 
 ```
-
+There is no significant difference in dispersion for tooth site groups or villages. 
 
 ## Cameroon samples only
 What is the relationship of Cameroon plaque samples to each other without any
@@ -2388,12 +2498,6 @@ malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
 
-# rownames(malt_genus.decontam_filtered_cmc) <- malt_genus.decontam_filtered_cmc$SampleID
-# 
-# malt_genus.decontam_filtered_cmc <- malt_genus.decontam_filtered_cmc %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered_cmc = malt_genus.decontam_filtered_cmc+1
-# 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
 tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
@@ -2459,10 +2563,10 @@ mr_genus <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv")
 
 malt_genus.decontam_filtered_cmc_mr <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-matches("10M|SRR164|EXB|LIB")) %>%
+                                         select(-matches("10M|SRR|JAE|EXB|LIB")) %>%
                                          rename(Genus = Species) %>%
                                          inner_join(., mr_genus %>%
-                                                      filter(str_detect(Residual, "MR1|MR2")) %>%
+                                                      filter(str_detect(Residual, "MR1")) %>%
                                                       select(-Residual)) %>%
                                          gather("SampleID","Counts",2:ncol(.)) %>%
                                          mutate(Counts = as.numeric(Counts),
@@ -2502,18 +2606,6 @@ plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC3", "PC2", "Market_econo
 plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
-# by Description (do HMP supragingival and HMP subgingival plaque samples separate?)
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC1", "PC2", "Description", "Description", "Description", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC3", "PC2", "Description", "Description", "Description", 3)
-
-# by Extraction batch 
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC1", "PC2", "ExtractionBatch", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC3", "PC2", "ExtractionBatch", "Ethnic_Group", "Ethnic_Group", 3)
-
-# by Library batch 
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC1", "PC2", "LibraryBatch", "Ethnic_Group", "Ethnic_Group", 3)
-plot_pca_titles(malt_genus.decontam_filtered_cmc_mr, "PC3", "PC2", "LibraryBatch", "Ethnic_Group", "Ethnic_Group", 3)
-
 # by Individual sequencing depth
 # perform a PCA to see how the data cluster
 malt_genus_decontam_filtered_cmc_mr.pca <- mixOmics::pca(malt_genus.decontam_filtered_cmc_mr, ncomp = 3, logratio = 'CLR')
@@ -2547,7 +2639,7 @@ Run a permanova with function adonis2 to test if the clusters are significantly 
 # use the CLR-transformed matrix from the mixOmics PCA in the last section
 
 # Euclidean distance
-malt_genus.decontam_filtered_cmc.euc <- vegdist(malt_genus.decontam_filtered_cmc.pca$X, method = "euclidean", na.rm = T)
+malt_genus.decontam_filtered_cmc.euc <- vegdist(malt_genus.decontam_filtered_cmc_mr.pca$X, method = "euclidean", na.rm = T)
 malt_genus.decontam_filtered_cmc.euc.pcoa <- ape::pcoa(malt_genus.decontam_filtered_cmc.euc)
 
 malt_genus.decontam_filtered_cmc.euc.pcoavectors <- as.data.frame(malt_genus.decontam_filtered_cmc.euc.pcoa$vectors)
@@ -2566,12 +2658,15 @@ malt_genus.decontam_filtered_cmc.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch +  LibraryBatch, metadata_cmc, permutations = 999, by = "margin")
+adonis2(malt_genus.decontam_filtered_cmc.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(malt_genus.decontam_filtered_cmc.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
+adonis2(malt_genus.decontam_filtered_cmc.euc ~ Village + Sex + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
+Village and tooth site are significantly different unless controlling for tooth
+site, when only village is significantly different.
 
 Then run betadisper to see if the groups have different dispersion ("tight" vs.
 "loose" clustering of groups) - is one group more variable than the other(s)?
@@ -2609,33 +2704,6 @@ plot(toothsite_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data e
 ## Draw a boxplot of the distances to centroid for each group
 boxplot(toothsite_betadisper_cmc_genus)
 
-
-# Sex
-groups_sex <- metadata_cmc %>%
-  select(Sex) %>% 
-  pull()
-
-## Calculate multivariate dispersions
-sex_betadisper_cmc_genus <- betadisper(malt_genus.decontam_filtered_cmc.euc, groups_sex, bias.adjust =TRUE)
-sex_betadisper_cmc_genus
-
-## Perform test
-anova(sex_betadisper_cmc_genus)
-
-## Permutation test for F
-permutest(sex_betadisper_cmc_genus, pairwise = TRUE, permutations = 99)
-
-## Tukey's Honest Significant Differences
-sex_betadisper_cmc_genus.HSD <- TukeyHSD(sex_betadisper_cmc_genus)
-plot(sex_betadisper_cmc_genus.HSD)
-
-## Plot with data ellipses instead of hulls
-plot(sex_betadisper_cmc_genus, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
-
-## Draw a boxplot of the distances to centroid for each group
-boxplot(sex_betadisper_cmc_genus)
-
-
 # Village
 groups_village <- metadata_cmc %>%
   select(Village) %>% 
@@ -2664,11 +2732,12 @@ boxplot(village_betadisper_cmc_genus)
 
 
 ```
-
+There is a significant difference in disperson between tooth site groups, but
+not between villages.
 
 Make biplots showing the loadings of the strongest loading genera in PC1 and PC2
 positive and negative directions
-```{r biplots_cmc_genus}
+```{r biplots_cmc_genus, eval = F}
 
 malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
@@ -2684,12 +2753,6 @@ malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          mutate(Counts = Counts +1) %>%
                                          spread(Species,Counts) %>%
                                          column_to_rownames("SampleID")
-
-# rownames(malt_genus.decontam_filtered_nocontrols) <- malt_genus.decontam_filtered_nocontrols$SampleID
-# 
-# malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam_filtered_nocontrols %>% select(-SampleID)
-# 
-# malt_genus.decontam_filtered_nocontrols = malt_genus.decontam_filtered_nocontrols+1
 
 malt_genus.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_genus.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
 plot(malt_genus.decontam_filtered_nocontrols.pca)
@@ -2762,6 +2825,92 @@ colonizing aerobes and facultative anaerobes. In PC3, the positive loading taxa
 are mostly late colonizing anaerobes, while the negative loading taxa are a mix
 of early colonizing aerobes and unusual, rare, or poorly characterized in the
 oral biofilm.
+
+Now biplots on the PCA with only MR1 genera
+```{r biplots_cmc_genus_mr}
+
+malt_genus.decontam_filtered_cmc_mr <- malt_genus.decontam %>%
+                                         select(-one_of(outliers)) %>%
+                                         select(-matches("10M|SRR|JAE|EXB|LIB")) %>%
+                                         rename(Genus = Species) %>%
+                                         inner_join(., mr_genus %>%
+                                                      filter(str_detect(Residual, "MR1|MR2")) %>%
+                                                      select(-Residual)) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>%
+                                         mutate(Counts = as.numeric(Counts),
+                                                Counts = Counts + 1) %>%
+                                         spread(Genus,Counts) %>%
+                                         column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_genus.decontam_filtered_cmc_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_genus.decontam_filtered_cmc_mr.pca <- pca(malt_genus.decontam_filtered_cmc_mr, ncomp = 3, logratio = 'CLR')
+
+malt_genus_decontam_filtered_nocontrols_biplot_121 <- plot_pca_bi(malt_genus.decontam_filtered_cmc_mr.pca, "PC1", "PC2", "Ethnic_Group", PC1)
+malt_genus_decontam_filtered_nocontrols_biplot_121
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_121$plot_env$pws_10 %>% arrange(desc(PC1)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_121$plot_env$neg_10 %>% arrange(PC1),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC1 negative loadings")
+
+
+
+malt_genus_decontam_filtered_nocontrols_biplot_122 <- plot_pca_bi(malt_genus.decontam_filtered_cmc_mr.pca, "PC1", "PC2", "Ethnic_Group", PC2)
+malt_genus_decontam_filtered_nocontrols_biplot_122
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_122$plot_env$pws_10 %>% arrange(desc(PC2)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_122$plot_env$neg_10 %>% arrange(PC2),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC2 negative loadings")
+
+
+malt_genus_decontam_filtered_nocontrols_biplot_322 <- plot_pca_bi(malt_genus.decontam_filtered_cmc_mr.pca, "PC3", "PC2", "Ethnic_Group", PC2)
+malt_genus_decontam_filtered_nocontrols_biplot_322
+
+malt_genus_decontam_filtered_nocontrols_biplot_323 <- plot_pca_bi(malt_genus.decontam_filtered_cmc_mr.pca, "PC3", "PC2", "Ethnic_Group", PC3)
+malt_genus_decontam_filtered_nocontrols_biplot_323
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_323$plot_env$pws_10 %>% arrange(desc(PC3)),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 positive loadings")
+
+pandoc.table(malt_genus_decontam_filtered_nocontrols_biplot_323$plot_env$neg_10 %>% arrange(PC3),
+             digits = 5,
+             keep.trailing.zeros = T,
+             justify = "lccr",
+             split.tables = Inf,
+             caption = "PC3 negative loadings")
+
+```
+There is overlap in the genera that are in the top 10 of PC1 and PC2 between the
+abundance filter and the MR1 genera, from 4-6 genera. Just stick with the MR1
+genera
+
 
 ```{r uky_graphs, eval = F}
 

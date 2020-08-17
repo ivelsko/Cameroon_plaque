@@ -632,6 +632,33 @@ each_order <- c(cmc_order, jae_order, hmp_order)
 
 ```
 
+To change the heatmap label colors by different metadata categories swap out the
+sections below
+```{r heatmap_label_colors, eval = F}
+
+Village_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Village, "Yanomami|10M|Gauze|Blank")), by = "Village"
+
+Sex_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex"
+
+
+Age_group_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Age_group = c("18-29","30-39","40-49","50-59","6+","10-18","HMP","HMP10M","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Age_group, "10|10M|Gauze|Blank")), by = "Age_group"
+
+
+```
+
+
 Try changing the sample order to group them by the different metadata categories
 (currently have Industrialization/Ethnic group/Market economy/Village grouping).
 Need to look at: Tooth site, Age group, Sex, others? Also try clustering the
@@ -742,12 +769,12 @@ malt_genus.decontam_FA_all_clr_long <- malt_genus.decontam_FA_all_clr %>%
   as_tibble(.) %>%
   gather("SampleID","CLR", 2:ncol(.)) %>%
   inner_join(., metadata %>%
-               select(SampleID, Village), by = "SampleID") %>%
-  inner_join(., Village_colors %>%
+               select(SampleID, Sex), by = "SampleID") %>%
+  inner_join(., Sex_colors %>%
                as_data_frame(.) %>%
                rename(Color = value) %>%
-               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
-               filter(!str_detect(Village, "Yanomami|10M|Gauze|Blank")), by = "Village") %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
   mutate(SampleID = fct_relevel(SampleID, malt_genus.decontam_FA_all_clr_smp_order)) %>%
   arrange(SampleID)
 
@@ -1284,11 +1311,12 @@ malt_genus.decontam_FA_cmc_clr_long <- malt_genus.decontam_FA_cmc_clr %>%
   arrange(Genus) %>%
   gather("SampleID","CLR", 2:ncol(.)) %>%
   inner_join(., metadata %>%
-               select(SampleID, Village), by = "SampleID") %>%
-  inner_join(., Village_colors %>%
+               select(SampleID, Sex), by = "SampleID") %>%
+  inner_join(., Sex_colors %>%
                as_data_frame(.) %>%
                rename(Color = value) %>%
-               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")), by = "Village") %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
   mutate(SampleID = fct_relevel(SampleID, malt_genus.decontam_FA_cmc_clr_smp_order)) %>%
   arrange(SampleID)
 

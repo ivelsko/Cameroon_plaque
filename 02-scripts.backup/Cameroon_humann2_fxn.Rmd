@@ -401,7 +401,7 @@ humann2_path.decontam_noblanks_long <- humann2_path.decontam %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
 humann2_path.decontam_noblanks_long_box <- humann2_path.decontam_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
   ggplot(., aes(Village, Paths, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
@@ -422,6 +422,7 @@ pairwise.wilcox.test(humann2_path.decontam_noblanks_long_box_w$Paths, humann2_pa
 # potential contaminant pathways removed and only pathways present in at least 33% of one ethnic group
 h2_path_test <- humann2_path.decontam %>%
   filter(!str_detect(Pathway, "\\|")) %>%
+  select(-matches("EXB|LIB|SRR164|10M")) %>%
   mutate_if(is.numeric, ~1 * (. > 0)) %>%
   gather("SampleID","CPM",2:ncol(.)) %>%
   inner_join(., metadata %>%
@@ -437,6 +438,7 @@ h2_path_test <- humann2_path.decontam %>%
 
 humann2_path.decontam_noblanks_33_long <- humann2_path.decontam %>%
   inner_join(., h2_path_test, by = "Pathway") %>%
+  select(-matches("EXB|LIB|SRR164|10M")) %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
   mutate_if(is.numeric, ~1 * (. != 0)) %>%
   group_by(SampleID) %>%
@@ -444,7 +446,6 @@ humann2_path.decontam_noblanks_33_long <- humann2_path.decontam %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
 humann2_path.decontam_noblanks_33_long_box <- humann2_path.decontam_noblanks_33_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
   ggplot(., aes(Village, Paths, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
@@ -623,14 +624,15 @@ humann2_path_noyanomami_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch +  LibraryBatch, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_noyanomami_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
+adonis2(humann2_path_noyanomami_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
-Tooth site (p = 0.0001) and village (p < 0.05) are significantly different. When
-controlling for tooth site, village is significant (p < 0.05).
+Tooth site (p = 0.001) and village (p < 0.01) are significantly different. When
+controlling for tooth site, village is significant (p < 0.01).
 
 What are the relationships of the Cameroon plaque samples to eachother without
 the industrial samples?
@@ -699,14 +701,15 @@ humann2_path_cmc_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch +  LibraryBatch, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_cmc_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group +  Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
+adonis2(humann2_path_cmc_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
 
 ```
-Tooth site (p < 0.01) is significantly different, but when controlling for tooth
-site none are significantly different.
+Tooth site and village (both p < 0.01) are significantly different, but when
+controlling for tooth site only village is significantly different.
 
 Now let's look at which pathways are driving separation of the sample groups.
 Which of the pathways have the strongest loadings in PC1 and PC2?
@@ -922,6 +925,14 @@ assigned to each population to see if this may bias further analyses. Is the
 proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs
 consistent and high across all sample types? That would be good b/c we have no
 major group biases.
+
+```{r mr1_orthologs}
+# Now keep only the orthologs that are in MR1 from the factor analysis
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_KO.tsv")
+
+```
+
+
 ```{r orthologs_boxes}
 # use the full table
 humann2_KO_long <- humann2_KOs %>%
@@ -931,17 +942,17 @@ humann2_KO_long <- humann2_KOs %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
   mutate_if(is.numeric, ~1 * (. != 0)) %>%
   group_by(SampleID) %>%
-  summarize(Paths = sum(CPM)) %>%
+  summarize(Orthologs = sum(CPM)) %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
 humann2_KO_box <- humann2_KO_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Paths, fill = Village)) +
+  ggplot(., aes(Village, Orthologs, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of KEGG orthologs detected")
+    ylab("Number of KEGG orthologs detected") +
     ggtitle("Total number of KEGG orthologs ID'd by HUMAnN2 (no filtering)")
 humann2_KO_box
 
@@ -950,24 +961,24 @@ humann2_KO_box
 
 humann2_KO_long_w <- humann2_KO_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
-pairwise.wilcox.test(humann2_KO_long_w$Paths, humann2_KO_long_w$Village, p.adjust.method = "fdr")
+pairwise.wilcox.test(humann2_KO_long_w$Orthologs, humann2_KO_long_w$Village, p.adjust.method = "fdr")
 
 # use the decontaminated table, with KOs identified as potential contaminants removed
 humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
   gather("SampleID","CPM", 2:ncol(.)) %>%
   mutate_if(is.numeric, ~1 * (. != 0)) %>%
   group_by(SampleID) %>%
-  summarize(Paths = sum(CPM)) %>%
+  summarize(Orthologs = sum(CPM)) %>%
   inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
 
 humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Paths, fill = Village)) +
+  ggplot(., aes(Village, Orthologs, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of KEGG orthologs detected")
+    ylab("Number of KEGG orthologs detected") +
     ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 (decontaminated)")
 humann2_KOs.decontam_box
 
@@ -976,14 +987,45 @@ humann2_KOs.decontam_box
 
 humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
-pairwise.wilcox.test(humann2_KOs.decontam_long_w$Paths, humann2_KOs.decontam_long_w$Village, p.adjust.method = "fdr")
+pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Village, p.adjust.method = "fdr")
 
+# how many orthologs are in each group from the MR1 proteins?
+# use the decontaminated table, with KOs identified as potential contaminants removed
+humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
+  select(-matches("EXB|LIB|10M")) %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Ortholog), by = "Ortholog") %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Orthologs = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
+
+humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  ggplot(., aes(Village, Orthologs, fill = Village)) +
+    geom_boxplot() +
+    scale_fill_manual(values = Village_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Number of KEGG orthologs detected") +
+    ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 in MR1")
+humann2_KOs.decontam_box
+
+# ggsave("./05-results.backup/presentation_pdfs/humann2_KOs.decontam_box.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
+pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Village, p.adjust.method = "fdr")
 
 ```
 There are significantly more orthologs identified in HMP samples than each of
 the villates, and in JAE samples than each of the villages. There are no
 significant difrerences between any villages, or between HMP and JAE samples.
-This is true for both the full table and the decontaminated table.
+This is true for the full table, the decontaminated table. and the MR1 orthologs
+table.
 
 Now perform a PCA to see if there is more distinct clustering of the samples
 based on any of the metadata categories than we see with the pathways.
@@ -1042,7 +1084,7 @@ exactly on top of their counterpart full samples, so we can keep using the full
 samples. The difference in sequencing depth isn't responsible for the
 differences we observe between the sample types.
 
-How does the reationship of the samples change when we filter out orthologs that
+How does the relationship of the samples change when we filter out orthologs that
 are low abundance or low prevalence?
 ```{r pca_KOs_filtering}
 # filter low-abundance orthologs
@@ -1127,8 +1169,6 @@ plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
 ```
 
 ```{r mr1_orthologs}
-# Now keep only the orthologs that are in MR1 from the factor analysis
-mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_KO.tsv")
 
 humann2_KOs.decontam_mr1 <- humann2_KOs.decontam %>%
   select(-matches("EXB|LIB|10M")) %>%
@@ -1182,17 +1222,17 @@ humann2_KO_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_mat.euc.vecmet$Tooth_site)
+adonis2(humann2_KO_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_mat.euc.vecmet$Tooth_site)
 
 ```
-When using the MR1 orthologs, there are no significant differences between
-groups, both when not controlling for tooth site and when controlling for tooth
-site.  If using the abundance cut-off, only tooth site is significantly
-different (p < 0.01), and when controlling for tooth site, none are
-significantly different.
+When using the MR1 orthologs, there are significant differences between tooth
+site, but none when controlling for tooth site.  If using the abundance cut-off,
+only tooth site is significantly different (p < 0.01), and when controlling for
+tooth site, none are significantly different.
 
 What is the relationship of the Cameroon plaque samples without the industrial samples?
 ```{r pca_KOs_cmc_metadata}
@@ -1337,20 +1377,22 @@ humann2_KO_cmc_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_KO_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_cmc_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_cmc_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_cmc_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_mat.euc.vecmet$Tooth_site)
+adonis2(humann2_KO_cmc_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_mat.euc.vecmet$Tooth_site)
 
 ```
-When using only the orthologs in MR1 from the factor analysis, none are
-significantly different, either when not controlling for tooth site, or when
-controlling for tooth site. When using the abundance cut-off, only tooth site is
-significantly different (p < 0.01), and when controlling for tooth site, only
-sex is significantly different (p < 0.05).
+When using only the orthologs in MR1 from the factor analysis, only tooth site
+is significantly different, and none when controlling for tooth site. When using
+the abundance cut-off, only tooth site is significantly different (p < 0.01),
+and when controlling for tooth site, only sex is significantly different (p <
+0.05).
 
 
-Now to see which of the orthologs have the strongest loadings in PC1 and PC2
+Now to see which of the orthologs have the strongest loadings in PC1 and PC2,
+using the MR1 orthologs
 ```{r pca_KO_biplot}
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
@@ -1374,7 +1416,7 @@ pandoc.table(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_KO_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
+# humann2_KO_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
 # humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
 #   bind_rows(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
@@ -1490,7 +1532,7 @@ K06221 - 2,5-diketo-D-gluconate reductase A [EC:1.1.1.346] dkgA; Oxidoreductases
 K06980 - tRNA-modifying protein YgfZ; transfer RNA biogenesis
 K03684 - ribonuclease D [EC:3.1.13.5] rnd; transfer RNA biogenesis
 K00982 - [glutamine synthetase] adenylyltransferase / [glutamine synthetase]-adenylyl-L-tyrosine phosphorylase [EC:2.7.7.42 2.7.7.89] glnE; Nucleotidyltransferases
-K03578 - ATP-dependent helicase HrpA [EC:3.6.4.13]; DNA replication and repair
+K03578 - ATP-dependent helicase HrpA [EC:3.6.4.13]; DNA replication and repair`8
 
 _PC2-_
 K11784 - cyclic dehypoxanthinyl futalosine synthase [EC:1.21.98.1] mqnC; metabolism of cofactors and vitamins
@@ -1712,14 +1754,15 @@ humann2_KO_carbs_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_KO_carbs_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_carbs_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_carbs_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_carbs_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_carbs_mat.euc.vecmet$Tooth_site)
+adonis2(humann2_KO_carbs_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_carbs_mat.euc.vecmet$Tooth_site)
 
 ```
-Only tooth site is significantly different (p < 0.01). When controlling for
-tooth site, no categories are different.
+Only village (p < 0.05) and tooth site (p < 0.01) are significantly different.
+When controlling for tooth site, no village (p < 0.05) is different.
 
 
 Cameroon plaque samples only
@@ -1773,14 +1816,15 @@ humann2_KO_cmc_carbs_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_KO_cmc_carbs_mat.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_cmc_carbs_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_cmc_carbs_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_cmc_carbs_mat.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_carbs_mat.euc.vecmet$Tooth_site)
+adonis2(humann2_KO_cmc_carbs_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_carbs_mat.euc.vecmet$Tooth_site)
 
 ```
-Only tooth site is significantly different (p < 0.01). When controlling for
-tooth site, no categories are different.
+Only village (p < 0.05) and tooth site (p < 0.01) are significantly different.
+When controlling for tooth site, no categories are different.
 
 Now to see which of the orthologs have the strongest loadings in PC1 and PC2
 ```{r pca_KO_biplot}
@@ -1899,101 +1943,101 @@ humann2_KO_carbs_biplot_list %>%
 
 _*All samples*_
 _PC1+:_
-K01848
-K15633
-K00209
-K01678
-K01849
-K03737
-K00030
-K01711
-K01571
-K01858
+K01848 - methylmalonyl-CoA mutase, N-terminal domain [EC:5.4.99.2] E5.4.99.2A, mcmA1; Glyoxylate and dicarboxylate metabolism
+K15633 - 2,3-bisphosphoglycerate-independent phosphoglycerate mutase [EC:5.4.2.12] gpmI; Glycolysis / Gluconeogenesis
+K00209 - enoyl-[acyl-carrier protein] reductase / trans-2-enoyl-CoA reductase (NAD+) [EC:1.3.1.9 1.3.1.44] fabV, ter; Butanoate metabolism
+K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] E4.2.1.2AB, fumB; Citrate cycle (TCA cycle)
+K01849 - methylmalonyl-CoA mutase, C-terminal domain [EC:5.4.99.2] E5.4.99.2B, mcmA2; Glyoxylate and dicarboxylate metabolism
+K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
+K00030 - isocitrate dehydrogenase (NAD+) [EC:1.1.1.41], IDH3; Citrate cycle (TCA cycle)
+K01711 - GDPmannose 4,6-dehydratase [EC:4.2.1.47], gmd, GMDS; Fructose and mannose metabolism
+K01571 - oxaloacetate decarboxylase (Na+ extruding) subunit alpha [EC:7.2.4.2], oadA; Pyruvate metabolism
+K01858 - myo-inositol-1-phosphate synthase [EC:5.5.1.4], INO1, ISYNA1; Inositol phosphate metabolism
 
 _PC1-:_
-K02821
-K02783
-K01433
-K03335
-K02782
-K00068
-K13788
-K07248
-K00010
-K09788
+K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194], ulaC, sgaA; Ascorbate and aldarate metabolism
+K02783 - glucitol/sorbitol PTS system EIIC component, srlA; Fructose and mannose metabolism
+K01433 - formyltetrahydrofolate deformylase [EC:3.5.1.10], purU; Glyoxylate and dicarboxylate metabolism
+K03335 - inosose dehydratase [EC:4.2.1.44], iolE; Inositol phosphate metabolism
+K02782 - glucitol/sorbitol PTS system EIIB component [EC:2.7.1.198], srlE; Fructose and mannose metabolism
+K00068 - sorbitol-6-phosphate 2-dehydrogenase [EC:1.1.1.140], srlE; Fructose and mannose metabolism
+K13788 - phosphate acetyltransferase [EC:2.3.1.8], pta; Pyruvate metabolism
+K07248 - lactaldehyde dehydrogenase / glycolaldehyde dehydrogenase [EC:1.2.1.22 1.2.1.21], aldA; Pyruvate metabolism
+K00010 - myo-inositol 2-dehydrogenase / D-chiro-inositol 1-dehydrogenase [EC:1.1.1.18 1.1.1.369], iolG; Inositol phosphate metabolism
+K09788 - 2-methylaconitate isomerase [EC:5.3.3.-], prpF; Propanoate metabolism
 
 _PC2+:_
-K00008
-K02438
-K17489
-K13922
-K16148
-K06044
-K03338
-K05341
-K03336
-K01236
+K00008 - L-iditol 2-dehydrogenase [EC:1.1.1.14], SORD, gutB; Pentose and glucuronate interconversions
+K02438 - glycogen debranching enzyme [EC:3.2.1.196], glgX; Starch and sucrose metabolism
+K17489 - methylmalonyl-CoA carboxyltransferase 12S subunit [EC:2.1.3.1], E2.1.3.1-12S; Propanoate metabolism
+K13922 - propionaldehyde dehydrogenase [EC:1.2.1.87], pduP; Propanoate metabolism
+K16148 - alpha-maltose-1-phosphate synthase [EC:2.4.1.342], glgM; Starch and sucrose metabolism
+K06044 - (1->4)-alpha-D-glucan 1-alpha-D-glucosylmutase [EC:5.4.99.15], treY, glgY; Starch and sucrose metabolism
+K03338 - 5-dehydro-2-deoxygluconokinase [EC:2.7.1.92], iolC; Inositol phosphate metabolism
+K05341 - amylosucrase [EC:2.4.1.4], E2.4.1.4; Starch and sucrose metabolism
+K03336 - 3D-(3,5/4)-trihydroxycyclohexane-1,2-dione acylhydrolase (decyclizing) [EC:3.7.1.22], iolD; Inositol phosphate metabolism
+K01236 - maltooligosyltrehalose trehalohydrolase [EC:3.2.1.141], treZ, glgZ; Starch and sucrose metabolism
 
 _PC2-:_
-K18369
-K00123
-K01792
-K01654
-K11258
-K03781
-K00246
-K01092
-K00127
-K01512
+K18369 - alcohol dehydrogenase [EC:1.1.1.-], adh2; Propanoate metabolism
+K00123 - formate dehydrogenase major subunit [EC:1.17.1.9], fdoG, fdhF, fdwA; Glyoxylate and dicarboxylate metabolism
+K01792 - glucose-6-phosphate 1-epimerase [EC:5.1.3.15], E5.1.3.15; Glycolysis / Gluconeogenesis
+K01654 - N-acetylneuraminate synthase [EC:2.5.1.56], neuB, nnaB; Amino sugar and nucleotide sugar metabolism
+K11258 - acetolactate synthase II small subunit [EC:2.2.1.6], ilvM; Butanoate metabolism
+K03781 - catalase [EC:1.11.1.6], katE, CAT, catB, srpA; Glyoxylate and dicarboxylate metabolism
+K00246 - fumarate reductase subunit C, frdC; Citrate cycle (TCA cycle)
+K01092 - myo-inositol-1(or 4)-monophosphatase [EC:3.1.3.25], E3.1.3.25, IMPA, suhB; Inositol phosphate metabolism
+K00127 - formate dehydrogenase subunit gamma, fdoI, fdsG; Glyoxylate and dicarboxylate metabolism
+K01512 - 
 
 _*CMC samples only*_
 _PC1+:_
-K01848
-K01849
-K15633
-K01678
-K03737
-K01220
-K00030
-K02787
-K02788
-K00209
+K01848 - methylmalonyl-CoA mutase, N-terminal domain [EC:5.4.99.2] E5.4.99.2A, mcmA1; Glyoxylate and dicarboxylate metabolism
+K01849 - methylmalonyl-CoA mutase, C-terminal domain [EC:5.4.99.2] E5.4.99.2B, mcmA2; Glyoxylate and dicarboxylate metabolism
+K15633 - 2,3-bisphosphoglycerate-independent phosphoglycerate mutase [EC:5.4.2.12] gpmI; Glycolysis / Gluconeogenesis
+K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] E4.2.1.2AB, fumB; Citrate cycle (TCA cycle)
+K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
+K01220 - 6-phospho-beta-galactosidase [EC:3.2.1.85], E3.2.1.85, lacG; Galactose metabolism
+K00030 - isocitrate dehydrogenase (NAD+) [EC:1.1.1.41], IDH3; Citrate cycle (TCA cycle)
+K02787 - ???
+K02788 - lactose PTS system EIICB component [EC:2.7.1.207], lacE; Galactose metabolism
+K00209 - enoyl-[acyl-carrier protein] reductase / trans-2-enoyl-CoA reductase (NAD+) [EC:1.3.1.9 1.3.1.44] fabV, ter; Butanoate metabolism
 
 _PC1-:_
-K02783
-K02821
-K01433
-K00854
-K03079
-K00694
-K03078
-K02438
-K03335
-K02782
+K02783 - glucitol/sorbitol PTS system EIIC component, srlA; Fructose and mannose metabolism
+K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194], ulaC, sgaA; Ascorbate and aldarate metabolism
+K01433 - formyltetrahydrofolate deformylase [EC:3.5.1.10], purU; Glyoxylate and dicarboxylate metabolism
+K00854 - xylulokinase [EC:2.7.1.17], xylB, XYLB; Pentose and glucuronate interconversions
+K03079 - L-ribulose-5-phosphate 3-epimerase [EC:5.1.3.22], ulaE, sgaU, sgbU; Pentose and glucuronate interconversions
+K00694 - cellulose synthase (UDP-forming) [EC:2.4.1.12], bcsA; Starch and sucrose metabolism
+K03078 - 3-dehydro-L-gulonate-6-phosphate decarboxylase [EC:4.1.1.85], ulaD, sgaH, sgbH; Pentose and glucuronate interconversions
+K02438 - glycogen debranching enzyme [EC:3.2.1.196], glgX; Starch and sucrose metabolism
+K03335 - inosose dehydratase [EC:4.2.1.44], iolE; Inositol phosphate metabolism
+K02782 - glucitol/sorbitol PTS system EIIB component [EC:2.7.1.198], srlE; Fructose and mannose metabolism
 
 _PC2+:_
-K00009
-K01006
-K17489
-K00008
-K01218
-K01580
-K03737
-K03336
-K00692
-K03416
+K00009 - mannitol-1-phosphate 5-dehydrogenase [EC:1.1.1.17], mtlD; Fructose and mannose metabolism
+K01006 - pyruvate, orthophosphate dikinase [EC:2.7.9.1], ppdK; Glycolysis / Gluconeogenesis
+K17489 - methylmalonyl-CoA carboxyltransferase 12S subunit [EC:2.1.3.1], E2.1.3.1-12S; Propanoate metabolism
+K00008 - L-iditol 2-dehydrogenase [EC:1.1.1.14], SORD, gutB; Pentose and glucuronate interconversions
+K01218 - mannan endo-1,4-beta-mannosidase [EC:3.2.1.78], gmuG; Fructose and mannose metabolism
+K01580 - glutamate decarboxylase [EC:4.1.1.15], E4.1.1.15, gadB, gadA, GAD; Butanoate metabolism
+K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
+K03336 - 3D-(3,5/4)-trihydroxycyclohexane-1,2-dione acylhydrolase (decyclizing) [EC:3.7.1.22], iolD; Inositol phosphate metabolism
+K00692 - levansucrase [EC:2.4.1.10], sacB; Starch and sucrose metabolism
+K03416 - methylmalonyl-CoA carboxyltransferase 5S subunit [EC:2.1.3.1], E2.1.3.1-5S, pcyB; Propanoate metabolism
 
 _PC2-:_
-K07248
-K01092
-K18369
-K01595
-K03777
-K00029
-K01690
-K00121
-K01069
-K09788
+K07248 - lactaldehyde dehydrogenase / glycolaldehyde dehydrogenase [EC:1.2.1.22 1.2.1.21], aldA; Pyruvate metabolism
+K01092 - myo-inositol-1(or 4)-monophosphatase [EC:3.1.3.25], E3.1.3.25, IMPA, suhB; Inositol phosphate metabolism
+K18369 - alcohol dehydrogenase [EC:1.1.1.-], adh2; Propanoate metabolism
+K01595 - phosphoenolpyruvate carboxylase [EC:4.1.1.31], ppc; Pyruvate metabolism
+K03777 - D-lactate dehydrogenase (quinone) [EC:1.1.5.12], dld; Pyruvate metabolism
+K00029 - malate dehydrogenase (oxaloacetate-decarboxylating)(NADP+) [EC:1.1.1.40], E1.1.1.40, maeB; Pyruvate metabolism
+K01690 - phosphogluconate dehydratase [EC:4.2.1.12], edd; Pentose phosphate pathway
+K00121 - S-(hydroxymethyl)glutathione dehydrogenase / alcohol dehydrogenase [EC:1.1.1.284 1.1.1.1], frmA, ADH5, adhC; Glycolysis / Gluconeogenesis
+K01069 - hydroxyacylglutathione hydrolase [EC:3.1.2.6], gloB, gloc, HAGH; Pyruvate metabolism
+K09788 - 2-methylaconitate isomerase [EC:5.3.3.-], prpF; Propanoate metabolism
 
 
 

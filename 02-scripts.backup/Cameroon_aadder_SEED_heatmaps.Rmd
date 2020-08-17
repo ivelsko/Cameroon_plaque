@@ -1,0 +1,469 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque SEED heat maps"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(vegan)
+# library(ape)
+library(mixOmics)
+library(compositions)
+# library(MASS)
+library(janitor)
+# library(rstatix)
+# library(pander)
+library(tidyverse)
+# library(gplots)
+# library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+## load the species and genus tables generated with HUMAnN2
+load("./05-results.backup/CMC_seed_tables.RData")
+
+seed_L4.decontam_noblanks.fa_seed <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+seed_L4.decontam_cmc.fa_seed <- fread("./05-results.backup/minres_oblimin_cmc.fa_seed.tsv")
+
+```
+
+```{r load_metadata}
+
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+## Heatmaps
+Make a heat map of the species in MR1 and MR2 to see how they're different between the groups
+```{r metadata_heatmaps}
+# minres_oblimin_nobl_noyano_fa_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv", sep = "\t")
+# minres_oblimin_cmc_fa_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv", sep = "\t")
+
+# read in metadata again to get it without all the factors
+metadata_hm <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
+# order the samples so they can be ordered this way in the heat maps
+
+# order the CMC samples by Village
+cmc_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
+  select(SampleID, Village) %>%
+  arrange(Village) %>%
+  pull(SampleID)
+
+# order the HMP samples by subplaque, supraplaque
+hmp_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "SRR")) %>%
+  filter(!str_detect(SampleID, "10M|SRR164")) %>%
+  mutate(Description = fct_relevel(Description, "HMP_subPlaque","HMP_supPlaque")) %>%
+  select(SampleID, Description) %>%
+  arrange(Description) %>%
+  pull(SampleID)
+
+# keep JAE samples in alphabetical order
+jae_order <- metadata_hm %>%
+  rename(SampleID = `#SampleID`)  %>%
+  as_tibble() %>%
+  filter(str_detect(SampleID, "JAE")) %>%
+  filter(!str_detect(SampleID, "10M")) %>%
+  pull(SampleID)
+
+# combine all 3 ordered vectors into a final ordered vector
+each_order <- c(cmc_order, jae_order, hmp_order)
+
+```
+
+To change the heatmap label colors by different metadata categories swap out the
+sections below
+```{r heatmap_label_colors, eval = F}
+
+Village_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Village, "Yanomami|10M|Gauze|Blank")), by = "Village"
+
+Sex_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex"
+
+
+Age_group_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Age_group = c("18-29","30-39","40-49","50-59","60+","10-18","HMP","HMP10M","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Age_group, "10|10M|Gauze|Blank")), by = "Age_group"
+
+
+```
+
+Try changing the sample order to group them by the different metadata categories
+(currently have Industrialization/Ethnic group/Market economy/Village grouping).
+Need to look at: Tooth site, Age group, Sex, others? Also try clustering the
+samples to see if they fall into any recognizable categories.
+```{r heatmap_noblanks_noyanomami}
+# select the SEED proteins in MR1 and MR2 for the FA
+seed_L4.decontam_FA_all <- seed_L4.decontam %>%
+                                  select(-matches("SRR164|10M|EXB|LIB|CMC032.B")) %>%
+                                  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+                                  select(-c("SEED","L2","L3")) %>%
+                                  inner_join(., seed_L4.decontam_noblanks.fa_seed %>%
+                                               filter(Residual == "MR2") %>%
+                                               select(-Residual)) %>%
+                                  gather("SampleID","Counts",2:ncol(.)) %>%
+                                  mutate(Counts = Counts + 1) %>%
+                                  spread(Pathway,Counts) %>%
+                                  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_FA_all_clr <- clr(seed_L4.decontam_FA_all)
+seed_L4.decontam_FA_all_clr <- as.matrix(seed_L4.decontam_FA_all_clr)
+
+# orient the matrix with correct rows/columns to run the distance calculation for the seed protein, not the samples (columns are SampleID, rows are proteins)
+seed_L4.decontam_FA_all_clr_sp <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  column_to_rownames("Pathway")
+
+# perform a distance calculation for hierarchical clustering for the protein ordering
+seed_L4.decontam_FA_all_clr_dist <- vegdist(seed_L4.decontam_FA_all_clr_sp, method = "euclidian")
+# cluster the data with hclust
+seed_L4.decontam_FA_all_clr_dist_hr <- hclust(seed_L4.decontam_FA_all_clr_dist)
+# seed_L4.decontam_FA_all_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+sp_all_order <- seed_L4.decontam_FA_all_clr_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the SEED protein in the correct order for the heatmap
+seed_L4.decontam_FA_all_clr_order <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(SpOrder = as.character(seq(1,869))) %>% # MR1 - 700; MR2 - 869
+  select(Pathway, SpOrder, everything()) %>%
+  mutate(SpOrder = fct_relevel(SpOrder, sp_all_order)) %>%
+  arrange(SpOrder) %>%
+  pull(Pathway)
+
+# make the protein a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_all_clr_long <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Pathway = fct_relevel(Pathway, seed_L4.decontam_FA_all_clr_order)) %>%
+  arrange(Pathway) %>%
+  gather("SampleID","CLR", 2:ncol(.))
+
+
+# now cluster by sample
+# convert the matrix to a data.frame
+seed_L4.decontam_FA_all_clr_smp <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame()
+
+# perform a distance calculation for hierarchical clustering for the Pathway ordering
+seed_L4.decontam_FA_all_clr_smp_dist <- vegdist(seed_L4.decontam_FA_all_clr_smp, method = "euclidian")
+
+# cluster the data with hclust
+seed_L4.decontam_FA_all_clr_smp_dist_hr <- hclust(seed_L4.decontam_FA_all_clr_smp_dist)
+# seed_L4.decontam_FA_all_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+smp_all_order <- seed_L4.decontam_FA_all_clr_smp_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the Pathway in the correct order for the heatmap
+seed_L4.decontam_FA_all_clr_smp_order <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(Pathway,CLR) %>%
+  mutate(SmpOrder = as.character(seq(1,113))) %>%
+  select(SampleID, SmpOrder, everything()) %>%
+  mutate(SmpOrder = fct_relevel(SmpOrder, smp_all_order)) %>%
+  arrange(SmpOrder) %>%
+  pull(SampleID)
+
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+# Plot the heatmap with samples ordered by the clustering from above
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_all_clr_long <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Species = fct_relevel(Species, seed_L4.decontam_FA_all_clr_order)) %>%
+  arrange(Species) %>%
+  gather("SampleID","CLR", 2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Sex), by = "SampleID") %>%
+  inner_join(., Sex_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
+  mutate(SampleID = fct_relevel(SampleID, seed_L4.decontam_FA_all_clr_smp_order)) %>%
+  arrange(SampleID)
+
+vector_color = seed_L4.decontam_FA_all_clr_long %>%
+  select(SampleID, Color) %>%
+  unique %>%
+  pull(Color) %>%
+  as.character()
+
+# make a heatmap with ggplot
+heatmap_smp_cluster <- ggplot(seed_L4.decontam_FA_all_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_smp_cluster
+
+
+# Plot the heatmap with samples ordered by Village, then alphabetical
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_all_clr_long <- seed_L4.decontam_FA_all_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Species = fct_relevel(Species, seed_L4.decontam_FA_all_clr_order)) %>%
+  arrange(Species) %>%
+  gather("SampleID","CLR", 2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Village), by = "SampleID") %>%
+  inner_join(., Village_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")), by = "Village") %>%
+  mutate(SampleID = fct_relevel(SampleID, each_order)) %>%
+  arrange(SampleID)
+
+vector_color = seed_L4.decontam_FA_all_clr_long %>%
+  select(SampleID, Color) %>%
+  unique %>%
+  pull(Color) %>%
+  as.character()
+
+# make a heatmap with ggplot
+heatmap_smp_village <- ggplot(seed_L4.decontam_FA_all_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_smp_village
+
+# ggsave("05-results.backuppresentation_pdfs/noblanks_fa_heatmap.pdf", plot = heatmap_base, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+## Cameroon samples only
+```{r heatmap_cmc_noyanomami}
+# select the SEED proteins in MR1 and MR2 for the FA
+seed_L4.decontam_FA_cmc <- seed_L4.decontam %>%
+                                  select(-matches("SRR|JAE|EXB|LIB|CMC032.B")) %>%
+                                  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+                                  select(-c("SEED","L2","L3")) %>%
+                                  inner_join(., seed_L4.decontam_cmc.fa_seed %>%
+                                               filter(Residual == "MR2") %>%
+                                               select(-Residual)) %>%
+                                  gather("SampleID","Counts",2:ncol(.)) %>%
+                                  mutate(Counts = Counts + 1) %>%
+                                  spread(Pathway,Counts) %>%
+                                  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_FA_cmc_clr <- clr(seed_L4.decontam_FA_cmc)
+seed_L4.decontam_FA_cmc_clr <- as.matrix(seed_L4.decontam_FA_cmc_clr)
+
+# orient the matrix with correct rows/columns to run the distance calculation for the seed protein, not the samples (columns are SampleID, rows are proteins)
+seed_L4.decontam_FA_cmc_clr_sp <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  column_to_rownames("Pathway")
+
+# perform a distance calculation for hierarchical clustering for the protein ordering
+seed_L4.decontam_FA_cmc_clr_dist <- vegdist(seed_L4.decontam_FA_cmc_clr_sp, method = "euclidian")
+# cluster the data with hclust
+seed_L4.decontam_FA_cmc_clr_dist_hr <- hclust(seed_L4.decontam_FA_cmc_clr_dist)
+# seed_L4.decontam_FA_cmc_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+sp_cmc_order <- seed_L4.decontam_FA_cmc_clr_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the SEED protein in the correct order for the heatmap
+seed_L4.decontam_FA_cmc_clr_order <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(SpOrder = as.character(seq(1,712))) %>%
+  select(Pathway, SpOrder, everything()) %>%
+  mutate(SpOrder = fct_relevel(SpOrder, sp_cmc_order)) %>%
+  arrange(SpOrder) %>%
+  pull(Pathway)
+
+# make the protein a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_cmc_clr_long <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Pathway = fct_relevel(Pathway, seed_L4.decontam_FA_cmc_clr_order)) %>%
+  arrange(Pathway) %>%
+  gather("SampleID","CLR", 2:ncol(.))
+
+
+# now cluster by sample
+# convert the matrix to a data.frame
+seed_L4.decontam_FA_cmc_clr_smp <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame()
+
+# perform a distance calculation for hierarchical clustering for the Pathway ordering
+seed_L4.decontam_FA_cmc_clr_smp_dist <- vegdist(seed_L4.decontam_FA_cmc_clr_smp, method = "euclidian")
+
+# cluster the data with hclust
+seed_L4.decontam_FA_cmc_clr_smp_dist_hr <- hclust(seed_L4.decontam_FA_cmc_clr_smp_dist)
+# seed_L4.decontam_FA_cmc_clr_dist_hr$order gives the dendrogram order from the bottom to the top, but using the row numbers not the row names
+# pull this order out and store as a vector to make the order a factor in the next step for plotting
+smp_cmc_order <- seed_L4.decontam_FA_cmc_clr_smp_dist_hr$order %>%
+  as.character.numeric_version(.) %>%
+  str_trim(.)
+
+# use the dendrogram order to pull out the Pathway in the correct order for the heatmap
+seed_L4.decontam_FA_cmc_clr_smp_order <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","CLR",2:ncol(.)) %>%
+  spread(Pathway,CLR) %>%
+  mutate(SmpOrder = as.character(seq(1,83))) %>%
+  select(SampleID, SmpOrder, everything()) %>%
+  mutate(SmpOrder = fct_relevel(SmpOrder, smp_cmc_order)) %>%
+  arrange(SmpOrder) %>%
+  pull(SampleID)
+
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+# Plot the heatmap with samples ordered by the clustering from above
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_cmc_clr_long <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Species = fct_relevel(Species, seed_L4.decontam_FA_cmc_clr_order)) %>%
+  arrange(Species) %>%
+  gather("SampleID","CLR", 2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Sex), by = "SampleID") %>%
+  inner_join(., Sex_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
+  mutate(SampleID = fct_relevel(SampleID, seed_L4.decontam_FA_cmc_clr_smp_order)) %>%
+  arrange(SampleID)
+
+vector_color = seed_L4.decontam_FA_cmc_clr_long %>%
+  select(SampleID, Color) %>%
+  unique %>%
+  pull(Color) %>%
+  as.character()
+
+# make a heatmap with ggplot
+heatmap_smp_cluster <- ggplot(seed_L4.decontam_FA_cmc_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_smp_cluster
+
+
+# Plot the heatmap with samples ordered by Village, then alphabetical
+# make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
+seed_L4.decontam_FA_cmc_clr_long <- seed_L4.decontam_FA_cmc_clr %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleID") %>%
+  gather("Species","CLR",2:ncol(.)) %>%
+  spread(SampleID,CLR) %>%
+  mutate(Species = fct_relevel(Species, seed_L4.decontam_FA_cmc_clr_order)) %>%
+  arrange(Species) %>%
+  gather("SampleID","CLR", 2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Village), by = "SampleID") %>%
+  inner_join(., Village_colors %>%
+               as_data_frame(.) %>%
+               rename(Color = value) %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")), by = "Village") %>%
+  mutate(SampleID = fct_relevel(SampleID, each_order)) %>%
+  arrange(SampleID)
+
+vector_color = seed_L4.decontam_FA_cmc_clr_long %>%
+  select(SampleID, Color) %>%
+  unique %>%
+  pull(Color) %>%
+  as.character()
+
+# make a heatmap with ggplot
+heatmap_smp_village <- ggplot(seed_L4.decontam_FA_cmc_clr_long, aes(SampleID, Species, fill = CLR)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_smp_village
+
+# ggsave("05-results.backuppresentation_pdfs/cmc_fa_heatmap.pdf", plot = heatmap_base, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
