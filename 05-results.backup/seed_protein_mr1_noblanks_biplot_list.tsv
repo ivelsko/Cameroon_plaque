@@ -1,0 +1,41 @@
+Function	PC1	PC2	PC3	Direction	Samples	Filter
+Type IV fimbrial biogenesis protein PilW	0.194406860489673	-0.0196599633309132	-0.249030680077753	PC1+	Industrial+CMC	MR1
+Type IV secretion system protein VirD4	0.191527363715431	0.00391717876016967	-0.198569008672655	PC1+	Industrial+CMC	MR1
+Type IV fimbrial biogenesis protein PilX	0.185086269267369	-0.0012984725735286	-0.214691009699946	PC1+	Industrial+CMC	MR1
+Type IV pilus biogenesis protein PilO	0.180351448195159	-0.0146665987138869	-0.226305253151684	PC1+	Industrial+CMC	MR1
+Sialic acid biosynthesis protein NeuD, O-acetyltransferase	0.177120718151357	0.0748220344555799	0.0202838825441808	PC1+	Industrial+CMC	MR1
+UDP-glucose:(glucosyl)lipopolysaccharide alpha-1,2-glucosyltransferase (EC 2.4.1.58)	0.153988018118133	0.0792785932913623	-0.00635974080670936	PC1+	Industrial+CMC	MR1
+Type IV pilus biogenesis protein PilP	0.150070025168842	0.0146917672322494	-0.108896958314579	PC1+	Industrial+CMC	MR1
+Outer membrane component of tripartite multidrug resistance system	0.136949944730988	-0.104665653490554	-0.198873690689072	PC1+	Industrial+CMC	MR1
+Legionaminic acid cytidylyltransferase (EC 2.7.7.43)	0.13495376102336	0.0911951216133123	0.0336625045666337	PC1+	Industrial+CMC	MR1
+putative ATP-dependent DNA helicase YjcD	0.132254408506333	0.0716587769345154	0.150142444226496	PC1+	Industrial+CMC	MR1
+Ribonuclease HI (EC 3.1.26.4)	-0.0444246541570911	-0.0253704868412422	0.00410900657954672	PC1-	Industrial+CMC	MR1
+Methylmalonate-semialdehyde dehydrogenase [inositol] (EC 1.2.1.27)	-0.0468259143601024	0.00565897095794356	-0.0560833087595138	PC1-	Industrial+CMC	MR1
+Copper chaperone	-0.0470456640140268	-0.000816044111267939	-0.0185678625040553	PC1-	Industrial+CMC	MR1
+Major myo-inositol transporter IolT	-0.0478688454673159	0.13496738094137	-0.000136509825228185	PC1-	Industrial+CMC	MR1
+Streptothricin acetyltransferase, Streptomyces lavendulae type	-0.0486007102606616	0.028119652976922	-0.00118520041414376	PC1-	Industrial+CMC	MR1
+Acting phosphoribosylanthranilate isomerase (EC 5.3.1.24)	-0.054826367829921	0.0489662594362342	-0.0339095488573029	PC1-	Industrial+CMC	MR1
+Epi-inositol hydrolase (EC 3.7.1.-)	-0.0554472878572423	-0.0060850904819249	-0.0298830838143319	PC1-	Industrial+CMC	MR1
+Biosynthetic Aromatic amino acid aminotransferase beta (EC 2.6.1.57)	-0.0614925856760467	-0.00141758984675711	-0.0493140054602651	PC1-	Industrial+CMC	MR1
+Excinuclease ABC subunit A paralog of unknown function	-0.0750170255216846	0.0246631042497171	0.0491663874973808	PC1-	Industrial+CMC	MR1
+NAD-dependent malic enzyme (EC 1.1.1.38)	-0.0783514360079827	-0.0498465978062031	0.0295564075251104	PC1-	Industrial+CMC	MR1
+Major myo-inositol transporter IolT	-0.0478688454673159	0.13496738094137	-0.000136509825228185	PC2+	Industrial+CMC	MR1
+Inosine-uridine preferring nucleoside hydrolase (EC 3.2.2.1)	-0.00112825838103281	0.129320223952029	-0.0519630879869692	PC2+	Industrial+CMC	MR1
+Cytosine/purine/uracil/thiamine/allantoin permease family protein	-0.0180273971218198	0.120404771938434	0.027602963889318	PC2+	Industrial+CMC	MR1
+RNA polymerase sigma-70 factor	0.000132304572157516	0.106887818756193	-0.03533561207956	PC2+	Industrial+CMC	MR1
+N-Acetyltransferase PseH involved in the biosynthesis of pseudaminic acid	0.132158591460418	0.105208659699985	0.0217287584053349	PC2+	Industrial+CMC	MR1
+4-amino-6-deoxy-N-Acetyl-D-hexosaminyl-(Lipid carrier) acetyltrasferase	0.111516779385084	0.0965126780125479	0.0427922250064638	PC2+	Industrial+CMC	MR1
+internalin, putative (LPXTG motif)	0.118348947785191	0.0932929769642764	-0.000490234669107221	PC2+	Industrial+CMC	MR1
+Legionaminic acid biosynthesis protein PtmF	0.119957126282196	0.0914478652312032	0.0109792206321976	PC2+	Industrial+CMC	MR1
+Legionaminic acid cytidylyltransferase (EC 2.7.7.43)	0.13495376102336	0.0911951216133123	0.0336625045666337	PC2+	Industrial+CMC	MR1
+Pyrophosphate-dependent fructose 6-phosphate-1-kinase (EC 2.7.1.90)	0.00790801146772268	0.0890762274905557	0.0375274431115056	PC2+	Industrial+CMC	MR1
+Outer membrane stress sensor protease DegQ, serine protease	0.0407751630342486	-0.141516543752153	0.0304705192184436	PC2-	Industrial+CMC	MR1
+N-acetylglucosamine-6P-responsive transcriptional repressor NagC, ROK family	0.0524355400803764	-0.146228721502869	0.0573166263275892	PC2-	Industrial+CMC	MR1
+[NiFe] hydrogenase nickel incorporation protein HybF	0.0618167658990844	-0.147083317260122	0.0485945997993564	PC2-	Industrial+CMC	MR1
+Ribosome hibernation protein YfiA	0.0466862663938442	-0.149210724445246	0.00677211402952907	PC2-	Industrial+CMC	MR1
+Z-ring-associated protein ZapA	0.0517165218043363	-0.149960278718084	0.00822642957332574	PC2-	Industrial+CMC	MR1
+Glutaredoxin 1	0.00748766768875652	-0.166968192432955	0.0062503225374689	PC2-	Industrial+CMC	MR1
+Putative thiol:disulfide oxidoreductase, nitrite reductase complex assembly	0.0631360118253561	-0.171597140520151	0.0447130453601844	PC2-	Industrial+CMC	MR1
+Primosomal replication protein N	0.0381331113918647	-0.177200141839719	0.0251697122191555	PC2-	Industrial+CMC	MR1
+Nitrate reductase cytochrome c550-type subunit	0.0461635771269877	-0.189063470033516	0.0143226920711493	PC2-	Industrial+CMC	MR1
+Universal stress protein A	0.0317672219884954	-0.20372076589069	0.0164980366723051	PC2-	Industrial+CMC	MR1

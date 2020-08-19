@@ -142,7 +142,7 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
 ```
 
 #Ancom2
-```{r ancom2_example}
+```{r ancom2_example, eval = F}
 otu_data <- malt_species.decontam_filtered_cmc
 otu_id = otu_data$Species
 otu_data <- otu_data %>%
@@ -206,7 +206,7 @@ fig
 
 ## Ancom1
 
-```{r input_tables_ancom}
+```{r input_tables_ancom, eval = F}
 # this works
 # this converts the rownames to a column with the necessary heder for ANCOM, removes the rownames, then puts them back in from the column with the appropriate header
 malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_noblanks %>% rownames_to_column("Sample.ID") %>% remove_rownames() %>% column_to_rownames(var = "Sample.ID")
@@ -227,7 +227,7 @@ malt_species.decontam_filtered_noblanks_test <- data.frame(Sample.ID=rownames(ma
 
 ```
 
-```{r input_tables_tidyverse}
+```{r input_tables_tidyverse, eval = F}
 # this should do the same as above but using fewer steps - except it keeps the spaces in names, which have to be removed
 malt_species.decontam_filtered_noblanks_clr_test <- malt_species.decontam_filtered_noblanks_clr %>%
   rownames_to_column("Sample.ID") 
@@ -247,7 +247,7 @@ malt_species.decontam_filtered_noblanks_test <- malt_species.decontam_filtered_n
 ```
 
 
-```{r run_ancom}
+```{r run_ancom, eval = F}
 malt_species.decontam_filtered_noblanks.ancom <- ANCOM.main(OTUdat = malt_species.decontam_filtered_noblanks_test, Vardat = metadata_new, 
                                                                 adjusted = F, repeated = F, main.var = "Village", adj.formula = NULL, repeat.var = "Village", 
                                                                 longitudinal = T, random.formula = "~1|Village", multcorr=2, sig = 0.05, prev.cut = 0.90)

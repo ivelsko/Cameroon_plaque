@@ -838,15 +838,15 @@ seed_L4.decontam_noblanks_33.euc.pcoavectors %>%
 
 # test for difference between different metadata categories 
 adonis2(seed_L4.decontam_noblanks_33.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Age_group, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Ethnic_Group, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Tooth_site, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Sex, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Industry, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Market_economy, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999)
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Age_group, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Ethnic_Group, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Tooth_site, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Sex, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Industry, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, metadata_noblanks, permutations = 999)
 
 adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group +  Market_economy, data = metadata_noblanks, permutations = 999, by = "margin")
 
@@ -855,13 +855,16 @@ adonis2(seed_L4.decontam_noblanks_33.euc ~ Village + Sex + Industry + Ethnic_Gro
 
 adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
-pairwise.adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, metadata_noblanks, nperm = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
-# Error in check(sn, control = control, quietly = quietly) : Number of observations and length of Block 'strata' do not match.
+# # pairwise adonis2
+# perm <- how(nperm = 199)
+# setBlocks(perm) <- with(metadata_noblanks, Tooth_site)
+# adonis2(seed_L4.decontam_noblanks_33.euc ~ Village, data = metadata_noblanks, permutations = perm, by = "margin")
+# pairwise.adonis2(seed_L4.decontam_noblanks_33.euc ~ Ethnic_Group, data = metadata_noblanks, nperm = perm,  by = "margin")
+# # Error in if (xi > xj) 1L else -1L : missing value where TRUE/FALSE needed
 
 ```
-Tooth site is the only category that is significantly different (p < 0.01). When
-controlling for tooth site, sex is the only category that is significantly
-different (p < 0.05).
+No categories are significantly different. When controlling for tooth site,
+still no categories are significantly different.
 
 
 ```{r biplots_decontam_33_noblanks_33}
@@ -889,9 +892,9 @@ pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              caption = "PC1 negative loadings")
 
 # make a table of the pathways to save, to use again later in another R notebook
-# seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
@@ -912,10 +915,10 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
 
 
 # which paths distinguish sample types when HMP and JAE are included?
@@ -928,34 +931,69 @@ pandoc.table(pca_EG_biplot_pc3$plot_env$pws_10 %>% arrange(desc(PC3)),
              keep.trailing.zeros = T,
              justify = "lrrr",
              split.tables = Inf,
-             caption = "PC2 positive loadings")
+             caption = "PC3 positive loadings")
 
 pandoc.table(pca_EG_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
              digits = 5,
              keep.trailing.zeros = T,
              justify = "lrrr",
              split.tables = Inf,
-             caption = "PC2 negative loadings")
+             caption = "PC3 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "Industrial+CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC3+", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC3-", Samples = "Industrial+CMC"))
 
 
 ```
 _PC1+_
-
+Iron compound ABC uptake transporter permease protein - 
+Adenylylsulfate reductase alpha-subunit (EC 1.8.99.2) - 
+Phage shock protein A - 
+Oxaloacetate decarboxylas involved in citrate fermentation, predicted (EC 4.1.1.3) - 
+Adenylylsulfate reductase beta-subunit (EC 1.8.99.2) - 
+CRISPR-associated protein TM1812 - 
+SMT0609 replicon stabilization protein (antitoxin to SMT0608 - 
+Predicted transcriptional regulator of N-Acetylglucosamine utilization, GntR family - 
+Dihydroneopterin triphosphate pyrophosphohydolase
+5'-nucleotidase YjjG (EC 3.1.3.5) - 
 
 _PC1-_
-
+Predicted NAD regulator in Alphaproteobacteria - 
+Aldehyde dehydrogenase A (EC 1.2.1.22) - 
+Cadmium resistance protein - 
+Sulfite reductase [NADPH] flavoprotein alpha-component (EC 1.8.1.2) - 
+Sulfite reductase [NADPH] hemoprotein beta-component (EC 1.8.1.2) - 
+Hydrogenase-4 component D - 
+NnrS protein involved in response to NO - 
+Predicted thiazole transporter ThiU - 
+Cyclohexadienyl dehydrogenase (EC 1.3.1.12)(EC 1.3.1.43) - 
+Copper-sensing two-component system response regulator CpxR - 
 
 _PC2+_
-
+Haloalkane dehalogenase-like protein - 
+ATP-dependent DNA helicase UvrD/PcrA, clostridial paralog - 
+Glycosyltransferase MshA involved in mycothiol biosynthesis (EC 2.4.1.-) - 
+Branched-chain alpha-keto acid dehydrogenase, E1 component, beta subunit (EC 1.2.4.4) - 
+Manganese transport protein MntH - 
+Possible hypoxanthine oxidase XdhD (EC 1.-.-.-) - 
+Eukaryotic-type low-affinity urea transporter - 
+FIG006789: Stage V sporulation protein - 
+1,3-propanediol dehydrogenase (EC 1.1.1.202) - 
+ATP-dependent RNA helicase BA2475 - 
 
 _PC2-_
-
-
+Probable glycerol transport protein - 
+Lysyl-tRNA synthetase (class I) (EC 6.1.1.6) - 
+TldD family protein, Beta/Gamma-proteobacterial subgroup - 
+Fumarate hydratase class I (EC 4.2.1.2) - 
+Propionyl-CoA carboxylase biotin-containing subunit (EC 6.4.1.3) - 
+TldE/PmbA family protein, Beta/Gamma-proteobacterial subgroup - 
+Glycerol-3-phosphate ABC transporter, periplasmic glycerol-3-phosphate-binding protein (TC 3.A.1.1.3) - 
+Indolepyruvate oxidoreductase subunit IorA (EC 1.2.7.8) - 
+Flagellar hook-associated protein FliD - 
+Sulfite reduction-associated complex DsrMKJOP protein DsrK (=HmeD) - 
 
 ## Cameroon samples only
 ```{r pca_decontam_33_cmc_categories}
@@ -1044,8 +1082,8 @@ adonis2(seed_L4.decontam_cmc_33.euc ~ Village + Sex + Tooth_site + Ethnic_Group 
 adonis2(seed_L4.decontam_cmc_33.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
-Only tooth site is significantly different (p < 0.001). When controlling for
-tooth site, only sex is significantly different (p < 0.05).
+Village (p < 0.05) and tooth site are significantly different (p < 0.001). When
+controlling for tooth site, only no categories are significantly different.
 
 
 ```{r biplots_decontam_33_cmc}
@@ -1053,8 +1091,8 @@ tooth site, only sex is significantly different (p < 0.05).
 pca_EG_cmc_33_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_cmc_33_biplot_pc1
 
-ggsave("./05-results.backup/pca_EG_bi_cmc_33_paths.pdf", plot = pca_EG_cmc_33_biplot_pc1, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./05-results.backup/pca_EG_bi_cmc_33_paths.pdf", plot = pca_EG_cmc_33_biplot_pc1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1071,10 +1109,9 @@ pandoc.table(pca_EG_cmc_33_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "cmc_33"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "cmc_33"))
+seed_protein_biplot_list <- pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "CMC", Filter = "33")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "CMC", Filter = "33"))
 
 pca_EG_cmc_33_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_33_biplot_pc2
@@ -1093,12 +1130,12 @@ pandoc.table(pca_EG_cmc_33_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "cmc_33"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "cmc_33"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "CMC", Filter = "33"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "CMC", Filter = "33"))
+
+fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_33_cmc_biplot_list.tsv", quote = F, sep = "\t")
 
 pca_EG_cmc_33_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_cmc_33.pca, "PC3", "PC2", "Ethnic_Group", PC3, pathways = F)
 pca_EG_cmc_33_biplot_pc3
@@ -1117,28 +1154,94 @@ pandoc.table(pca_EG_cmc_33_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "cmc_33"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC3)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "cmc_33"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_33_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC3+", Samples = "CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC3-", Samples = "CMC"))
+
+# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_33_cmc_biplot_list.tsv", quote = F, sep = "\t")
 
 
 ```
 _PC1+_
-
+ATP-dependent protease LonB-like Type I - 
+Predicted cell-wall-anchored protein SasA (LPXTG motif) - 
+Colicin I receptor precursor - 
+Adenylylsulfate reductase alpha-subunit (EC 1.8.99.2) - 
+Outer surface protein of unknown function, cellobiose operon - 
+PTS system, trehalose-specific IIB component (EC 2.7.1.69) - 
+rubredoxin-oxygen oxidoreductase - 
+(S)-2-hydroxy-acid oxidase (EC 1.1.3.15) - 
+Cell envelope-associated transcriptional attenuator LytR-CpsA-Psr, subfamily M (as in PMID19099556) - 
+Endo-1,4-beta-xylanase A precursor (EC 3.2.1.8) - 
 
 _PC1-_
-
+Predicted NAD regulator in Alphaproteobacteria - 
+Excinuclease ABC subunit A, dimeric form - 
+ATP-dependent RNA helicase Bcep18194_A5658 - 
+Acetate permease ActP (cation/acetate symporter) - 
+Aconitate hydratase 2 (EC 4.2.1.3) - 
+NnrS protein involved in response to NO - 
+Sulfite reductase [NADPH] flavoprotein alpha-component (EC 1.8.1.2) - 
+Sulfite reductase [NADPH] hemoprotein beta-component (EC 1.8.1.2) - 
+Aldehyde dehydrogenase A (EC 1.2.1.22) - 
+Isocitrate lyase (EC 4.1.3.1) - 
 
 _PC2+_
-
+Inositol transport system sugar-binding protein - 
+Glycosyltransferase MshA involved in mycothiol biosynthesis (EC 2.4.1.-) - 
+Haloalkane dehalogenase-like protein - 
+periplasmic fructose-binding protein component of signal transduction system LevT - 
+Nitrite reductase [NAD(P)H] large subunit (EC 1.7.1.4) - 
+Glutathione S-transferase, omega (EC 2.5.1.18) - 
+Mitogenic factor 2 - 
+Glutathione S-transferase, Streptococcal type (EC 2.5.1.18) - 
+Manganese transport protein MntH - 
+Glycine betaine ABC transport system, ATP-binding protein OpuAA (EC 3.6.3.32) - 
 
 _PC2-_
+Flagellar hook-associated protein FlgL - 
+Flagellar hook-associated protein FlgK - 
+Trehalase (EC 3.2.1.28) - 
+Flagellar assembly protein FliH - 
+Flagellar hook-associated protein FliD - 
+NAD(P)HX epimerase - 
+CoB--CoM heterodisulfide reductase subunit A (EC 1.8.98.1) - 
+Cell envelope-associated transcriptional attenuator LytR-CpsA-Psr, subfamily S (as in PMID19099556) - 
+Oxaloacetate decarboxylase involved in citrate fermentation, predicted (EC 4.1.1.3) - 
+Probable glycerol transport protein - 
 
+```{r pathways_biplot_proteins_cmc_33}
+# noblanks samples only
+seed_protein_mr1_noblanks_biplot_list <- fread("./05-results.backup/seed_protein_mr1_noblanks_biplot_list.tsv")
+mr1_noblanks_biplot_list <- seed_protein_mr1_noblanks_biplot_list %>%
+  pull(Function)
 
+# how many different (and which) pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_noblanks_biplot_list) %>%
+  select(L3, Pathway) %>%
+  full_join(., seed_protein_mr1_noblanks_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L3, Direction) %>%
+  group_by(Direction) %>%
+  count(L3)
 
+# how many different (and which) higher-level pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_noblanks_biplot_list) %>%
+  select(L2, Pathway) %>%
+  full_join(., seed_protein_mr1_noblanks_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L2, Direction) %>%
+  group_by(Direction) %>%
+  count(L2)
+
+```
 
 # Decontaminated and MR1 protein only-filtered table
 
@@ -1216,11 +1319,9 @@ adonis2(seed_L4.decontam_noblanks_mr1.euc ~ Village + Sex + Industry + Tooth_sit
 adonis2(seed_L4.decontam_noblanks_mr1.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, metadata_noblanks, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
-When using proteins from both MR1 and MR2, only tooth site is significantly
-different (p < 0.05), and further controlling for tooth site shows no categories
-are significantly different. When using only proteins in MR1, no categories are
-significantly different, but further controlling for tooth site shows that sex
-is significantly different (p < 0.05).
+When using only proteins in MR1, sex (p < 0.05) and tooth site (p < 0.01) are
+significantly different, but when controlling for tooth site none are is
+significantly different.
 
 
 ```{r biplots_decontam_mr1_noblanks}
@@ -1248,9 +1349,9 @@ pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              caption = "PC1 negative loadings")
 
 # make a table of the pathways to save, to use again later in another R notebook
-# seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC", Filter = "MR1")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC", Filter = "MR1"))
 
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
@@ -1271,10 +1372,12 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC", Filter = "MR1"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC", Filter = "MR1"))
+
+fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_mr1_noblanks_biplot_list.tsv", quote = F, sep = "\t")
 
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Ethnic_Group", PC3, pathways = F)
@@ -1296,23 +1399,90 @@ pandoc.table(pca_EG_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
              caption = "PC3 negative loadings")
 
 # seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC", Filter = "MR1"))
 # seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC3)) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC", Filter = "MR1"))
 
 ```
 _PC1+_
-
+Type IV fimbrial biogenesis protein PilW - 
+Type IV secretion system protein VirD4 - 
+Type IV fimbrial biogenesis protein PilX - 
+Type IV pilus biogenesis protein PilO - 
+Sialic acid biosynthesis protein NeuD, O-acetyltransferase - 
+UDP-glucose:(glucosyl)lipopolysaccharide alpha-1,2-glucosyltransferase (EC 2.4.1.58) - 
+Type IV pilus biogenesis protein PilP - 
+Outer membrane component of tripartite multidrug resistance system - 
+Legionaminic acid cytidylyltransferase (EC 2.7.7.43) - 
+putative ATP-dependent DNA helicase YjcD - 
 
 _PC1-_
-
+NAD-dependent malic enzyme (EC 1.1.1.38) - 
+Excinuclease ABC subunit A paralog of unknown function - 
+Biosynthetic Aromatic amino acid aminotransferase beta (EC 2.6.1.57) - 
+Epi-inositol hydrolase (EC 3.7.1.-) - 
+Acting phosphoribosylanthranilate isomerase (EC 5.3.1.24) - 
+Streptothricin acetyltransferase, Streptomyces lavendulae type - 
+Major myo-inositol transporter IolT - 
+Copper chaperone - 
+Methylmalonate-semialdehyde dehydrogenase [inositol] (EC 1.2.1.27) - 
+Ribonuclease HI (EC 3.1.26.4) - 
 
 _PC2+_
-
+Major myo-inositol transporter IolT - 
+Inosine-uridine preferring nucleoside hydrolase (EC 3.2.2.1) - 
+Cytosine/purine/uracil/thiamine/allantoin permease family protein - 
+RNA polymerase sigma-70 factor - 
+N-Acetyltransferase PseH involved in the biosynthesis of pseudaminic acid - 
+4-amino-6-deoxy-N-Acetyl-D-hexosaminyl-(Lipid carrier) acetyltrasferase - 
+internalin, putative (LPXTG motif) - 
+Legionaminic acid biosynthesis protein PtmF - 
+Legionaminic acid cytidylyltransferase (EC 2.7.7.43) - 
+Pyrophosphate-dependent fructose 6-phosphate-1-kinase (EC 2.7.1.90) - 
 
 _PC2-_
+Universal stress protein A - 
+Nitrate reductase cytochrome c550-type subunit - 
+Primosomal replication protein N - 
+Putative thiol:disulfide oxidoreductase, nitrite reductase complex assembly - 
+Glutaredoxin 1 - 
+Z-ring-associated protein ZapA - 
+Ribosome hibernation protein YfiA - 
+[NiFe] hydrogenase nickel incorporation protein HybF - 
+N-acetylglucosamine-6P-responsive transcriptional repressor NagC, ROK family - 
+Outer membrane stress sensor protease DegQ, serine protease - 
 
+```{r pathways_biplot_proteins_noblanks_mr1}
+# Industrial and CMC samples
+seed_protein_mr1_noblanks_biplot_list <- fread("./05-results.backup/seed_protein_mr1_noblanks_biplot_list.tsv")
+mr1_noblanks_biplot_list <- seed_protein_mr1_noblanks_biplot_list %>%
+  pull(Function)
 
+# how many different (and which) pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_noblanks_biplot_list) %>%
+  select(L3, Pathway) %>%
+  full_join(., seed_protein_mr1_noblanks_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L3, Direction) %>%
+  group_by(Direction) %>%
+  count(L3)
+
+# how many different (and which) higher-level pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_noblanks_biplot_list) %>%
+  select(L2, Pathway) %>%
+  full_join(., seed_protein_mr1_noblanks_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L2, Direction) %>%
+  group_by(Direction) %>%
+  count(L2)
+
+```
 
 ## Cameroon samples only
 
@@ -1382,27 +1552,24 @@ seed_L4.decontam_cmc_mr1.euc.pcoavectors %>%
     ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Tooth_site + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
 adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch +  LibraryBatch, metadata_cmc, permutations = 999, by = "margin")
 
 adonis2(seed_L4.decontam_cmc_mr1.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, metadata_cmc, permutations = 999, by = "margin")
 
-adonis2(seed_L4.decontam_cmc_mr1.euc ~ Ethnic_Group, metadata_cmc, permutations = 999, by = "margin")
+# adonis2(seed_L4.decontam_cmc_mr1.euc ~ Ethnic_Group, metadata_cmc, permutations = 999, by = "margin")
 
 # controlled for tooth site
 adonis2(seed_L4.decontam_cmc_mr1.euc ~ ExtractionBatch + Village + Sex + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
-When including proteins from both MR1 and MR2, only tooth site is significantly
-different (p < 0.01), and further controlling for tooth site shows none of the
-categories are significantly different. When including proteins from only MR1,
-both tooth site (p < 0.01) and sex (p < 0.05) are significantly different, and
-further controlling for tooth site shows sex (p < 0.05) is significantly
-different.
+When including proteins from only MR1, villate (p < 0.05), sex (p < 0.01), and
+tooth site (p < 0.001) are significantly different, and further controlling for
+tooth site shows sex (p < 0.05) is significantly different.
 
 
-```{r biplots_decontam_mr1_noblanks}
+```{r biplots_decontam_mr1_cmc}
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
@@ -1425,10 +1592,9 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+seed_protein_biplot_list <- pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "CMC", Filter = "MR1")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "CMC", Filter = "MR1"))
 
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_biplot_pc2
@@ -1447,12 +1613,12 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "CMC", Filter = "MR1"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "CMC", Filter = "MR1"))
+
+fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_mr1_cmc_biplot_list.tsv", quote = F, sep = "\t")
 
 pca_EG_cmc_biplot_pc3 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Sex", PC3, pathways = F)
 pca_EG_cmc_biplot_pc3
@@ -1471,24 +1637,96 @@ pandoc.table(pca_EG_cmc_biplot_pc3$plot_env$neg_10 %>% arrange(PC3),
              split.tables = Inf,
              caption = "PC3 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
 # seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC3+", Samples = "CMC", Filter = "MR1"))
+# seed_protein_biplot_list <- seed_protein_biplot_list %>%
+#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC3-", Samples = "CMC", Filter = "MR1"))
+
 
 ```
-_PC1+_
 
+_PC1+_
+Major myo-inositol transporter IolT - 
+Cytosine/purine/uracil/thiamine/allantoin permease family protein - 
+Excinuclease ABC subunit A paralog of unknown function - 
+Inosine-uridine preferring nucleoside hydrolase (EC 3.2.2.1) - 
+Teichoic acid export ATP-binding protein TagH (EC 3.6.3.40) - 
+Superoxide dismutase [Mn] (EC 1.15.1.1) - 
+RNA polymerase sigma-70 factor - 
+Phosphoribosylformylglycinamidine synthase, synthetase subunit (EC 6.3.5.3) - 
+Glutamyl-tRNA(Gln) amidotransferase subunit A (EC 6.3.5.7) - 
+ATP-dependent Clp protease, ATP-binding subunit ClpC - 
 
 _PC1-_
-
+Putative thiol:disulfide oxidoreductase, nitrite reductase complex assembly - 
+Outer membrane component of tripartite multidrug resistance system - 
+Mll9366 protein - 
+Universal stress protein A - 
+Nitrate reductase cytochrome c550-type subunit - 
+Primosomal replication protein N - 
+Uncharacterized protein ImpA - 
+Outer membrane stress sensor protease DegQ, serine protease - 
+N-acetylglucosamine-6P-responsive transcriptional repressor NagC, ROK family - 
+Type IV secretion system protein VirD4 - 
 
 _PC2+_
-
+Type IV secretion system protein VirD4 - 
+Uncharacterized protein ImpA - 
+Type IV pilus biogenesis protein PilO - 
+Capsular polysaccharide export system inner membrane protein KpsE - 
+Type IV fimbrial biogenesis protein PilW - 
+Outer membrane component of tripartite multidrug resistance system - 
+Type IV fimbrial biogenesis protein PilX - 
+Capsular polysaccharide export system protein KpsC - 
+Ribonuclease E (EC 3.1.26.12) - 
+Uncharacterized protein ImpH/VasB
 
 _PC2-_
+Evolved beta-D-galactosidase, alpha subunit - 
+Putative ABC transporter (ATP-binding protein), spy1791 homolog - 
+N-linked glycosylation glycosyltransferase PglG - 
+3-aminobutyrl-CoA ammonia lyase (EC 4.3.1.14) - 
+Ferredoxin-like protein - 
+Cytochrome c oxidase subunit CcoQ (EC 1.9.3.1) - 
+Formate hydrogenlyase subunit 4 - 
+putative ATP-dependent DNA helicase YjcD - 
+Potassium uptake protein TrkH - 
+L-fucose mutarotase - 
+
+Do the proteins in the top 10 PC loadings tend to be in the same paths, or the
+same general biomolecule type processing paths?
+```{r pathways_biplot_proteins_cmc_mr1}
+# CMC samples only
+seed_protein_mr1_cmc_biplot_list <- fread("./05-results.backup/seed_protein_mr1_cmc_biplot_list.tsv")
+mr1_cmc_biplot_list <- seed_protein_mr1_cmc_biplot_list %>%
+  pull(Function)
+
+# how many different (and which) pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_cmc_biplot_list) %>%
+  select(L3, Pathway) %>%
+  full_join(., seed_protein_mr1_cmc_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L3, Direction) %>%
+  group_by(Direction) %>%
+  count(L3)
+
+# how many different (and which) higher-level pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% mr1_cmc_biplot_list) %>%
+  select(L2, Pathway) %>%
+  full_join(., seed_protein_mr1_cmc_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L2, Direction) %>%
+  group_by(Direction) %>%
+  count(L2)
+
+```
+
 
 # MR1 protein pathway check
 ```{r protein_difference_stats}
@@ -1690,13 +1928,13 @@ adonis2(seed_L4_carbohydrates_cmc.euc ~ ExtractionBatch + Village + Sex + Tooth_
 adonis2(seed_L4_carbohydrates_cmc.euc ~ Village + Sex + Ethnic_Group + Age_group +  Market_economy, metadata_cmc, permutations = 999, by = "margin", strata = metadata_cmc$Tooth_site)
 
 ```
-Only tooth site is significantly different (p < 0.01). When controlling for
-tooth site, sex is significantly different (p < 0.05).
+Only sex (p < 0.05) and tooth site (p < 0.01) are significantly different. When
+controlling for tooth site, sex is significantly different (p < 0.05).
 
 
 Which carbohydrate processing pathway proteins are contributing most to the
 separation of samples?
-```{r biplots_decontam_mr1_cmc}
+```{r biplots_decontam_carbs_noblanks}
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_noblanks_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_noblanks_biplot_pc1
@@ -1719,10 +1957,9 @@ pandoc.table(pca_EG_noblanks_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_noblanks_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_noblanks_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+seed_protein_biplot_list <- pca_EG_noblanks_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "CMC+Industrial", Filter = "Carbs")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_noblanks_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "CMC+Industrial", Filter = "Carbs"))
 
 pca_EG_noblanks_biplot_pc2 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_noblanks_biplot_pc2
@@ -1741,12 +1978,12 @@ pandoc.table(pca_EG_noblanks_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "CMC+Industrial", Filter = "Carbs"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_noblanks_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "CMC+Industrial", Filter = "Carbs"))
+
+fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_carb_noblanks_biplot_list.tsv", quote = F, sep = "\t")
 
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
@@ -1765,12 +2002,9 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1+", Samples = "CMC", Filter = "Carbs")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% mutate(Direction = "PC1-", Samples = "CMC", Filter = "Carbs"))
 
 
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", PC2, pathways = F)
@@ -1790,24 +2024,155 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# seed_protein_biplot_list <- seed_protein_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3+", Samples = "CMC"))
-# seed_protein_biplot_list <- seed_protein_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC3-", Samples = "CMC"))
-# 
-# fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_biplot_list.tsv", quote = F, sep = "\t")
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2+", Samples = "CMC", Filter = "Carbs"))
+seed_protein_biplot_list <- seed_protein_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "CMC", Filter = "Carbs"))
+
+fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_carb_cmc_biplot_list.tsv", quote = F, sep = "\t")
 
 ```
 
+*Industrial and Cameroon samples*
+_PC1+_
+Aldehyde dehydrogenase A (EC 1.2.1.22) - 
+Glycolate dehydrogenase (EC 1.1.99.14), iron-sulfur subunit GlcF - 
+Acetate permease ActP (cation/acetate symporter) - 
+Glycolate dehydrogenase (EC 1.1.99.14), subunit GlcD - 
+Aconitate hydratase 2 (EC 4.2.1.3) - 
+2,3-butanediol dehydrogenase, R-alcohol forming, (R)- and (S)-acetoin-specific (EC 1.1.1.4) - 
+D-amino acid dehydrogenase small subunit (EC 1.4.99.1) - 
+Pyruvate decarboxylase (EC 4.1.1.1) - 
+Phosphogluconate dehydratase (EC 4.2.1.12) - 
+Dihydrolipoamide dehydrogenase of pyruvate dehydrogenase complex (EC 1.8.1.4) - 
 
 
+_PC1-_
+Oxaloacetate decarboxylase involved in citrate fermentation, predicted (EC 4.1.1.3) - 
+Predicted transcriptional regulator of N-Acetylglucosamine utilization, GntR family - 
+Alpha-L-arabinofuranosidase II precursor (EC 3.2.1.55) - 
+PTS system, diacetylchitobiose-specific IIB component (EC 2.7.1.69) - 
+Outer membrane protein SusE - 
+Outer membrane protein SusF - 
+L-idonate 5-dehydrogenase (EC 1.1.1.264) - 
+Two-component sensor histidine kinase, malate (EC 2.7.3.-) - 
+Alpha-N-acetylglucosaminidase (EC 3.2.1.50) - 
+Glycogen branching enzyme, GH-57-type, archaeal (EC 2.4.1.18) - 
+
+_PC2+_
+1,3-propanediol dehydrogenase (EC 1.1.1.202) - 
+Outer surface protein of unknown function, cellobiose operon - 
+Polygalacturonase (EC 3.2.1.15) - 
+(S)-2-hydroxy-acid oxidase (EC 1.1.3.15) - 
+Two-component sensor kinase YesM (EC 2.7.3.-) - 
+2,3-butanediol dehydrogenase, S-alcohol forming, (R)-acetoin-specific (EC 1.1.1.4) - 
+PTS system, trehalose-specific IIB component (EC 2.7.1.69) - 
+Sorbitol operon transcription regulator - 
+Acetolactate synthase, catabolic (EC 2.2.1.6) - 
+predicted xylose isomerase - 
+
+_PC2-_
+Propionyl-CoA carboxylase biotin-containing subunit (EC 6.4.1.3) - 
+Fumarate hydratase class I (EC 4.2.1.2) - 
+D-Lactate dehydrogenase, cytochrome c-dependent (EC 1.1.2.4) - 
+Probable glycerol transport protein - 
+Propionyl-CoA carboxylase carboxyl transferase subunit (EC 6.4.1.3) - 
+Pyruvate:ferredoxin oxidoreductase, alpha subunit (EC 1.2.7.1) - 
+Glycerol-3-phosphate ABC transporter, periplasmic glycerol-3-phosphate-binding protein (TC 3.A.1.1.3) - 
+Acetate permease ActP (cation/acetate symporter) - 
+Aconitate hydratase 2 (EC 4.2.1.3) - 
+2-methylcitrate synthase (EC 2.3.3.5) - 
 
 
+*Cameroon samples only*
+_PC1+_
+PTS system, trehalose-specific IIB component (EC 2.7.1.69) - 
+Outer surface protein of unknown function, cellobiose operon - 
+PTS system, diacetylchitobiose-specific IIB component (EC 2.7.1.69) - 
+(S)-2-hydroxy-acid oxidase (EC 1.1.3.15) - 
+Endo-1,4-beta-xylanase A precursor (EC 3.2.1.8) - 
+Trehalose operon transcriptional repressor - 
+Sorbitol operon transcription regulator - 
+N-acetyl glucosamine transporter, NagP - 
+Polygalacturonase (EC 3.2.1.15) - 
+Predicted transcriptional regulator of N-Acetylglucosamine utilization, GntR family - 
+
+_PC1-_
+Acetate permease ActP (cation/acetate symporter) - 
+Aconitate hydratase 2 (EC 4.2.1.3) - 
+Isocitrate lyase (EC 4.1.3.1) - 
+Malate synthase G (EC 2.3.3.9) - 
+Aldehyde dehydrogenase A (EC 1.2.1.22) - 
+Glycolate dehydrogenase (EC 1.1.99.14), subunit GlcD - 
+Propionyl-CoA carboxylase biotin-containing subunit (EC 6.4.1.3) - 
+D-amino acid dehydrogenase small subunit (EC 1.4.99.1) - 
+D-Lactate dehydrogenase, cytochrome c-dependent (EC 1.1.2.4) - 
+Glycolate dehydrogenase (EC 1.1.99.14), iron-sulfur subunit GlcF - 
+
+_PC2+_
+Oxaloacetate decarboxylase involved in citrate fermentation, predicted (EC 4.1.1.3) - 
+Trehalase (EC 3.2.1.28) - 
+Beta-mannosidase (EC 3.2.1.25) - 
+CoB--CoM heterodisulfide reductase subunit A (EC 1.8.98.1) - 
+Predicted glucose transporter in maltodextrin utilization gene cluster - 
+Probable glycerol transport protein - 
+Predicted L-lactate dehydrogenase, hypothetical protein subunit SO1518 - 
+Methylmalonyl-CoA decarboxylase, alpha chain (EC 4.1.1.41) - 
+Putative glycogen debranching enzyme, archaeal type, TIGR01561 - 
+Arabinan endo-1,5-alpha-L-arabinosidase (EC 3.2.1.99) - 
+
+_PC2-_
+Inositol transport system sugar-binding protein - 
+Transcriptional antiterminator of lichenan operon, BglG family - 
+Acetolactate synthase, catabolic (EC 2.2.1.6) - 
+Transcriptional antiterminator with PTS regulation domain, SPy0181 ortholog - 
+2,3-butanediol dehydrogenase, S-alcohol forming, (R)-acetoin-specific (EC 1.1.1.4) - 
+Succinate-semialdehyde dehydrogenase [NADP+] (EC 1.2.1.79) - 
+Arabinose operon protein AraL - 
+Trehalose synthase (EC 5.4.99.16) - 
+Ascorbate-specific PTS system, EIIB component (EC 2.7.1.69) - 
+Propanediol utilization polyhedral body protein PduA - 
+
+Do the proteins in the top 10 PC loadings tend to be in the same paths, or the
+same general biomolecule type processing paths?
+In this case no, there are typically only 1-2 prtoeins from any single path. 
+```{r pathways_biplot_proteins_carbs}
+# Industrial and CMC samples
+seed_protein_carb_noblanks_biplot_list <- fread("./05-results.backup/seed_protein_carb_noblanks_biplot_list.tsv")
+carb_noblanks_biplot_list <- seed_protein_carb_noblanks_biplot_list %>%
+  pull(Function)
+
+# how many different (and which) pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% carb_noblanks_biplot_list) %>%
+  select(L3, Pathway) %>%
+  full_join(., seed_protein_carb_noblanks_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L3, Direction) %>%
+  group_by(Direction) %>%
+  count(L3)
 
 
+# CMC samples only
+seed_protein_carb_cmc_biplot_list <- fread("./05-results.backup/seed_protein_carb_cmc_biplot_list.tsv")
+carb_cmc_biplot_list <- seed_protein_carb_cmc_biplot_list %>%
+  pull(Function)
 
+# how many different (and which) pathways do the proteins come from?
+seed_L4.decontam %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  filter(Pathway %in% carb_cmc_biplot_list) %>%
+  select(L3, Pathway) %>%
+  full_join(., seed_protein_carb_cmc_biplot_list %>%
+              select(-c("PC1","PC2","PC3")) %>%
+              rename(Pathway = Function), by = "Pathway") %>%
+  select(L3, Direction) %>%
+  group_by(Direction) %>%
+  count(L3)
 
-
+```
 
 
 
