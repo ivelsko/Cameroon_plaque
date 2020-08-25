@@ -408,11 +408,35 @@ mv all_taxonomy_filtered_hand-fixed2.csv all_taxonomy_filtered_hand.csv
 
 
 
+########################################################
+# Songbird for differential abundance
 
+# convert species and genus tables into biom format
+biom convert -i malt_species_decontam.tsv -o malt_species_decontam.biom --to-hdf5 --table-type="OTU table"
+biom convert -i malt_species_cmc_decontam.tsv -o malt_species_cmc_decontam.biom --to-hdf5 --table-type="OTU table"
+biom convert -i malt_genus_decontam.tsv -o malt_genus_decontam.biom --to-hdf5 --table-type="OTU table"
+biom convert -i malt_genus_cmc_decontam.tsv -o malt_genus_cmc_decontam.biom --to-hdf5 --table-type="OTU table"
 
+# to check that the conversion worked try:
+biom convert -i malt_genus_decontam.biom -o otu_table.txt --to-tsv
 
+# Tensorboard url:
+http://mpi-sdag1.sdag.ppj.shh.mpg.de:6006
 
+# For the formula pick from the parameters:
+Ethnic_Group+Village+Market_economy+Market_economy_split+Age_group+Sex+Tooth_site
 
+# use malt_species_decontam.biom, malt_species_cmc_decontam.biom, malt_genus_decontam.biom, malt_genus_cmc_decontam.biom
+
+# form0 "1" # this is the null model
+# form1 "Village+Ethnic_Group+Industry+Tooth_site" # performs the "best" so far
+# form2 "Village+Tooth_site" # very similar to form2
+# form3 "Village+Sex"
+# form4 "Tooth_site"
+# form5 "Sex"
+# form6 "Village"
+# form7 "Market_economy"
+# form8 "Industry"
 
 
 

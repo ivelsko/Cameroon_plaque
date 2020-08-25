@@ -77,11 +77,19 @@ malt_genus.decontam <- malt_genus_raw %>%
 
 malt_species.decontam_songbird <- malt_species_raw %>%
   anti_join(., contaminants_species) %>%
-  select(-matches("CMC023.B|EXB|LIB|10M|SRR164"))
+  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))
+
+malt_species_cmc.decontam_songbird <- malt_species_raw %>%
+  anti_join(., contaminants_species) %>%
+  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))
   
 malt_genus.decontam_songbird <- malt_genus_raw %>%
   anti_join(., contaminants_genus) %>%
-  select(-matches("CMC023.B|EXB|LIB|10M|SRR164"))
+  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))
+
+malt_genus_cmc.decontam_songbird <- malt_genus_raw %>%
+  anti_join(., contaminants_genus) %>%
+  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))
 
 ```
 
@@ -95,7 +103,9 @@ save(malt_species_raw,
 
 
 # fwrite(malt_species.decontam_songbird, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
+# fwrite(malt_species_cmc.decontam_songbird, "05-results.backup/malt_species_cmc_decontam.tsv", sep = "\t", quote = F)
 # fwrite(malt_genus.decontam_songbird, "05-results.backup/malt_genus_decontam.tsv", sep = "\t", quote = F)
+# fwrite(malt_genus_cmc.decontam_songbird, "05-results.backup/malt_genus_cmc_decontam.tsv", sep = "\t", quote = F)
 
 
 ```
