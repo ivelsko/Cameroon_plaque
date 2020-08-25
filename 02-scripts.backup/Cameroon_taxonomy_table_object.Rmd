@@ -12,6 +12,7 @@ output:
 ```{r load_libraries, echo = F, message = F}
 library(knitr)
 library(data.table)
+library(janitor)
 library(tidyverse)
 
 ```
@@ -74,22 +75,36 @@ malt_species.decontam <- malt_species_raw %>%
 malt_genus.decontam <- malt_genus_raw %>%
   anti_join(., contaminants_genus)
 
+# create tsv files to convert to biom files for Songbird differential abundance analysis
+# be sure to remove all species that sum to 0 after removing samples
 
 malt_species.decontam_songbird <- malt_species_raw %>%
   anti_join(., contaminants_species) %>%
-  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))
+  select(-matches("CMC032.B|EXB|LIB|10M|SRR164")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
 
 malt_species_cmc.decontam_songbird <- malt_species_raw %>%
   anti_join(., contaminants_species) %>%
-  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))
+  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))%>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
   
 malt_genus.decontam_songbird <- malt_genus_raw %>%
   anti_join(., contaminants_genus) %>%
-  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))
+  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))%>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
 
 malt_genus_cmc.decontam_songbird <- malt_genus_raw %>%
   anti_join(., contaminants_genus) %>%
-  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))
+  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))%>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
 
 ```
 
@@ -102,10 +117,10 @@ save(malt_species_raw,
      file = "./05-results.backup/CMC_taxonomy_tables.RData")
 
 
-# fwrite(malt_species.decontam_songbird, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
-# fwrite(malt_species_cmc.decontam_songbird, "05-results.backup/malt_species_cmc_decontam.tsv", sep = "\t", quote = F)
-# fwrite(malt_genus.decontam_songbird, "05-results.backup/malt_genus_decontam.tsv", sep = "\t", quote = F)
-# fwrite(malt_genus_cmc.decontam_songbird, "05-results.backup/malt_genus_cmc_decontam.tsv", sep = "\t", quote = F)
+fwrite(malt_species.decontam_songbird, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
+fwrite(malt_species_cmc.decontam_songbird, "05-results.backup/malt_species_cmc_decontam.tsv", sep = "\t", quote = F)
+fwrite(malt_genus.decontam_songbird, "05-results.backup/malt_genus_decontam.tsv", sep = "\t", quote = F)
+fwrite(malt_genus_cmc.decontam_songbird, "05-results.backup/malt_genus_cmc_decontam.tsv", sep = "\t", quote = F)
 
 
 ```
