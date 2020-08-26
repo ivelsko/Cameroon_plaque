@@ -12,6 +12,7 @@ output:
 ```{r load_libraries, echo = F, message = F}
 library(knitr)
 library(data.table)
+library(janitor)
 library(tidyverse)
 library(gplots)
 library(viridis)
@@ -85,13 +86,19 @@ meta_data <- metadata
 
 # species, no blanks, no Yanomami
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("EXB|LIB|10M|SRR164")) 
+  select(-one_of(outliers)) %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
 
 # species, CMC samples only
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("EXB|LIB|JAE|SRR")) 
+ select(-one_of(outliers)) %>%
+ select(-matches("EXB|LIB|JAE|SRR")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
 
 
 ```
@@ -406,8 +413,133 @@ ggarrange(p1, labels = "a")
 
 
 # Cameroon samples only
+## Ethnic Group
+```{r ancomBC_cmc_eg}
+
+otu_data <- malt_species.decontam_filtered_cmc
+taxonomy = otu_data$Species
+otu_data <- otu_data %>%
+  column_to_rownames("Species")
+
+# Pre-processing
+feature.table = otu_data
+sample.var = "SampleID"
+group.var = "Ethnic_Group"
+zero.cut = 0.90
+lib.cut = 1000
+neg.lb = TRUE
+pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
+                                        group.var, zero.cut, lib.cut, neg.lb)
+feature.table = pre.process$feature.table
+group.name = pre.process$group.name
+group.ind = pre.process$group.ind
+struc.zero = pre.process$structure.zeros
+
+# Paras for ANCOM-BC
+grp.name = group.name
+grp.ind = group.ind
+adj.method = "fdr"
+tol.EM = 1e-5
+max.iterNum = 100
+perNum = 1000
+alpha = 0.05
+
+out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
+               adj.method, tol.EM, max.iterNum, perNum, alpha)
+res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
+
+# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnicgroup.tsv", sep = "\t", quote = F)
+
+# Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
+res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+                        struc.zero[rownames(out_cmc$feature.table), ], 
+                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
+alpha.adj=0.05/nrow(res.ANCOM_BC)
+critic.val=qnorm(1-alpha.adj/2)
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+                                      `log fold change (Baka - Nzime)` = -`mean.difference (Nzime - Baka)`,
+                                      se = `se (Nzime - Baka)`,
+                                      ci.lo.adj=`log fold change (Baka - Nzime)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Baka - Nzime)`+critic.val*se, 
+                                      p.val, q.val, diff.abn, 
+                                      `structural.zero (Baka)`, 
+                                      `structural.zero (Nzime)`)
+
+# I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
+ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  arrange(q.val) %>%
+  filter(diff.abn == "TRUE")
+  # filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
+
+```
+
+
+```{r cmc_mr_filter_eg}
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_Nz_Ba %>%
+  inner_join(., mr_cmc_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_Nz_Ba %>%
+  inner_join(., mr_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1) %>%
+  transmute(Species, 
+            log_fold_change = `log fold change (Baka - Nzime)`, 
+            se = se, 
+            ci.lo = ci.lo.adj, 
+            ci.up = ci.up.adj, 
+            struct.zero = ifelse(se == 0, 1, 0), 
+            q.val, 
+            Ethnic_Group = "Baka", 
+            star = ifelse(q.val<0.001, "***", 
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))
+
+# list the species shared between the 2 comparisons
+Env_species = unique(ancom_bc_cmc_eg_mr1$Species)
+
+```
+
+Plots showing fold changes
+```{r noblanks_plot_eg}
+
+# ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_eg_mr1 %>%
+#   filter(se != 0) # thes have error bars in both directions as big as each data bar
+
+# plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
+p1 = ggplot(ancom_bc_cmc_eg_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Ethnic_Group)) + 
+  geom_bar(aes(fill=Ethnic_Group), stat="identity", width=0.4, position=position_dodge())+
+  geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
+  geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
+  labs(x=NULL, y="Log Fold Change")+coord_flip()+
+  scale_fill_discrete(name=NULL)+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_eg_mr1$Species)))+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill="white"))+
+  geom_text(aes(y=log_fold_change+4*sign(log_fold_change), label=star), 
+            vjust=.7, color="black", position=position_dodge(width = .5))
+
+p1
+
+p1 = p1+geom_point(data = ancom_bc_cmc_eg_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+                   position=position_dodge(width = 0.4), shape=18)
+
+p1
+
+
+```
+
+
+
 ## Market Economy
-```{r ancomBC_cmc_mareco}
+```{r ancomBC_cmc_me}
 
 otu_data <- malt_species.decontam_filtered_cmc
 taxonomy = otu_data$Species
@@ -450,76 +582,102 @@ res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res,
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
 res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
-                                      `log fold change (Farming - ForrestCamp)` = -`mean.difference (ForrestCamp - Farming)`,
+                                      `log fold change (ForrestCamp - Farming)` = `mean.difference (ForrestCamp - Farming)`,
                                       se = `se (ForrestCamp - Farming)`,
-                                      ci.lo.adj=`log fold change (Farming - ForrestCamp)`-critic.val*se, 
-                                      ci.up.adj=`log fold change (Farming - ForrestCamp)`+critic.val*se, 
+                                      ci.lo.adj=`log fold change (ForrestCamp - Farming)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (ForrestCamp - Farming)`+critic.val*se, 
                                       p.val, q.val, diff.abn, 
-                                      `structural.zero (Farming)`, 
-                                      `structural.zero (ForrestCamp)`)
+                                      `structural.zero (ForrestCamp)`, 
+                                      `structural.zero (Farming)`)
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
   rename(Species = species) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
-  # filter(`log fold change (Farming - ForrestCamp)` < -1 | `log fold change (Farming - ForrestCamp)` > 1)
+  # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
 # fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+
+
+# Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
+res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+                        struc.zero[rownames(out_cmc$feature.table), ], 
+                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
+alpha.adj=0.05/nrow(res.ANCOM_BC)
+critic.val=qnorm(1-alpha.adj/2)
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+                                      `log fold change (LoggingRoad - Farming)` = `mean.difference (LoggingRoad - Farming)`,
+                                      se = `se (LoggingRoad - Farming)`,
+                                      ci.lo.adj=`log fold change (LoggingRoad - Farming)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (LoggingRoad - Farming)`+critic.val*se, 
+                                      p.val, q.val, diff.abn, 
+                                      `structural.zero (LoggingRoad)`, 
+                                      `structural.zero (Farming)`)
+
+# I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
+ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  arrange(q.val) %>%
+  filter(diff.abn == "TRUE")
+  # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
+
+# fwrite(ancom_bc_cmc_Fa_LR, "../data/global_gut/ancom_bc_cmc_Fa_LR.tsv", sep = "\t", quote = F)
+
 
 ```
 
 
-```{r cmc_mr_filter_mareco}
+```{r cmc_mr_filter_me}
 
 # filter the table to include only the species that are in MR1 (if any)
 ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
   inner_join(., mr_cmc_species %>%
                select(Species), by = "Species") %>%
-  filter(`log fold change (Farming - ForrestCamp)` < -2 | `log fold change (Farming - ForrestCamp)` > 2)
+  filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
 # filter the table to include only the species that are in MR1 (if any)
 ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
   inner_join(., mr_species %>%
                select(Species), by = "Species") %>%
-  filter(`log fold change (Farming - ForrestCamp)` < -2 | `log fold change (Farming - ForrestCamp)` > 2) %>%
+  filter(`log fold change (ForrestCamp - Farming)` < -2 | `log fold change (ForrestCamp - Farming)` > 2) %>%
   transmute(Species, 
-            log_fold_change = `log fold change (Farming - ForrestCamp)`, 
+            log_fold_change = `log fold change (ForrestCamp - Farming)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
             ci.up = ci.up.adj, 
             struct.zero = ifelse(se == 0, 1, 0), 
             q.val, 
-            Env = "JAE", 
+            Market_economy = "ForrestCamp", 
             star = ifelse(q.val<0.001, "***", 
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# ancom_bc_noblanks_HMP_HG_mr1 <- ancom_bc_noblanks_HMP_HG %>%
-#   inner_join(., mr_species %>%
-#                select(Species), by = "Species") %>%
-#   filter(`log fold change (HunterGatherer - HMP)` < -2 | `log fold change (HunterGatherer - HMP)` > 2) %>%
-#   transmute(Species, 
-#             log_fold_change = `log fold change (HunterGatherer - HMP)`, 
-#             se = se, 
-#             ci.lo = ci.lo.adj, 
-#             ci.up = ci.up.adj, 
-#             struct.zero = ifelse(se == 0, 1, 0), 
-#             q.val, 
-#             Env = "HMP", 
-#             star = ifelse(q.val<0.001, "***", 
-#                       ifelse(q.val<0.01, "**",
-#                          ifelse(q.val<0.05, "*", ""))))
+ancom_bc_cmc_Fa_LR_mr1 <- ancom_bc_cmc_Fa_LR %>%
+  inner_join(., mr_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (LoggingRoad - Farming)` < -2 | `log fold change (LoggingRoad - Farming)` > 2) %>%
+  transmute(Species,
+            log_fold_change = `log fold change (LoggingRoad - Farming)`,
+            se = se,
+            ci.lo = ci.lo.adj,
+            ci.up = ci.up.adj,
+            struct.zero = ifelse(se == 0, 1, 0),
+            q.val,
+            Market_economy = "LoggingRoad",
+            star = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))
 
 # list the species shared between the 2 comparisons
-Env_species = unique(c(ancom_bc_cmc_Fa_FC_mr1$Species, XXXXX$Species))
+Env_species = unique(c(ancom_bc_cmc_Fa_FC_mr1$Species, ancom_bc_cmc_Fa_LR_mr1$Species))
 
 ```
 
 Plots showing fold changes
-```{r noblanks_plot_env}
+```{r noblanks_plot_me}
 
-ancom_bc_cmc_mareco_mr1 <- bind_rows(ancom_bc_cmc_Fa_FC_mr1, ancom_bc_noblanks_HMP_HG_mr1) %>%
+ancom_bc_cmc_mareco_mr1 <- bind_rows(ancom_bc_cmc_Fa_FC_mr1, ancom_bc_cmc_Fa_LR_mr1) %>%
   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
@@ -547,13 +705,320 @@ p1
 
 ```
 
-## Tooth Site
+## Tooth_site
+```{r ancomBC_cmc_ts}
 
+otu_data <- malt_species.decontam_filtered_cmc
+taxonomy = otu_data$Species
+otu_data <- otu_data %>%
+  column_to_rownames("Species")
+
+# Pre-processing
+feature.table = otu_data
+sample.var = "SampleID"
+group.var = "Tooth_site"
+zero.cut = 0.90
+lib.cut = 1000
+neg.lb = TRUE
+pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
+                                        group.var, zero.cut, lib.cut, neg.lb)
+feature.table = pre.process$feature.table
+group.name = pre.process$group.name
+group.ind = pre.process$group.ind
+struc.zero = pre.process$structure.zeros
+
+# Paras for ANCOM-BC
+grp.name = group.name
+grp.ind = group.ind
+adj.method = "fdr"
+tol.EM = 1e-5
+max.iterNum = 100
+perNum = 1000
+alpha = 0.05
+
+out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
+               adj.method, tol.EM, max.iterNum, perNum, alpha)
+res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
+
+# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_toothsite.tsv", sep = "\t", quote = F)
+
+# Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
+res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+                        struc.zero[rownames(out_cmc$feature.table), ], 
+                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
+alpha.adj=0.05/nrow(res.ANCOM_BC)
+critic.val=qnorm(1-alpha.adj/2)
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+                                      `log fold change (Anterior - Posterior)` = -`mean.difference (Posterior - Anterior)`,
+                                      se = `se (Posterior - Anterior)`,
+                                      ci.lo.adj=`log fold change (Anterior - Posterior)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Anterior - Posterior)`+critic.val*se, 
+                                      p.val, q.val, diff.abn, 
+                                      `structural.zero (Anterior)`, 
+                                      `structural.zero (Posterior)`)
+
+# I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
+ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  arrange(q.val) %>%
+  filter(diff.abn == "TRUE")
+  # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
+
+```
+
+
+```{r cmc_mr_filter_ts}
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_An_Po %>%
+  inner_join(., mr_cmc_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_An_Po %>%
+  inner_join(., mr_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Anterior - Posterior)` < -2 | `log fold change (Anterior - Posterior)` > 2) %>%
+  transmute(Species, 
+            log_fold_change = `log fold change (Anterior - Posterior)`, 
+            se = se, 
+            ci.lo = ci.lo.adj, 
+            ci.up = ci.up.adj, 
+            struct.zero = ifelse(se == 0, 1, 0), 
+            q.val, 
+            Tooth_site = "Anterior", 
+            star = ifelse(q.val<0.001, "***", 
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))
+
+# list the species shared between the 2 comparisons
+Env_species = unique(ancom_bc_cmc_ts_mr1$Species)
+
+```
+
+Plots showing fold changes
+```{r noblanks_plot_ts}
+
+ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_ts_mr1 %>%
+  filter(se != 0) # thes have error bars in both directions as big as each data bar
+
+# plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
+p1 = ggplot(ancom_bc_cmc_ts_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Tooth_site)) + 
+  geom_bar(aes(fill=Tooth_site), stat="identity", width=0.4, position=position_dodge())+
+  geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
+  geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
+  labs(x=NULL, y="Log Fold Change")+coord_flip()+
+  scale_fill_discrete(name=NULL)+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Species)))+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill="white"))+
+  geom_text(aes(y=log_fold_change+4*sign(log_fold_change), label=star), 
+            vjust=.7, color="black", position=position_dodge(width = .5))
+
+p1
+
+p1 = p1+geom_point(data = ancom_bc_cmc_ts_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+                   position=position_dodge(width = 0.4), shape=18)
+
+p1
+
+
+```
 
 ## Sex
+```{r ancomBC_cmc_sex}
+
+otu_data <- malt_species.decontam_filtered_cmc
+taxonomy = otu_data$Species
+otu_data <- otu_data %>%
+  column_to_rownames("Species")
+
+# Pre-processing
+feature.table = otu_data
+sample.var = "SampleID"
+group.var = "Sex"
+zero.cut = 0.90
+lib.cut = 1000
+neg.lb = TRUE
+pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
+                                        group.var, zero.cut, lib.cut, neg.lb)
+feature.table = pre.process$feature.table
+group.name = pre.process$group.name
+group.ind = pre.process$group.ind
+struc.zero = pre.process$structure.zeros
+
+# Paras for ANCOM-BC
+grp.name = group.name
+grp.ind = group.ind
+adj.method = "fdr"
+tol.EM = 1e-5
+max.iterNum = 100
+perNum = 1000
+alpha = 0.05
+
+out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
+               adj.method, tol.EM, max.iterNum, perNum, alpha)
+res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
+
+# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnic_group.tsv", sep = "\t", quote = F)
+
+# Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
+res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+                        struc.zero[rownames(out_cmc$feature.table), ], 
+                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
+alpha.adj=0.05/nrow(res.ANCOM_BC)
+critic.val=qnorm(1-alpha.adj/2)
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+                                      `log fold change (Female - Male)` = -`mean.difference (Male - Female)`,
+                                      se = `se (Male - Female)`,
+                                      ci.lo.adj=`log fold change (Female - Male)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Female - Male)`+critic.val*se, 
+                                      p.val, q.val, diff.abn, 
+                                      `structural.zero (Female)`, 
+                                      `structural.zero (Male)`)
+
+# I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
+ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  arrange(q.val) %>%
+  filter(diff.abn == "TRUE")
+  # filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
+
+# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+
+```
+
+
+```{r cmc_mr_filter_sex}
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_M_F %>%
+  inner_join(., mr_cmc_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
+
+# filter the table to include only the species that are in MR1 (if any)
+ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_M_F %>%
+  inner_join(., mr_species %>%
+               select(Species), by = "Species") %>%
+  filter(`log fold change (Female - Male)` < -2 | `log fold change (Female - Male)` > 2) %>%
+  transmute(Species, 
+            log_fold_change = `log fold change (Female - Male)`, 
+            se = se, 
+            ci.lo = ci.lo.adj, 
+            ci.up = ci.up.adj, 
+            struct.zero = ifelse(se == 0, 1, 0), 
+            q.val, 
+            Sex = "Female", 
+            star = ifelse(q.val<0.001, "***", 
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))
+
+# list the species shared between the 2 comparisons
+Env_species = unique(ancom_bc_cmc_sex_mr1$Species)
+
+```
+
+Plots showing fold changes
+```{r noblanks_plot_sex}
+
+ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_sex_mr1 %>%
+  filter(se != 0) # thes have error bars in both directions as big as each data bar
+
+# plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
+p1 = ggplot(ancom_bc_cmc_sex_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Sex)) + 
+  geom_bar(aes(fill=Sex), stat="identity", width=0.4, position=position_dodge())+
+  geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
+  geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
+  labs(x=NULL, y="Log Fold Change")+coord_flip()+
+  scale_fill_discrete(name=NULL)+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Species)))+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill="white"))+
+  geom_text(aes(y=log_fold_change+4*sign(log_fold_change), label=star), 
+            vjust=.7, color="black", position=position_dodge(width = .5))
+
+p1
+
+p1 = p1+geom_point(data = ancom_bc_cmc_sex_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+                   position=position_dodge(width = 0.4), shape=18)
+
+p1
+
+
+```
 
 
 ## Village
+Is there any reason to do this comparison? Between the different market
+economies there were almost no differentially abundant genera, and village is
+basically a smaller breakdown of the market economies, with 2 villages in
+LoggingRoad (202, 205), 1 in ForrestCamp (204), and 2 in Farming (203, 206).
+I think for now not. 
+```{r ancomBC_cmc_vi}
+
+otu_data <- malt_species.decontam_filtered_cmc
+taxonomy = otu_data$Species
+otu_data <- otu_data %>%
+  column_to_rownames("Species")
+
+# Pre-processing
+feature.table = otu_data
+sample.var = "SampleID"
+group.var = "Village"
+zero.cut = 0.90
+lib.cut = 1000
+neg.lb = TRUE
+pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
+                                        group.var, zero.cut, lib.cut, neg.lb)
+feature.table = pre.process$feature.table
+group.name = pre.process$group.name
+group.ind = pre.process$group.ind
+struc.zero = pre.process$structure.zeros
+
+# Paras for ANCOM-BC
+grp.name = group.name
+grp.ind = group.ind
+adj.method = "fdr"
+tol.EM = 1e-5
+max.iterNum = 100
+perNum = 1000
+alpha = 0.05
+
+out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
+               adj.method, tol.EM, max.iterNum, perNum, alpha)
+res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
+
+# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_toothsite.tsv", sep = "\t", quote = F)
+
+# Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
+res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+                        struc.zero[rownames(out_cmc$feature.table), ], 
+                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
+alpha.adj=0.05/nrow(res.ANCOM_BC)
+critic.val=qnorm(1-alpha.adj/2)
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+                                      `log fold change (Anterior - Posterior)` = -`mean.difference (Posterior - Anterior)`,
+                                      se = `se (Posterior - Anterior)`,
+                                      ci.lo.adj=`log fold change (Anterior - Posterior)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Anterior - Posterior)`+critic.val*se, 
+                                      p.val, q.val, diff.abn, 
+                                      `structural.zero (Anterior)`, 
+                                      `structural.zero (Posterior)`)
+
+# I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
+ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  arrange(q.val) %>%
+  filter(diff.abn == "TRUE")
+  # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
+
+```
 
 
 
