@@ -1,5 +1,5 @@
 ---
-title: "Cameroon calculus/plaque MALT differentially abundant taxa by ANCOM-BC"
+title: "Cameroon calculus/plaque MALT differentially abundant genera by ANCOM-BC"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output:
@@ -42,11 +42,11 @@ load("./05-results.backup/CMC_taxonomy_tables.RData")
 
 ```
 
-Read in the tables that have the species that are in MR1, for filtering the results later
-```{r mr_species}
-# read in the files that have the MR1, MR2, MR3 species/genera
-mr_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv")
-mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
+Read in the tables that have the genus that are in MR1, for filtering the results later
+```{r mr_genus}
+# read in the files that have the MR1, MR2, MR3 genus/genera
+mr_genus <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv")
+mr_cmc_genus <- fread("./05-results.backup/minres_oblimin_cmc.fa_genus.tsv")
 
 ```
 
@@ -84,109 +84,37 @@ metadata <- metadata %>%
 meta_data <- metadata
 
 
-# species, no blanks, no Yanomami
-malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
+# genus, no blanks, no Yanomami
+malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
   select(-one_of(outliers)) %>%
   select(-matches("EXB|LIB|10M|SRR164")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
-  select(-Total)
+  select(-Total) %>%
+  rename(Genus = Species)
 
-# species, CMC samples only
-malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
+# genus, CMC samples only
+malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
  select(-one_of(outliers)) %>%
  select(-matches("EXB|LIB|JAE|SRR")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
-  select(-Total)
+  select(-Total) %>%
+  rename(Genus = Species)
 
 
 ```
 
 # ANCOM-BC
-```{r ancomBC_test, eval = F}
-library(microbiome)
+# Industrial and Cameroon plaque samples
 
-# Load example data
-data(dietswap)
-pseq = dietswap
-n_taxa = ntaxa(pseq)
-n_samp = nsamples(pseq)
-# Metadata
-meta_data = meta(pseq)
-# Taxonomy table
-taxonomy = tax_table(pseq)
-# Absolute abundances
-otu_absolute = abundances(pseq)
-
-# 2-group comparison
-# Pre-processing
-feature.table = otu_absolute; sample.var = "sample"; group.var = "nationality"; 
-zero.cut = 0.90; lib.cut = 1000; neg.lb = TRUE
-pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
-                                        group.var, zero.cut, lib.cut, neg.lb)
-feature.table = pre.process$feature.table
-group.name = pre.process$group.name
-group.ind = pre.process$group.ind
-struc.zero = pre.process$structure.zeros
-
-# Paras for ANCOM-BC
-grp.name = group.name; grp.ind = group.ind; adj.method = "bonferroni"
-tol.EM = 1e-5; max.iterNum = 100; perNum = 1000; alpha = 0.05
-
-out = ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
-               adj.method, tol.EM, max.iterNum, perNum, alpha)
-res = cbind(taxon = rownames(out$feature.table), out$res)
-# write_csv(res, "demo_two_group.csv")
-
-# Test result
-res.ANCOM_BC <- data.frame(phylum=rownames(out$feature.table), out$res, 
-                        struc.zero[rownames(out$feature.table), ], 
-                        row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
-alpha.adj=0.05/nrow(res.ANCOM_BC)
-critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC%>%transmute(phylum,
-                                      `log fold change (AAM - AFR)` = -`mean.difference (AFR - AAM)`,
-                                      se = `se (AFR - AAM)`,
-                                      ci.lo.adj=`log fold change (AAM - AFR)`-critic.val*se, 
-                                      ci.up.adj=`log fold change (AAM - AFR)`+critic.val*se, 
-                                      p.val, q.val, diff.abn, 
-                                      `structural.zero (AAM)`, 
-                                      `structural.zero (AFR)`)
-res.ANCOM_BC <- res.ANCOM_BC%>%arrange(q.val)
-# fwrite(res.ANCOM_BC, "../data/global_gut/<pick a new file name>.tsv", sep = "\t", quote = F)
-
-
-
-# multi-group comparison
-feature.table = otu_absolute; sample.var = "sample"; group.var = "bmi_group"; 
-zero.cut = 0.90; lib.cut = 1000; neg.lb = TRUE
-pre.process = feature_table_pre_process(feature.table, meta_data, sample.var, 
-                                        group.var, zero.cut, lib.cut, neg.lb)
-feature.table = pre.process$feature.table
-group.name = pre.process$group.name
-group.ind = pre.process$group.ind
-struc.zero = pre.process$structure.zeros
-
-# Paras for ANCOM-BC
-grp.name = group.name; grp.ind = group.ind; adj.method = "bonferroni"
-tol.EM = 1e-5; max.iterNum = 100; perNum = 1000; alpha = 0.05
-
-out = ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
-               adj.method, tol.EM, max.iterNum, perNum, alpha)
-res = cbind(taxon = rownames(out$feature.table), out$res)
-# write_csv(res, "demo_multi_group.csv")
-
-
-```
-
-
+## Env
 ```{r ancomBC_noblanks_env}
 
-otu_data <- malt_species.decontam_filtered_noblanks_noyanomami
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_noblanks_noyanomami
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -217,12 +145,12 @@ res_noblanks <- cbind(taxon = rownames(out_noblanks$feature.table), out_noblanks
 # fwrite(res_noblanks, "./05-results.backup/ancomBC_noblanks_ethnic_group.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res_noblanks.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
+res_noblanks.ANCOM_BC <- data.frame(genus=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res_noblanks.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(species,
+res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(genus,
                                       `log fold change (HunterGatherer - HMP)` = `mean.difference (HunterGatherer - HMP)`,
                                       se = `se (HunterGatherer - HMP)`,
                                       ci.lo.adj=`log fold change (HunterGatherer - HMP)`-critic.val*se, 
@@ -233,19 +161,19 @@ res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE") %>%
   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
 
 # fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
-res.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (HunterGatherer - JAE)` = -`mean.difference (JAE - HunterGatherer)`,
                                       se = `se (JAE - HunterGatherer)`,
                                       ci.lo.adj=`log fold change (HunterGatherer - JAE)`-critic.val*se, 
@@ -254,10 +182,10 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
                                       `structural.zero (HunterGatherer)`, 
                                       `structural.zero (JAE)`)
 ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
-  # possiblly filter out the species that have a differential abundance of less than |1|
+  # possiblly filter out the genus that have a differential abundance of less than |1|
   # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
   
 # fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_JAE.tsv", sep = "\t", quote = F)
@@ -267,12 +195,12 @@ ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
 
 ```{r noblanks_mr_filter_env}
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_noblanks_JAE_HG_mr1 <- ancom_bc_noblanks_JAE_HG %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (HunterGatherer - JAE)` < -2 | `log fold change (HunterGatherer - JAE)` > 2) %>%
-  transmute(Species, 
+  transmute(Genus, 
             log_fold_change = `log fold change (HunterGatherer - JAE)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -285,10 +213,10 @@ ancom_bc_noblanks_JAE_HG_mr1 <- ancom_bc_noblanks_JAE_HG %>%
                          ifelse(q.val<0.05, "*", ""))))
 
 ancom_bc_noblanks_HMP_HG_mr1 <- ancom_bc_noblanks_HMP_HG %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (HunterGatherer - HMP)` < -2 | `log fold change (HunterGatherer - HMP)` > 2) %>%
-  transmute(Species, 
+  transmute(Genus, 
             log_fold_change = `log fold change (HunterGatherer - HMP)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -300,8 +228,8 @@ ancom_bc_noblanks_HMP_HG_mr1 <- ancom_bc_noblanks_HMP_HG %>%
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# list the species shared between the 2 comparisons
-Env_species = unique(c(ancom_bc_noblanks_JAE_HG_mr1$Species, ancom_bc_noblanks_HMP_HG_mr1$Species))
+# list the genus shared between the 2 comparisons
+Env_genus = unique(c(ancom_bc_noblanks_JAE_HG_mr1$Genus, ancom_bc_noblanks_HMP_HG_mr1$Genus))
 
 ```
 
@@ -313,13 +241,13 @@ ancom_bc_noblanks_env_mr1 <- bind_rows(ancom_bc_noblanks_JAE_HG_mr1, ancom_bc_no
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_noblanks_env_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Env)) + 
+p1 = ggplot(ancom_bc_noblanks_env_mr1, aes(x=Genus, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Env)) + 
   geom_bar(aes(fill=Env), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
   scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(ancom_bc_noblanks_env_mr1$Species)))+
+  scale_x_discrete(limits = rev(levels(ancom_bc_noblanks_env_mr1$Genus)))+
   theme_bw()+
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -329,7 +257,7 @@ p1 = ggplot(ancom_bc_noblanks_env_mr1, aes(x=Species, y=log_fold_change, ymin=ci
 
 p1
 
-p1 = p1+geom_point(data = ancom_bc_noblanks_env_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+p1 = p1+geom_point(data = ancom_bc_noblanks_env_mr1 %>% filter(struct.zero == 1), aes(x=Genus, y=log_fold_change),
                    position=position_dodge(width = 0.4), shape=18)
 
 p1
@@ -338,89 +266,15 @@ p1
 ```
 
 
-For plots (from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-```{r, eval = F}
-## 3.1 MA vs US
-ma_us_0_2=read_csv("../data/global_gut/ma_us_phylum_age2.csv") # HMP-HG
-ma_us_18_40=read_csv("../data/global_gut/ma_us_phylum_age18_40.csv") # JAE-HG
-ma_us_phyla=unique(c(ma_us_0_2$phylum, ma_us_18_40$phylum)) # list the species shared between the 2 comparisons
-ma_us_0_2=ma_us_0_2%>%transmute(phylum, log.fold.change=`log fold change (MA - US)`, # HMP-HunterGatherer
-                                se=se, ci.lo=ci.lo.adj, ci.up=ci.up.adj,
-                                struc.zero=ifelse(se==0, 1, 0), 
-                                q.val, age.group = "Infants", # Env = "HMP"
-                                star=ifelse(q.val<.001, "***", 
-                                                ifelse(q.val<.01, "**",
-                                                       ifelse(q.val<.05, "*", ""))))
-if(length(setdiff(ma_us_phyla, ma_us_0_2$phylum))>0){
-  ma_us_0_2.1=data.frame(phylum=setdiff(ma_us_phyla, ma_us_0_2$phylum),
-                         log.fold.change=0, se=0, ci.lo=0, ci.up=0, 
-                         struc.zero=1, q.val=1, age.group="Infants", star="")
-  ma_us_0_2=rbind(ma_us_0_2, ma_us_0_2.1)
-}
-ma_us_18_40=ma_us_18_40%>%transmute(phylum, log.fold.change=`log fold change (MA - US)`,
-                                    se=se, ci.lo=ci.lo.adj, ci.up=ci.up.adj,
-                                    struc.zero=ifelse(se==0, 1, 0), 
-                                    q.val, age.group = "Adults",
-                                    star=ifelse(q.val<.001, "***", 
-                                                ifelse(q.val<.01, "**",
-                                                       ifelse(q.val<.05, "*", ""))))
-if(length(setdiff(ma_us_phyla, ma_us_18_40$phylum))>0){
-  ma_us_18_40.1=data.frame(phylum=setdiff(ma_us_phyla, ma_us_18_40$phylum),
-                           log.fold.change=0, se=0, ci.lo=0, ci.up=0, 
-                           struc.zero=1, q.val=1, age.group="Adults", star="")
-  ma_us_18_40=rbind(ma_us_18_40, ma_us_18_40.1)
-}
-dat.fig_ma_us=rbind(ma_us_0_2, ma_us_18_40)
-dat.fig_ma_us$age.group=factor(dat.fig_ma_us$age.group, 
-                               levels = c("Infants", "Adults"))
-dat.fig_ma_us$phylum=sapply(dat.fig_ma_us$phylum, function(x) strsplit(x, "__")[[1]][2])
-dat.fig_ma_us$phylum=factor(dat.fig_ma_us$phylum, levels = sort(unique(dat.fig_ma_us$phylum)))
-dat.fig_ma_us$struc.zero=factor(dat.fig_ma_us$struc.zero)
-
-
-
-
-## 3.4 Fig. 6a
-
-dat.fig_ma_us2=cbind(dat.fig_ma_us, type="MA - US")
-dat.fig_ven_us2=cbind(dat.fig_ven_us, type="VEN - US")
-dat.fig_ma_ven2=cbind(dat.fig_ma_ven, type="MA - VEN")
-dat.fig_ma_ven2=dat.fig_ma_ven2[-which(dat.fig_ma_ven2$phylum%in%c("Acidobacteria", "Chloroflexi")), ]
-dat.fig_ma_ven2$phylum=factor(dat.fig_ma_ven2$phylum)
-dat.fig=rbind(dat.fig_ma_us2, dat.fig_ven_us2, dat.fig_ma_ven2)
-dat.fig$type=factor(dat.fig$type, levels = c("MA - US", "VEN - US", "MA - VEN"))
-
-p1=ggplot(dat.fig, aes(x=phylum, y=log.fold.change, ymin=ci.lo, ymax=ci.up, group=age.group)) + 
-  geom_bar(aes(fill=age.group), stat="identity", width=0.4, position=position_dodge())+
-  geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
-  geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
-  labs(x=NULL, y="Log Fold Change")+coord_flip()+
-  scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(dat.fig$phylum)))+
-  facet_grid(.~type, scales = "free_x")+
-  theme_bw()+
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_rect(fill="white"))+
-  geom_text(aes(y=log.fold.change+4*sign(log.fold.change), label=star), 
-            vjust=.7, color="black", position=position_dodge(width = .5))
-p1 = p1+geom_point(data = dat.fig%>%filter(struc.zero==1), aes(x=phylum, y=log.fold.change),
-                   position=position_dodge(width = 0.4), shape=18)
-ggarrange(p1, labels = "a")
-
-
-
-```
-
 
 # Cameroon samples only
 ## Ethnic Group
 ```{r ancomBC_cmc_eg}
 
-otu_data <- malt_species.decontam_filtered_cmc
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_cmc
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -452,12 +306,12 @@ res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 # fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnicgroup.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (Baka - Nzime)` = -`mean.difference (Nzime - Baka)`,
                                       se = `se (Nzime - Baka)`,
                                       ci.lo.adj=`log fold change (Baka - Nzime)`-critic.val*se, 
@@ -468,7 +322,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
@@ -478,18 +332,18 @@ ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
 
 ```{r cmc_mr_filter_eg}
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_Nz_Ba %>%
-  # inner_join(., mr_cmc_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_cmc_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_Nz_Ba %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1) %>%
-  transmute(Species, 
+  transmute(Genus, 
             log_fold_change = `log fold change (Baka - Nzime)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -501,8 +355,8 @@ ancom_bc_cmc_eg_mr1 <- ancom_bc_cmc_Nz_Ba %>%
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# list the species shared between the 2 comparisons
-Env_species = unique(ancom_bc_cmc_eg_mr1$Species)
+# list the genus shared between the 2 comparisons
+Env_genus = unique(ancom_bc_cmc_eg_mr1$Genus)
 
 ```
 
@@ -513,13 +367,13 @@ Plots showing fold changes
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_cmc_eg_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Ethnic_Group)) + 
+p1 = ggplot(ancom_bc_cmc_eg_mr1, aes(x=Genus, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Ethnic_Group)) + 
   geom_bar(aes(fill=Ethnic_Group), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
   scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_eg_mr1$Species)))+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_eg_mr1$Genus)))+
   theme_bw()+
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -529,7 +383,7 @@ p1 = ggplot(ancom_bc_cmc_eg_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, y
 
 p1
 
-p1 = p1+geom_point(data = ancom_bc_cmc_eg_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+p1 = p1+geom_point(data = ancom_bc_cmc_eg_mr1 %>% filter(struct.zero == 1), aes(x=Genus, y=log_fold_change),
                    position=position_dodge(width = 0.4), shape=18)
 
 p1
@@ -542,10 +396,10 @@ p1
 ## Market Economy
 ```{r ancomBC_cmc_me}
 
-otu_data <- malt_species.decontam_filtered_cmc
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_cmc
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -577,12 +431,12 @@ res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 # fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnic_group.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (ForrestCamp - Farming)` = `mean.difference (ForrestCamp - Farming)`,
                                       se = `se (ForrestCamp - Farming)`,
                                       ci.lo.adj=`log fold change (ForrestCamp - Farming)`-critic.val*se, 
@@ -593,7 +447,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
@@ -602,12 +456,12 @@ ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
 
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (LoggingRoad - Farming)` = `mean.difference (LoggingRoad - Farming)`,
                                       se = `se (LoggingRoad - Farming)`,
                                       ci.lo.adj=`log fold change (LoggingRoad - Farming)`-critic.val*se, 
@@ -618,7 +472,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
@@ -631,18 +485,18 @@ ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
 
 ```{r cmc_mr_filter_me}
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
-  # inner_join(., mr_cmc_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_cmc_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
-  filter(`log fold change (ForrestCamp - Farming)` < -2 | `log fold change (ForrestCamp - Farming)` > 2) %>%
-  transmute(Species, 
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
+  filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1) %>%
+  transmute(Genus, 
             log_fold_change = `log fold change (ForrestCamp - Farming)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -655,10 +509,10 @@ ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
                          ifelse(q.val<0.05, "*", ""))))
 
 ancom_bc_cmc_Fa_LR_mr1 <- ancom_bc_cmc_Fa_LR %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
-  filter(`log fold change (LoggingRoad - Farming)` < -2 | `log fold change (LoggingRoad - Farming)` > 2) %>%
-  transmute(Species,
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
+  filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1) %>%
+  transmute(Genus,
             log_fold_change = `log fold change (LoggingRoad - Farming)`,
             se = se,
             ci.lo = ci.lo.adj,
@@ -670,8 +524,8 @@ ancom_bc_cmc_Fa_LR_mr1 <- ancom_bc_cmc_Fa_LR %>%
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# list the species shared between the 2 comparisons
-Env_species = unique(c(ancom_bc_cmc_Fa_FC_mr1$Species, ancom_bc_cmc_Fa_LR_mr1$Species))
+# list the genus shared between the 2 comparisons
+Env_genus = unique(c(ancom_bc_cmc_Fa_FC_mr1$Genus, ancom_bc_cmc_Fa_LR_mr1$Genus))
 
 ```
 
@@ -683,13 +537,13 @@ ancom_bc_cmc_mareco_mr1 <- bind_rows(ancom_bc_cmc_Fa_FC_mr1, ancom_bc_cmc_Fa_LR_
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_cmc_mareco_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Market_economy)) + 
+p1 = ggplot(ancom_bc_cmc_mareco_mr1, aes(x=Genus, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Market_economy)) + 
   geom_bar(aes(fill=Market_economy), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
   scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_mareco_mr1$Species)))+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_mareco_mr1$Genus)))+
   theme_bw()+
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -699,7 +553,7 @@ p1 = ggplot(ancom_bc_cmc_mareco_mr1, aes(x=Species, y=log_fold_change, ymin=ci.l
 
 p1
 
-p1 = p1+geom_point(data = ancom_bc_cmc_mareco_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+p1 = p1+geom_point(data = ancom_bc_cmc_mareco_mr1 %>% filter(struct.zero == 1), aes(x=Genus, y=log_fold_change),
                    position=position_dodge(width = 0.4), shape=18)
 
 p1
@@ -710,10 +564,10 @@ p1
 ## Tooth_site
 ```{r ancomBC_cmc_ts}
 
-otu_data <- malt_species.decontam_filtered_cmc
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_cmc
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -745,12 +599,12 @@ res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 # fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (Anterior - Posterior)` = -`mean.difference (Posterior - Anterior)`,
                                       se = `se (Posterior - Anterior)`,
                                       ci.lo.adj=`log fold change (Anterior - Posterior)`-critic.val*se, 
@@ -761,7 +615,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
@@ -771,18 +625,18 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
 
 ```{r cmc_mr_filter_ts}
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_An_Po %>%
-  # inner_join(., mr_cmc_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_cmc_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_An_Po %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (Anterior - Posterior)` < -2 | `log fold change (Anterior - Posterior)` > 2) %>%
-  transmute(Species, 
+  transmute(Genus, 
             log_fold_change = `log fold change (Anterior - Posterior)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -794,26 +648,25 @@ ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_An_Po %>%
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# list the species shared between the 2 comparisons
-Env_species = unique(ancom_bc_cmc_ts_mr1$Species)
+# list the genus shared between the 2 comparisons
+Env_genus = unique(ancom_bc_cmc_ts_mr1$Genus)
 
 ```
 
 Plots showing fold changes
 ```{r noblanks_plot_ts}
 
-ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_ts_mr1 
-# %>%
+# ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_ts_mr1 %>%
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_cmc_ts_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Tooth_site)) + 
+p1 = ggplot(ancom_bc_cmc_ts_mr1, aes(x=Genus, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Tooth_site)) + 
   geom_bar(aes(fill=Tooth_site), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
   scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Species)))+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Genus)))+
   theme_bw()+
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -823,7 +676,7 @@ p1 = ggplot(ancom_bc_cmc_ts_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, y
 
 p1
 
-p1 = p1+geom_point(data = ancom_bc_cmc_ts_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+p1 = p1+geom_point(data = ancom_bc_cmc_ts_mr1 %>% filter(struct.zero == 1), aes(x=Genus, y=log_fold_change),
                    position=position_dodge(width = 0.4), shape=18)
 
 p1
@@ -834,10 +687,10 @@ p1
 ## Sex
 ```{r ancomBC_cmc_sex}
 
-otu_data <- malt_species.decontam_filtered_cmc
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_cmc
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -869,12 +722,12 @@ res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 # fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnic_group.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (Female - Male)` = -`mean.difference (Male - Female)`,
                                       se = `se (Male - Female)`,
                                       ci.lo.adj=`log fold change (Female - Male)`-critic.val*se, 
@@ -885,7 +738,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
@@ -897,18 +750,18 @@ ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
 
 ```{r cmc_mr_filter_sex}
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_M_F %>%
-  # inner_join(., mr_cmc_species %>%
-  #              select(Species), by = "Species") %>%
+  # inner_join(., mr_cmc_genus %>%
+  #              select(Genus), by = "Genus") %>%
   filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
 
-# filter the table to include only the species that are in MR1 (if any)
+# filter the table to include only the genus that are in MR1 (if any)
 ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_M_F %>%
-  # inner_join(., mr_species %>%
-  #              select(Species), by = "Species") %>%
-  filter(`log fold change (Female - Male)` < -2 | `log fold change (Female - Male)` > 2) %>%
-  transmute(Species, 
+  # inner_join(., mr_genus %>%
+  #              select(Genus), by = "Genus") %>%
+  filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1) %>%
+  transmute(Genus, 
             log_fold_change = `log fold change (Female - Male)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
@@ -920,25 +773,22 @@ ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_M_F %>%
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-# list the species shared between the 2 comparisons
-Env_species = unique(ancom_bc_cmc_sex_mr1$Species)
+# list the genus shared between the 2 comparisons
+Env_genus = unique(ancom_bc_cmc_sex_mr1$Genus)
 
 ```
 
 Plots showing fold changes
 ```{r noblanks_plot_sex}
 
-ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_sex_mr1 %>%
-  filter(se != 0) # thes have error bars in both directions as big as each data bar
-
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_cmc_sex_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Sex)) + 
+p1 = ggplot(ancom_bc_cmc_sex_mr1, aes(x=Genus, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Sex)) + 
   geom_bar(aes(fill=Sex), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
   scale_fill_discrete(name=NULL)+
-  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Species)))+
+  scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Genus)))+
   theme_bw()+
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -948,7 +798,7 @@ p1 = ggplot(ancom_bc_cmc_sex_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, 
 
 p1
 
-p1 = p1+geom_point(data = ancom_bc_cmc_sex_mr1 %>% filter(struct.zero == 1), aes(x=Species, y=log_fold_change),
+p1 = p1+geom_point(data = ancom_bc_cmc_sex_mr1 %>% filter(struct.zero == 1), aes(x=Genus, y=log_fold_change),
                    position=position_dodge(width = 0.4), shape=18)
 
 p1
@@ -963,12 +813,12 @@ economies there were almost no differentially abundant genera, and village is
 basically a smaller breakdown of the market economies, with 2 villages in
 LoggingRoad (202, 205), 1 in ForrestCamp (204), and 2 in Farming (203, 206).
 I think for now not. 
-```{r ancomBC_cmc_vi}
+```{r ancomBC_cmc_vi, eval = F}
 
-otu_data <- malt_species.decontam_filtered_cmc
-taxonomy = otu_data$Species
+otu_data <- malt_genus.decontam_filtered_cmc
+taxonomy = otu_data$Genus
 otu_data <- otu_data %>%
-  column_to_rownames("Species")
+  column_to_rownames("Genus")
 
 # Pre-processing
 feature.table = otu_data
@@ -1000,12 +850,12 @@ res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 # fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
+res.ANCOM_BC <- data.frame(genus=rownames(out_cmc$feature.table), out_cmc$res, 
                         struc.zero[rownames(out_cmc$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC <- res.ANCOM_BC %>% transmute(genus,
                                       `log fold change (Anterior - Posterior)` = -`mean.difference (Posterior - Anterior)`,
                                       se = `se (Posterior - Anterior)`,
                                       ci.lo.adj=`log fold change (Anterior - Posterior)`-critic.val*se, 
@@ -1016,7 +866,7 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
-  rename(Species = species) %>%
+  rename(Genus = genus) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)

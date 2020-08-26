@@ -435,10 +435,10 @@ Ethnic_Group+Village+Market_economy+Market_economy_split+Age_group+Sex+Tooth_sit
 # for all samples
 # for genus these all are higher than the null model, none are "good"
 --form0 "1" # this is the null model
--form1 "Village+Ethnic_Group+Industry+Tooth_site"
--form2 "Village+Tooth_site"
--form3 "Village+Sex"
--form4 "Tooth_site"
+--form1 "Village+Ethnic_Group+Industry+Tooth_site"
+--form2 "Village+Tooth_site"
+--form3 "Village+Sex"
+--form4 "Tooth_site"
 -form5 "Sex"
 -form6 "Village"
 -form7 "Market_economy"
@@ -450,14 +450,14 @@ Ethnic_Group+Village+Market_economy+Market_economy_split+Age_group+Sex+Tooth_sit
 # the null model and having the lowest cross-validation error; form 6 is a close 2nd based
 # on the plateau and cv error; form4 has the lowest loss but plateaus higher than form0 
 
--form0 "1" # this is the null model
--form1 "Village+Ethnic_Group+Market_economy+Tooth_site"
--form2 "Village+Tooth_site"
+form0 "1" # this is the null model
+form1 "Village+Ethnic_Group+Market_economy+Tooth_site"
+form2 "Village+Tooth_site"
 -form3 "Village+Sex"
 -form4 "Tooth_site"
 -form5 "Sex"
 -form6 "Village"
--form7 "Market_economy" # 
+-form7 "Market_economy"
 
 
 
