@@ -429,36 +429,58 @@ http://mpi-sdag1.sdag.ppj.shh.mpg.de:6006
 # For the formula pick from the parameters:
 Ethnic_Group+Village+Market_economy+Market_economy_split+Age_group+Sex+Tooth_site
 
-# to do: *malt_species_decontam.biom, malt_species_cmc_decontam.biom
-# done: malt_genus_decontam.biom, malt_genus_cmc_decontam.biom
+# done: malt_genus_decontam.biom, malt_genus_cmc_decontam.biom, malt_species_decontam.biom, malt_species_cmc_decontam.biom
 
-# for all samples
-# for genus these all are higher than the null model, none are "good"
+# Industrial and Cameroon samples
+# for genus this plateaus above the null model and has a higher cross-validation error
+# for species this plateaus slightly below the null model and has a lower cross-validation error and lower loss
+
 --form0 "1" # this is the null model
---form1 "Village+Ethnic_Group+Industry+Tooth_site"
---form2 "Village+Tooth_site"
---form3 "Village+Sex"
---form4 "Tooth_site"
--form5 "Sex"
--form6 "Village"
--form7 "Market_economy"
--form8 "Industry"
+--form1 "C(Env, Treatment('HunterGatherer'))"
 
 
-# for cmc samples only
-# for genus form7 appears to perform the best, reaching the lowest plateau below 
-# the null model and having the lowest cross-validation error; form 6 is a close 2nd based
-# on the plateau and cv error; form4 has the lowest loss but plateaus higher than form0 
+# Cameroon samples only
+# for genus form1 and form2 plateau below the null model and have lower cross-validation errors
+# for species form1 plateaus below the null model and has the lowest cross-validation error, however form 3 has the lowest loss
 
-form0 "1" # this is the null model
-form1 "Village+Ethnic_Group+Market_economy+Tooth_site"
-form2 "Village+Tooth_site"
--form3 "Village+Sex"
--form4 "Tooth_site"
--form5 "Sex"
--form6 "Village"
--form7 "Market_economy"
+--form0 "1" # this is the null model
+--form1 "C(Ethnic_Group, Treatment('Nzime'))"
+--form2 "C(Market_economy, Treatment('Farming'))"
+--form3 "C(Tooth_site, Treatment('Posterior'))"
+--form4 "C(Sex, Treatment('Male'))"
 
 
 
+#!/bin/bash
+
+#SBATCH -n 4
+#SBATCH --mem 24G
+#SBATCH --partition=short
+#SBATCH -o /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.out
+#SBATCH -e /projects1/clusterhomes/velsko/slurm_logs/slurm.%j.err
+#SBATCH --mail-type=fail
+#SBATCH --mail-type=time_limit
+#SBATCH --mail-use=velsko@shh.mpg.de
+#SBATCH -J "songbird"
+
+songbird multinomial \
+        --input-biom /projects1/microbiome_calculus/Cameroon_plaque/05-results.backup/malt_species_decontam.biom \
+        --metadata-file /projects1/microbiome_calculus/Cameroon_plaque/00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv \
+        --formula "C(Env,Treatment('HunterGatherer'))" \
+        --epochs 10000 \
+        --differential-prior 0.5 \
+        --summary-interval 1 \
+        --summary-dir /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/songbird/species_noblanks/formTest
+
+# need to copy the differentials.tsv files into 05-results.backup for upload to Rmd files
+cp ../04-analysis/songbird/species_noblanks/form1/differentials.tsv ./songbird_noblanks_species_env.tsv
+cp ../04-analysis/songbird/species_cmc/form1/differentials.tsv ./songbird_noblanks_species_eg.tsv
+cp ../04-analysis/songbird/species_cmc/form2/differentials.tsv ./songbird_noblanks_species_me.tsv
+cp ../04-analysis/songbird/species_cmc/form3/differentials.tsv ./songbird_noblanks_species_ts.tsv
+cp ../04-analysis/songbird/species_cmc/form4/differentials.tsv ./songbird_noblanks_species_sex.tsv
+cp ../04-analysis/songbird/genus_noblanks/form1/differentials.tsv ./songbird_noblanks_genus_env.tsv
+cp ../04-analysis/songbird/genus_cmc/form1/differentials.tsv ./songbird_noblanks_genus_eg.tsv
+cp ../04-analysis/songbird/genus_cmc/form2/differentials.tsv ./songbird_noblanks_genus_me.tsv
+cp ../04-analysis/songbird/genus_cmc/form3/differentials.tsv ./songbird_noblanks_genus_ts.tsv
+cp ../04-analysis/songbird/genus_cmc/form4/differentials.tsv ./songbird_noblanks_genus_sex.tsv
 

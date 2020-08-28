@@ -154,7 +154,7 @@ res.ANCOM_BC <- res.ANCOM_BC%>%transmute(phylum,
                                       `structural.zero (AAM)`, 
                                       `structural.zero (AFR)`)
 res.ANCOM_BC <- res.ANCOM_BC%>%arrange(q.val)
-# fwrite(res.ANCOM_BC, "../data/global_gut/<pick a new file name>.tsv", sep = "\t", quote = F)
+# fwrite(res.ANCOM_BC, "./05-results.backup/<pick a new file name>.tsv", sep = "\t", quote = F)
 
 
 
@@ -180,7 +180,7 @@ res = cbind(taxon = rownames(out$feature.table), out$res)
 
 ```
 
-
+## Env
 ```{r ancomBC_noblanks_env}
 
 otu_data <- malt_species.decontam_filtered_noblanks_noyanomami
@@ -235,10 +235,11 @@ res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(species,
 ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
   rename(Species = species) %>%
   arrange(q.val) %>%
-  filter(diff.abn == "TRUE") %>%
-  filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
+  filter(diff.abn == "TRUE") 
+# %>%
+#   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
+# fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
 res.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
@@ -260,7 +261,7 @@ ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
   # possiblly filter out the species that have a differential abundance of less than |1|
   # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
   
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_JAE.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -341,8 +342,8 @@ p1
 For plots (from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
 ```{r, eval = F}
 ## 3.1 MA vs US
-ma_us_0_2=read_csv("../data/global_gut/ma_us_phylum_age2.csv") # HMP-HG
-ma_us_18_40=read_csv("../data/global_gut/ma_us_phylum_age18_40.csv") # JAE-HG
+ma_us_0_2=read_csv("./05-results.backup/ma_us_phylum_age2.csv") # HMP-HG
+ma_us_18_40=read_csv("./05-results.backup/ma_us_phylum_age18_40.csv") # JAE-HG
 ma_us_phyla=unique(c(ma_us_0_2$phylum, ma_us_18_40$phylum)) # list the species shared between the 2 comparisons
 ma_us_0_2=ma_us_0_2%>%transmute(phylum, log.fold.change=`log fold change (MA - US)`, # HMP-HunterGatherer
                                 se=se, ci.lo=ci.lo.adj, ci.up=ci.up.adj,
@@ -449,7 +450,6 @@ out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
                adj.method, tol.EM, max.iterNum, perNum, alpha)
 res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 
-# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnicgroup.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
 res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
@@ -472,6 +472,8 @@ ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
+
+# fwrite(ancom_bc_cmc_Nz_Ba, "./05-results.backup/ancomBC_species_cmc_ethnicgroup.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -598,7 +600,7 @@ ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_species_noblanks_FA_FC.tsv", sep = "\t", quote = F)
 
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
@@ -623,7 +625,7 @@ ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
 
-# fwrite(ancom_bc_cmc_Fa_LR, "../data/global_gut/ancom_bc_cmc_Fa_LR.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_species_noblanks_FA_LR.tsv", sep = "\t", quote = F)
 
 
 ```
@@ -742,7 +744,6 @@ out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
                adj.method, tol.EM, max.iterNum, perNum, alpha)
 res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 
-# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
 res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
@@ -765,6 +766,8 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
+
+# fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_species_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -890,7 +893,7 @@ ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_M_F, "./05-results.backup/ancomBC_species_cmc_sex.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -963,7 +966,7 @@ economies there were almost no differentially abundant genera, and village is
 basically a smaller breakdown of the market economies, with 2 villages in
 LoggingRoad (202, 205), 1 in ForrestCamp (204), and 2 in Farming (203, 206).
 I think for now not. 
-```{r ancomBC_cmc_vi}
+```{r ancomBC_cmc_vi, eval = F}
 
 otu_data <- malt_species.decontam_filtered_cmc
 taxonomy = otu_data$Species

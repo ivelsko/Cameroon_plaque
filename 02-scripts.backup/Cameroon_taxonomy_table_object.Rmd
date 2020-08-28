@@ -63,6 +63,14 @@ malt_genus_raw <- malt_genus_raw %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
 
 ```
 
+List samples that appear to be outliers from a PCA w/o any filtering of samples or species
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+```
+
 Read in the contaminant list from `Cameroon_taxonomy_decontam.Rmd` and remove them from the taxonomy table. 
 ```{r contaminants}
 
@@ -78,30 +86,29 @@ malt_genus.decontam <- malt_genus_raw %>%
 # create tsv files to convert to biom files for Songbird differential abundance analysis
 # be sure to remove all species that sum to 0 after removing samples
 
-malt_species.decontam_songbird <- malt_species_raw %>%
-  anti_join(., contaminants_species) %>%
-  select(-matches("CMC032.B|EXB|LIB|10M|SRR164")) %>%
+malt_species.decontam_songbird <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)
 
-malt_species_cmc.decontam_songbird <- malt_species_raw %>%
-  anti_join(., contaminants_species) %>%
-  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))%>%
+malt_species_cmc.decontam_songbird <- malt_species.decontam %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)
   
-malt_genus.decontam_songbird <- malt_genus_raw %>%
-  anti_join(., contaminants_genus) %>%
-  select(-matches("CMC032.B|EXB|LIB|10M|SRR164"))%>%
+malt_genus.decontam_songbird <- malt_genus.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)
 
-malt_genus_cmc.decontam_songbird <- malt_genus_raw %>%
-  anti_join(., contaminants_genus) %>%
-  select(-matches("CMC032.B|EXB|LIB|JAE|SRR"))%>%
+malt_genus_cmc.decontam_songbird <- malt_genus.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)

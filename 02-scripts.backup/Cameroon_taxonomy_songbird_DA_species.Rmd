@@ -35,11 +35,11 @@ Load the taxonomy tables and songbird differentials tables
 # load the taxonomy tables that have been decontaminated and the column headers are cleaned up
 load("./05-results.backup/CMC_taxonomy_tables.RData")
 
-songbird_noblanks_species_env <- fread("./04-analysis/songbird/species_noblanks/form1/differentials.tsv")
-songbird_cmc_species_eg <- fread("./04-analysis/songbird/species_cmc/form1/differentials.tsv")
-songbird_cmc_species_me <- fread("./04-analysis/songbird/species_cmc/form2/differentials.tsv")
-songbird_cmc_species_ts <- fread("./04-analysis/songbird/species_cmc/form3/differentials.tsv")
-songbird_cmc_species_sex <- fread("./04-analysis/songbird/species_cmc/form4/differentials.tsv")
+songbird_noblanks_species_env <- fread("./05-results.backup/songbird_noblanks_species_env.tsv")
+songbird_cmc_species_eg <- fread("./05-results.backup/songbird_noblanks_species_eg.tsv")
+songbird_cmc_species_me <- fread("./05-results.backup/songbird_noblanks_species_me.tsv")
+songbird_cmc_species_ts <- fread("./05-results.backup/songbird_noblanks_species_ts.tsv")
+songbird_cmc_species_sex <- fread("./05-results.backup/songbird_noblanks_species_sex.tsv")
 
 ```
 
@@ -119,11 +119,25 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
 
 # Industrial and Cameroon Samples
 ```{r}
-songbird_noblanks_species_env %>%
+zeros <- songbird_noblanks_species_env %>%
   filter(`C(Env, Treatment('HunterGatherer'))[T.HMP]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.HMP]` <= -3) %>%
+  rename(Species = featureid) %>%
+  # mutate(Species = as_factor(Species)) %>%
+  full_join(., ancomBC_noblanks_sp_HMP_HG %>%
+               select(Species, diff.abn, `structural.zero (HMP)`, `structural.zero (HunterGatherer)`) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Env, Treatment('HunterGatherer'))[T.HMP]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Env, Treatment('HunterGatherer'))[T.HMP]`, fill = ancomBC_da)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
   
 ```
 
@@ -133,25 +147,41 @@ songbird_noblanks_species_env %>%
 
 songbird_noblanks_species_env %>%
   filter(`C(Env, Treatment('HunterGatherer'))[T.HMP]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.HMP]` <= -3) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_noblanks_sp_HMP_HG %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Env, Treatment('HunterGatherer'))[T.HMP]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Env, Treatment('HunterGatherer'))[T.HMP]`)) +
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Env, Treatment('HunterGatherer'))[T.HMP]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
     ylab("Log fold change") +
-    xlab("Species")
+    xlab("Species") +
+    ggtitle("Cameroon plaque vs HMP plaque")
 
 songbird_noblanks_species_env %>%
   filter(`C(Env, Treatment('HunterGatherer'))[T.JAE]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.JAE]` <= -3) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_noblanks_sp_JAE_HG %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Env, Treatment('HunterGatherer'))[T.JAE]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Env, Treatment('HunterGatherer'))[T.JAE]`)) +
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Env, Treatment('HunterGatherer'))[T.JAE]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
     ylab("Log fold change") +
-    xlab("Species")
+    xlab("Species") +
+    ggtitle("Cameroon plaque vs JAE calculus")
 
 ```
 
@@ -162,9 +192,16 @@ songbird_noblanks_species_env %>%
 
 songbird_cmc_species_eg %>%
   filter(`C(Ethnic_Group, Treatment('Nzime'))[T.Baka]` >= 1 | `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]` <= -1) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_cmc_sp_eg %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`)) +
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
@@ -180,9 +217,16 @@ songbird_cmc_species_eg %>%
 
 songbird_cmc_species_me %>%
   filter(`C(Market_economy, Treatment('Farming'))[T.Logging road]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Logging road]` <= -1) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_cmc_sp_eg %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Market_economy, Treatment('Farming'))[T.Logging road]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Market_economy, Treatment('Farming'))[T.Logging road]`)) +
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Market_economy, Treatment('Farming'))[T.Logging road]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
@@ -198,9 +242,16 @@ songbird_cmc_species_me %>%
 
 songbird_cmc_species_ts %>%
   filter(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]` >= 1 | `C(Tooth_site, Treatment('Posterior'))[T.Anterior]` <= -1) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_cmc_sp_eg %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
   arrange(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Tooth_site, Treatment('Posterior'))[T.Anterior]`)) +
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Tooth_site, Treatment('Posterior'))[T.Anterior]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
@@ -218,8 +269,15 @@ songbird_cmc_species_ts %>%
 songbird_cmc_species_sex %>%
   filter(`C(Sex, Treatment('Male'))[T.Female]` >= 1 | `C(Sex, Treatment('Male'))[T.Female]` <= -1) %>%
   arrange(`C(Sex, Treatment('Male'))[T.Female]`) %>%
-  mutate(featureid = as_factor(featureid)) %>%
-  ggplot(., aes(x = featureid, y = `C(Sex, Treatment('Male'))[T.Female]`)) +
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_cmc_sp_eg %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Sex, Treatment('Male'))[T.Female]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
