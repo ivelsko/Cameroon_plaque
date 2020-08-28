@@ -178,7 +178,7 @@ songbird_noblanks_species_env %>%
   ggplot(., aes(x = Species, y = `C(Env, Treatment('HunterGatherer'))[T.JAE]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Species") +
     ggtitle("Cameroon plaque vs JAE calculus")
@@ -204,7 +204,7 @@ songbird_cmc_species_eg %>%
   ggplot(., aes(x = Species, y = `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Species")
 
@@ -216,9 +216,28 @@ songbird_cmc_species_eg %>%
 ```{r plot_me}
 
 songbird_cmc_species_me %>%
+  filter(`C(Market_economy, Treatment('Farming'))[T.Forrest camp]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Forrest camp]` <= -1) %>%
+  rename(Species = featureid) %>%
+  full_join(., ancomBC_cmc_sp_Fa_FC %>%
+               select(Species, diff.abn) %>%
+               rename(ancomBC_da = diff.abn)) %>%
+  mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = replace_na(ancomBC_da, "No")) %>%
+  drop_na(Intercept) %>%
+  arrange(`C(Market_economy, Treatment('Farming'))[T.Forrest camp]`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `C(Market_economy, Treatment('Farming'))[T.Forrest camp]`, fill = ancomBC_da)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Forrest Camp vs. Farming")
+
+songbird_cmc_species_me %>%
   filter(`C(Market_economy, Treatment('Farming'))[T.Logging road]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Logging road]` <= -1) %>%
   rename(Species = featureid) %>%
-  full_join(., ancomBC_cmc_sp_eg %>%
+  full_join(., ancomBC_cmc_sp_Fa_LR %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
@@ -229,10 +248,10 @@ songbird_cmc_species_me %>%
   ggplot(., aes(x = Species, y = `C(Market_economy, Treatment('Farming'))[T.Logging road]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
-    xlab("Species")
-
+    xlab("Species") +
+    ggtitle("Logging Road vs. Farming")
 
 ```
 
@@ -243,7 +262,7 @@ songbird_cmc_species_me %>%
 songbird_cmc_species_ts %>%
   filter(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]` >= 1 | `C(Tooth_site, Treatment('Posterior'))[T.Anterior]` <= -1) %>%
   rename(Species = featureid) %>%
-  full_join(., ancomBC_cmc_sp_eg %>%
+  full_join(., ancomBC_cmc_sp_ts %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
@@ -254,7 +273,7 @@ songbird_cmc_species_ts %>%
   ggplot(., aes(x = Species, y = `C(Tooth_site, Treatment('Posterior'))[T.Anterior]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Species")
 
@@ -270,7 +289,7 @@ songbird_cmc_species_sex %>%
   filter(`C(Sex, Treatment('Male'))[T.Female]` >= 1 | `C(Sex, Treatment('Male'))[T.Female]` <= -1) %>%
   arrange(`C(Sex, Treatment('Male'))[T.Female]`) %>%
   rename(Species = featureid) %>%
-  full_join(., ancomBC_cmc_sp_eg %>%
+  full_join(., ancomBC_cmc_sp_sex %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
@@ -280,7 +299,7 @@ songbird_cmc_species_sex %>%
   ggplot(., aes(x = Species, y = `C(Sex, Treatment('Male'))[T.Female]`, fill = ancomBC_da)) +
     geom_col() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Species")
 

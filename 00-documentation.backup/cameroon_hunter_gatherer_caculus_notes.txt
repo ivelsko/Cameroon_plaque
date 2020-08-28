@@ -431,17 +431,19 @@ Ethnic_Group+Village+Market_economy+Market_economy_split+Age_group+Sex+Tooth_sit
 
 # done: malt_genus_decontam.biom, malt_genus_cmc_decontam.biom, malt_species_decontam.biom, malt_species_cmc_decontam.biom
 
-# Industrial and Cameroon samples
-# for genus this plateaus above the null model and has a higher cross-validation error
-# for species this plateaus slightly below the null model and has a lower cross-validation error and lower loss
+## Industrial and Cameroon samples
+# for genus this plateaus below the null model and has a lower cross-validation error and lower loss
+# for species this plateaus below the null model and has a lower cross-validation error and lower loss
 
 --form0 "1" # this is the null model
 --form1 "C(Env, Treatment('HunterGatherer'))"
 
 
-# Cameroon samples only
-# for genus form1 and form2 plateau below the null model and have lower cross-validation errors
-# for species form1 plateaus below the null model and has the lowest cross-validation error, however form 3 has the lowest loss
+## Cameroon samples only
+# for genus form1, form2 form3, form 4 plateau below the null model and have the lowest cross-validation errors (form1 loss is slightly lower than form3, cv-error is nearly identical)
+# for genus form2, form 4 plateau below the null model and have lower cross-validation errors but are higher than form1/form3 (form 2 is just below the null model)
+# for species form1 plateaus below the null model and has the lowest cross-validation error; form3 plateaus at the same place as the null model and form2/form4 plateau above the null model
+# for species form1/form3 both have lower cv-error and lower loss than the null model, with form 1 lower for both
 
 --form0 "1" # this is the null model
 --form1 "C(Ethnic_Group, Treatment('Nzime'))"
