@@ -10,10 +10,10 @@ sbatch \
 --mail-type=time_limit \
 --mail-user=velsko@shh.mpg.de \
 --wrap="songbird multinomial \
-	--input-biom /projects1/microbiome_calculus/Cameroon_plaque/05-results.backup/malt_genus_decontam.biom \
+	--input-biom /projects1/microbiome_calculus/Cameroon_plaque/05-results.backup/malt_species_decontam.biom \
 	--metadata-file /projects1/microbiome_calculus/Cameroon_plaque/00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv \
-	--formula "1" \
+	--formula "C(Env,Treatment('HunterGatherer'))" \
 	--epochs 10000 \
 	--differential-prior 0.5 \
 	--summary-interval 1 \
-	--summary-dir /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/songbird/run1"
+	--summary-dir /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/songbird/species_noblanks/formTest"

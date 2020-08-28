@@ -1,0 +1,272 @@
+---
+title: "Cameroon calculus/plaque MALT differentially abundant taxa by Songbird"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(tidyverse)
+library(gplots)
+library(viridis)
+library(cowplot)
+# source("./02-scripts.backup/ancom_v2.1.R") # source the ancom2 script to be able to use it here
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
+```
+
+Load the taxonomy tables and songbird differentials tables
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+songbird_noblanks_species_env <- fread("./04-analysis/songbird/species_noblanks/form1/differentials.tsv")
+songbird_cmc_species_eg <- fread("./04-analysis/songbird/species_cmc/form1/differentials.tsv")
+songbird_cmc_species_me <- fread("./04-analysis/songbird/species_cmc/form2/differentials.tsv")
+songbird_cmc_species_ts <- fread("./04-analysis/songbird/species_cmc/form3/differentials.tsv")
+songbird_cmc_species_sex <- fread("./04-analysis/songbird/species_cmc/form4/differentials.tsv")
+
+```
+
+Load the ancom-BC differential abundance tables for comparison
+```{r load_ancom_diffs}
+
+ancomBC_noblanks_sp_HMP_HG <- fread("./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv")
+ancomBC_noblanks_sp_JAE_HG <- fread("./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv")
+ancomBC_cmc_sp_eg <- fread("./05-results.backup/ancomBC_species_cmc_ethnicgroup.tsv")
+ancomBC_cmc_sp_Fa_FC <- fread("./05-results.backup/ancomBC_species_noblanks_FA_FC.tsv")
+ancomBC_cmc_sp_Fa_LR <- fread("./05-results.backup/ancomBC_species_noblanks_FA_LR.tsv")
+ancomBC_cmc_sp_ts <- fread("./05-results.backup/ancomBC_species_cmc_toothsite.tsv")
+ancomBC_cmc_sp_sex <- fread("./05-results.backup/ancomBC_species_cmc_sex.tsv")
+
+```
+
+
+Read in the tables that have the species that are in MR1, for filtering the results later
+```{r mr_species}
+# read in the files that have the MR1, MR2, MR3 species/genera
+mr_species <- fread("./05-results.backup/minres_oblimin_noyanomami.fa_species.tsv")
+mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
+
+```
+
+
+List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+
+```{r input_tables}
+# new metadata table without factors, in case that's messing this up (Baka isn't appearing)
+metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata <- metadata %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(!SampleID %in% outliers,
+         !str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+  # rename(Sample.ID = SampleID) %>%
+  as_tibble() %>%
+  mutate(Market_economy = str_replace(Market_economy, "Forrest camp", "ForrestCamp"),
+         Market_economy = str_replace(Market_economy, "Logging road", "LoggingRoad"),
+         Market_economy_split = str_replace(Market_economy_split, "Forrest camp", "ForrestCamp"),
+         Market_economy_split = str_replace(Market_economy_split, "Logging road", "LoggingRoad"),
+         Market_economy_split = str_replace(Market_economy_split, "Industrial calculus", "IndustrialCalculus"),
+         Market_economy_split = str_replace(Market_economy_split, "Industrial plaque", "IndustrialPlaque"),
+         Industry = str_replace(Industry, "Non-industrial","nonIndustrial")) %>%
+  select(SampleID, Env, Industry, Age_group, Env, Ethnic_Group, Market_economy, Market_economy_split, Sex, Tooth_site, Village)
+
+# now re-name it for input to ancom-bc so I have to change fewer names
+meta_data <- metadata
+
+
+# species, no blanks, no Yanomami
+malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("EXB|LIB|10M|SRR164")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
+
+# species, CMC samples only
+malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
+ select(-one_of(outliers)) %>%
+ select(-matches("EXB|LIB|JAE|SRR")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
+
+```
+
+# Industrial and Cameroon Samples
+```{r}
+songbird_noblanks_species_env %>%
+  filter(`C(Env, Treatment('HunterGatherer'))[T.HMP]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.HMP]` <= -3) %>%
+  arrange(`C(Env, Treatment('HunterGatherer'))[T.HMP]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  
+  
+```
+
+
+
+```{r plot_env}
+
+songbird_noblanks_species_env %>%
+  filter(`C(Env, Treatment('HunterGatherer'))[T.HMP]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.HMP]` <= -3) %>%
+  arrange(`C(Env, Treatment('HunterGatherer'))[T.HMP]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Env, Treatment('HunterGatherer'))[T.HMP]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+songbird_noblanks_species_env %>%
+  filter(`C(Env, Treatment('HunterGatherer'))[T.JAE]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.JAE]` <= -3) %>%
+  arrange(`C(Env, Treatment('HunterGatherer'))[T.JAE]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Env, Treatment('HunterGatherer'))[T.JAE]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+```
+
+# Cameroon samples only
+
+## Ethnic Group
+```{r plot_eg}
+
+songbird_cmc_species_eg %>%
+  filter(`C(Ethnic_Group, Treatment('Nzime'))[T.Baka]` >= 1 | `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]` <= -1) %>%
+  arrange(`C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Ethnic_Group, Treatment('Nzime'))[T.Baka]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+
+```
+
+
+## Market Economy
+```{r plot_me}
+
+songbird_cmc_species_me %>%
+  filter(`C(Market_economy, Treatment('Farming'))[T.Logging road]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Logging road]` <= -1) %>%
+  arrange(`C(Market_economy, Treatment('Farming'))[T.Logging road]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Market_economy, Treatment('Farming'))[T.Logging road]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+
+```
+
+
+## Tooth Site
+```{r plot_ts}
+
+songbird_cmc_species_ts %>%
+  filter(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]` >= 1 | `C(Tooth_site, Treatment('Posterior'))[T.Anterior]` <= -1) %>%
+  arrange(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Tooth_site, Treatment('Posterior'))[T.Anterior]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+
+```
+
+
+
+## Sex
+```{r plot_sex}
+
+songbird_cmc_species_sex %>%
+  filter(`C(Sex, Treatment('Male'))[T.Female]` >= 1 | `C(Sex, Treatment('Male'))[T.Female]` <= -1) %>%
+  arrange(`C(Sex, Treatment('Male'))[T.Female]`) %>%
+  mutate(featureid = as_factor(featureid)) %>%
+  ggplot(., aes(x = featureid, y = `C(Sex, Treatment('Male'))[T.Female]`)) +
+    geom_col() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.5)) +
+    ylab("Log fold change") +
+    xlab("Species")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
