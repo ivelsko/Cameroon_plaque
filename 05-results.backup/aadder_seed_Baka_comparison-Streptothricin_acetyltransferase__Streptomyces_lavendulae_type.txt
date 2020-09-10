@@ -1,0 +1,28 @@
+"Pseudomonas sp. NC02"	1.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces bouchesdurhonensis"	8.0
+"Actinomyces culturomici"	1.0
+"Actinomyces gaoshouyii"	4.0
+"Actinomyces johnsonii"	7.0
+"Actinomyces massiliensis"	87.0
+"Actinomyces oris"	3.0
+"Actinomyces urogenitalis"	38.0
+"Actinomyces viscosus"	3.0
+"Actinomyces sp. HMSC035G02"	4.0
+"Actinomyces sp. HMSC062G12"	1.0
+"Actinomyces sp. HMSC075C01"	1.0
+"Actinomyces sp. HMSC08A09"	4.0
+"Actinomyces sp. HPA0247"	24.0
+"Actinomyces sp. oral taxon 170"	18.0
+"Actinomyces sp. oral taxon 171"	8.0
+"Actinomyces sp. oral taxon 172"	2.0
+"Actinomyces sp. oral taxon 180"	20.0
+"Actinomyces sp. oral taxon 414"	83.0
+"Actinomyces sp. oral taxon 448"	6.0
+"Actinomyces sp. oral taxon 848"	171.0
+"Actinomyces sp. oral taxon 877"	1.0
+"Actinomyces sp. oral taxon 897"	56.0
+"Actinomyces sp. Z16"	1.0
+"Schaalia cardiffensis"	52.0
+"Schaalia odontolytica"	88.0
+"Lactobacillus acidophilus"	1.0

@@ -1,0 +1,110 @@
+"Bacteroides heparinolyticus"	5.0
+"Bacteroides salanitronis"	2.0
+"Bacteroides zoogleoformans"	10.0
+"Alloprevotella rava"	17.0
+"Paraprevotella xylaniphila"	1.0
+"Prevotella buccae"	19.0
+"Prevotella dentalis"	14.0
+"Prevotella denticola"	59.0
+"Prevotella fusca"	3.0
+"Prevotella jejuni"	26.0
+"Prevotella maculosa"	176.0
+"Prevotella multiformis"	12.0
+"Prevotella multisaccharivorax"	1.0
+"Prevotella sp. C561"	59.0
+"Prevotella sp. F0091"	28.0
+"Tannerella forsythia"	2.0
+"Tannerella sp. oral taxon HOT-286"	5.0
+"Phocaeicola abscessus"	2.0
+"Fusobacterium hwasookii"	1.0
+"Fusobacterium nucleatum"	14.0
+"Fusobacterium periodonticum"	1.0
+"Fusobacterium sp. oral taxon 370"	28.0
+"Achromobacter denitrificans"	1.0
+"Castellaniella defragrans"	1.0
+"Lautropia mirabilis"	37.0
+"Pandoraea pulmonicola"	3.0
+"Comamonas sp. B-9"	1.0
+"Ottowia sp. Marseille-P4747"	2.0
+"Ottowia sp. oral taxon 894"	5.0
+"Massilia sp. YMA4"	1.0
+"Eikenella corrodens"	55.0
+"Eikenella sp. HMSC061C02"	47.0
+"Kingella denitrificans"	11.0
+"Kingella oralis"	2.0
+"Neisseria cinerea"	4.0
+"Neisseria elongata"	466.0
+"Neisseria lactamica"	6.0
+"Neisseria macacae"	89.0
+"Neisseria meningitidis"	3.0
+"Neisseria polysaccharea"	1.0
+"Neisseria subflava"	3.0
+"Neisseria sp. GT4A_CT1"	84.0
+"Neisseria sp. HMSC03D10"	13.0
+"Neisseria sp. HMSC055F11"	17.0
+"Neisseria sp. HMSC055H02"	29.0
+"Neisseria sp. HMSC056A03"	50.0
+"Neisseria sp. HMSC059F02"	76.0
+"Neisseria sp. HMSC061B04"	4.0
+"Neisseria sp. HMSC064E01"	31.0
+"Neisseria sp. HMSC064F03"	1.0
+"Neisseria sp. HMSC064F04"	102.0
+"Neisseria sp. HMSC065C04"	1.0
+"Neisseria sp. HMSC065D04"	12.0
+"Neisseria sp. HMSC066H01"	8.0
+"Neisseria sp. HMSC068C04"	2.0
+"Neisseria sp. HMSC069H12"	45.0
+"Neisseria sp. HMSC070E12"	13.0
+"Neisseria sp. HMSC070F02"	1.0
+"Neisseria sp. HMSC072F04"	29.0
+"Neisseria sp. HMSC074B07"	3.0
+"Neisseria sp. HMSC077D05"	48.0
+"Neisseria sp. HMSC078C12"	9.0
+"Neisseria sp. HMSC15C08"	13.0
+"Neisseria sp. HMSC15G01"	3.0
+"Neisseria sp. HMSC31F04"	43.0
+"Neisseria sp. HMSC70E02"	70.0
+"Neisseria sp. oral taxon 014"	19.0
+"Azoarcus sp. KH32C"	1.0
+"Desulfovibrio fairfieldensis"	3.0
+"Desulfovibrio sp. 6_1_46AFAA"	1.0
+"Acidihalobacter ferrooxidans"	1.0
+"Enterobacter sp. E20"	1.0
+"Pseudomonas mediterranea"	1.0
+"Pseudomonas monteilii"	1.0
+"Pseudomonas putida"	2.0
+"Pseudomonas stutzeri"	1.0
+"Pseudomonas xanthomarina"	1.0
+"Pseudomonas syringae"	1.0
+"Pseudomonas sp. LAIL14HWK12:I7"	1.0
+"Actinomyces sp. oral taxon 414"	2.0
+"Micropruina glycogenica"	1.0
+"Pseudopropionibacterium propionicum"	3594.0
+"Tessaracoccus sp. T2.5-30"	2.0
+"Olsenella uli"	53.0
+"Olsenella sp. oral taxon 807"	2.0
+"Olsenella sp. oral taxon 809"	10.0
+"Johnsonella ignava"	133.0
+"Lachnoanaerobaculum saburreum"	185.0
+"Lachnoanaerobaculum umeaense"	1.0
+"Lachnoanaerobaculum sp. OBRC5-5"	17.0
+"[Clostridium] citroniae"	1.0
+"Stomatobaculum longum"	1.0
+"Lachnospiraceae bacterium oral taxon 082"	7.0
+"Lachnospiraceae bacterium oral taxon 500"	64.0
+"Desulfitobacterium dichloroeliminans"	1.0
+"Solobacterium moorei"	44.0
+"Centipeda periodontii"	216.0
+"Selenomonas artemidis"	79.0
+"Selenomonas felix"	12.0
+"Selenomonas infelix"	220.0
+"Selenomonas massiliensis"	83.0
+"Selenomonas noxia"	667.0
+"Selenomonas sp. oral taxon 126"	15.0
+"Selenomonas sp. oral taxon 136"	1.0
+"Selenomonas sp. oral taxon 138"	22.0
+"Selenomonas sp. oral taxon 478"	7.0
+"Selenomonas sp. oral taxon 892"	14.0
+"Selenomonas sp. oral taxon 920"	137.0
+"Anaeroglobus geminatus"	406.0
+"Megasphaera micronuciformis"	14.0

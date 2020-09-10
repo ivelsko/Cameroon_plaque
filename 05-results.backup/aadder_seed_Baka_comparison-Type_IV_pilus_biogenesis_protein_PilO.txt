@@ -1,0 +1,7 @@
+"Lautropia mirabilis"	1.0
+"Ralstonia insidiosa"	1.0
+"Neisseria sp. HMSC056A03"	113.0
+"Neisseria sp. HMSC061B04"	2.0
+"Neisseria sp. HMSC077D05"	1.0
+"Neisseria sp. HMSC078C12"	1.0
+"Neisseria sp. oral taxon 014"	130.0

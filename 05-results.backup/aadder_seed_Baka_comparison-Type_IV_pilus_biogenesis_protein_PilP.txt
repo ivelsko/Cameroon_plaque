@@ -1,0 +1,7 @@
+"Neisseria cinerea"	1.0
+"Neisseria subflava"	1.0
+"Neisseria sp. HMSC056A03"	46.0
+"Neisseria sp. HMSC065C04"	2.0
+"Neisseria sp. HMSC066H01"	1.0
+"Neisseria sp. HMSC069H12"	1.0
+"Neisseria sp. HMSC078C12"	1.0

@@ -1,0 +1,31 @@
+"Actinomyces gaoshouyii"	14.0
+"Actinomyces graevenitzii"	2.0
+"Actinomyces israelii"	5.0
+"Actinomyces johnsonii"	62.0
+"Actinomyces massiliensis"	255.0
+"Actinomyces oris"	11.0
+"Actinomyces slackii"	2.0
+"Actinomyces timonensis"	39.0
+"Actinomyces urogenitalis"	17.0
+"Actinomyces viscosus"	93.0
+"Actinomyces sp. Chiba101"	14.0
+"Actinomyces sp. HMSC035G02"	1.0
+"Actinomyces sp. HMSC075C01"	25.0
+"Actinomyces sp. HMSC08A09"	40.0
+"Actinomyces sp. oral taxon 170"	71.0
+"Actinomyces sp. oral taxon 171"	60.0
+"Actinomyces sp. oral taxon 180"	3.0
+"Actinomyces sp. oral taxon 414"	996.0
+"Actinomyces sp. oral taxon 448"	242.0
+"Actinomyces sp. oral taxon 849"	41.0
+"Actinomyces sp. oral taxon 877"	1.0
+"Actinomyces sp. oral taxon 897"	166.0
+"Actinomyces sp. Z16"	2.0
+"Schaalia cardiffensis"	2.0
+"Pseudarthrobacter equi"	1.0
+"Rothia sp. HMSC065G12"	1.0
+"Rothia sp. HMSC071C12"	1.0
+"Acidipropionibacterium virtanenii"	1.0
+"Propionibacterium acidifaciens"	427.0
+"Propionibacterium freudenreichii"	3.0
+"Tessaracoccus timonensis"	1.0

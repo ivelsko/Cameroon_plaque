@@ -1,0 +1,46 @@
+"Herbaspirillum sp. WT00C"	1.0
+"Spiribacter curvatus"	1.0
+"Aggregatibacter actinomycetemcomitans"	41.0
+"Aggregatibacter aphrophilus"	341.0
+"Haemophilus parainfluenzae"	154.0
+"Actinomyces gaoshouyii"	47.0
+"Actinomyces gerencseriae"	715.0
+"Actinomyces graevenitzii"	1.0
+"Actinomyces johnsonii"	163.0
+"Actinomyces oris"	231.0
+"Actinomyces timonensis"	152.0
+"Actinomyces urogenitalis"	103.0
+"Actinomyces viscosus"	250.0
+"Actinomyces sp. 2129"	5.0
+"Actinomyces sp. Chiba101"	27.0
+"Actinomyces sp. HMSC035G02"	20.0
+"Actinomyces sp. HMSC065F11"	1.0
+"Actinomyces sp. HMSC075C01"	355.0
+"Actinomyces sp. HMSC08A09"	184.0
+"Actinomyces sp. oral taxon 170"	372.0
+"Actinomyces sp. oral taxon 171"	173.0
+"Actinomyces sp. oral taxon 178"	19.0
+"Actinomyces sp. oral taxon 448"	287.0
+"Actinomyces sp. oral taxon 849"	106.0
+"Actinomyces sp. oral taxon 877"	11.0
+"Schaalia georgiae"	8.0
+"Schaalia odontolytica"	39.0
+"Corynebacterium matruchotii"	1.0
+"Actinopolymorpha alba"	1.0
+"Propionicicella superfundia"	3.0
+"Acidipropionibacterium acidipropionici"	46.0
+"Acidipropionibacterium virtanenii"	120.0
+"Cutibacterium avidum"	1.0
+"Propionibacterium freudenreichii"	3.0
+"Propionibacterium sp. HGH0353"	1.0
+"Pseudopropionibacterium propionicum"	1793.0
+"Tessaracoccus aquimaris"	35.0
+"Tessaracoccus flavescens"	20.0
+"Tessaracoccus flavus"	12.0
+"Amycolatopsis balhimycina"	1.0
+"Streptomyces sulphureus"	1.0
+"Streptomyces xiamenensis"	1.0
+"Streptomyces sp. DSM 15324"	1.0
+"Streptomyces sp. Mg1"	1.0
+"Streptomyces sp. MspMP-M5"	1.0
+"Nocardiopsis gilva"	1.0
