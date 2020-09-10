@@ -1,0 +1,49 @@
+"Lautropia mirabilis"	21.0
+"Ralstonia solanacearum"	1.0
+"Campylobacter concisus"	2.0
+"Campylobacter sp. 10_1_50"	4.0
+"Aggregatibacter actinomycetemcomitans"	1.0
+"Aggregatibacter aphrophilus"	117.0
+"Aggregatibacter sp. oral taxon 458"	13.0
+"Haemophilus parainfluenzae"	2.0
+"Haemophilus sp. HMSC061E01"	2.0
+"Haemophilus sp. HMSC61B11"	49.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces bouchesdurhonensis"	2.0
+"Actinomyces gerencseriae"	146.0
+"Actinomyces johnsonii"	47.0
+"Actinomyces massiliensis"	224.0
+"Actinomyces oris"	70.0
+"Actinomyces timonensis"	9.0
+"Actinomyces viscosus"	135.0
+"Actinomyces sp. 2129"	1.0
+"Actinomyces sp. HMSC035G02"	18.0
+"Actinomyces sp. HMSC075C01"	39.0
+"Actinomyces sp. HMSC08A09"	75.0
+"Actinomyces sp. HPA0247"	43.0
+"Actinomyces sp. oral taxon 170"	166.0
+"Actinomyces sp. oral taxon 171"	160.0
+"Actinomyces sp. oral taxon 172"	1.0
+"Actinomyces sp. oral taxon 180"	70.0
+"Actinomyces sp. oral taxon 414"	305.0
+"Actinomyces sp. oral taxon 448"	45.0
+"Actinomyces sp. oral taxon 848"	210.0
+"Actinomyces sp. oral taxon 849"	29.0
+"Actinomyces sp. oral taxon 877"	49.0
+"Actinomyces sp. oral taxon 897"	9.0
+"Actinomyces sp. Z16"	7.0
+"Schaalia cardiffensis"	63.0
+"Schaalia odontolytica"	140.0
+"Corynebacterium durum"	227.0
+"Corynebacterium matruchotii"	22.0
+"Rothia aeria"	1.0
+"Rothia dentocariosa"	30.0
+"Rothia sp. HMSC036D11"	19.0
+"Rothia sp. HMSC058E10"	18.0
+"Rothia sp. HMSC064D08"	18.0
+"Rothia sp. HMSC065D02"	10.0
+"Rothia sp. HMSC065G12"	16.0
+"Rothia sp. HMSC067H10"	4.0
+"Rothia sp. HMSC069C01"	1.0
+"Rothia sp. HMSC071F11"	1.0
+"Rothia sp. HMSC08A08"	16.0

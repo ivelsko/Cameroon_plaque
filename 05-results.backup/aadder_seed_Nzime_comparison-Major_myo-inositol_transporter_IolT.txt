@@ -1,0 +1,25 @@
+"Actinomyces gaoshouyii"	13.0
+"Actinomyces johnsonii"	31.0
+"Actinomyces massiliensis"	117.0
+"Actinomyces oris"	5.0
+"Actinomyces timonensis"	25.0
+"Actinomyces urogenitalis"	22.0
+"Actinomyces viscosus"	43.0
+"Actinomyces sp. 2129"	1.0
+"Actinomyces sp. Chiba101"	13.0
+"Actinomyces sp. HMSC075C01"	9.0
+"Actinomyces sp. HMSC08A09"	12.0
+"Actinomyces sp. oral taxon 170"	30.0
+"Actinomyces sp. oral taxon 171"	47.0
+"Actinomyces sp. oral taxon 180"	2.0
+"Actinomyces sp. oral taxon 414"	573.0
+"Actinomyces sp. oral taxon 448"	160.0
+"Actinomyces sp. oral taxon 849"	31.0
+"Actinomyces sp. oral taxon 897"	53.0
+"Schaalia odontolytica"	2.0
+"Brachybacterium saurashtrense"	1.0
+"Brachybacterium sp. HMSC06H03"	1.0
+"Pseudarthrobacter equi"	1.0
+"Acidipropionibacterium virtanenii"	1.0
+"Propionibacterium acidifaciens"	999.0
+"Propionibacterium freudenreichii"	3.0

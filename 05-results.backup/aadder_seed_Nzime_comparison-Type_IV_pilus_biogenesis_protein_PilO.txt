@@ -1,0 +1,4 @@
+"Lautropia mirabilis"	3.0
+"Neisseria sp. HMSC056A03"	50.0
+"Neisseria sp. HMSC078C12"	1.0
+"Neisseria sp. oral taxon 014"	91.0

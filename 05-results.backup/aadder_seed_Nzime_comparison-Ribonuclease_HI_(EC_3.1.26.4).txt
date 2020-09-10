@@ -1,0 +1,108 @@
+"Riemerella columbina"	1.0
+"Ottowia sp. Marseille-P4747"	6.0
+"Janthinobacterium sp. CG3"	1.0
+"Eikenella corrodens"	10.0
+"Kingella denitrificans"	11.0
+"Kingella oralis"	29.0
+"Neisseria elongata"	97.0
+"Neisseria gonorrhoeae"	2.0
+"Neisseria lactamica"	1.0
+"Neisseria meningitidis"	1.0
+"Neisseria polysaccharea"	1.0
+"Neisseria sp. GT4A_CT1"	1.0
+"Neisseria sp. HMSC03D10"	3.0
+"Neisseria sp. HMSC055H02"	6.0
+"Neisseria sp. HMSC064D07"	2.0
+"Neisseria sp. HMSC065D04"	5.0
+"Neisseria sp. HMSC069H12"	7.0
+"Neisseria sp. HMSC073B07"	1.0
+"Neisseria sp. HMSC074B07"	4.0
+"Neisseria sp. HMSC075C10"	2.0
+"Neisseria sp. HMSC078C12"	3.0
+"Neisseria sp. HMSC31F04"	11.0
+"Neisseria sp. HMSC70E02"	9.0
+"Neisseria sp. oral taxon 014"	50.0
+"Campylobacter concisus"	6.0
+"Campylobacter curvus"	1.0
+"Campylobacter gracilis"	81.0
+"Campylobacter sp. 10_1_50"	2.0
+"Cardiobacterium hominis"	62.0
+"Cardiobacterium valvarum"	9.0
+"Aggregatibacter actinomycetemcomitans"	4.0
+"Aggregatibacter aphrophilus"	90.0
+"Aggregatibacter segnis"	44.0
+"Aggregatibacter sp. oral taxon 458"	24.0
+"Haemophilus influenzae"	1.0
+"Haemophilus parainfluenzae"	3.0
+"Haemophilus sp. HMSC068C11"	1.0
+"Haemophilus sp. HMSC073C03"	1.0
+"Pasteurella dagmatis"	1.0
+"Treponema denticola"	17.0
+"Treponema maltophilum"	24.0
+"Treponema medium"	13.0
+"Treponema putidum"	6.0
+"Treponema socranskii"	47.0
+"Treponema vincentii"	13.0
+"Treponema sp. OMZ 838"	8.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces bouchesdurhonensis"	6.0
+"Actinomyces johnsonii"	2.0
+"Actinomyces massiliensis"	13.0
+"Actinomyces oris"	66.0
+"Actinomyces radicidentis"	19.0
+"Actinomyces slackii"	1.0
+"Actinomyces timonensis"	45.0
+"Actinomyces urogenitalis"	8.0
+"Actinomyces viscosus"	2.0
+"Actinomyces sp. 2129"	2.0
+"Actinomyces sp. HMSC035G02"	21.0
+"Actinomyces sp. HMSC062G12"	2.0
+"Actinomyces sp. HMSC075C01"	10.0
+"Actinomyces sp. HMSC08A09"	9.0
+"Actinomyces sp. HPA0247"	19.0
+"Actinomyces sp. oral taxon 170"	3.0
+"Actinomyces sp. oral taxon 171"	6.0
+"Actinomyces sp. oral taxon 172"	9.0
+"Actinomyces sp. oral taxon 180"	24.0
+"Actinomyces sp. oral taxon 414"	156.0
+"Actinomyces sp. oral taxon 448"	4.0
+"Actinomyces sp. oral taxon 848"	140.0
+"Actinomyces sp. oral taxon 849"	1.0
+"Actinomyces sp. oral taxon 877"	21.0
+"Actinomyces sp. oral taxon 897"	76.0
+"Schaalia cardiffensis"	54.0
+"Schaalia meyeri"	2.0
+"Schaalia odontolytica"	87.0
+"Corynebacterium provencense"	1.0
+"Janibacter indicus"	38.0
+"Janibacter sp. Marseille-P4121"	2.0
+"Agrococcus lahaulensis"	1.0
+"Kocuria turfanensis"	2.0
+"Rothia aeria"	5.0
+"Rothia dentocariosa"	28.0
+"Rothia sp. HMSC036D11"	13.0
+"Rothia sp. HMSC064D08"	46.0
+"Rothia sp. HMSC065D02"	13.0
+"Rothia sp. HMSC065G12"	31.0
+"Rothia sp. HMSC067H10"	10.0
+"Rothia sp. HMSC068F09"	1.0
+"Rothia sp. HMSC071F11"	13.0
+"Rothia sp. HMSC08A08"	24.0
+"Acidipropionibacterium thoenii"	2.0
+"Propionibacterium sp. oral taxon 192"	174.0
+"Pseudopropionibacterium propionicum"	6.0
+"Atopobium sp. HMSC064B08"	1.0
+"Olsenella sp. oral taxon 807"	1.0
+"Slackia exigua"	3.0
+"Shuttleworthia satelles"	1.0
+"Centipeda periodontii"	6.0
+"Selenomonas artemidis"	1.0
+"Selenomonas flueggei"	11.0
+"Selenomonas infelix"	3.0
+"Selenomonas massiliensis"	8.0
+"Selenomonas noxia"	240.0
+"Selenomonas sputigena"	73.0
+"Selenomonas sp. oral taxon 126"	10.0
+"Selenomonas sp. oral taxon 138"	6.0
+"Selenomonas sp. oral taxon 892"	1.0
+"Selenomonas sp. oral taxon 920"	3.0

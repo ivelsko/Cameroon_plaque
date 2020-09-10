@@ -1,0 +1,3 @@
+"Lachnoanaerobaculum saburreum"	1.0
+"Parvimonas micra"	23.0
+"Peptoniphilus sp. oral taxon 386"	1.0

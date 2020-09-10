@@ -1,0 +1,2 @@
+"Neisseria sp. HMSC068C04"	1.0
+"Neisseria sp. HMSC069H12"	1.0
