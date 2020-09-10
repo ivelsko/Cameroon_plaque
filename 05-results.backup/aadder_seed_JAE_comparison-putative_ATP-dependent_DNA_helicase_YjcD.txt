@@ -1,0 +1,4 @@
+"Leptotrichia sp. oral taxon 212"	1.0
+"Bacillus cytotoxicus"	1.0
+"Peptostreptococcus anaerobius"	2.0
+"Parvimonas micra"	64.0

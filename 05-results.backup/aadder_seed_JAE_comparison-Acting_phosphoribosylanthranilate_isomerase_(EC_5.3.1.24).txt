@@ -1,0 +1,97 @@
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces gaoshouyii"	8.0
+"Actinomyces johnsonii"	271.0
+"Actinomyces massiliensis"	1342.0
+"Actinomyces oris"	268.0
+"Actinomyces radicidentis"	510.0
+"Actinomyces timonensis"	7.0
+"Actinomyces urogenitalis"	25.0
+"Actinomyces viscosus"	351.0
+"Actinomyces sp. Chiba101"	1.0
+"Actinomyces sp. HMSC035G02"	67.0
+"Actinomyces sp. HMSC075C01"	190.0
+"Actinomyces sp. HMSC08A09"	257.0
+"Actinomyces sp. HPA0247"	3.0
+"Actinomyces sp. oral taxon 170"	109.0
+"Actinomyces sp. oral taxon 171"	137.0
+"Actinomyces sp. oral taxon 180"	1.0
+"Actinomyces sp. oral taxon 414"	3629.0
+"Actinomyces sp. oral taxon 448"	177.0
+"Actinomyces sp. oral taxon 848"	2.0
+"Actinomyces sp. oral taxon 849"	53.0
+"Actinomyces sp. oral taxon 877"	18.0
+"Actinomyces sp. oral taxon 897"	1410.0
+"Actinomyces sp. Z16"	67.0
+"Schaalia odontolytica"	2620.0
+"Trueperella sp. HMSC08H06"	1.0
+"Bifidobacterium dentium"	19.0
+"Catenulispora acidiphila"	2.0
+"Corynebacterium frankenforstense"	3.0
+"Corynebacterium lubricantis"	1.0
+"Corynebacterium matruchotii"	8.0
+"Corynebacterium variabile"	1.0
+"Frankia alni"	3.0
+"Frankia inefficax"	2.0
+"Frankia sp. DC12"	3.0
+"Blastococcus saxobsidens"	12.0
+"Stackebrandtia nassauensis"	2.0
+"Cellulomonas flavigena"	4.0
+"Brachybacterium faecium"	1.0
+"Brachybacterium ginsengisoli"	1.0
+"Brachybacterium phenoliresistens"	1.0
+"Brachybacterium saurashtrense"	2.0
+"Brachybacterium timonense"	2.0
+"Brachybacterium sp. HMSC06H03"	26.0
+"Dermacoccus nishinomiyaensis"	8.0
+"Tetrasphaera japonica"	3.0
+"Cryobacterium arcticum"	1.0
+"Cryocola sp. 340MFSha3.1"	1.0
+"Frondihabitans sp. 762G35"	10.0
+"Leifsonia sp. 21MFCrub1.1"	3.0
+"Leucobacter sp. UCD-THU"	1.0
+"Lysinimonas sp. 2DFWR-13"	1.0
+"Microbacterium paludicola"	6.0
+"Arthrobacter enclensis"	1.0
+"Arthrobacter sp. 35W"	27.0
+"Arthrobacter sp. B6"	1.0
+"Arthrobacter sp. PAMC 25486"	3.0
+"Kocuria flava"	5.0
+"Kocuria palustris"	9.0
+"Kocuria turfanensis"	11.0
+"Micrococcus sp. HMSC067E09"	1.0
+"Rothia aeria"	9.0
+"Rothia dentocariosa"	6.0
+"Rothia mucilaginosa"	9.0
+"Rothia sp. HMSC058E10"	105.0
+"Rothia sp. HMSC064D08"	67.0
+"Rothia sp. HMSC064F07"	6.0
+"Rothia sp. HMSC069C01"	2.0
+"Rothia sp. HMSC069C03"	4.0
+"Rothia sp. HMSC069C04"	2.0
+"Rothia sp. HMSC076D04"	1.0
+"Isoptericola variabilis"	1.0
+"Promicromonospora kroppenstedtii"	1.0
+"Xylanimonas cellulosilytica"	7.0
+"Sanguibacter massiliensis"	1.0
+"Micromonospora coxensis"	1.0
+"Micromonospora echinofusca"	1.0
+"Verrucosispora maris"	1.0
+"Nakamurella panacisegetis"	4.0
+"Pseudopropionibacterium propionicum"	189.0
+"Saccharomonospora paurometabolica"	1.0
+"Streptomyces actuosus"	2.0
+"Streptomyces clavuligerus"	1.0
+"Streptomyces baarnensis"	1.0
+"Streptomyces hundungensis"	2.0
+"Streptomyces venezuelae"	1.0
+"Streptomyces viridosporus"	2.0
+"Streptomyces xinghaiensis"	1.0
+"Streptomyces sp. e14"	1.0
+"Streptomyces sp. NEAU-S7GS2"	1.0
+"Streptomyces sp. SAT1"	3.0
+"Nonomuraea candida"	4.0
+"Nonomuraea coxensis"	5.0
+"Streptosporangium roseum"	19.0
+"Actinomadura flavalba"	31.0
+"actinobacterium LLX17"	4.0
+"Nitriliruptor alkaliphilus"	1.0

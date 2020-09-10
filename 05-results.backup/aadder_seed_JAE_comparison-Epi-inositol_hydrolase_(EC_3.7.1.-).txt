@@ -1,0 +1,84 @@
+"Sebaldella termitidis"	1.0
+"Citrobacter youngae"	1.0
+"Pectobacterium atrosepticum"	1.0
+"Legionella longbeachae"	1.0
+"Aggregatibacter actinomycetemcomitans"	4.0
+"Aggregatibacter aphrophilus"	21180.0
+"Bibersteinia trehalosi"	2.0
+"Haemophilus parainfluenzae"	206.0
+"Histophilus somni"	2.0
+"Mannheimia haemolytica"	3.0
+"Mannheimia varigena"	2.0
+"Rodentibacter pneumotropicus"	3.0
+"Pseudomonas sp. MOIL14HWK12:I1"	1.0
+"Treponema maltophilum"	20.0
+"Actinomyces europaeus"	4.0
+"Actinomyces gaoshouyii"	468.0
+"Actinomyces graevenitzii"	8.0
+"Actinomyces johnsonii"	352.0
+"Actinomyces oris"	415.0
+"Actinomyces slackii"	750.0
+"Actinomyces timonensis"	655.0
+"Actinomyces urogenitalis"	4229.0
+"Actinomyces viscosus"	229.0
+"Actinomyces sp. 2129"	951.0
+"Actinomyces sp. Chiba101"	787.0
+"Actinomyces sp. HMSC035G02"	256.0
+"Actinomyces sp. HMSC075C01"	128.0
+"Actinomyces sp. HMSC08A09"	612.0
+"Actinomyces sp. oral taxon 170"	481.0
+"Actinomyces sp. oral taxon 171"	541.0
+"Actinomyces sp. oral taxon 178"	79.0
+"Actinomyces sp. oral taxon 414"	2.0
+"Actinomyces sp. oral taxon 448"	4834.0
+"Actinomyces sp. oral taxon 849"	190.0
+"Actinomyces sp. oral taxon 877"	25.0
+"Flaviflexus massiliensis"	1.0
+"Schaalia georgiae"	90.0
+"Schaalia odontolytica"	2167.0
+"Catenulispora acidiphila"	2.0
+"Corynebacterium sp. Marseille-P2417"	2.0
+"Mycobacterium tuberculosis"	1.0
+"Jiangella alba"	1.0
+"Jiangella sp. DSM 45060"	1.0
+"Brachybacterium phenoliresistens"	3.0
+"Brachybacterium sp. HMSC06H03"	1.0
+"Brachybacterium sp. P6-10-X1"	3.0
+"Devriesea agamarum"	14.0
+"Arsenicicoccus sp. oral taxon 190"	1.0
+"Clavibacter michiganensis"	3.0
+"Curtobacterium flaccumfaciens"	1.0
+"Arthrobacter sp. 135MFCol5.1"	1.0
+"Kocuria flava"	10.0
+"Micrococcus sp. HMSC31B01"	8.0
+"Actinoplanes sp. N902-109"	1.0
+"Nakamurella panacisegetis"	1.0
+"Propionicicella superfundia"	1.0
+"Acidipropionibacterium acidipropionici"	12.0
+"Acidipropionibacterium virtanenii"	25.0
+"Cutibacterium avidum"	6.0
+"Propionibacterium freudenreichii"	196.0
+"Pseudopropionibacterium propionicum"	1625.0
+"Tessaracoccus aquimaris"	54.0
+"Tessaracoccus flavescens"	46.0
+"Tessaracoccus flavus"	5.0
+"Tessaracoccus timonensis"	1.0
+"Tessaracoccus sp. T2.5-30"	50.0
+"Amycolatopsis balhimycina"	4.0
+"Pseudonocardia sp. AL041005-10"	1.0
+"Saccharopolyspora erythraea"	3.0
+"Streptomyces alboflavus"	1.0
+"Streptomyces canus"	1.0
+"Streptomyces fulvissimus"	1.0
+"Streptomyces monomycini"	1.0
+"Streptomyces sp. CMB-StM0423"	1.0
+"Streptomyces sp. CNQ-509"	10.0
+"Streptosporangium roseum"	1.0
+"Anaerolineaceae bacterium oral taxon 439"	34.0
+"Bacillus cereus"	2.0
+"Bacillus paralicheniformis"	1.0
+"Clostridium botulinum"	12.0
+"Clostridium perfringens"	1.0
+"Dorea sp. 5-2"	4.0
+"Oribacterium sp. oral taxon 078"	5.0
+"Selenomonas massiliensis"	1.0

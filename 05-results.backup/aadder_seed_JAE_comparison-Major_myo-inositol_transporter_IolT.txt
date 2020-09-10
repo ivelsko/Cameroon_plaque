@@ -1,0 +1,49 @@
+"Dickeya sp. DW 0440"	1.0
+"Actinomyces europaeus"	1.0
+"Actinomyces gaoshouyii"	63.0
+"Actinomyces israelii"	27.0
+"Actinomyces johnsonii"	124.0
+"Actinomyces massiliensis"	563.0
+"Actinomyces oris"	94.0
+"Actinomyces slackii"	27.0
+"Actinomyces timonensis"	130.0
+"Actinomyces urogenitalis"	217.0
+"Actinomyces viscosus"	201.0
+"Actinomyces sp. 2129"	31.0
+"Actinomyces sp. Chiba101"	74.0
+"Actinomyces sp. HMSC035G02"	3.0
+"Actinomyces sp. HMSC075C01"	44.0
+"Actinomyces sp. HMSC08A09"	64.0
+"Actinomyces sp. HPA0247"	2.0
+"Actinomyces sp. oral taxon 170"	51.0
+"Actinomyces sp. oral taxon 171"	162.0
+"Actinomyces sp. oral taxon 172"	1.0
+"Actinomyces sp. oral taxon 178"	1.0
+"Actinomyces sp. oral taxon 180"	4.0
+"Actinomyces sp. oral taxon 414"	2539.0
+"Actinomyces sp. oral taxon 448"	525.0
+"Actinomyces sp. oral taxon 849"	257.0
+"Actinomyces sp. oral taxon 897"	647.0
+"Actinomyces sp. Z16"	1.0
+"Schaalia cardiffensis"	2.0
+"Schaalia georgiae"	3.0
+"Schaalia odontolytica"	89.0
+"Gordonia polyisoprenivorans"	1.0
+"Mycolicibacterium goodii"	1.0
+"Mycolicibacterium vaccae"	1.0
+"Brachybacterium ginsengisoli"	1.0
+"Brachybacterium saurashtrense"	7.0
+"Arthrobacter sp. 162MFSha1.1"	2.0
+"Rothia aeria"	4.0
+"Rothia sp. HMSC036D11"	1.0
+"Rothia sp. HMSC064D08"	2.0
+"Rothia sp. HMSC065G12"	1.0
+"Acidipropionibacterium acidipropionici"	3.0
+"Acidipropionibacterium virtanenii"	5.0
+"Cutibacterium granulosum"	3.0
+"Propionibacterium acidifaciens"	34.0
+"Propionibacterium freudenreichii"	2.0
+"Propionibacterium sp. HGH0353"	1.0
+"Tessaracoccus timonensis"	4.0
+"Saccharopolyspora erythraea"	1.0
+"Streptomyces afghaniensis"	1.0
