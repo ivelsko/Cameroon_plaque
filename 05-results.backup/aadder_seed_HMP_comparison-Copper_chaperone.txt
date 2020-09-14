@@ -1,0 +1,60 @@
+"Capnocytophaga gingivalis"	349.0
+"Capnocytophaga granulosa"	143.0
+"Aggregatibacter actinomycetemcomitans"	2.0
+"Aggregatibacter aphrophilus"	241.0
+"Aggregatibacter segnis"	83.0
+"Aggregatibacter sp. oral taxon 458"	35.0
+"Haemophilus haemolyticus"	8.0
+"Haemophilus influenzae"	14.0
+"Haemophilus parainfluenzae"	137.0
+"Haemophilus sp. HMSC073C03"	3.0
+"Haemophilus sp. HMSC71H05"	3.0
+"Haemophilus sp. oral taxon 036"	9.0
+"Haemophilus sp. oral taxon 851"	1.0
+"Actinomyces gerencseriae"	93.0
+"Actinomyces graevenitzii"	2.0
+"Actinomyces massiliensis"	254.0
+"Actinomyces timonensis"	2.0
+"Actinomyces urogenitalis"	1.0
+"Actinomyces sp. HMSC035G02"	3.0
+"Actinomyces sp. HMSC062G12"	4.0
+"Actinomyces sp. HMSC075C01"	246.0
+"Actinomyces sp. HMSC08A09"	19.0
+"Actinomyces sp. HPA0247"	1.0
+"Actinomyces sp. oral taxon 170"	92.0
+"Actinomyces sp. oral taxon 171"	23.0
+"Actinomyces sp. oral taxon 172"	1.0
+"Actinomyces sp. oral taxon 180"	17.0
+"Actinomyces sp. oral taxon 181"	2.0
+"Actinomyces sp. oral taxon 414"	145.0
+"Actinomyces sp. oral taxon 448"	269.0
+"Actinomyces sp. oral taxon 848"	63.0
+"Actinomyces sp. oral taxon 877"	20.0
+"Actinomyces sp. oral taxon 897"	8.0
+"Schaalia odontolytica"	37.0
+"Corynebacterium durum"	495.0
+"Corynebacterium matruchotii"	2901.0
+"Rothia aeria"	4.0
+"Rothia dentocariosa"	220.0
+"Rothia sp. HMSC036D11"	1.0
+"Rothia sp. HMSC058E10"	21.0
+"Rothia sp. HMSC064D08"	40.0
+"Rothia sp. HMSC065D02"	87.0
+"Rothia sp. HMSC065G12"	14.0
+"Rothia sp. HMSC067H10"	57.0
+"Rothia sp. HMSC069C01"	11.0
+"Rothia sp. HMSC075F09"	1.0
+"Rothia sp. HMSC08A08"	24.0
+"Amycolatopsis methanolica"	1.0
+"Abiotrophia defectiva"	25.0
+"Abiotrophia sp. HMSC24B09"	39.0
+"Streptococcus intermedius"	46.0
+"Streptococcus cristatus"	156.0
+"Streptococcus gordonii"	38.0
+"Streptococcus massiliensis"	1.0
+"Streptococcus mutans"	104.0
+"Streptococcus sanguinis"	605.0
+"Streptococcus sp. 2_1_36FAA"	28.0
+"Streptococcus sp. HMSC062B01"	2.0
+"Streptococcus sp. HMSC078H03"	3.0
+"Streptococcus sp. HMSC10A01"	6.0

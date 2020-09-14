@@ -1,0 +1,9 @@
+"Acidovorax carolinensis"	1.0
+"Neisseria sp. HMSC056A03"	161.0
+"Neisseria sp. HMSC064D07"	2.0
+"Neisseria sp. HMSC068C04"	106.0
+"Neisseria sp. HMSC069H12"	11.0
+"Neisseria sp. HMSC072F04"	1.0
+"Neisseria sp. HMSC077D05"	1.0
+"Neisseria sp. HMSC078C12"	4.0
+"Neisseria sp. oral taxon 014"	207.0

@@ -1,0 +1,34 @@
+"Bacteroides caccae"	1.0
+"Bacteroides coprocola"	1.0
+"Bacteroides ovatus"	1.0
+"Bacteroides plebeius"	2.0
+"Bacteroides stercoris"	1.0
+"Bacteroides uniformis"	2.0
+"Bacteroides xylanisolvens"	1.0
+"Caulobacter sp. K31"	1.0
+"Castellaniella defragrans"	1.0
+"Ralstonia pickettii"	1.0
+"Acidovorax sp. 1608163"	1.0
+"Comamonas testosteroni"	2.0
+"Diaphorobacter polyhydroxybutyrativorans"	1.0
+"Neisseria elongata"	1.0
+"Neisseria subflava"	11.0
+"Neisseria sp. GT4A_CT1"	1.0
+"Neisseria sp. HMSC056A03"	128.0
+"Neisseria sp. HMSC064D07"	6.0
+"Neisseria sp. HMSC065C04"	13.0
+"Neisseria sp. HMSC068C04"	33.0
+"Neisseria sp. HMSC069H12"	308.0
+"Neisseria sp. HMSC070H10"	69.0
+"Neisseria sp. HMSC072C05"	42.0
+"Neisseria sp. HMSC073G10"	4.0
+"Neisseria sp. HMSC075C10"	10.0
+"Neisseria sp. HMSC078C12"	1.0
+"Neisseria sp. HMSC15G01"	2.0
+"Neisseria sp. HMSC70E02"	2.0
+"Neisseria sp. oral taxon 014"	682.0
+"Escherichia coli"	11.0
+"Aggregatibacter actinomycetemcomitans"	14.0
+"Aggregatibacter aphrophilus"	20.0
+"Pseudomonas sp. HMSC08G10"	3.0
+"Xanthomonas campestris"	1.0

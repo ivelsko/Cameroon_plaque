@@ -1,0 +1,60 @@
+"Burkholderia sp. MSMB0856"	1.0
+"Ralstonia solanacearum"	1.0
+"Rhodoferax koreense"	1.0
+"Leptothrix cholodnii"	2.0
+"Pectobacterium atrosepticum"	1.0
+"Yersinia enterocolitica"	1.0
+"Aggregatibacter actinomycetemcomitans"	246.0
+"Aggregatibacter aphrophilus"	1134.0
+"Haemophilus parainfluenzae"	2876.0
+"Mannheimia haemolytica"	1.0
+"Rodentibacter pneumotropicus"	1.0
+"Treponema maltophilum"	1.0
+"Actinomyces gaoshouyii"	82.0
+"Actinomyces graevenitzii"	1.0
+"Actinomyces johnsonii"	606.0
+"Actinomyces oris"	1830.0
+"Actinomyces slackii"	15.0
+"Actinomyces timonensis"	84.0
+"Actinomyces urogenitalis"	444.0
+"Actinomyces viscosus"	1588.0
+"Actinomyces sp. 2129"	57.0
+"Actinomyces sp. Chiba101"	83.0
+"Actinomyces sp. HMSC035G02"	18.0
+"Actinomyces sp. HMSC075C01"	777.0
+"Actinomyces sp. HMSC08A09"	1685.0
+"Actinomyces sp. oral taxon 170"	1689.0
+"Actinomyces sp. oral taxon 171"	1460.0
+"Actinomyces sp. oral taxon 178"	95.0
+"Actinomyces sp. oral taxon 448"	2736.0
+"Actinomyces sp. oral taxon 849"	206.0
+"Actinomyces sp. oral taxon 877"	46.0
+"Schaalia georgiae"	116.0
+"Schaalia odontolytica"	149.0
+"Catenulispora acidiphila"	1.0
+"Corynebacterium ammoniagenes"	2.0
+"Devriesea agamarum"	7.0
+"Janibacter sp. HTCC2649"	1.0
+"Clavibacter michiganensis"	1.0
+"Curtobacterium flaccumfaciens"	1.0
+"Pseudoclavibacter faecalis"	3.0
+"Glutamicibacter nicotianae"	1.0
+"Propionicicella superfundia"	1.0
+"Acidipropionibacterium acidipropionici"	2.0
+"Acidipropionibacterium virtanenii"	2.0
+"Cutibacterium acnes"	1.0
+"Propionibacterium freudenreichii"	52.0
+"Pseudopropionibacterium propionicum"	886.0
+"Tessaracoccus aquimaris"	25.0
+"Tessaracoccus flavescens"	65.0
+"Tessaracoccus flavus"	15.0
+"Tessaracoccus sp. T2.5-30"	1.0
+"Amycolatopsis balhimycina"	1.0
+"Saccharomonospora marina"	1.0
+"Streptomyces alboflavus"	1.0
+"Streptomyces sp. A217"	1.0
+"Streptomyces sp. GSSD-12"	4.0
+"Streptosporangium roseum"	1.0
+"Oribacterium sp. oral taxon 078"	2.0
+"Selenomonas felix"	1.0
+"[Clostridium] ultunense"	1.0

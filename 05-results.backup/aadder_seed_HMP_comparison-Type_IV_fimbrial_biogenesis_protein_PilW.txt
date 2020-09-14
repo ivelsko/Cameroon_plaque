@@ -1,0 +1,12 @@
+"Ralstonia pickettii"	4.0
+"Neisseria cinerea"	1.0
+"Neisseria subflava"	1.0
+"Neisseria sp. HMSC056A03"	361.0
+"Neisseria sp. HMSC064D07"	3.0
+"Neisseria sp. HMSC065C04"	1.0
+"Neisseria sp. HMSC068C04"	20.0
+"Neisseria sp. HMSC069H12"	4.0
+"Neisseria sp. HMSC071A01"	1.0
+"Neisseria sp. HMSC073G10"	26.0
+"Neisseria sp. HMSC15G01"	5.0
+"Neisseria sp. oral taxon 014"	445.0
