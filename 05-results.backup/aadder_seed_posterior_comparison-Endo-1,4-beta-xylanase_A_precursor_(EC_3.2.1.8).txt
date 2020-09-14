@@ -1,0 +1,21 @@
+"Bacteroides uniformis"	2.0
+"Bacteroides zoogleoformans"	1.0
+"Prevotella buccae"	21.0
+"Prevotella conceptionensis"	3.0
+"Prevotella maculosa"	1050.0
+"Prevotella oris"	63.0
+"Prevotella salivae"	1.0
+"Prevotella sp. oral taxon 317"	1.0
+"Fusobacterium nucleatum"	16.0
+"Sorangium cellulosum"	1.0
+"Treponema denticola"	7.0
+"Treponema medium"	9.0
+"Treponema putidum"	1.0
+"Treponema vincentii"	16.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces sp. oral taxon 414"	2.0
+"Actinomyces sp. oral taxon 897"	3.0
+"Corynebacterium matruchotii"	2.0
+"Cellulomonas flavigena"	3.0
+"Isoptericola dokdonensis"	2.0
+"Micromonospora aurantiaca"	2.0

@@ -1,0 +1,133 @@
+"Luteitalea pratensis"	2.0
+"Tidjanibacter massiliensis"	1.0
+"Tannerella sp. oral taxon HOT-286"	1.0
+"Capnocytophaga sputigena"	37.0
+"Capnocytophaga sp. ChDC OS43"	4.0
+"Capnocytophaga sp. oral taxon 326"	9.0
+"Capnocytophaga sp. oral taxon 863"	30.0
+"Fusobacterium nucleatum"	19.0
+"Sphingomonas phyllosphaerae"	1.0
+"Variovorax paradoxus"	1.0
+"Sutterella wadsworthensis"	4.0
+"Neisseria sp. HMSC066B07"	1.0
+"Pseudomonas sp. NC02"	1.0
+"Lysobacter gummosus"	3.0
+"Treponema medium"	38.0
+"Treponema vincentii"	12.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces bouchesdurhonensis"	14.0
+"Actinomyces massiliensis"	31.0
+"Actinomyces oris"	47.0
+"Actinomyces viscosus"	20.0
+"Actinomyces sp. 2129"	28.0
+"Actinomyces sp. Chiba101"	1.0
+"Actinomyces sp. HMSC035G02"	8.0
+"Actinomyces sp. HMSC08A09"	450.0
+"Actinomyces sp. HPA0247"	41.0
+"Actinomyces sp. oral taxon 170"	15.0
+"Actinomyces sp. oral taxon 171"	18.0
+"Actinomyces sp. oral taxon 172"	16.0
+"Actinomyces sp. oral taxon 180"	65.0
+"Actinomyces sp. oral taxon 414"	7.0
+"Actinomyces sp. oral taxon 877"	109.0
+"Actinomyces sp. oral taxon 897"	2.0
+"Actinomyces sp. Z16"	43.0
+"Schaalia odontolytica"	41.0
+"Actinopolyspora erythraea"	1.0
+"Bifidobacterium animalis"	2.0
+"Bifidobacterium bifidum"	29.0
+"Bifidobacterium choerinum"	13.0
+"Bifidobacterium pseudolongum"	3.0
+"Bifidobacterium scardovii"	1.0
+"Parascardovia denticolens"	4.0
+"Scardovia inopinata"	1.0
+"Corynebacterium frankenforstense"	49.0
+"Mycobacterium sp. 360MFTsu5.1"	1.0
+"Frankia saprophytica"	1.0
+"Geodermatophilaceae bacterium URHB0062"	1.0
+"Stackebrandtia nassauensis"	14.0
+"Jiangella gansuensis"	1.0
+"Kineococcus radiotolerans"	2.0
+"Georgenia sp. ZLJ0423"	2.0
+"Cellulomonas gilvus"	1.0
+"Paraoerskovia marina"	1.0
+"Brachybacterium saurashtrense"	1.0
+"Brachybacterium sp. HMSC06H03"	1.0
+"Brachybacterium sp. P6-10-X1"	1.0
+"Mobilicoccus massiliensis"	1.0
+"Leucobacter sp. UCD-THU"	1.0
+"Leucobacter sp. wl10"	1.0
+"Microbacterium sp. BH-3-3-3"	1.0
+"Arthrobacter sp. ERGS1:01"	1.0
+"Kocuria turfanensis"	1.0
+"Pseudarthrobacter chlorophenolicus"	3.0
+"Rothia sp. HMSC058E10"	1.0
+"Rothia sp. HMSC065D02"	4.0
+"Actinoplanes globisporus"	1.0
+"Actinoplanes missouriensis"	1.0
+"Catelliglobosispora koreensis"	3.0
+"Micromonospora sp. HK10"	1.0
+"Nakamurella multipartita"	1.0
+"Nakamurella panacisegetis"	1.0
+"Acidipropionibacterium acidipropionici"	19.0
+"Acidipropionibacterium thoenii"	2.0
+"Granulicoccus phenolivorans"	2.0
+"Propionibacterium freudenreichii"	5.0
+"Propionibacterium sp. oral taxon 192"	93.0
+"Propionimicrobium lymphophilum"	1.0
+"Pseudopropionibacterium propionicum"	1.0
+"Actinokineospora enzanensis"	1.0
+"Amycolatopsis balhimycina"	1.0
+"Amycolatopsis orientalis"	1.0
+"Amycolatopsis thermoflava"	1.0
+"Pseudonocardia sp. HH130629-09"	1.0
+"Saccharomonospora cyanea"	1.0
+"Sciscionella marina"	4.0
+"Sporichthya polymorpha"	1.0
+"Streptomyces albulus"	1.0
+"Streptomyces bungoensis"	2.0
+"Streptomyces clavuligerus"	1.0
+"Streptomyces griseorubiginosus"	1.0
+"Streptomyces hundungensis"	2.0
+"Streptomyces katrae"	3.0
+"Streptomyces lydicus"	1.0
+"Streptomyces purpureus"	1.0
+"Streptomyces vitaminophilus"	3.0
+"Streptomyces xiamenensis"	2.0
+"Streptomyces sp. 2323.1"	1.0
+"Streptomyces sp. 3214.6"	1.0
+"Streptomyces sp. 351MFTsu5.1"	1.0
+"Streptomyces sp. M56"	1.0
+"Streptomyces sp. RTd22"	1.0
+"Nocardiopsis gilva"	1.0
+"Thermobifida fusca"	1.0
+"Nonomuraea coxensis"	1.0
+"Actinomadura flavalba"	1.0
+"Thermomonospora curvata"	1.0
+"Libanicoccus massiliensis"	19.0
+"Olsenella provencensis"	19.0
+"Olsenella sp. GAM18"	6.0
+"Olsenella sp. Marseille-P2300"	21.0
+"Olsenella sp. oral taxon 807"	38.0
+"Collinsella sp. 4_8_47FAA"	3.0
+"Enorma massiliensis"	1.0
+"Enorma phocaeensis"	14.0
+"Senegalimassilia anaerobia"	2.0
+"Arabia massiliensis"	5.0
+"Eggerthella lenta"	3.0
+"Eggerthella sp. 1_3_56FAA"	1.0
+"Enterorhabdus caecimuris"	2.0
+"Gordonibacter massiliensis"	5.0
+"Gordonibacter pamelaeae"	3.0
+"Gordonibacter urolithinfaciens"	17.0
+"Slackia heliotrinireducens"	1.0
+"Eggerthellaceae bacterium AT8"	3.0
+"Nitriliruptor alkaliphilus"	2.0
+"Conexibacter woesei"	16.0
+"Anaerolineaceae bacterium oral taxon 439"	1.0
+"Streptococcus sanguinis"	40.0
+"Streptococcus sp. HMSC061E03"	84.0
+"Oribacterium sp. oral taxon 078"	391.0
+"Roseburia intestinalis"	1.0
+"Clostridiales bacterium Marseille-P2846"	1.0
+"Selenomonas sp. oral taxon 149"	1.0

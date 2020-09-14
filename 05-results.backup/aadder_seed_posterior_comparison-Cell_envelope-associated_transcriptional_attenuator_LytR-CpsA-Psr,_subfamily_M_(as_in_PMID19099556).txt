@@ -1,0 +1,18 @@
+"Streptomyces sp. TLI_053"	1.0
+"Centipeda periodontii"	69.0
+"Mitsuokella multacida"	2.0
+"Mitsuokella sp. oral taxon 131"	20.0
+"Propionispira raffinosivorans"	1.0
+"Selenomonas artemidis"	17.0
+"Selenomonas bovis"	8.0
+"Selenomonas flueggei"	24.0
+"Selenomonas infelix"	20.0
+"Selenomonas massiliensis"	64.0
+"Selenomonas noxia"	951.0
+"Selenomonas sputigena"	269.0
+"Selenomonas sp. F0473"	5.0
+"Selenomonas sp. oral taxon 126"	58.0
+"Selenomonas sp. oral taxon 138"	193.0
+"Selenomonas sp. oral taxon 149"	3.0
+"Selenomonas sp. oral taxon 892"	19.0
+"Selenomonas sp. oral taxon 920"	37.0

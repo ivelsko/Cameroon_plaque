@@ -1,0 +1,9 @@
+"Leptotrichia hofstadii"	89.0
+"Leptotrichia trevisanii"	45.0
+"Leptotrichia wadei"	734.0
+"Leptotrichia sp. oral taxon 212"	5.0
+"Leptotrichia sp. oral taxon 498"	8.0
+"Leptotrichia sp. oral taxon 847"	8.0
+"Leptotrichia sp. oral taxon 879"	87.0
+"Atopobium sp. oral taxon 199"	12.0
+"Eggerthia catenaformis"	2.0

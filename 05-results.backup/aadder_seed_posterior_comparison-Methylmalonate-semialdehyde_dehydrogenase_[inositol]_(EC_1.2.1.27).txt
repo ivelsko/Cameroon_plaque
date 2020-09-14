@@ -1,0 +1,36 @@
+"Herbaspirillum sp. WT00C"	1.0
+"Aggregatibacter actinomycetemcomitans"	1.0
+"Aggregatibacter aphrophilus"	9.0
+"Haemophilus parainfluenzae"	44.0
+"Actinomyces gaoshouyii"	93.0
+"Actinomyces gerencseriae"	655.0
+"Actinomyces johnsonii"	116.0
+"Actinomyces oris"	162.0
+"Actinomyces timonensis"	264.0
+"Actinomyces urogenitalis"	116.0
+"Actinomyces viscosus"	245.0
+"Actinomyces sp. 2129"	2.0
+"Actinomyces sp. Chiba101"	66.0
+"Actinomyces sp. HMSC035G02"	15.0
+"Actinomyces sp. HMSC075C01"	246.0
+"Actinomyces sp. HMSC08A09"	107.0
+"Actinomyces sp. oral taxon 170"	236.0
+"Actinomyces sp. oral taxon 171"	186.0
+"Actinomyces sp. oral taxon 178"	16.0
+"Actinomyces sp. oral taxon 448"	369.0
+"Actinomyces sp. oral taxon 849"	49.0
+"Actinomyces sp. oral taxon 877"	13.0
+"Schaalia georgiae"	5.0
+"Schaalia odontolytica"	23.0
+"Schaalia turicensis"	1.0
+"Propionicicella superfundia"	10.0
+"Acidipropionibacterium acidipropionici"	91.0
+"Acidipropionibacterium virtanenii"	213.0
+"Propionibacterium freudenreichii"	4.0
+"Propionibacterium sp. HGH0353"	3.0
+"Pseudopropionibacterium propionicum"	1014.0
+"Tessaracoccus aquimaris"	59.0
+"Tessaracoccus flavescens"	47.0
+"Tessaracoccus flavus"	4.0
+"Streptomyces sp. DSM 15324"	1.0
+"Streptomyces sp. MspMP-M5"	1.0

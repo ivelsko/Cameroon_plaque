@@ -1,0 +1,19 @@
+"Centipeda periodontii"	96.0
+"Mitsuokella multacida"	5.0
+"Mitsuokella sp. oral taxon 131"	68.0
+"Selenomonas artemidis"	30.0
+"Selenomonas bovis"	2.0
+"Selenomonas flueggei"	174.0
+"Selenomonas infelix"	13.0
+"Selenomonas massiliensis"	87.0
+"Selenomonas noxia"	1153.0
+"Selenomonas sputigena"	451.0
+"Selenomonas sp. oral taxon 126"	58.0
+"Selenomonas sp. oral taxon 136"	1.0
+"Selenomonas sp. oral taxon 138"	140.0
+"Selenomonas sp. oral taxon 149"	2.0
+"Selenomonas sp. oral taxon 478"	1.0
+"Selenomonas sp. oral taxon 892"	16.0
+"Selenomonas sp. oral taxon 920"	55.0
+"Anaeroglobus geminatus"	5.0
+"Dialister invisus"	1.0

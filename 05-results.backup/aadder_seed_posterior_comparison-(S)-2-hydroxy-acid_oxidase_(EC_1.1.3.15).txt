@@ -1,0 +1,2 @@
+"Campylobacter gracilis"	506.0
+"Sulfurospirillum cavolei"	1.0
