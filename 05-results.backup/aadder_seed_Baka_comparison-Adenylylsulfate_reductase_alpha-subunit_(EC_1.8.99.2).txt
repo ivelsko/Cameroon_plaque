@@ -1,0 +1,18 @@
+"Leptotrichia buccalis"	674.0
+"Leptotrichia hofstadii"	506.0
+"Leptotrichia shahii"	1017.0
+"Leptotrichia wadei"	1886.0
+"Leptotrichia sp. oral taxon 498"	234.0
+"Leptotrichia sp. oral taxon 847"	77.0
+"Leptotrichia sp. oral taxon 879"	384.0
+"Desulfobulbus oralis"	39.0
+"Desulfomicrobium orale"	12.0
+"Bilophila sp. 4_1_30"	1.0
+"Desulfovibrio fairfieldensis"	3.0
+"Desulfovibrio piger"	2.0
+"Desulfovibrio sp. 6_1_46AFAA"	4.0
+"Clostridium sp. DL-VIII"	1.0
+"Anaerostipes hadrus"	1.0
+"Blautia sp. Marseille-P2398"	3.0
+"[Eubacterium] rectale"	2.0
+"Mitsuokella multacida"	1.0

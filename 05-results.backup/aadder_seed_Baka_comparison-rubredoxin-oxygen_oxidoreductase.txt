@@ -1,0 +1,23 @@
+"Desulfomicrobium orale"	1.0
+"Atopobium parvulum"	27.0
+"Atopobium sp. HMSC064B08"	22.0
+"Atopobium sp. oral taxon 199"	2.0
+"[Clostridium] asparagiforme"	1.0
+"Centipeda periodontii"	65.0
+"Mitsuokella multacida"	4.0
+"Mitsuokella sp. oral taxon 131"	2.0
+"Selenomonas artemidis"	6.0
+"Selenomonas felix"	1.0
+"Selenomonas flueggei"	88.0
+"Selenomonas infelix"	182.0
+"Selenomonas massiliensis"	102.0
+"Selenomonas noxia"	458.0
+"Selenomonas sputigena"	504.0
+"Selenomonas sp. F0473"	2.0
+"Selenomonas sp. FC4001"	1.0
+"Selenomonas sp. oral taxon 126"	63.0
+"Selenomonas sp. oral taxon 136"	15.0
+"Selenomonas sp. oral taxon 138"	63.0
+"Selenomonas sp. oral taxon 478"	3.0
+"Selenomonas sp. oral taxon 892"	24.0
+"Selenomonas sp. oral taxon 920"	23.0

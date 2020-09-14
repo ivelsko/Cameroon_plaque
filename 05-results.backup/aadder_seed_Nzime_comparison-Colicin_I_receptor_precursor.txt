@@ -1,0 +1,16 @@
+"Lautropia mirabilis"	2.0
+"Ottowia sp. Marseille-P4747"	1.0
+"Centipeda periodontii"	66.0
+"Selenomonas felix"	9.0
+"Selenomonas flueggei"	3.0
+"Selenomonas infelix"	77.0
+"Selenomonas massiliensis"	24.0
+"Selenomonas noxia"	2561.0
+"Selenomonas sputigena"	7.0
+"Selenomonas sp. F0473"	29.0
+"Selenomonas sp. oral taxon 126"	8.0
+"Selenomonas sp. oral taxon 136"	8.0
+"Selenomonas sp. oral taxon 138"	12.0
+"Selenomonas sp. oral taxon 149"	5.0
+"Selenomonas sp. oral taxon 478"	8.0
+"Selenomonas sp. oral taxon 892"	1.0
