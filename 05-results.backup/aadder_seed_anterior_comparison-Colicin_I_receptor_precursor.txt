@@ -1,0 +1,17 @@
+"Tannerella sp. oral taxon HOT-286"	1.0
+"Lautropia mirabilis"	4.0
+"Ottowia sp. Marseille-P4747"	4.0
+"Centipeda periodontii"	110.0
+"Selenomonas felix"	9.0
+"Selenomonas flueggei"	4.0
+"Selenomonas infelix"	210.0
+"Selenomonas massiliensis"	79.0
+"Selenomonas noxia"	1859.0
+"Selenomonas sputigena"	25.0
+"Selenomonas sp. F0473"	93.0
+"Selenomonas sp. oral taxon 126"	19.0
+"Selenomonas sp. oral taxon 136"	13.0
+"Selenomonas sp. oral taxon 138"	49.0
+"Selenomonas sp. oral taxon 149"	10.0
+"Selenomonas sp. oral taxon 478"	14.0
+"Anaeroglobus geminatus"	1.0

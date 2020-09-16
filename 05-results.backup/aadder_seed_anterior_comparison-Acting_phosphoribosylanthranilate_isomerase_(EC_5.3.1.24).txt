@@ -1,0 +1,61 @@
+"Actinobaculum sp. oral taxon 183"	3.0
+"Actinomyces gaoshouyii"	1.0
+"Actinomyces johnsonii"	151.0
+"Actinomyces massiliensis"	369.0
+"Actinomyces oris"	116.0
+"Actinomyces radicidentis"	62.0
+"Actinomyces timonensis"	13.0
+"Actinomyces urogenitalis"	1.0
+"Actinomyces viscosus"	132.0
+"Actinomyces sp. HMSC035G02"	9.0
+"Actinomyces sp. HMSC075C01"	121.0
+"Actinomyces sp. HMSC08A09"	49.0
+"Actinomyces sp. HPA0247"	31.0
+"Actinomyces sp. oral taxon 170"	101.0
+"Actinomyces sp. oral taxon 171"	73.0
+"Actinomyces sp. oral taxon 180"	1.0
+"Actinomyces sp. oral taxon 181"	1.0
+"Actinomyces sp. oral taxon 414"	425.0
+"Actinomyces sp. oral taxon 448"	39.0
+"Actinomyces sp. oral taxon 848"	1.0
+"Actinomyces sp. oral taxon 849"	8.0
+"Actinomyces sp. oral taxon 877"	2.0
+"Actinomyces sp. oral taxon 897"	233.0
+"Actinomyces sp. Z16"	12.0
+"Schaalia odontolytica"	165.0
+"Bifidobacterium bifidum"	2.0
+"Bifidobacterium dentium"	7.0
+"Corynebacterium matruchotii"	9.0
+"Corynebacterium sphenisci"	1.0
+"Corynebacterium sp. 2183"	3.0
+"Corynebacterium sp. HMSC071B10"	1.0
+"Corynebacterium sp. HMSC08A12"	2.0
+"Modestobacter marinus"	2.0
+"Jiangella sp. DSM 45060"	1.0
+"Cellulomonas flavigena"	1.0
+"Brachybacterium muris"	1.0
+"Brachybacterium timonense"	1.0
+"Brachybacterium sp. HMSC06H03"	1.0
+"Tetrasphaera japonica"	2.0
+"Tetrasphaera jenkinsii"	1.0
+"Frondihabitans sp. 762G35"	2.0
+"Leifsonia sp. 21MFCrub1.1"	1.0
+"Arthrobacter enclensis"	1.0
+"Arthrobacter sp. 35W"	2.0
+"Kocuria turfanensis"	1.0
+"Rothia aeria"	1.0
+"Rothia dentocariosa"	2.0
+"Rothia sp. HMSC058E10"	8.0
+"Rothia sp. HMSC064D08"	17.0
+"Isoptericola variabilis"	2.0
+"Promicromonosporaceae bacterium W15"	2.0
+"Xylanimonas cellulosilytica"	4.0
+"Actinoplanes sp. SE50"	1.0
+"Friedmanniella luteola"	2.0
+"Pseudopropionibacterium propionicum"	65.0
+"Amycolatopsis balhimycina"	1.0
+"Streptomyces clavuligerus"	5.0
+"Streptomyces lydicus"	1.0
+"Streptomyces sp. TLI_053"	1.0
+"Streptosporangium sp. 'caverna'"	1.0
+"Actinomadura flavalba"	1.0

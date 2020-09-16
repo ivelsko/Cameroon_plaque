@@ -1,0 +1,54 @@
+"Paracoccus denitrificans"	1.0
+"Erwinia amylovora"	1.0
+"Edwardsiella piscicida"	1.0
+"Providencia sneebia"	1.0
+"Aggregatibacter actinomycetemcomitans"	3.0
+"Aggregatibacter aphrophilus"	880.0
+"Haemophilus parainfluenzae"	110.0
+"Pseudomonas sp. NC02"	1.0
+"Actinomyces gaoshouyii"	102.0
+"Actinomyces graevenitzii"	3.0
+"Actinomyces johnsonii"	191.0
+"Actinomyces oris"	159.0
+"Actinomyces slackii"	97.0
+"Actinomyces timonensis"	134.0
+"Actinomyces urogenitalis"	465.0
+"Actinomyces viscosus"	122.0
+"Actinomyces sp. 2129"	66.0
+"Actinomyces sp. Chiba101"	55.0
+"Actinomyces sp. HMSC035G02"	23.0
+"Actinomyces sp. HMSC075C01"	142.0
+"Actinomyces sp. HMSC08A09"	239.0
+"Actinomyces sp. oral taxon 170"	306.0
+"Actinomyces sp. oral taxon 171"	161.0
+"Actinomyces sp. oral taxon 178"	64.0
+"Actinomyces sp. oral taxon 414"	1.0
+"Actinomyces sp. oral taxon 448"	730.0
+"Actinomyces sp. oral taxon 849"	99.0
+"Actinomyces sp. oral taxon 877"	31.0
+"Schaalia georgiae"	22.0
+"Schaalia odontolytica"	187.0
+"Schaalia turicensis"	1.0
+"Trueperella pyogenes"	1.0
+"Mycolicibacterium litorale"	1.0
+"Geodermatophilus obscurus"	2.0
+"Brachybacterium sp. P6-10-X1"	1.0
+"Kribbella flavida"	1.0
+"Propionicicella superfundia"	4.0
+"Acidipropionibacterium acidipropionici"	2.0
+"Acidipropionibacterium virtanenii"	1.0
+"Auraticoccus monumenti"	6.0
+"Propionibacterium freudenreichii"	24.0
+"Pseudopropionibacterium propionicum"	721.0
+"Tessaracoccus aquimaris"	3.0
+"Tessaracoccus flavescens"	5.0
+"Tessaracoccus flavus"	7.0
+"Streptomyces atratus"	1.0
+"Streptomyces sp. CNQ-509"	1.0
+"Streptomyces sp. HGB0020"	1.0
+"Anaerolineaceae bacterium oral taxon 439"	3.0
+"Clostridium botulinum"	2.0
+"Dorea sp. 5-2"	1.0
+"Oribacterium sp. oral taxon 078"	2.0
+"Mitsuokella sp. oral taxon 131"	1.0
+"Selenomonas felix"	2.0

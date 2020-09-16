@@ -1,0 +1,23 @@
+"Leptotrichia wadei"	629.0
+"Leptotrichia sp. oral taxon 212"	36.0
+"Leptotrichia sp. oral taxon 215"	3.0
+"Leptotrichia sp. oral taxon 498"	221.0
+"Leptotrichia sp. oral taxon 847"	235.0
+"Cardiobacterium valvarum"	4.0
+"Hafnia sp. HMSC23F03"	1.0
+"Aggregatibacter aphrophilus"	39.0
+"Actinobaculum sp. oral taxon 183"	1.0
+"Actinomyces johnsonii"	1.0
+"Actinomyces sp. oral taxon 414"	7.0
+"Actinomyces sp. oral taxon 897"	1.0
+"Atopobium parvulum"	2.0
+"Atopobium sp. HMSC064B08"	12.0
+"Atopobium sp. oral taxon 199"	1.0
+"Olsenella sp. Marseille-P2300"	1.0
+"Lactobacillus fermentum"	1.0
+"Streptococcus ruminantium"	1.0
+"Streptococcus sanguinis"	1.0
+"Oribacterium sp. oral taxon 078"	1.0
+"Lachnospiraceae bacterium 5_1_63FAA"	1.0
+"Ruminococcaceae bacterium CPB6"	1.0
+"Centipeda periodontii"	1.0

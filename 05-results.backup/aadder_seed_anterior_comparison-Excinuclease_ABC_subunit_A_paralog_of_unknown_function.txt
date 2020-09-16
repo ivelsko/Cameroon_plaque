@@ -1,0 +1,155 @@
+"Luteitalea pratensis"	1.0
+"Prevotella dentalis"	1.0
+"Tannerella sp. oral taxon HOT-286"	2.0
+"Capnocytophaga sputigena"	98.0
+"Capnocytophaga sp. ChDC OS43"	2.0
+"Capnocytophaga sp. oral taxon 326"	9.0
+"Capnocytophaga sp. oral taxon 863"	32.0
+"Fusobacterium nucleatum"	43.0
+"Lautropia mirabilis"	5.0
+"Variovorax paradoxus"	1.0
+"Neisseria sp. HMSC066B07"	3.0
+"Desulfobulbus oralis"	1.0
+"Myxococcus fulvus"	1.0
+"Akkermansia muciniphila"	1.0
+"Treponema medium"	76.0
+"Treponema vincentii"	18.0
+"Jonquetella anthropi"	1.0
+"Thermobispora bispora"	6.0
+"Actinomyces bouchesdurhonensis"	19.0
+"Actinomyces gaoshouyii"	2.0
+"Actinomyces massiliensis"	69.0
+"Actinomyces oris"	29.0
+"Actinomyces timonensis"	1.0
+"Actinomyces viscosus"	19.0
+"Actinomyces sp. 2129"	21.0
+"Actinomyces sp. HMSC035G02"	1.0
+"Actinomyces sp. HMSC08A09"	215.0
+"Actinomyces sp. HPA0247"	17.0
+"Actinomyces sp. oral taxon 170"	42.0
+"Actinomyces sp. oral taxon 171"	19.0
+"Actinomyces sp. oral taxon 172"	15.0
+"Actinomyces sp. oral taxon 180"	44.0
+"Actinomyces sp. oral taxon 414"	1.0
+"Actinomyces sp. oral taxon 877"	49.0
+"Actinomyces sp. oral taxon 897"	2.0
+"Actinomyces sp. Z16"	26.0
+"Schaalia meyeri"	1.0
+"Schaalia odontolytica"	51.0
+"Actinopolyspora erythraea"	1.0
+"Bifidobacterium bifidum"	3.0
+"Bifidobacterium choerinum"	2.0
+"Scardovia inopinata"	3.0
+"Catenulispora acidiphila"	1.0
+"Corynebacterium diphtheriae"	1.0
+"Corynebacterium frankenforstense"	8.0
+"Corynebacterium lubricantis"	1.0
+"Mycolicibacterium goodii"	1.0
+"Mycolicibacterium smegmatis"	1.0
+"Nocardia cyriacigeorgica"	1.0
+"Rhodococcus opacus"	3.0
+"Rhodococcus ruber"	1.0
+"Rhodococcus sp. BH4"	1.0
+"Rhodococcus sp. PBTS 1"	1.0
+"Geodermatophilaceae bacterium URHB0062"	2.0
+"Glycomyces tenuis"	2.0
+"Stackebrandtia nassauensis"	11.0
+"Kineococcus radiotolerans"	2.0
+"Georgenia sp. ZLJ0423"	4.0
+"Brevibacterium aurantiacum"	1.0
+"Cellulomonas gilvus"	1.0
+"Paraoerskovia marina"	2.0
+"Brachybacterium saurashtrense"	1.0
+"Brachybacterium sp. P6-10-X1"	1.0
+"Ornithinimicrobium sp. AMA3305"	2.0
+"Curtobacterium flaccumfaciens"	1.0
+"Curtobacterium sp. UNCCL17"	3.0
+"Leucobacter chromiiresistens"	1.0
+"Microbacterium sp. No. 7"	1.0
+"Mycetocola sp. 449"	1.0
+"Arthrobacter sp. 35/47"	1.0
+"Kocuria turfanensis"	1.0
+"Pseudarthrobacter chlorophenolicus"	2.0
+"Pseudarthrobacter phenanthrenivorans"	1.0
+"Rothia sp. HMSC036D11"	5.0
+"Rothia sp. HMSC058E10"	5.0
+"Rothia sp. HMSC065D02"	3.0
+"Zhihengliuella sp. ISTPL4"	2.0
+"Actinoplanes globisporus"	1.0
+"Actinoplanes teichomyceticus"	2.0
+"Actinoplanes sp. N902-109"	2.0
+"Longispora albida"	1.0
+"Micromonospora chokoriensis"	1.0
+"Micromonospora inositola"	2.0
+"Salinispora arenicola"	1.0
+"Verrucosispora maris"	2.0
+"Nakamurella panacisegetis"	2.0
+"Aeromicrobium sp. 592"	2.0
+"Friedmanniella sagamiharensis"	2.0
+"Nocardioides sp. JS614"	4.0
+"Acidipropionibacterium acidipropionici"	3.0
+"Auraticoccus monumenti"	3.0
+"Granulicoccus phenolivorans"	1.0
+"Microlunatus soli"	1.0
+"Propionibacterium freudenreichii"	5.0
+"Propionibacterium sp. oral taxon 192"	92.0
+"Pseudopropionibacterium propionicum"	5.0
+"Actinokineospora enzanensis"	1.0
+"Amycolatopsis alba"	1.0
+"Amycolatopsis balhimycina"	3.0
+"Kutzneria sp. 744"	1.0
+"Pseudonocardia sp. HH130629-09"	8.0
+"Saccharomonospora cyanea"	1.0
+"Saccharomonospora saliphila"	1.0
+"Sciscionella marina"	3.0
+"Sporichthya polymorpha"	3.0
+"Streptomyces albulus"	1.0
+"Streptomyces antibioticus"	3.0
+"Streptomyces canus"	1.0
+"Streptomyces cattleya"	1.0
+"Streptomyces davaonensis"	1.0
+"Streptomyces formicae"	1.0
+"Streptomyces glaucescens"	1.0
+"Streptomyces griseolus"	1.0
+"Streptomyces griseoruber"	1.0
+"Streptomyces hundungensis"	2.0
+"Streptomyces katrae"	2.0
+"Streptomyces nigra"	1.0
+"Streptomyces purpureus"	1.0
+"Streptomyces qaidamensis"	1.0
+"Streptomyces resistomycificus"	1.0
+"Streptomyces rubrolavendulae"	1.0
+"Streptomyces sp. GSSD-12"	3.0
+"Streptomyces sp. LaPpAH-108"	1.0
+"Streptomyces sp. Mg1"	1.0
+"Streptomyces sp. NRRL WC-3549"	1.0
+"Nocardiopsis gilva"	3.0
+"Nocardiopsis sp. CNS-639"	1.0
+"Microbispora sp. ATCC PTA-5024"	1.0
+"Nonomuraea coxensis"	2.0
+"Actinomadura flavalba"	1.0
+"Thermomonospora curvata"	1.0
+"Libanicoccus massiliensis"	1.0
+"Olsenella provencensis"	5.0
+"Olsenella sp. Marseille-P2300"	4.0
+"Olsenella sp. oral taxon 807"	43.0
+"Collinsella sp. 4_8_47FAA"	1.0
+"Eggerthella sp. 1_3_56FAA"	1.0
+"Enterorhabdus caecimuris"	2.0
+"Gordonibacter massiliensis"	1.0
+"Gordonibacter pamelaeae"	2.0
+"Gordonibacter urolithinfaciens"	1.0
+"Eggerthellaceae bacterium AT8"	1.0
+"Conexibacter woesei"	3.0
+"Streptococcus sanguinis"	5.0
+"Streptococcus sp. HMSC061E03"	109.0
+"Dorea sp. 5-2"	1.0
+"Lachnoclostridium phocaeense"	1.0
+"Oribacterium sp. oral taxon 078"	182.0
+"Oscillibacter sp. 1-3"	1.0
+"[Clostridium] leptum"	4.0
+"Clostridiales bacterium Marseille-P2846"	1.0
+"Phascolarctobacterium succinatutens"	1.0
+"Selenomonas sp. F0473"	3.0
+"Selenomonas sp. oral taxon 149"	1.0
+"bacterium OL-1"	1.0
