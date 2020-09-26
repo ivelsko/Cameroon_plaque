@@ -1,0 +1,356 @@
+---
+title: "Cameroon calculus/plaque BacDiveR species characteristics for ANCOM-BC"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(tidyverse)
+# devtools::install_github('TIBHannover/BacDiveR')
+library(BacDiveR)
+
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
+```
+
+
+```{r species_table}
+species_ancom <- fread("./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv", sep = "\t") 
+taxIDs <- fread("./05-results.backup/ncbi_taxIDs_species.tsv")
+
+species_list <- species_ancom %>%
+  select(Species) %>% 
+  bind_rows(., fread("./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv", sep = "\t") %>%
+              select(Species)) %>%
+  bind_rows(., fread("./05-results.backup/ancomBC_species_cmc_FA_FC.tsv", sep = "\t") %>%
+              select(Species)) %>%
+  bind_rows(., fread("./05-results.backup/ancomBC_species_cmc_FA_LR.tsv", sep = "\t") %>%
+              select(Species)) %>%
+  bind_rows(., fread("./05-results.backup/ancomBC_species_cmc_sex.tsv", sep = "\t") %>%
+              select(Species)) %>%
+  bind_rows(., fread("./05-results.backup/ancomBC_species_cmc_toothsite.tsv", sep = "\t") %>%
+              select(Species)) %>%
+  distinct() %>%
+  arrange() %>%
+  inner_join(., taxIDs) %>%
+  filter(!str_detect(Species, "\\[")) %>%
+  pull(Species)
+
+```
+
+
+Get a list from the online advanced search URL
+```{r, eval = F}
+# Search query for Gram stain, spore formation, oxygen tolerance, metabolite utilization, kind of utilization: carbon source
+
+queryURL <- paste0("https://bacdive.dsmz.de/advsearch?site=advsearch&searchparams%5B42%5D%5Bsearchterm%5D=*&searchparams%5B254%5D%5Bsearchterm%5D=*&searchparams%5B921%5D%5Bsearchterm%5D=*&searchparams%5B344%5D%5Bcontenttype%5D=text&searchparams%5B344%5D%5Btypecontent%5D=contains&searchparams%5B344%5D%5Bsearchterm%5D=*&searchparams%5B346%5D%5Bsearchterm%5D=carbon+source&advsearch=search")
+
+species_info <- bd_retrieve_by_search(queryURL)
+
+```
+
+
+Save the list so you don't need to download it again
+```{r, eval = F}
+saveRDS(species_info, "./05-results.backup/species_info_bacdiveR.rds", version = 3)
+
+```
+
+
+Load the saved list
+```{r}
+species_info_stored <- readRDS("./05-results.backup/species_info_bacdiveR.rds")
+
+```
+
+
+Make a dataframe with the info for only the species of interest
+```{r taxa_names}
+# first we need to get a list of the taxa IDs used in the BacDive list
+speciesid <- map_df(.x = species_info_stored, .f = ~.x$taxonomy_name$strains$species) %>%
+  mutate(Header = "Species") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Code",2:ncol(.)) %>%
+  spread(Header, Code) %>%
+  pull(ID)
+
+
+speciesIDs <- map_df(.x = species_info_stored, .f = ~.x$taxonomy_name$strains$species) %>%
+  mutate(Header = "Species") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Code",2:ncol(.)) %>%
+  select(ID, Code) %>%
+  rename(Species = Code) %>%
+  bind_rows(., map_df(.x = species_info_stored, .f = ~.x$taxonomy_name$strains$species) %>%
+  mutate(Header = "Species") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Code",2:ncol(.)) %>%
+  select(ID, Code) %>%
+  rename(Species = Code))
+
+```
+
+Which of the species in our list are in the BacDive table?
+```{r}
+# only 17 species
+ancom_species <- speciesIDs %>%
+  filter(Species %in% species_list)
+
+```
+
+```{r}
+species_info_new <- lapply(species_list, function(envmt){
+  Bac_data <- bd_retrieve_taxon(name = envmt)
+})
+
+```
+
+
+
+```{r gram_stain}
+# Now the Gram stain info
+full_gram <- map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$cell_morphology$gram_stain[1]) %>%
+  mutate(Header = "gram1") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Stain",2:ncol(.)) %>%
+  select(-Header) %>%
+  rename(Stain1 = Stain) %>%
+  full_join(., map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$cell_morphology$gram_stain[2]) %>%
+            mutate(Header = "gram2") %>%
+            select(Header, everything(.)) %>%
+            gather("ID","Stain",2:ncol(.)) %>%
+            select(-Header) %>%
+            rename(Stain2 = Stain), by = "ID") %>%
+  mutate(Same = Stain1 == Stain2)
+
+# now we need to replace all NAs in either Stain column with the value in the other, and double check that any with an entry in both Strain1 and Strain2 have the same entries (at least 1 has 'positive' for 1 and 'negative' for the other)
+
+# find unmatched entries
+gram_mismatch <- full_gram %>%
+  filter(Same == FALSE) %>%
+  select(ID, Stain1, Stain2) 
+# IDs may have mulitple entries b/c references on BacDive are text-mined (and maybe not manually checked)
+# (species_info_stored$`194`$taxonomy_name$strains$species) - Get the species name and manually check (mostly from IJSEM pubs)
+# 194 ("Gleimia hominis") - positive 
+# 1245 ("Fictibacillus macauensis") - positive
+# 133149 ("Flavobacterium terriphilum") - negative
+
+# Table with Gram stain  
+gram_info <- full_gram %>%
+  filter(is.na(Same)) %>%
+  # replace the NAs in either Stain column with the value in the other
+  mutate(Stain = coalesce(Stain1, Stain2)) %>%
+  select(ID, Stain) %>%
+  # add back the IDs that have 2 matching stain values
+  bind_rows(., full_gram %>%
+              filter(Same == TRUE) %>%
+              select(ID, Stain1) %>%
+              rename(Stain = Stain1)) %>%
+  bind_rows(., gram_mismatch <- full_gram %>%
+              filter(Same == FALSE) %>%
+              select(ID, Stain1, Stain2) %>%
+              mutate(Stain = c("positive","positive","negative")) %>%
+              select(ID, Stain))
+
+
+```
+
+```{r spore}
+# And the spore formation
+full_spore <- map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$spore_formation$ability[1]) %>%
+  mutate(Header = "spore1") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Spore",2:ncol(.)) %>%
+  select(-Header) %>%
+  rename(Spore1 = Spore) %>%
+  full_join(., map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$spore_formation$ability[2]) %>%
+            mutate(Header = "spore2") %>%
+            select(Header, everything(.)) %>%
+            gather("ID","Spore",2:ncol(.)) %>%
+            select(-Header) %>%
+            rename(Spore2 = Spore), by = "ID") %>%
+  mutate(Same = Spore1 == Spore2)
+
+# 3 entries:
+# species_info_stored$`11930`$morphology_physiology$spore_formation$ability
+# [1] FALSE FALSE FALSE
+
+
+# find unmatched entries
+spore_mismatch <- full_spore %>%
+  filter(Same == FALSE) %>%
+  select(ID, Spore1, Spore2) 
+
+# IDs may have mulitple entries b/c references on BacDive are text-mined (and maybe not manually checked)
+# (species_info_stored$`194`$taxonomy_name$strains$species) - Get the species name and manually check (mostly from IJSEM pubs)
+# 1245 ("Fictibacillus macauensis") - TRUE
+# 3199 ("Corynebacterium aurimucosum") - FALSE
+# 11123 ("Nocardioides dubius") - FALSE
+# 13252 ("Amycolatopsis decaplanina") - FALSE
+
+spore_info <- full_spore %>%
+  mutate(Same = replace_na(Same, TRUE)) %>%
+  filter(Same == TRUE) %>%
+  select(ID, Spore1) %>%
+  rename(Spore = Spore1) %>%
+  bind_rows(., full_spore %>%
+              filter(Same == FALSE) %>%
+              mutate(Spore = c(TRUE,FALSE,FALSE,FALSE))) %>%
+  select(ID, Spore)
+
+```
+
+```{r oxygen}
+# And the oxygen tolerance
+full_oxygen <- map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$oxygen_tolerance$oxygen_tol[1]) %>%
+  mutate(Header = "oxygen1") %>%
+  select(Header, everything(.)) %>%
+  gather("ID","Oxygen",2:ncol(.)) %>%
+  select(-Header) %>%
+  mutate(ox_group = "ox1") %>%
+  bind_rows(., map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$oxygen_tolerance$oxygen_tol[2]) %>%
+            mutate(Header = "oxygen") %>%
+            select(Header, everything(.)) %>%
+            gather("ID","Oxygen",2:ncol(.)) %>%
+            select(-Header) %>%
+            mutate(ox_group = "ox2")) %>%
+   bind_rows(., map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$oxygen_tolerance$oxygen_tol[3]) %>%
+            mutate(Header = "oxygen") %>%
+            select(Header, everything(.)) %>%
+            gather("ID","Oxygen",2:ncol(.)) %>%
+            select(-Header) %>%
+            mutate(ox_group = "ox3")) %>%
+  bind_rows(., map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$oxygen_tolerance$oxygen_tol[4]) %>%
+            mutate(Header = "oxygen") %>%
+            select(Header, everything(.)) %>%
+            gather("ID","Oxygen",2:ncol(.)) %>%
+            select(-Header) %>%
+            mutate(ox_group = "ox4")) %>%
+  mutate(Oxygen = str_replace(Oxygen, "facultative aerobe","facultative anaerobe"),
+         Oxygen = str_replace(Oxygen, "microaerophile","facultative anaerobe"),
+         Oxygen = str_replace(Oxygen, "obligate aerobe","aerobe"),
+         Oxygen = str_replace(Oxygen, "obligate anaerobe","anaerobe")) %>%
+  drop_na(Oxygen) %>%
+  distinct()
+
+check_oxygen <- full_oxygen %>%
+  spread(ox_group, Oxygen) %>%
+  drop_na(ox4)
+# ox4 is mostly overlapping with the other columns so we can drop it
+
+check_oxygen <- full_oxygen %>%
+  spread(ox_group, Oxygen) %>%
+  select(-ox4) %>%
+  distinct() %>%
+  drop_na(ox3) %>%
+  mutate(same31 = ox3 == ox1,
+         same32 = ox3 == ox2,
+         same12 = ox1 == ox2) %>%
+  filter(same31 == FALSE, same32 == FALSE, same12 == FALSE)
+# 8 IDs with 3 different entries
+# 194 ("Gleimia hominis") - facultative anaerobe
+# 348 ("Castellaniella denitrificans") - aerobe
+# 5351 ("Enterococcus caccae") - facultative anaerobe
+# 6397 ("Pediococcus stilesii") - aerobe
+# 13750 ("Rhodovulum kholense") - anaerobe
+# 17690 ("Fastidiosipila sanguinis") - anaerobe
+# 132549 ("Oceanivirga salmonicida") - facultative anaerobe
+# 134233 ("Lactobacillus crustorum") - facultative anaerobe
+
+check_oxygen <- full_oxygen %>%
+  spread(ox_group, Oxygen) %>%
+  select(-ox4) %>%
+  distinct() %>%
+  drop_na(ox2) 
+
+
+
+
+# take a new approach and save the ones w/o issues
+ox1_single <- full_oxygen %>%
+  spread(ox_group, Oxygen) %>%
+  select(-c("ox4","ox3")) %>%
+  distinct() %>%
+  filter(is.na(ox2)) %>%
+  select(ID, ox1) %>%
+  rename(Oxygen = ox1)
+
+ox1_check <- full_oxygen %>%
+  spread(ox_group, Oxygen) %>%
+  select(-c("ox4","ox3")) %>%
+  distinct() %>%
+  drop_na(ox2) %>%
+  mutate(Same = ox1 == ox2) %>%
+  filter(Same == FALSE)
+
+
+
+full_oxygen <- map_df(.x = species_info_stored, .f = ~.x$morphology_physiology$oxygen_tolerance$oxygen_tol)
+
+```
+
+```{r carbon}
+# And the carbon source
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

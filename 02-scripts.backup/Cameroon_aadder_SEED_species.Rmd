@@ -1,0 +1,1630 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque SEED"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(decontam)
+library(data.table)
+library(janitor)
+library(compositions)
+library(rstatix)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+
+# SEED category assignment stats
+```{r load_data}
+## load the species and genus tables generated with AADDER
+load("./05-results.backup/CMC_seed_tables.RData")
+
+# read in the list of proteins in the top 10 for PC1 and PC2
+mr1_proteins <- fread("./05-results.backup/seed_protein_mr1_noblanks_biplot_list.tsv")
+mr1_proteins_cmc <- fread("./05-results.backup/seed_protein_mr1_cmc_biplot_list.tsv")
+
+```
+
+```{r load_metadata}
+
+load("./05-results.backup/CMC_metadata.RData")
+
+# try metadata w/o factors for pairwise.adonis2
+metadata_noblanks <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+
+# make a separate table for adonis2 stats later
+metadata_noblanks <- metadata_noblanks %>%
+  rename(SampleID = `#SampleID`)  %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Market_economy_split, Ethnic_Group, Sex, Industry, Tooth_site) %>%
+  as_tibble() %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206","HMP","JAE"),
+         ExtractionBatch = fct_relevel(ExtractionBatch, "Ex01_VE_2019-01-23","Ex04_VE_2019-02-18","Ex05_VE_2019-02-18","Ex06_VE_2019-02-21","Ex07_VE_2019-02-21","Ex08_VE_2019-02-25","Ex09_VE_2019-03-13"),
+         LibraryBatch = fct_relevel(LibraryBatch, "Li03_VE_2019-04-17","Li04_VE_2019-04-17","Li05_VE_2019-04-17","Li06_VE_2019-05-02","Li07_VE_2019-05-06","Li08_VE_2019-05-06","Li09_VE_2019-05-06"),
+         Market_economy = fct_relevel(Market_economy, "Logging road","Forrest camp","Farming","Industrial"),
+         Market_economy_split = fct_relevel(Market_economy_split, "Logging road","Forrest camp","Farming","Industrial plaque","Industrial calculus"),
+         Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
+         Sex = fct_relevel(Sex, "Male","Female"),
+         Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","HMP"))
+
+metadata_cmc <- metadata %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  filter(SampleID != "CMC032.B0101") %>%  # this sample has very few reads
+  select(SampleID, ExtractionBatch, LibraryBatch, Village, Age_group, Market_economy, Ethnic_Group, Sex, Tooth_site) %>%
+  as_tibble()
+
+
+
+```
+
+
+```{r load_species_tables_Baka}
+# load the individual tables from MEGAN
+baka_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_Baka_comparison-", full.names = T)
+
+baka_species <- map_dfr(baka_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+baka_species <- baka_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_Baka_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+```{r load_species_tables_Nzime}
+# load the individual tables from MEGAN
+nzime_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_Nzime_comparison-", full.names = T)
+
+nzime_species <- map_dfr(nzime_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+nzime_species <- nzime_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_Nzime_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+```{r load_species_tables_JAE}
+# load the individual tables from MEGAN
+JAE_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_JAE_comparison-", full.names = T)
+
+JAE_species <- map_dfr(JAE_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+JAE_species <- JAE_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_JAE_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+```{r load_species_tables_HMP}
+# load the individual tables from MEGAN
+HMP_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_HMP_comparison-", full.names = T)
+
+HMP_species <- map_dfr(HMP_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+HMP_species <- HMP_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_HMP_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+# Industrial and Cameroon samples
+
+## Individual groups
+
+### Baka
+```{r pc1pws_Baka}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+baka_pc1pws <- baka_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+baka_pc1pws_stats <- baka_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+baka_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- baka_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+baka_pc1pws_bar_df <- baka_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., baka_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+baka_pc1pws_bar_df %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Fusobacterium","Neisseria","Parvimonas",)) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+
+```
+
+```{r pc1neg_Baka}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+baka_pc1neg <- baka_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+baka_pc1neg_stats <- baka_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+baka_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- baka_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+baka_pc1neg_bar_df <- baka_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., baka_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+baka_pc1neg_bar_df %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+### Nzime
+```{r pc1pws_Nzime}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+nzime_pc1pws <- nzime_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+nzime_pc1pws_stats <- nzime_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+nzime_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- nzime_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+nzime_pc1pws_bar_df <- nzime_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., nzime_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+nzime_pc1pws_bar_df %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Fusobacterium","Neisseria","Parvimonas")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+```
+
+```{r pc1neg_Nzime}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+nzime_pc1neg <- nzime_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+nzime_pc1neg_stats <- nzime_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+nzime_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- nzime_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+nzime_pc1neg_bar_df <- nzime_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., nzime_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+nzime_pc1neg_bar_df %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinomyces","Aggregatibacter","Corynebacterium","Neisseria","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+### JAE
+```{r pc1pws_JAE}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+JAE_pc1pws <- JAE_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+JAE_pc1pws_stats <- JAE_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+JAE_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- JAE_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+JAE_pc1pws_bar_df <- JAE_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., JAE_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+JAE_pc1pws_bar_df %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Aggregatibacter","Campylobacter","Fusobacterium","Neisseria","Ottowia","Parvimonas","Xanthomonas")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+```
+
+```{r pc1neg_JAE}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+JAE_pc1neg <- JAE_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+JAE_pc1neg_stats <- JAE_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+JAE_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- JAE_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+JAE_pc1neg_bar_df <- JAE_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., JAE_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+JAE_pc1neg_bar_df %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Eikenella","Neisseria","Olsenella","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Simonsiella","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+
+```
+
+
+### HMP
+```{r pc1pws_HMP}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+HMP_pc1pws <- HMP_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+HMP_pc1pws_stats <- HMP_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+HMP_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- HMP_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+HMP_pc1pws_bar_df <- HMP_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., HMP_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+HMP_pc1pws_bar_df %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Escherichia","Fusobacterium","Neisseria","Parvimonas")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+
+```
+
+```{r pc1neg_HMP}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+HMP_pc1neg <- HMP_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+HMP_pc1neg_stats <- HMP_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+HMP_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- HMP_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+HMP_pc1neg_bar_df <- HMP_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., HMP_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC+Industrial")
+  
+# plot the values in a bar chart
+HMP_pc1neg_bar_df %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinobaculum","Actinomyces","Aggregatibacter","Capnocytophaga","Cardiobacterium","Corynebacterium","Fusobacterium","Haemophilus","Neisseria","Pseudopropionibacterium","Rothia","Schaalia","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+
+```
+
+## All together
+```{r}
+all_bar_df <- baka_pc1pws_bar_df %>%
+  mutate(Ethnic_Group = "Baka") %>%
+  bind_rows(., baka_pc1neg_bar_df %>%
+            mutate(Ethnic_Group = "Baka")) %>%
+  bind_rows(., nzime_pc1pws_bar_df %>%
+              mutate(Ethnic_Group = "Nzime")) %>%
+  bind_rows(., nzime_pc1neg_bar_df %>%
+              mutate(Ethnic_Group = "Nzime")) %>%
+  bind_rows(., JAE_pc1pws_bar_df %>%
+              mutate(Ethnic_Group = "JAE")) %>%
+  bind_rows(., JAE_pc1neg_bar_df %>%
+              mutate(Ethnic_Group = "JAE")) %>%
+   bind_rows(., HMP_pc1pws_bar_df %>%
+              mutate(Ethnic_Group = "HMP")) %>%
+  bind_rows(., HMP_pc1neg_bar_df %>%
+              mutate(Ethnic_Group = "HMP")) %>%
+  mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","JAE","HMP"))
+
+
+all_bar_df_pws_plot <- all_bar_df %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Aggregatibacter","Campylobacter","Escherichia","Fusobacterium","Neisseria","Ottowia","Parvimonas","Xanthomonas")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    scale_fill_manual(values = c("#bdbdbd","#6B1D81FF","#D6456CFF",
+                                 "#FEB37BFF","#440154FF","#39558CFF",
+                                 "#1F968BFF","#74D055FF","#DCE318FF")) +
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#07071DFF",
+    #                              "#FA815FFF","#FCFDBFFF",)) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+all_bar_df_neg_plot <- all_bar_df %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # mutate(Genus = fct_relevel(Genus, "Other","Aggregatibacter","Campylobacter","Escherichia","Fusobacterium","Neisseria","Ottowia","Parvimonas","Xanthomonas")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+allplots_all <- plot_grid(all_bar_df_neg_plot, all_bar_df_pws_plot,
+          nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
+
+allplots_all
+
+# ggsave("05-results.backup/presentation_pdfs/seed_species_ap_pc1.pdf", plot = allplots_seed, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+```
+
+
+## Heatmaps to show difference in counts
+```{r heatmaps_all}
+# heatmap of the genes in PC1+
+seed_L4.decontam_pc1pws <- seed_L4.decontam %>%
+  select(-matches("SRR164|10M|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_pws) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1pws_clr <- clr(seed_L4.decontam_pc1pws)
+seed_L4.decontam_pc1pws_clr <- as.data.frame.matrix(seed_L4.decontam_pc1pws_clr)
+
+seed_L4.decontam_pc1pws_clr_l <- seed_L4.decontam_pc1pws_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.))
+
+heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1pws
+
+# heatmap of the genes in PC1-
+seed_L4.decontam_pc1neg <- seed_L4.decontam %>%
+  select(-matches("SRR164|10M|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_neg) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1neg_clr <- clr(seed_L4.decontam_pc1neg)
+seed_L4.decontam_pc1neg_clr <- as.data.frame.matrix(seed_L4.decontam_pc1neg_clr)
+
+seed_L4.decontam_pc1neg_clr_l <- seed_L4.decontam_pc1neg_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.))
+
+heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1neg
+
+
+```
+
+
+# Cameroon samples only
+
+## Individual groups
+
+### Baka
+```{r pc1pws_Baka}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+baka_pc1pws <- baka_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+baka_pc1pws_stats <- baka_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+baka_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- baka_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+baka_pc1pws_bar_df_cmc <- baka_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., baka_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+baka_pc1pws_bar_df_cmc %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Centipeda","Leptotrichia","Prevotella","Selenomonas","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+
+```
+
+```{r pc1neg_Baka}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+baka_pc1neg <- baka_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+baka_pc1neg_stats <- baka_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+baka_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- baka_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+baka_pc1neg_bar_df_cmc <- baka_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., baka_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+baka_pc1neg_bar_df_cmc %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+### Nzime
+```{r pc1pws_Nzime}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+nzime_pc1pws <- nzime_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+nzime_pc1pws_stats <- nzime_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+nzime_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- nzime_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+nzime_pc1pws_bar_df_cmc <- nzime_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., nzime_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+nzime_pc1pws_bar_df_cmc %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Leptotrichia","Prevotella","Selenomonas","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+```
+
+```{r pc1neg_Nzime}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+nzime_pc1neg <- nzime_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+nzime_pc1neg_stats <- nzime_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+nzime_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- nzime_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+nzime_pc1neg_bar_df_cmc <- nzime_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., nzime_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+nzime_pc1neg_bar_df_cmc %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Acidipropionibacterium","Actinomyces","Aggregatibacter","Corynebacterium","Neisseria","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+## All together
+```{r}
+all_bar_df_cmc <- baka_pc1pws_bar_df_cmc %>%
+  mutate(Ethnic_Group = "Baka") %>%
+  bind_rows(., baka_pc1neg_bar_df_cmc %>%
+            mutate(Ethnic_Group = "Baka")) %>%
+  bind_rows(., nzime_pc1pws_bar_df_cmc %>%
+              mutate(Ethnic_Group = "Nzime")) %>%
+  bind_rows(., nzime_pc1neg_bar_df_cmc %>%
+              mutate(Ethnic_Group = "Nzime"))
+
+all_bar_df_cmc_pws_plot <- all_bar_df_cmc %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Centipeda","Leptotrichia","Prevotella","Selenomonas","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+all_bar_df_cmc_neg_plot <- all_bar_df_cmc %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Acidipropionibacterium","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+allplots_cmc <- plot_grid(all_bar_df_cmc_neg_plot, all_bar_df_cmc_pws_plot,
+          nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
+
+allplots_cmc
+
+# ggsave("05-results.backup/presentation_pdfs/seed_species_ap_pc1.pdf", plot = allplots_seed, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+```
+
+
+## Heatmaps to show difference in counts
+```{r heatmaps_cmc}
+# heatmap of the genes in PC1+
+seed_L4.decontam_pc1pws <- seed_L4.decontam %>%
+  select(-matches("SRR|JAE|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_pws) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1pws_clr <- clr(seed_L4.decontam_pc1pws)
+seed_L4.decontam_pc1pws_clr <- as.data.frame.matrix(seed_L4.decontam_pc1pws_clr)
+
+seed_L4.decontam_pc1pws_clr_l <- seed_L4.decontam_pc1pws_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.))
+
+heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1pws
+
+# heatmap of the genes in PC1-
+seed_L4.decontam_pc1neg <- seed_L4.decontam %>%
+  select(-matches("SRR|JAE|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_neg) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1neg_clr <- clr(seed_L4.decontam_pc1neg)
+seed_L4.decontam_pc1neg_clr <- as.data.frame.matrix(seed_L4.decontam_pc1neg_clr)
+
+seed_L4.decontam_pc1neg_clr_l <- seed_L4.decontam_pc1neg_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.))
+
+heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1neg
+```
+
+## Anterior
+
+```{r load_species_tables_anterior}
+# load the individual tables from MEGAN
+anterior_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_anterior_comparison-", full.names = T)
+
+anterior_species <- map_dfr(anterior_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+anterior_species <- anterior_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_anterior_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+```{r pc1pws_Anterior}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+anterior_pc1pws <- anterior_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+anterior_pc1pws_stats <- anterior_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+anterior_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- anterior_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+anterior_pc1pws_bar_df_cmc <- anterior_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., anterior_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+anterior_pc1pws_bar_df_cmc %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Prevotella","Selenomonas","Leptotrichia","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+
+```
+
+```{r pc1neg_Anterior}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+anterior_pc1neg <- anterior_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+anterior_pc1neg_stats <- anterior_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+anterior_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- anterior_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+anterior_pc1neg_bar_df_cmc <- anterior_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., anterior_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+anterior_pc1neg_bar_df_cmc %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+### Posterior
+
+```{r load_species_tables_posterior}
+# load the individual tables from MEGAN
+posterior_list <- list.files(path = "./05-results.backup/", pattern = "aadder_seed_posterior_comparison-", full.names = T)
+
+posterior_species <- map_dfr(posterior_list, function(fn) {
+  fread(fn, col.names = c("Species", "Counts"), sep = "\t") %>%
+  mutate(Gene = basename(fn))
+}) %>%
+  arrange(Gene)
+
+posterior_species <- posterior_species %>%
+# remove the end of the file name from Gene
+  mutate(Gene = str_replace_all(Gene, "aadder_seed_posterior_comparison-",""),
+         Gene = str_replace_all(Gene, ".txt",""),
+         Gene = str_replace_all(Gene, "UDP-glucose","UDP-glucose:"))
+
+```
+
+```{r pc1pws_Posterior}
+# list the 10 orthologs with strongest loading in PC1 + values
+pc1_pws <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1+") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+posterior_pc1pws <- posterior_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_pws) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+posterior_pc1pws_stats <- posterior_pc1pws %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+posterior_pc1pws_stats_extra <- lapply(pc1_pws, function(eclass) {
+ high_percent <- posterior_pc1pws_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+posterior_pc1pws_bar_df_cmc <- posterior_pc1pws_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., posterior_pc1pws_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1+",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+posterior_pc1pws_bar_df_cmc %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Leptotrichia","Prevotella","Selenomonas","Streptococcus")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10))
+
+```
+
+```{r pc1neg_Posterior}
+# list the 10 orthologs with strongest loading in PC1 - values
+pc1_neg <- mr1_proteins_cmc %>%
+  filter(Direction == "PC1-") %>%
+  arrange(desc(PC1)) %>%
+  pull(Function) 
+
+# select only those 10 orthologs from the list, and split the full species name into just Genus
+posterior_pc1neg <- posterior_species %>%
+  mutate(Gene = str_replace_all(Gene, "_"," ")) %>%
+  filter(Gene %in% pc1_neg) %>%
+  separate(Species, into = c("Genus","Species"), sep = " ", extra = "merge") %>%
+  select(-Species)
+
+# calculate the % for each ortholog contributed by each genus         
+posterior_pc1neg_stats <- posterior_pc1neg %>%
+  group_by(Gene, Genus) %>%
+  summarize(Sum = sum(Counts)) %>%
+  mutate(Percent = Sum/sum(Sum)*100) %>%
+  ungroup(.)
+
+
+# calculate the total % of all genera that contribute < X% to each ortholog
+posterior_pc1neg_stats_extra <- lapply(pc1_neg, function(eclass) {
+ high_percent <- posterior_pc1neg_stats %>%
+   filter(Gene == eclass) %>%
+   filter(Percent < 5) %>%
+   summarise(Remaining = sum(Percent)) %>%
+   mutate(Gene = eclass,
+          Genus = "Other")
+}) %>%
+ bind_rows(.) %>%
+  filter(Remaining > 0)
+
+# add this additional % to the main table
+posterior_pc1neg_bar_df_cmc <- posterior_pc1neg_stats_extra %>%
+  rename(Percent = Remaining) %>%
+  bind_rows(., posterior_pc1neg_stats %>%
+              select(-Sum)) %>% 
+  select(Gene, Genus, Percent) %>%
+  mutate(Direction = "PC1-",
+         Samples = "CMC")
+  
+# plot the values in a bar chart
+posterior_pc1neg_bar_df_cmc %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Acidipropionibacterium","Actinomyces","Aggregatibacter","Corynebacterium","Neisseria","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10))
+
+```
+
+## All together
+```{r ant_post_plots}
+all_bar_df_cmc_ap <- anterior_pc1pws_bar_df_cmc %>%
+  mutate(Ethnic_Group = "Anterior") %>%
+  bind_rows(., anterior_pc1neg_bar_df_cmc %>%
+            mutate(Ethnic_Group = "Anterior")) %>%
+  bind_rows(., posterior_pc1pws_bar_df_cmc %>%
+              mutate(Ethnic_Group = "Posterior")) %>%
+  bind_rows(., posterior_pc1neg_bar_df_cmc %>%
+              mutate(Ethnic_Group = "Posterior"))
+
+all_bar_df_cmc_ap_pws_plot <- all_bar_df_cmc_ap %>%
+  filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Leptotrichia","Prevotella","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+all_bar_df_cmc_ap_neg_plot <- all_bar_df_cmc_ap %>%
+  filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
+  mutate(Genus = fct_relevel(Genus, "Other","Acidipropionibacterium","Actinomyces","Aggregatibacter","Capnocytophaga","Corynebacterium","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Streptococcus","Treponema")) %>%
+  ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
+    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
+    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
+    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    theme(text = element_text(size=8),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    theme(title = element_text(size=10)) +
+  facet_wrap(~Ethnic_Group, ncol = 1)
+
+
+
+allplots_ap <- plot_grid(all_bar_df_cmc_ap_neg_plot, all_bar_df_cmc_ap_pws_plot,
+          nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
+
+allplots_ap
+
+# ggsave("05-results.backup/presentation_pdfs/seed_species_ap_pc1.pdf", plot = allplots_seed, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+
+```
+
+
+## Heatmaps to show difference in counts
+```{r}
+# keep samples in order by anterior/posterior
+ts_order <- metadata %>%
+  as_tibble() %>%
+  filter(str_detect(Tooth_site, "Anterior|Posterior")) %>%
+  filter(!str_detect(SampleID, "JAE")) %>%
+  arrange(Tooth_site, SampleID) %>%
+  pull(SampleID)
+
+```
+
+
+```{r heatmaps_cmc}
+# heatmap of the genes in PC1+
+seed_L4.decontam_pc1pws <- seed_L4.decontam %>%
+  select(-matches("SRR|JAE|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_pws) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1pws_clr <- clr(seed_L4.decontam_pc1pws)
+seed_L4.decontam_pc1pws_clr <- as.data.frame.matrix(seed_L4.decontam_pc1pws_clr)
+
+seed_L4.decontam_pc1pws_clr_l <- seed_L4.decontam_pc1pws_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  mutate(SampleID = fct_relevel(SampleID, ts_order),
+         Pathway = fct_relevel(Pathway, pc1_pws)) %>%
+  arrange(SampleID)
+
+heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1pws
+
+# heatmap of the genes in PC1-
+seed_L4.decontam_pc1neg <- seed_L4.decontam %>%
+  select(-matches("SRR|JAE|EXB|LIB|CMC032.B")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  filter(Protein %in% pc1_neg) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Protein,Counts) %>%
+  column_to_rownames("SampleID")
+
+# CLR-transform the matrix for plotting the heatmap
+seed_L4.decontam_pc1neg_clr <- clr(seed_L4.decontam_pc1neg)
+seed_L4.decontam_pc1neg_clr <- as.data.frame.matrix(seed_L4.decontam_pc1neg_clr)
+
+seed_L4.decontam_pc1neg_clr_l <- seed_L4.decontam_pc1neg_clr %>%
+  rownames_to_column("SampleID") %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  mutate(SampleID = fct_relevel(SampleID, ts_order),
+         Pathway = fct_relevel(Pathway, pc1_neg)) %>%
+  arrange(SampleID)
+
+heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, fill = Counts)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "A") +
+  theme_minimal(base_size = 7) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
+        plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.title.y = element_blank(),
+        legend.position = "left")
+
+heatmap_pc1neg
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
