@@ -101,16 +101,16 @@ species/genera.
 ```{r observed_species}
 # make Relab binary to make a presence/absence table
 presabs_table <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
 
 # calculate observed species for each sample with janitor 'adorn_totals'
 malt_species.decontam.os <- presabs_table %>%
@@ -123,17 +123,17 @@ plot_box_whisker(malt_species.decontam.os, "Observed_species", "Village", "Villa
 
 # now on filtered tables
 presabs_table_f <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed species for each sample with janitor 'adorn_totals'
 malt_species.decontam_filtered.os <- presabs_table_f %>%
@@ -149,16 +149,16 @@ plot_box_whisker(malt_species.decontam_filtered.os, "Observed_species", "Village
 Now at the genus level
 ```{r observed_genera}
 presabs_table <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed genus for each sample with janitor 'adorn_totals'
 malt_genus.decontam.os <- presabs_table %>%
@@ -172,17 +172,17 @@ plot_box_whisker(malt_genus.decontam.os, "Observed_genera", "Village", "Village"
 
 # now on the filtered table
 presabs_table_filtered <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed genus for each sample with janitor 'adorn_totals'
 malt_genus.decontam_filtered.os <- presabs_table_filtered %>%
@@ -200,13 +200,13 @@ plot_box_whisker(malt_genus.decontam_filtered.os, "Observed_genera", "Village", 
 ```{r shannon_diversity}
 # Shannon diversity with the package vegan
 malt_species.decontam.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
  
 malt_species.decontam.shannon <- as.data.frame(diversity(malt_species.decontam.matrix, index = "shannon"))
 names(malt_species.decontam.shannon)[1] <- "Shannon_index"
@@ -221,14 +221,14 @@ plot_box_whisker(malt_species.decontam.shannon, "Shannon_index", "Village", "Vil
 
 # now with the filtered data
 malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
 names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -247,13 +247,13 @@ At the genus level
 ```{r shannon_genera}
 # Shannon diversity with the package vegan
 malt_genus.decontam.matrix <- as.matrix(malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_genus.decontam.shannon <- as.data.frame(diversity(malt_genus.decontam.matrix, index = "shannon"))
 names(malt_genus.decontam.shannon)[1] <- "Shannon_index"
@@ -268,14 +268,14 @@ plot_box_whisker(malt_genus.decontam.shannon, "Shannon_index", "Village", "Villa
 
 # now with the filtered data
 malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_genus.decontam_filtered.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
 names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -363,18 +363,18 @@ for the evenness calculation).
 # Filtered species tables alpha-diversity stats
 # get the number of observed species
 presabs_table_f <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed species for each sample with janitor 'adorn_totals'
 malt_species.decontam_filtered.alpha <- presabs_table_f %>%
@@ -385,15 +385,15 @@ malt_species.decontam_filtered.alpha <- presabs_table_f %>%
 
 # get the Shannon index
 malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
 names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -549,18 +549,18 @@ a higher average.
 # Filtered genus tables alpha-diversity stats
 # get the number of observed genus
 presabs_table_f <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed genus for each sample with janitor 'adorn_totals'
 malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
@@ -571,15 +571,15 @@ malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
 
 # get the Shannon index
 malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("10M|EXB|LIB|SRR164")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_genus.decontam_filtered.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
 names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -771,18 +771,18 @@ there differences in diversity between the various metadata groups?
 # Filtered species tables alpha-diversity stats
 # get the number of observed species
 presabs_table_f <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed species for each sample with janitor 'adorn_totals'
 malt_species.decontam_filtered.alpha <- presabs_table_f %>%
@@ -793,15 +793,15 @@ malt_species.decontam_filtered.alpha <- presabs_table_f %>%
 
 # get the Shannon index
 malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_species.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
 names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -949,18 +949,18 @@ Posterior. In the sex category Females are significantly higher in Shannon index
 # Filtered genus tables alpha-diversity stats
 # get the number of observed genus
 presabs_table_f <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>%
-                                         gather("Species","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
-                                         spread(Species, Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
   
 # calculate observed genus for each sample with janitor 'adorn_totals'
 malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
@@ -971,15 +971,15 @@ malt_genus.decontam_filtered.alpha <- presabs_table_f %>%
 
 # get the Shannon index
 malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         filter(Percent > 0.001) %>%
-                                         select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(Species,Counts) %>% 
-                                         column_to_rownames("SampleID"))
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
 
 malt_genus.decontam_filtered.shannon <- as.data.frame(diversity(malt_genus.decontam_filtered.matrix, index = "shannon"))
 names(malt_genus.decontam_filtered.shannon)[1] <- "Shannon_index"
@@ -1330,16 +1330,16 @@ Now make heatmaps of the top 50 most abundant species and genera (as an arbitrar
 ```{r heatmaps_species_all}
 # select the top 50 most abundant species for all samples (CMC, JAE, HMP)
 malt_species.decontam_top50_all <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_species.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR164|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_species.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # CLR-transform the matrix for plotting the heatmap
 malt_species.decontam_top50_all_clr <- clr(malt_species.decontam_top50_all)
@@ -1495,29 +1495,29 @@ heatmap_base
 
 # select the top 50 most abundant species for CMC samples
 malt_species.decontam_top50_cmc <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_species.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_species.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # also save the species as a vector
 malt_species.decontam_top50_cmcV <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_species.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(CMC = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_species.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(CMC = 1)
 
 
 # CLR-transform the matrix for plotting the heatmap
@@ -1674,29 +1674,29 @@ heatmap_base
 # the section above for CMC samples has to be run before this one. this section uses output from that one
 # select the top 50 most abundant species for HMP samples
 malt_species.decontam_top50_hmpV <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("CMC|SRR164|JAE|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_species.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(HMP = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("CMC|SRR164|JAE|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_species.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(HMP = 1)
 
 # select the top 50 most abundant species for JAE samples
 malt_species.decontam_top50_jaeV <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("CMC|SRR|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_species.decontam") %>%
-                                         mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_species.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(JAE = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("CMC|SRR|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_species.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(JAE = 1)
 
 
 # Now select only those species (top 50 of CMC, HMP, JAE) out of the table to create a new matrix
@@ -1708,13 +1708,13 @@ malt_species.decontam_top50_each_list <- malt_species.decontam_top50_cmcV %>%
   pull()
 
 malt_species.decontam_top50_each <- malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
-                                         filter(Species %in% malt_species.decontam_top50_each_list) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR164|10M|EXB|LIB")) %>%
+  filter(Species %in% malt_species.decontam_top50_each_list) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # 77 of 150 species are left after unique() - how many species are in the top 50 of all 3 (26)? of JAE and HMP (the same 26)? of CMC and JAE (46)? of CMC and HMP (27)?
 all3 <- malt_species.decontam_top50_cmcV %>%
@@ -1884,16 +1884,16 @@ heatmap_base
 ```{r heatmaps_genus_all}
 # select the top 50 most abundant genera for all samples (CMC, JAE, HMP)
 malt_genus.decontam_top50_all <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR164|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_genus.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # CLR-transform the matrix for plotting the heatmap
 malt_genus.decontam_top50_all_clr <- clr(malt_genus.decontam_top50_all)
@@ -2053,29 +2053,29 @@ heatmap_base
 
 # select the top 50 most abundant genera for CMC samples
 malt_genus.decontam_top50_cmc <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|JAE|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|JAE|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_genus.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # also save the genera as a vector
 malt_genus.decontam_top50_cmcV <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(CMC = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_genus.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(CMC = 1)
 
 
 # CLR-transform the matrix for plotting the heatmap
@@ -2231,29 +2231,29 @@ heatmap_base
 # the section above for CMC samples has to be run before this one. this section uses output from that one
 # select the top 50 most abundant genera for HMP samples
 malt_genus.decontam_top50_hmpV <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("CMC|SRR164|JAE|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(HMP = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("CMC|SRR164|JAE|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_genus.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(HMP = 1)
 
 # select the top 50 most abundant genera for JAE samples
 malt_genus.decontam_top50_jaeV <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("CMC|SRR|10M|EXB|LIB")) %>%
-                                         adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
-                                         mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
-                                         top_n(50, Percent) %>%
-                                         select(-one_of("Sum_genus.decontam","Percent")) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         spread(SampleID,Counts) %>%
-                                         select(Species) %>%
-                                         mutate(JAE = 1)
+  select(-one_of(outliers)) %>%
+  select(-matches("CMC|SRR|10M|EXB|LIB")) %>%
+  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
+  mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
+  top_n(50, Percent) %>%
+  select(-one_of("Sum_genus.decontam","Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(SampleID,Counts) %>%
+  select(Species) %>%
+  mutate(JAE = 1)
 
 
 # Now select only those genera (top 50 of CMC, HMP, JAE) out of the table to create a new matrix
@@ -2265,13 +2265,13 @@ malt_genus.decontam_top50_each_list <- malt_genus.decontam_top50_cmcV %>%
   pull()
 
 malt_genus.decontam_top50_each <- malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
-                                         select(-matches("SRR164|10M|EXB|LIB")) %>%
-                                         filter(Species %in% malt_genus.decontam_top50_each_list) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>%
-                                         mutate(Counts = Counts + 1) %>%
-                                         spread(Species,Counts) %>%
-                                         column_to_rownames("SampleID")
+  select(-one_of(outliers)) %>%
+  select(-matches("SRR164|10M|EXB|LIB")) %>%
+  filter(Species %in% malt_genus.decontam_top50_each_list) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
 
 # rownames(malt_genus.decontam_top50_each) <- malt_genus.decontam_top50_each$SampleID
 # malt_genus.decontam_top50_each <- malt_genus.decontam_top50_each %>% select(-SampleID)
@@ -2480,14 +2480,14 @@ vector_colour <- data_heatmap %>%
 heatmap_base <- ggplot(data_heatmap, aes(Taxon, Individual, fill = CLR)) +
   geom_tile() +
   ggtitle(paste("Centered Log Ratio Transformed Heatmap at", tax_level ,"level"), subtitle = paste0("Database: ", db, 
-                                                                   ". Sources: ", sources, 
-                                                                   ". Controls: ", controls, 
-                                                                   ". Bad Samples: ", bad_samples,
-                                                                   ". Min Support: ", minsupp_threshold,
-                                                                   ". \nZero replacement: ", zero_trans,
-                                                                   ". Min. Prevalence (Inds): ", prevalence_filter,
-                                                                   ". Individual clustering: ", best_method,
-                                                                   ". Taxon clustering: ", best_method_tax)) +
+                            ". Sources: ", sources, 
+                            ". Controls: ", controls, 
+                            ". Bad Samples: ", bad_samples,
+                            ". Min Support: ", minsupp_threshold,
+                            ". \nZero replacement: ", zero_trans,
+                            ". Min. Prevalence (Inds): ", prevalence_filter,
+                            ". Individual clustering: ", best_method,
+                            ". Taxon clustering: ", best_method_tax)) +
   #scale_fill_viridis_c() +
   scale_fill_distiller(palette = "Spectral") +
   scale_colour_manual(values = NA) +

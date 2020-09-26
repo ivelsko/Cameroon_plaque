@@ -15,9 +15,10 @@ library(data.table)
 library(janitor)
 library(tidyverse)
 library(gplots)
+library(ggrepel)
 library(viridis)
 library(cowplot)
-# source("./02-scripts.backup/ancom_v2.1.R") # source the ancom2 script to be able to use it here
+
 opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 ```
 
@@ -265,6 +266,105 @@ ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
 
 ```
 
+Make a quick plot like with Songbird that shows all species w/log-fold difference >1
+```{r env_plots}
+# Cameroon vs HMP
+res.ANCOM_BC_env_HMP_HG <- res_noblanks.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (HunterGatherer - HMP)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res_noblanks.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (HunterGatherer - HMP)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_env_HMP_HG %>%
+  filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
+  arrange(`log fold change (HunterGatherer - HMP)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (HunterGatherer - HMP)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("HunterGatherer - HMP") +
+    geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (HMP)` == 1) %>%
+                      filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
+                      arrange(`log fold change (HunterGatherer - HMP)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (HunterGatherer - HMP)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (HunterGatherer)` == 1) %>%
+                      filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
+                      arrange(`log fold change (HunterGatherer - HMP)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (HunterGatherer - HMP)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+
+# Cameroon vs JAE
+res.ANCOM_BC_env_JAE_HG <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (HunterGatherer - JAE)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (HunterGatherer - JAE)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_env_JAE_HG %>%
+  filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
+  arrange(`log fold change (HunterGatherer - JAE)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (HunterGatherer - JAE)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    # coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("HunterGatherer - JAE") +
+    geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (JAE)` == 1) %>%
+                      filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
+                      arrange(`log fold change (HunterGatherer - JAE)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (HunterGatherer - JAE)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (HunterGatherer)` == 1) %>%
+                      filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
+                      arrange(`log fold change (HunterGatherer - JAE)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (HunterGatherer - JAE)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+
+
+```
 
 ```{r noblanks_mr_filter_env}
 
@@ -477,6 +577,44 @@ ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
 
 ```
 
+Make a quick plot like with Songbird that shows all species w/log-fold difference >1
+```{r}
+res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (Baka - Nzime)` >= 1 | `log fold change (Baka - Nzime)` <= -1) %>%
+  arrange(`log fold change (Baka - Nzime)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  mutate(star = ifelse(q.val<0.001, "***", 
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Baka - Nzime)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    theme_minimal() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    coord_flip() +
+    # theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Baka - Nzime") +
+    geom_text(aes(y=`log fold change (Baka - Nzime)`+4*sign(`log fold change (Baka - Nzime)`), label=star), 
+            vjust=0.5, hjust=5, color="black") +
+    geom_point(data = res.ANCOM_BC %>% filter(`structural.zero (Nzime)` == 1) %>%
+                      filter(`log fold change (Baka - Nzime)` >= 1 | `log fold change (Baka - Nzime)` <= -1) %>%
+                      rename(Species = species) %>%
+                      arrange(`log fold change (Baka - Nzime)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Baka - Nzime)`),
+                   position=position_dodge(width = 0.4), shape=18)  +
+    geom_point(data = res.ANCOM_BC %>% filter(`structural.zero (Baka)` == 1) %>%
+                      filter(`log fold change (Baka - Nzime)` >= 1 | `log fold change (Baka - Nzime)` <= -1) %>%
+                      rename(Species = species) %>%
+                      arrange(`log fold change (Baka - Nzime)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Baka - Nzime)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+```
 
 ```{r cmc_mr_filter_eg}
 
@@ -527,7 +665,7 @@ p1 = ggplot(ancom_bc_cmc_eg_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, y
         panel.grid.minor = element_blank(),
         strip.background = element_rect(fill="white"))+
   geom_text(aes(y=log_fold_change+4*sign(log_fold_change), label=star), 
-            vjust=.7, color="black", position=position_dodge(width = .5))
+            vjust=.7, hjust = 10.5, color="black", position=position_dodge(width = .5))
 
 p1
 
@@ -584,7 +722,7 @@ res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res,
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC_Fa_FC <- res.ANCOM_BC %>% transmute(species,
                                       `log fold change (ForrestCamp - Farming)` = `mean.difference (ForrestCamp - Farming)`,
                                       se = `se (ForrestCamp - Farming)`,
                                       ci.lo.adj=`log fold change (ForrestCamp - Farming)`-critic.val*se, 
@@ -594,13 +732,13 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
                                       `structural.zero (Farming)`)
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
-ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
+ancom_bc_cmc_Fa_FC <- res.ANCOM_BC_Fa_FC %>%
   rename(Species = species) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
-fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_species_noblanks_FA_FC.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_species_cmc_FA_FC.tsv", sep = "\t", quote = F)
 
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
@@ -609,7 +747,7 @@ res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res,
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
 alpha.adj=0.05/nrow(res.ANCOM_BC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
+res.ANCOM_BC_Fa_LR <- res.ANCOM_BC %>% transmute(species,
                                       `log fold change (LoggingRoad - Farming)` = `mean.difference (LoggingRoad - Farming)`,
                                       se = `se (LoggingRoad - Farming)`,
                                       ci.lo.adj=`log fold change (LoggingRoad - Farming)`-critic.val*se, 
@@ -619,14 +757,111 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
                                       `structural.zero (Farming)`)
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
-ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
+ancom_bc_cmc_Fa_LR <- res.ANCOM_BC_Fa_LR %>%
   rename(Species = species) %>%
   arrange(q.val) %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
 
-# fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_species_noblanks_FA_LR.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_species_cmc_FA_LR.tsv", sep = "\t", quote = F)
 
+
+```
+
+Make a quick plot like with Songbird that shows all species w/log-fold difference >1
+```{r}
+# Farming vs Forrest Camp
+res.ANCOM_BC_Fa_FC_star <- res.ANCOM_BC_Fa_FC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (ForrestCamp - Farming)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC_Fa_FC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (ForrestCamp - Farming)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_Fa_FC_star %>%
+  filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+  arrange(`log fold change (ForrestCamp - Farming)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (ForrestCamp - Farming)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("ForrestCamp - Farming") +
+    geom_text(aes(y=`log fold change (ForrestCamp - Farming)`+4*sign(`log fold change (ForrestCamp - Farming)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (ForrestCamp - Farming)`+4*sign(`log fold change (ForrestCamp - Farming)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_Fa_FC_star %>% filter(`structural.zero (Farming)` == 1) %>%
+                      filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+                      arrange(`log fold change (ForrestCamp - Farming)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (ForrestCamp - Farming)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_Fa_FC_star %>% filter(`structural.zero (ForrestCamp)` == 1) %>%
+                      filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+                      arrange(`log fold change (ForrestCamp - Farming)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (ForrestCamp - Farming)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+# Farming vs Logging Road
+
+res.ANCOM_BC_Fa_LR_star <- res.ANCOM_BC_Fa_LR %>%
+  rename(Species = species) %>%
+  filter(`log fold change (LoggingRoad - Farming)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC_Fa_LR %>%
+  rename(Species = species) %>%
+  filter(`log fold change (LoggingRoad - Farming)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_Fa_LR_star %>%
+  filter(`log fold change (LoggingRoad - Farming)` >= 1.5 | `log fold change (LoggingRoad - Farming)` <= -1.5) %>%
+  arrange(`log fold change (LoggingRoad - Farming)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (LoggingRoad - Farming)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("LoggingRoad - Farming") +
+    geom_text(aes(y=`log fold change (LoggingRoad - Farming)`+4*sign(`log fold change (LoggingRoad - Farming)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (LoggingRoad - Farming)`+4*sign(`log fold change (LoggingRoad - Farming)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_Fa_LR_star %>% filter(`structural.zero (Farming)` == 1) %>%
+                      filter(`log fold change (LoggingRoad - Farming)` >= 1.5 | `log fold change (LoggingRoad - Farming)` <= -1.5) %>%
+                      arrange(`log fold change (LoggingRoad - Farming)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (LoggingRoad - Farming)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_Fa_LR_star %>% filter(`structural.zero (LoggingRoad)` == 1) %>%
+                      filter(`log fold change (LoggingRoad - Farming)` >= 1.5 | `log fold change (LoggingRoad - Farming)` <= -1.5) %>%
+                      arrange(`log fold change (LoggingRoad - Farming)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (LoggingRoad - Farming)`),
+                   position=position_dodge(width = 0.4), shape=18)
 
 ```
 
@@ -676,6 +911,8 @@ ancom_bc_cmc_Fa_LR_mr1 <- ancom_bc_cmc_Fa_LR %>%
 Env_species = unique(c(ancom_bc_cmc_Fa_FC_mr1$Species, ancom_bc_cmc_Fa_LR_mr1$Species))
 
 ```
+
+
 
 Plots showing fold changes
 ```{r noblanks_plot_me}
@@ -771,6 +1008,56 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
 
 ```
 
+Make a quick plot like with Songbird that shows all species w/log-fold difference >1
+```{r}
+
+res.ANCOM_BC_ts <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (Anterior - Posterior)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (Anterior - Posterior)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_ts %>%
+  filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+  arrange(`log fold change (Anterior - Posterior)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Anterior - Posterior)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Anterior - Posterior") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Posterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Anterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+
+```
 
 ```{r cmc_mr_filter_ts}
 
@@ -805,7 +1092,10 @@ Env_species = unique(ancom_bc_cmc_ts_mr1$Species)
 Plots showing fold changes
 ```{r noblanks_plot_ts}
 
-ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_ts_mr1 
+# ancom_bc_cmc_ts_mr1 <- ancom_bc_cmc_ts_mr1 %>%
+#   arrange((desc(log_fold_change))) %>%
+#   mutate(lfc_order = round(log_fold_change, digits = 3)) %>%
+#   mutate(lfc_order = as_factor(log_fold_change))
 # %>%
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
@@ -814,7 +1104,8 @@ p1 = ggplot(ancom_bc_cmc_ts_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, y
   geom_bar(aes(fill=Tooth_site), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
-  labs(x=NULL, y="Log Fold Change")+coord_flip()+
+  labs(x=NULL, y="Log Fold Change")+
+  coord_flip()+
   scale_fill_discrete(name=NULL)+
   scale_x_discrete(limits = rev(levels(ancom_bc_cmc_ts_mr1$Species)))+
   theme_bw()+
@@ -897,6 +1188,56 @@ ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
 
 ```
 
+Make a quick plot like with Songbird that shows all species w/log-fold difference >1
+```{r}
+
+res.ANCOM_BC_sex <- res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (Female - Male)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC %>%
+  rename(Species = species) %>%
+  filter(`log fold change (Female - Male)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", "")))))
+
+res.ANCOM_BC_sex %>%
+  filter(`log fold change (Female - Male)` >= 1.5 | `log fold change (Female - Male)` <= -1.5) %>%
+  arrange(`log fold change (Female - Male)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Female - Male)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+    geom_col() +
+    theme_minimal() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Female - Male") +
+    geom_text(aes(y=`log fold change (Female - Male)`+4*sign(`log fold change (Female - Male)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Female - Male)`+4*sign(`log fold change (Female - Male)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_sex %>% filter(`structural.zero (Male)` == 1) %>%
+                      filter(`log fold change (Female - Male)` >= 1.5 | `log fold change (Female - Male)` <= -1.5) %>%
+                      arrange(`log fold change (Female - Male)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Female - Male)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_sex %>% filter(`structural.zero (Female)` == 1) %>%
+                      filter(`log fold change (Female - Male)` >= 1.5 | `log fold change (Female - Male)` <= -1.5) %>%
+                      arrange(`log fold change (Female - Male)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Female - Male)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+```
+
 
 ```{r cmc_mr_filter_sex}
 
@@ -931,8 +1272,9 @@ Env_species = unique(ancom_bc_cmc_sex_mr1$Species)
 Plots showing fold changes
 ```{r noblanks_plot_sex}
 
-ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_sex_mr1 %>%
-  filter(se != 0) # thes have error bars in both directions as big as each data bar
+ancom_bc_cmc_sex_mr1 <- ancom_bc_cmc_sex_mr1 
+# %>%
+#   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
 p1 = ggplot(ancom_bc_cmc_sex_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Sex)) + 

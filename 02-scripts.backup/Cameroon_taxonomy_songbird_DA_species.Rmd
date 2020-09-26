@@ -36,10 +36,10 @@ Load the taxonomy tables and songbird differentials tables
 load("./05-results.backup/CMC_taxonomy_tables.RData")
 
 songbird_noblanks_species_env <- fread("./05-results.backup/songbird_noblanks_species_env.tsv")
-songbird_cmc_species_eg <- fread("./05-results.backup/songbird_noblanks_species_eg.tsv")
-songbird_cmc_species_me <- fread("./05-results.backup/songbird_noblanks_species_me.tsv")
-songbird_cmc_species_ts <- fread("./05-results.backup/songbird_noblanks_species_ts.tsv")
-songbird_cmc_species_sex <- fread("./05-results.backup/songbird_noblanks_species_sex.tsv")
+songbird_cmc_species_eg <- fread("./05-results.backup/songbird_cmc_species_eg.tsv")
+songbird_cmc_species_me <- fread("./05-results.backup/songbird_cmc_species_me.tsv")
+songbird_cmc_species_ts <- fread("./05-results.backup/songbird_cmc_species_ts.tsv")
+songbird_cmc_species_sex <- fread("./05-results.backup/songbird_cmc_species_sex.tsv")
 
 ```
 
@@ -49,8 +49,8 @@ Load the ancom-BC differential abundance tables for comparison
 ancomBC_noblanks_sp_HMP_HG <- fread("./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv")
 ancomBC_noblanks_sp_JAE_HG <- fread("./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv")
 ancomBC_cmc_sp_eg <- fread("./05-results.backup/ancomBC_species_cmc_ethnicgroup.tsv")
-ancomBC_cmc_sp_Fa_FC <- fread("./05-results.backup/ancomBC_species_noblanks_FA_FC.tsv")
-ancomBC_cmc_sp_Fa_LR <- fread("./05-results.backup/ancomBC_species_noblanks_FA_LR.tsv")
+ancomBC_cmc_sp_Fa_FC <- fread("./05-results.backup/ancomBC_species_cmc_FA_FC.tsv")
+ancomBC_cmc_sp_Fa_LR <- fread("./05-results.backup/ancomBC_species_cmc_FA_LR.tsv")
 ancomBC_cmc_sp_ts <- fread("./05-results.backup/ancomBC_species_cmc_toothsite.tsv")
 ancomBC_cmc_sp_sex <- fread("./05-results.backup/ancomBC_species_cmc_sex.tsv")
 

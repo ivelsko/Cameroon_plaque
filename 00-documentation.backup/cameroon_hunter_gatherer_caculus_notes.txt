@@ -476,13 +476,57 @@ songbird multinomial \
 
 # need to copy the differentials.tsv files into 05-results.backup for upload to Rmd files
 cp ../04-analysis/songbird/species_noblanks/form1/differentials.tsv ./songbird_noblanks_species_env.tsv
-cp ../04-analysis/songbird/species_cmc/form1/differentials.tsv ./songbird_noblanks_species_eg.tsv
-cp ../04-analysis/songbird/species_cmc/form2/differentials.tsv ./songbird_noblanks_species_me.tsv
-cp ../04-analysis/songbird/species_cmc/form3/differentials.tsv ./songbird_noblanks_species_ts.tsv
-cp ../04-analysis/songbird/species_cmc/form4/differentials.tsv ./songbird_noblanks_species_sex.tsv
+cp ../04-analysis/songbird/species_cmc/form1/differentials.tsv ./songbird_cmc_species_eg.tsv
+cp ../04-analysis/songbird/species_cmc/form2/differentials.tsv ./songbird_cmc_species_me.tsv
+cp ../04-analysis/songbird/species_cmc/form3/differentials.tsv ./songbird_cmc_species_ts.tsv
+cp ../04-analysis/songbird/species_cmc/form4/differentials.tsv ./songbird_cmc_species_sex.tsv
 cp ../04-analysis/songbird/genus_noblanks/form1/differentials.tsv ./songbird_noblanks_genus_env.tsv
-cp ../04-analysis/songbird/genus_cmc/form1/differentials.tsv ./songbird_noblanks_genus_eg.tsv
-cp ../04-analysis/songbird/genus_cmc/form2/differentials.tsv ./songbird_noblanks_genus_me.tsv
-cp ../04-analysis/songbird/genus_cmc/form3/differentials.tsv ./songbird_noblanks_genus_ts.tsv
-cp ../04-analysis/songbird/genus_cmc/form4/differentials.tsv ./songbird_noblanks_genus_sex.tsv
+cp ../04-analysis/songbird/genus_cmc/form1/differentials.tsv ./songbird_cmc_genus_eg.tsv
+cp ../04-analysis/songbird/genus_cmc/form2/differentials.tsv ./songbird_cmc_genus_me.tsv
+cp ../04-analysis/songbird/genus_cmc/form3/differentials.tsv ./songbird_cmc_genus_ts.tsv
+cp ../04-analysis/songbird/genus_cmc/form4/differentials.tsv ./songbird_cmc_genus_sex.tsv
+
+
+
+
+
+
+
+########################################################
+# BacDiveR
+
+# Search on 23 September 2020
+# Search query for Gram stain, spore formation, oxygen tolerance, metabolite utilization, kind of utilization: carbon source
+
+https://bacdive.dsmz.de/advsearch?site=advsearch&searchparams%5B42%5D%5Bsearchterm%5D=*&searchparams%5B254%5D%5Bsearchterm%5D=*&searchparams%5B921%5D%5Bsearchterm%5D=*&searchparams%5B344%5D%5Bcontenttype%5D=text&searchparams%5B344%5D%5Btypecontent%5D=contains&searchparams%5B344%5D%5Bsearchterm%5D=*&searchparams%5B346%5D%5Bsearchterm%5D=carbon+source&advsearch=search
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

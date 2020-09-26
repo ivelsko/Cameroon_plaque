@@ -166,7 +166,7 @@ ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
   filter(diff.abn == "TRUE") %>%
   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
+fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_genus_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
 res.ANCOM_BC <- data.frame(genus=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
@@ -188,7 +188,7 @@ ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
   # possiblly filter out the genus that have a differential abundance of less than |1|
   # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
   
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_JAE.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_genus_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -327,6 +327,8 @@ ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
 
+fwrite(ancom_bc_cmc_Nz_Ba, "./05-results.backup/ancomBC_genus_cmc_eg.tsv", sep = "\t", quote = F)
+
 ```
 
 
@@ -452,7 +454,7 @@ ancom_bc_cmc_Fa_FC <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_genus_cmc_Fa_FC.tsv", sep = "\t", quote = F)
 
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
@@ -477,7 +479,7 @@ ancom_bc_cmc_Fa_LR <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
 
-# fwrite(ancom_bc_cmc_Fa_LR, "../data/global_gut/ancom_bc_cmc_Fa_LR.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_genus_cmc_Fa_LR.tsv", sep = "\t", quote = F)
 
 
 ```
@@ -620,6 +622,8 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
 
+fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_genus_cmc_toothsite.tsv", sep = "\t", quote = F)
+
 ```
 
 
@@ -743,7 +747,7 @@ ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP, "../data/global_gut/ancom_bc_noblanks_HMP.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_M_F, "./05-results.backup/ancomBC_genus_cmc_sex.tsv", sep = "\t", quote = F)
 
 ```
 

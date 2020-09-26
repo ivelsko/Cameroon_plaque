@@ -1,5 +1,5 @@
 ---
-title: "Cameroon hunter-gatherer calculus/plaque SEED decontam"
+title: "Cameroon hunter-gatherer calculus/plaque SEED cumulative decay curves"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output: html_notebook

@@ -39,7 +39,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 # SEED category assignment stats
 ```{r load_data}
-## load the species and genus tables generated with HUMAnN2
+## load the species and genus tables generated with AADDER
 load("./05-results.backup/CMC_seed_tables.RData")
 
 ```
@@ -1489,7 +1489,7 @@ seed_L4.decontam %>%
 ```{r pca_decontam_mr1_cmc_categories}
 
 # now filter for only the proteins in MR1
-mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
+mr1_proteins_cmc <- fread("./05-results.backup/minres_oblimin_cmc.fa_seed.tsv")
 
 # keep only the proteins in at least 1/3 of at least one ethnic group 
 seed_L4.decontam_cmc_mr1 <- seed_L4.decontam %>%
@@ -1497,7 +1497,7 @@ seed_L4.decontam_cmc_mr1 <- seed_L4.decontam %>%
   select(-matches("EXB|LIB|JAE|SRR")) %>%
   separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
   select(-c("SEED","L2","L3")) %>%
-  inner_join(., mr1_proteins %>%
+  inner_join(., mr1_proteins_cmc %>%
                filter(Residual == "MR1") %>%
                select(Pathway), by = "Pathway") %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
@@ -1730,7 +1730,6 @@ seed_L4.decontam %>%
 
 # MR1 protein pathway check
 ```{r protein_difference_stats}
-mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_seed.tsv")
 
 # keep only the proteins in at least 1/3 of at least one ethnic group 
 seed_L4_mr1_proteins <- seed_L4.decontam %>%
