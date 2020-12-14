@@ -130,24 +130,19 @@ seed_L4.decontam_noblanks_presence_more_30 <- seed_L4.decontam %>%
 
 # SEED proteins, no blanks 
 seed_L4.decontam_noblanks <- seed_L4.decontam %>%
-                               select(-matches("EXB|LIB|10M")) %>%
-                               separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
-                               select(-c("SEED","L2","L3")) %>%
-                               inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
-                               gather("SampleID","Counts",2:ncol(.)) %>%
-                               spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_noblanks) <- seed_L4.decontam_noblanks$SampleID
-
-seed_L4.decontam_noblanks <- seed_L4.decontam_noblanks %>% select(-SampleID)
-
-seed_L4.decontam_noblanks = seed_L4.decontam_noblanks+1
+  select(-matches("EXB|LIB|10M")) %>%
+  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+  select(-c("SEED","L2","L3")) %>%
+  inner_join(., seed_L4.decontam_noblanks_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # perform PCA to get a clr-transformed species table
 seed_L4.decontam_noblanks.pca <- mixOmics::pca(seed_L4.decontam_noblanks, ncomp = 3, logratio = 'CLR')
 # save the clr-transformed species table
 seed_L4.decontam_noblanks_clr <- as.data.frame.matrix(seed_L4.decontam_noblanks.pca$X)
-
 
 # SEED proteins, CMC only 
 # Determine the prevalence of SEED proteins in each group
@@ -173,13 +168,9 @@ seed_L4.decontam_cmc <- seed_L4.decontam %>%
                                select(-c("SEED","L2","L3")) %>%
                                inner_join(., seed_L4.decontam_cmc_presence_more_30, by = "Pathway") %>%
                                gather("SampleID","Counts",2:ncol(.)) %>%
-                               spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_cmc) <- seed_L4.decontam_cmc$SampleID
-
-seed_L4.decontam_cmc <- seed_L4.decontam_cmc %>% select(-SampleID)
-
-seed_L4.decontam_cmc = seed_L4.decontam_cmc+1
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # perform PCA to get a clr-transformed species table
 seed_L4.decontam_cmc.pca <- mixOmics::pca(seed_L4.decontam_cmc, ncomp = 3, logratio = 'CLR')
@@ -557,8 +548,10 @@ allplots_seed <- plot_grid(seed_eg, seed_age,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
 
 
-ggsave("05-results.backup/presentation_pdfs/allplots_seed.pdf", plot = allplots_seed, device = "pdf",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX22/SXX22_seed_lda.pdf", plot = allplots_seed,
+       device = "pdf", scale = 1, width = 8, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX22/SXX22_seed_lda.png", plot = allplots_seed,
+       device = "png", scale = 1, width = 8, height = 10, units = c("in"), dpi = 300)
 
 ```
 
@@ -567,20 +560,16 @@ How does a PCA using only the species in MR1 and MR2 look?
 ```{r discriminant_pca_noblanks}
 # CLR-transform the matrix for plotting the heatmap
 seed_L4.decontam_FA <- seed_L4.decontam %>%
-                                  select(-matches("SRR164|10M|EXB|LIB")) %>%
-                                  separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
-                                  select(-c("SEED","L2","L3")) %>%
-                                  inner_join(., seed_L4.decontam_noblanks.fa_seed %>%
-                                              # filter(Residual == "MR2") %>%
-                                               select(-Residual)) %>%
-                                  gather("SampleID","Counts",2:ncol(.)) %>%
-                                  spread(Pathway,Counts)
-
-rownames(seed_L4.decontam_FA) <- seed_L4.decontam_FA$SampleID
-
-seed_L4.decontam_FA <- seed_L4.decontam_FA %>% select(-SampleID)
-
-seed_L4.decontam_FA = seed_L4.decontam_FA+1
+ select(-matches("SRR164|10M|EXB|LIB")) %>%
+ separate(., Pathway, into = c("SEED","L2","L3","Pathway"), sep = ";") %>%
+ select(-c("SEED","L2","L3")) %>%
+ inner_join(., seed_L4.decontam_noblanks.fa_seed %>%
+             # filter(Residual == "MR2") %>%
+               select(-Residual)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
 
 # prepare to run a PCA
 # check the number of components to retain by tuning the PCA
@@ -967,8 +956,10 @@ cmcplots_seed_fada <- plot_grid(seed_cmc_eg, seed_cmc_age,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
 
 
-ggsave("05-results.backup/presentation_pdfs/cmcplots_seed_fada.pdf", plot = cmcplots_seed_fada, device = "pdf",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX23/SXX23_seed_cmc_lda.pdf", plot = cmcplots_seed_fada,
+       device = "pdf", scale = 1, width = 8, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX23/SXX23_seed_cmc_lda.png", plot = cmcplots_seed_fada,
+       device = "png", scale = 1, width = 8, height = 10, units = c("in"), dpi = 300)
 
 ```
 

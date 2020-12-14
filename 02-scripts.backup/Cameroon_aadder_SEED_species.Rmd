@@ -207,10 +207,7 @@ baka_pc1pws_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -271,10 +268,7 @@ baka_pc1neg_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -335,10 +329,7 @@ nzime_pc1pws_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -398,10 +389,7 @@ nzime_pc1neg_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -462,10 +450,7 @@ JAE_pc1pws_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -525,10 +510,7 @@ JAE_pc1neg_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -591,10 +573,7 @@ HMP_pc1pws_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -655,10 +634,7 @@ HMP_pc1neg_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -688,6 +664,7 @@ all_bar_df <- baka_pc1pws_bar_df %>%
               mutate(Ethnic_Group = "HMP")) %>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","JAE","HMP"))
 
+fwrite(all_bar_df, "./05-results.backup/seed_all_bar_df.tsv", sep = "\t")
 
 all_bar_df_pws_plot <- all_bar_df %>%
   filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
@@ -696,42 +673,41 @@ all_bar_df_pws_plot <- all_bar_df %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    scale_fill_manual(values = c("#bdbdbd","#6B1D81FF","#D6456CFF",
-                                 "#FEB37BFF","#440154FF","#39558CFF",
-                                 "#1F968BFF","#74D055FF","#DCE318FF")) +
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#07071DFF",
-    #                              "#FA815FFF","#FCFDBFFF",)) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
-    theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    ggtitle("PC1+") +
+    theme(title = element_text(size=12)) +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 all_bar_df_neg_plot <- all_bar_df %>%
   filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   # filter(Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
-  # mutate(Genus = fct_relevel(Genus, "Other","Aggregatibacter","Campylobacter","Escherichia","Fusobacterium","Neisseria","Ottowia","Parvimonas","Xanthomonas")) %>%
+  mutate(Genus = fct_relevel(Genus, "Other","Acidipropionibacterium","Actinobaculum","Actinomyces","Aggregatibacter","Capnocytophaga","Cardiobacterium","Corynebacterium","Eikenella","Fusobacterium","Haemophilus","Neisseria","Olsenella","Oribacterium","Propionibacterium","Pseudopropionibacterium","Rothia","Schaalia","Selenomonas","Simonsiella","Streptococcus","Treponema")) %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
-    theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    ggtitle("PC1-") +
+    theme(title = element_text(size=12)) +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 allplots_all <- plot_grid(all_bar_df_neg_plot, all_bar_df_pws_plot,
-          nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
+          nrow=1, labels = c("A", "B"), rel_widths = c(1.3, 1))
 
 allplots_all
 
-# ggsave("05-results.backup/presentation_pdfs/seed_species_ap_pc1.pdf", plot = allplots_seed, device = "pdf",
+# ggsave("05-results.backup/presentation_pdfs/seed_species_ap_pc1.pdf", plot = allplots_all, device = "pdf",
 #        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
@@ -763,9 +739,13 @@ heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, f
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
-        plot.margin = margin(0, 0, 0, 0, "pt"),
+        plot.margin = margin(0, 3, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        axis.text.y =  element_text(size = 16), # element_blank(),
+        legend.position = "left") +
+  ggtitle("PC1+") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1pws
 
@@ -795,10 +775,23 @@ heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        axis.text.y =  element_text(size = 16), # element_blank(),
+        legend.position = "left") +
+  ggtitle("PC1-") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1neg
 
+heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
+          nrow=2, labels = c("A", "B"), rel_widths = c(1, 1.3))
+
+heatmapplots_all
+
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
 
@@ -859,10 +852,7 @@ baka_pc1pws_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -923,10 +913,7 @@ baka_pc1neg_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -987,10 +974,7 @@ nzime_pc1pws_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1050,10 +1034,7 @@ nzime_pc1neg_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1080,16 +1061,16 @@ all_bar_df_cmc_pws_plot <- all_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
+    ggtitle("PC1+") +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
     theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    theme(plot.title = element_text(hjust = 0.5)) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 all_bar_df_cmc_neg_plot <- all_bar_df_cmc %>%
   filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
@@ -1098,16 +1079,16 @@ all_bar_df_cmc_neg_plot <- all_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
+    ggtitle("PC1-") +
+    theme(plot.title = element_text(hjust = 0.5)) +
     theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 allplots_cmc <- plot_grid(all_bar_df_cmc_neg_plot, all_bar_df_cmc_pws_plot,
           nrow=1, labels = c("A", "B"), rel_widths = c(1, 1))
@@ -1144,11 +1125,15 @@ seed_L4.decontam_pc1pws_clr_l <- seed_L4.decontam_pc1pws_clr %>%
 heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, fill = Counts)) +
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
-  theme_minimal(base_size = 7) +
+  theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        axis.text.y =  element_text(size = 16), # element_blank(),
+        legend.position = "left") +
+  ggtitle("PC1+") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1pws
 
@@ -1174,13 +1159,29 @@ seed_L4.decontam_pc1neg_clr_l <- seed_L4.decontam_pc1neg_clr %>%
 heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, fill = Counts)) +
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
-  theme_minimal(base_size = 7) +
+  theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
+        axis.text.y =  element_text(size = 16), # element_blank(),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        legend.position = "left") +
+  ggtitle("PC1-") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1neg
+
+
+heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
+          nrow=2, labels = c("A", "B"), rel_widths = c(1, 1.3))
+
+heatmapplots_all
+
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
 ```
 
 ## Anterior
@@ -1254,10 +1255,7 @@ anterior_pc1pws_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1318,10 +1316,7 @@ anterior_pc1neg_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1401,10 +1396,7 @@ posterior_pc1pws_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1464,10 +1456,7 @@ posterior_pc1neg_bar_df_cmc %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
+    scale_fill_viridis_d(option = "A") +
     theme(text = element_text(size=8),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
@@ -1487,22 +1476,24 @@ all_bar_df_cmc_ap <- anterior_pc1pws_bar_df_cmc %>%
   bind_rows(., posterior_pc1neg_bar_df_cmc %>%
               mutate(Ethnic_Group = "Posterior"))
 
+fwrite(all_bar_df_cmc_ap, "./05-results.backup/all_bar_df_cmc_ap.tsv", sep = "\t")
+
 all_bar_df_cmc_ap_pws_plot <- all_bar_df_cmc_ap %>%
   filter(Direction == "PC1+", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
   mutate(Genus = fct_relevel(Genus, "Other","Campylobacter","Leptotrichia","Prevotella","Selenomonas","Streptococcus","Treponema")) %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1+") +
-    theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    ggtitle("PC1+") +
+    theme(title = element_text(size=12)) +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 all_bar_df_cmc_ap_neg_plot <- all_bar_df_cmc_ap %>%
   filter(Direction == "PC1-", Percent >= 5 | (Percent <= 5 & Genus == "Other")) %>% # filter out the genera with % < 5, but keep Other < 5
@@ -1510,16 +1501,16 @@ all_bar_df_cmc_ap_neg_plot <- all_bar_df_cmc_ap %>%
   ggplot(., aes(x=Gene, y=Percent, fill = Genus)) +
     geom_bar(stat = "identity") +
     theme_minimal() +
-    # scale_fill_manual(values = c("#440154FF","#39558CFF","#1F968BFF","#74D055FF",
-    #                              "#07071DFF","#6B1D81FF","#D6456CFF","#FEB37BFF",
-    #                              "#453781FF","#287D8EFF","#3CBC75FF","#DCE318FF",
-    #                              "#FA815FFF","#FCFDBFFF","#bdbdbd")) +
-    theme(text = element_text(size=8),
+    scale_fill_viridis_d(option = "A") +
+    theme(text = element_text(size=12),
           axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Percent") +
-    ggtitle("Genus-level assignents to SEED-classified proteins, PC1-") +
-    theme(title = element_text(size=10)) +
-  facet_wrap(~Ethnic_Group, ncol = 1)
+    ggtitle("PC1-") +
+    theme(title = element_text(size=12)) +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank()) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    facet_wrap(~Ethnic_Group, ncol = 1)
 
 
 
@@ -1574,11 +1565,15 @@ seed_L4.decontam_pc1pws_clr_l <- seed_L4.decontam_pc1pws_clr %>%
 heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, fill = Counts)) +
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
-  theme_minimal(base_size = 7) +
+  theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        axis.text.y =  element_text(size = 16), # element_blank(),
+        legend.position = "left") +
+  ggtitle("PC1+") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1pws
 
@@ -1607,13 +1602,28 @@ seed_L4.decontam_pc1neg_clr_l <- seed_L4.decontam_pc1neg_clr %>%
 heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, fill = Counts)) +
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
-  theme_minimal(base_size = 7) +
+  theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        legend.position = "left")
+        axis.text.y =  element_text(size = 16), # element_blank(),
+        legend.position = "left") +
+  ggtitle("PC1-") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_discrete(position = "right")
 
 heatmap_pc1neg
+
+heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
+          nrow=2, labels = c("A", "B"), rel_widths = c(1, 1.3))
+
+heatmapplots_all
+
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
 ```
 
 

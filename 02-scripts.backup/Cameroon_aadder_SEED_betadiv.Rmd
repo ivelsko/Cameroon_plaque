@@ -1,5 +1,5 @@
 ---
-title: "Cameroon hunter-gatherer calculus/plaque SEED"
+title: "Cameroon Baka/Nzime calculus/plaque SEED"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output:
@@ -134,7 +134,7 @@ plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
                         # stat_ellipse() +
                         xlab(paste(xaxis, " - ", exp_var_pc1)) +
                         ylab(paste(yaxis, " - ", exp_var_pc2)) +
-                        theme_minimal(base_size = 10) +
+                        theme_minimal(base_size = 16) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
 
@@ -338,14 +338,14 @@ seed_assignments_box <- seed_assignments %>%
   ggplot(., aes(Village, Assigned, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Percent") +
+    theme_minimal(base_size = 16) +
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 16)) +
+    ylab("% assigned") +
     ggtitle("Percent of reads assigned to SEED proteins")
 seed_assignments_box
 
-# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX21/panel_parts/SXX21_aadder_assignment_pct.pdf", plot = seed_assignments_box,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 seed_assignments_w <- seed_assignments %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -383,14 +383,14 @@ seed_counts_box <- seed_counts %>%
   ggplot(., aes(Village, Total_detected, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Total number of proteins") +
+    theme_minimal(base_size = 16) +
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 16)) +
+    ylab("Number of genes") +
     ggtitle("Total number of SEED proteins identified in samples")
 seed_counts_box
 
-# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX21/panel_parts/SXX21_aadder_assignment_numbers.pdf", plot = seed_counts_box,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 seed_counts_w <- seed_counts %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -419,14 +419,14 @@ seed_counts_decontam_box <- seed_counts_decontam %>%
   ggplot(., aes(Village, Total_detected, fill = Village)) +
     geom_boxplot() +
     scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Total number of proteins") +
+    theme_minimal(base_size = 16) +
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 16)) +
+    ylab("Nnumber of genes") +
     ggtitle("Number of SEED proteins remaining after filtering contaminants")
 seed_counts_decontam_box
 
-# ggsave("./05-results.backup/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX21/panel_parts/SXX21_aadder_assignment_numbers_decontam.pdf", plot = seed_counts_decontam_box,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 seed_counts_decontam_w <- seed_counts_decontam %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -1272,11 +1272,23 @@ seed_L4.decontam_noblanks_mr1.pca <- pca(seed_L4.decontam_noblanks_mr1, ncomp = 
 
 # plot the PCA
 plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+seed_age <- plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+seed_age
+seed_me <- plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+seed_me
+seed_sex <- plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+seed_sex
 plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_age_pc12.pdf", plot = seed_age,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_me_pc12.pdf", plot = seed_me,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_sex_pc12.pdf", plot = seed_sex,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(seed_L4.decontam_noblanks_mr1.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
@@ -1329,9 +1341,8 @@ significantly different.
 pca_EG_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_biplot_pc1
 
-# ggsave("./05-results.backup/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#         dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX24/panel_parts/SXX24_seed_biplot_pc12.pdf", plot = pca_EG_biplot_pc1,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1512,11 +1523,23 @@ seed_L4.decontam_cmc_mr1.pca <- pca(seed_L4.decontam_cmc_mr1, ncomp = 3, lograti
 
 # plot the PCA
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+seed_age <- plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+seed_age
+seed_me <- plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+seed_me
+seed_sex <- plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+seed_sex
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_cmc_age_pc12.pdf", plot = seed_age,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_cmc_me_pc12.pdf", plot = seed_me,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX38/panel_parts/SXX38_seed_cmc_sex_pc12.pdf", plot = seed_sex,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(seed_L4.decontam_cmc_mr1.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
@@ -1571,11 +1594,11 @@ tooth site shows sex (p < 0.05) is significantly different.
 
 ```{r biplots_decontam_mr1_cmc}
 # which paths distinguish sample groups when only CMC samples are included?
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
 
-# ggsave("./05-results.backup/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX24/panel_parts/SXX24_seed_cmc_biplot_pc12.pdf", plot = pca_EG_cmc_biplot_pc1,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1799,12 +1822,36 @@ tune.seed_L4_carbohydrates_pca <- tune.pca(seed_L4_carbohydrates, logratio = 'CL
 seed_L4_carbohydrates.pca <- pca(seed_L4_carbohydrates, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Village", "Village", "Village")
+seed_carb_eg <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+seed_carb_eg
+seed_carb_age <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group")
+seed_carb_age
+seed_carb_me <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group")
+seed_carb_me
+seed_carb_sex <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group")
+seed_carb_sex
+seed_carb_ts <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
+seed_carb_ts
+seed_carb_village <- plot_pca(seed_L4_carbohydrates.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
+seed_carb_village
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_eg_pc12.pdf", plot = seed_carb_eg,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_age_pc12.pdf", plot = seed_carb_age,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_me_pc12.pdf", plot = seed_carb_me,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_sex_pc12.pdf", plot = seed_carb_sex,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_ts_pc12.pdf", plot = seed_carb_ts,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_village_pc12.pdf", plot = seed_carb_village,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(seed_L4_carbohydrates.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
@@ -1881,12 +1928,36 @@ tune.seed_L4_carbohydrates_cmc_pca <- tune.pca(seed_L4_carbohydrates_cmc, lograt
 seed_L4_carbohydrates_cmc.pca <- pca(seed_L4_carbohydrates_cmc, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+seed_carb_eg <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+seed_carb_eg
+seed_carb_age <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Age_group", "Ethnic_Group", "Ethnic_Group")
+seed_carb_age
+seed_carb_me <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Market_economy", "Ethnic_Group", "Ethnic_Group")
+seed_carb_me
+seed_carb_sex <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group")
+seed_carb_sex
+seed_carb_ts <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
+seed_carb_ts
+seed_carb_village <- plot_pca(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
+seed_carb_village
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_eg_pc12.pdf", plot = seed_carb_eg,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_age_pc12.pdf", plot = seed_carb_age,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_me_pc12.pdf", plot = seed_carb_me,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_sex_pc12.pdf", plot = seed_carb_sex,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_ts_pc12.pdf", plot = seed_carb_ts,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_village_pc12.pdf", plot = seed_carb_village,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 # plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 # plot_pca(seed_L4_carbohydrates_cmc.pca, "PC3", "PC2", "Age_group", "Age_group", "Age_group")
@@ -1938,8 +2009,8 @@ separation of samples?
 pca_EG_noblanks_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
 pca_EG_noblanks_biplot_pc1
 
-# ggsave("./05-results.backup/pca_EG_bi_noblanks_paths.pdf", plot = pca_EG_noblanks_biplot_pc1, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX25/panel_parts/SXX25_seed_carb_biplot_pc12.pdf", plot = pca_EG_noblanks_biplot_pc1,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # what are those pathways?
 pandoc.table(pca_EG_noblanks_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
@@ -1984,8 +2055,11 @@ seed_protein_biplot_list <- seed_protein_biplot_list %>%
 
 fwrite(seed_protein_biplot_list, file = "./05-results.backup/seed_protein_carb_noblanks_biplot_list.tsv", quote = F, sep = "\t")
 
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Sex", PC1, pathways = F)
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(seed_L4_carbohydrates_cmc.pca, "PC1", "PC2", "Tooth_site", PC1, pathways = F)
 pca_EG_cmc_biplot_pc1
+
+ggsave("./06-publication/supplemental_figures/SXX40/panel_parts/SXX40_seed_cmc_carb_biplot_pc12.pdf", plot = pca_EG_cmc_biplot_pc1,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,

@@ -383,8 +383,8 @@ humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
     ggtitle("Total number of pathways ID'd by HUMAnN2")
 humann2_path_noblanks_long_box
 
-# ggsave("./05-results.backup/presentation_pdfs/humann2_path_noblanks_box.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_total.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
@@ -411,8 +411,8 @@ humann2_path.decontam_noblanks_long_box <- humann2_path.decontam_noblanks_long %
     ggtitle("Number of pathways with potential contaminants removed")
 humann2_path.decontam_noblanks_long_box
 
-# ggsave("./05-results.backup/presentation_pdfs/humann2_path.decontam_noblanks_long_box.pdf", plot = humann2_path.decontam_noblanks_long_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_decontam.pdf", plot = humann2_path.decontam_noblanks_long_box, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 humann2_path.decontam_noblanks_long_box_w <- humann2_path.decontam_noblanks_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -588,11 +588,11 @@ pca_S_plot
 pca_TS_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Village", "Village", "Village")
+pca_V_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
 pca_V_plot
 
-# ggsave("./05-results.backup/presentation_pdfs/pca_EG_noyanomami_paths.pdf", plot = pca_EG_plot, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 ```
 Some of the samles plot closer to the industrial calculus, but generally they
@@ -665,14 +665,17 @@ pca_S_plot
 plot_pca(humann2_path_cmc.pca, "PC3", "PC1", "Sex", "Sex", "Sex")
 
 
-pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
 pca_TS_plot
 
-pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_ts_pc12.pdf", plot = pca_TS_plot, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+
+pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
 pca_V_plot
 
-# ggsave("./05-results.backup/presentation_pdfs/pca_EG_cmc_paths.pdf", plot = pca_EG_plot, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 ```
 Again the only sort-of clustering that we see is by tooth site (anterior or
@@ -956,8 +959,8 @@ humann2_KO_box <- humann2_KO_long %>%
     ggtitle("Total number of KEGG orthologs ID'd by HUMAnN2 (no filtering)")
 humann2_KO_box
 
-# ggsave("./05-results.backup/presentation_pdfs/humann2_KO_box.pdf", plot = humann2_KO_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_total.pdf", plot = humann2_KO_box, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 humann2_KO_long_w <- humann2_KO_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
@@ -982,8 +985,8 @@ humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
     ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 (decontaminated)")
 humann2_KOs.decontam_box
 
-# ggsave("./05-results.backup/presentation_pdfs/humann2_KOs.decontam_box.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_decontam.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -1013,8 +1016,6 @@ humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
     ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 in MR1")
 humann2_KOs.decontam_box
 
-# ggsave("./05-results.backup/presentation_pdfs/humann2_KOs.decontam_box.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
   filter(!str_detect(SampleID, "EXB|LIB|10M")) 
@@ -1069,13 +1070,32 @@ humann2_KO_noblanks_mat <- humann2_KOs.decontam %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
-tune.humann2_path_pca <- tune.pca(humann2_KO_noblanks_mat, logratio = 'CLR')
+tune.pca(humann2_KO_noblanks_mat, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
 humann2_KO_noblanks.pca <- pca(humann2_KO_noblanks_mat, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
 pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+pca_EG_plot
+
+# create the input matrix
+humann2_KO_noblanks_mat2 <- humann2_KOs.decontam %>%
+  select(-matches("10M")) %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate(CPM = CPM + 1) %>%
+  spread(Ortholog, CPM) %>%
+  filter(!str_detect(SampleID, "EXB|LIB")) %>%
+  column_to_rownames("SampleID")
+
+# check the number of components to retain by tuning the PCA
+tune.pca(humann2_KO_noblanks_mat2, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_KO_noblanks2.pca <- pca(humann2_KO_noblanks_mat2, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+pca_EG_plot <- plot_pca(humann2_KO_noblanks2.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
 ```
@@ -1191,9 +1211,17 @@ plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Gro
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
+h2_mr1_ts <- plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
+h2_mr1_ts
 
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_ts_pc12.pdf", plot = h2_mr1_ts, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+
+h2_mr1_village <- plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
+h2_mr1_village
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_pc12.pdf", plot = h2_mr1_village, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 ```
 
@@ -1307,8 +1335,10 @@ plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethn
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+h2_mr1_ts <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+h2_mr1_ts
+h2_mr1_village <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
+h2_mr1_village
 
 # # decontam and prevalence >33% filtered plots
 # plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
@@ -1345,8 +1375,16 @@ plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
+h2_mr1_ts <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+h2_mr1_ts
+h2_mr1_village <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
+h2_mr1_village
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_cmc_pc12.pdf", plot = h2_mr1_village, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_cmc_ts_pc12.pdf", plot = h2_mr1_ts, device = "pdf",
+       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 
 ```

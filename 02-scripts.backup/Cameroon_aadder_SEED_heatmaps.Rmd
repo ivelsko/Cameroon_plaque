@@ -138,8 +138,8 @@ seed_L4.decontam_FA_all <- seed_L4.decontam %>%
                                   separate(., Protein, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
                                   select(-c("SEED","L2","L3")) %>%
                                   inner_join(., seed_L4.decontam_noblanks.fa_seed %>%
-        filter(Residual == "MR2") %>%
-        select(-Residual)) %>%
+                                             filter(Residual == "MR1") %>%
+                                             select(-Residual)) %>%
                                   gather("SampleID","Counts",2:ncol(.)) %>%
                                   mutate(Counts = Counts + 1) %>%
                                   spread(Protein,Counts) %>%
@@ -173,7 +173,7 @@ seed_L4.decontam_FA_all_clr_order <- seed_L4.decontam_FA_all_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Protein","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(SpOrder = as.character(seq(1,869))) %>% # MR1 - 700; MR2 - 869
+  mutate(SpOrder = as.character(seq(1,700))) %>% # MR1 - 700; MR2 - 869
   select(Protein, SpOrder, everything()) %>%
   mutate(SpOrder = fct_relevel(SpOrder, sp_all_order)) %>%
   arrange(SpOrder) %>%
@@ -253,10 +253,15 @@ heatmap_smp_cluster <- ggplot(seed_L4.decontam_FA_all_clr_long, aes(SampleID, Pr
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
         legend.position = "left")
 
 heatmap_smp_cluster
+ggsave("./06-publication/supplemental_figures/SXX33/Figure_SXX33_seed_mr1_all_heatmap.pdf", plot = heatmap_smp_cluster, device = "pdf",
+       scale = 1, width = 12, height = 18, units = c("in"), dpi = 300)
 
+ggsave("./06-publication/supplemental_figures/SXX33/Figure_SXX33_seed_mr1_all_heatmap.png", plot = heatmap_smp_cluster, device = "png",
+       scale = 1, width = 12, height = 18, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -308,8 +313,8 @@ seed_L4.decontam_FA_cmc <- seed_L4.decontam %>%
                                   separate(., Protein, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
                                   select(-c("SEED","L2","L3")) %>%
                                   inner_join(., seed_L4.decontam_cmc.fa_seed %>%
-        filter(Residual == "MR2") %>%
-        select(-Residual)) %>%
+                                             filter(Residual == "MR1") %>%
+                                             select(-Residual)) %>%
                                   gather("SampleID","Counts",2:ncol(.)) %>%
                                   mutate(Counts = Counts + 1) %>%
                                   spread(Protein,Counts) %>%
@@ -343,7 +348,7 @@ seed_L4.decontam_FA_cmc_clr_order <- seed_L4.decontam_FA_cmc_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Protein","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(SpOrder = as.character(seq(1,712))) %>%
+  mutate(SpOrder = as.character(seq(1,968))) %>% # MR2 712
   select(Protein, SpOrder, everything()) %>%
   mutate(SpOrder = fct_relevel(SpOrder, sp_cmc_order)) %>%
   arrange(SpOrder) %>%
@@ -423,9 +428,15 @@ heatmap_smp_cluster <- ggplot(seed_L4.decontam_FA_cmc_clr_long, aes(SampleID, Pr
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
         legend.position = "left")
 
 heatmap_smp_cluster
+ggsave("./06-publication/supplemental_figures/SXX34/Figure_SXX34_seed_mr1_all_heatmap.pdf", plot = heatmap_smp_cluster, device = "pdf",
+       scale = 1, width = 12, height = 18, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX34/Figure_SXX34_seed_mr1_all_heatmap.png", plot = heatmap_smp_cluster, device = "png",
+       scale = 1, width = 12, height = 18, units = c("in"), dpi = 300)
 
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
@@ -966,7 +977,7 @@ da_env_both %>% select(Proteins, diff.abn, log_fold_change) %>%
 # select the SEED proteins in MR1 and MR2 for the FA
 seed_L4.decontam_env_da <- seed_L4.decontam %>%
   select(-matches("SRR164|10M|EXB|LIB|CMC032.B")) %>%
-  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  separate(., Protein, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
   select(-c("SEED","L2","L3")) %>%
   filter(Protein %in% da_list) %>%
   inner_join(., da_env_both %>%
@@ -1082,7 +1093,7 @@ vector_color = seed_L4.decontam_env_da_clr_long %>%
   as.character()
 
 # make a heatmap with ggplot
-heatmap_smp_cluster <- ggplot(seed_L4.decontam_env_da_clr_long, aes(SampleID, Pathway, fill = CLR)) +
+heatmap_smp_cluster <- ggplot(seed_L4.decontam_env_da_clr_long, aes(SampleID, Protein, fill = CLR)) +
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
@@ -1149,7 +1160,7 @@ da_eg_cmc <- fread("./05-results.backup/res_ANCOM_BC_cmc_EG_seed.tsv")
 # select the SEED proteins in MR1 and MR2 for the FA
 seed_L4.decontam_eg_da <- seed_L4.decontam %>%
   select(-matches("SRR164|10M|EXB|LIB|CMC032.B")) %>%
-  separate(., Pathway, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
+  separate(., Protein, into = c("SEED","L2","L3","Protein"), sep = ";") %>%
   select(-c("SEED","L2","L3")) %>%
   inner_join(., da_eg_cmc %>%
             rename(Protein = Proteins) %>%

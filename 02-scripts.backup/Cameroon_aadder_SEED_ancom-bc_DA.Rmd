@@ -169,12 +169,13 @@ res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(species,
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
 ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
   rename(Proteins = species) %>%
-  arrange(q.val) %>%
-  filter(diff.abn == "TRUE") 
+  arrange(q.val) 
+# %>%
+#   filter(diff.abn == "TRUE") 
 # %>%
 #   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
+# fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_seed_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
 res.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
@@ -191,12 +192,13 @@ res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
                                       `structural.zero (JAE)`)
 ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
   rename(Proteins = species) %>%
-  arrange(q.val) %>%
-  filter(diff.abn == "TRUE")
+  arrange(q.val) 
+# %>%
+#   filter(diff.abn == "TRUE")
   # possiblly filter out the species that have a differential abundance of less than |1|
   # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
   
-# fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_seed_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -222,7 +224,7 @@ res.ANCOM_BC_env_HMP_HG <- res_noblanks.ANCOM_BC %>%
   inner_join(., metadata_paths, by = "Proteins")
 
 
-res.ANCOM_BC_env_HMP_HG %>%
+ancom_seed_HMP_CMC_plot <- res.ANCOM_BC_env_HMP_HG %>%
   filter(`log fold change (HunterGatherer - HMP)` >= 1.0 | `log fold change (HunterGatherer - HMP)` <= -1.0) %>%
   arrange(`log fold change (HunterGatherer - HMP)`) %>%
   mutate(Proteins = as_factor(Proteins)) %>%
@@ -234,7 +236,7 @@ res.ANCOM_BC_env_HMP_HG %>%
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Proteins") +
-    ggtitle("HunterGatherer - HMP") +
+    ggtitle("Cameroon - HMP") +
     geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_up),
               vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
     geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_down),
@@ -245,6 +247,8 @@ res.ANCOM_BC_env_HMP_HG %>%
                       mutate(Proteins = as_factor(Proteins)), 
                aes(x=Proteins, y=`log fold change (HunterGatherer - HMP)`),
                    position=position_dodge(width = 0.4), shape=18)
+
+ancom_seed_HMP_CMC_plot
 
 # fwrite(res.ANCOM_BC_env_HMP_HG, "./05-results.backup/res_ANCOM_BC_env_HMP_HG_seed.tsv", sep = "\t")
 
@@ -265,7 +269,7 @@ res.ANCOM_BC_env_JAE_HG <- res.ANCOM_BC %>%
                          ifelse(q.val<0.05, "*", ""))))) %>%
   inner_join(., metadata_paths, by = "Proteins")
 
-res.ANCOM_BC_env_JAE_HG %>%
+ancom_seed_JAE_CMC_plot <- res.ANCOM_BC_env_JAE_HG %>%
   filter(`log fold change (HunterGatherer - JAE)` >= 1.0 | `log fold change (HunterGatherer - JAE)` <= -1.0) %>%
   arrange(`log fold change (HunterGatherer - JAE)`) %>%
   mutate(Proteins = as_factor(Proteins)) %>%
@@ -278,7 +282,7 @@ res.ANCOM_BC_env_JAE_HG %>%
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     ylab("Log fold change") +
     xlab("Proteins") +
-    ggtitle("HunterGatherer - JAE") +
+    ggtitle("Cameroon - JAE") +
     geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_up),
               vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
     geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_down),
@@ -296,7 +300,16 @@ res.ANCOM_BC_env_JAE_HG %>%
                aes(x=Proteins, y=`log fold change (HunterGatherer - JAE)`),
                    position=position_dodge(width = 0.4), shape=18)
 
+ancom_seed_JAE_CMC_plot
+
 # fwrite(res.ANCOM_BC_env_JAE_HG, "./05-results.backup/res_ANCOM_BC_env_JAE_HG_seed.tsv", sep = "\t")
+
+# ggsave("~/Desktop/ancom_seed_HMP_CMC_plot.png", plot = ancom_seed_HMP_CMC_plot, device = "png",
+#        scale = 1, width = 16, height = 10, units = c("in"), dpi = 300)
+# 
+# ggsave("~/Desktop/ancom_seed_JAE_CMC_plot.png", plot = ancom_seed_JAE_CMC_plot, device = "png",
+#        scale = 1, width = 16, height = 10, units = c("in"), dpi = 300)
+
 
 ```
 
@@ -881,7 +894,7 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
 
-# fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_species_cmc_toothsite.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_seed_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 ```
 
