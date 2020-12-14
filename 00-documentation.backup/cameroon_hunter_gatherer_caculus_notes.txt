@@ -379,7 +379,7 @@ nextflow run nf-core/mag --reads '/projects1/microbiome_calculus/Cameroon_plaque
 
 ########################################################
 
-snakemake -s aadder.Snakefile --cluster-config aadder-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j 1 # -n # for a test run
+snakemake -s aadder.Snakefile --cluster-config aadder-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j 1 -n # for a test run
 
 snakemake -s aadder_SEED_fada_ols.Snakefile --cluster-config fa_seed-cluster.config --cluster 'sbatch --mem {cluster.mem} -p {cluster.partition} -o {cluster.out} -e {cluster.err} -n {threads}' -j -n # for a test run
 
@@ -500,11 +500,27 @@ cp ../04-analysis/songbird/genus_cmc/form4/differentials.tsv ./songbird_cmc_genu
 
 https://bacdive.dsmz.de/advsearch?site=advsearch&searchparams%5B42%5D%5Bsearchterm%5D=*&searchparams%5B254%5D%5Bsearchterm%5D=*&searchparams%5B921%5D%5Bsearchterm%5D=*&searchparams%5B344%5D%5Bcontenttype%5D=text&searchparams%5B344%5D%5Btypecontent%5D=contains&searchparams%5B344%5D%5Bsearchterm%5D=*&searchparams%5B346%5D%5Bsearchterm%5D=carbon+source&advsearch=search
 
+########################################################
+# eager2 to remove human reads for upload to ENA
 
-
-
-
-
+nextflow run nf-core/eager \
+-r 2.2.1 \
+-profile microbiome_screening,shh \
+--outdir /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/eager2 \
+-work-dir /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/work \
+--input /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/cmc_eager2.tsv \
+--complexity_filter_poly_g \
+--fasta /projects1/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--bwa_index /projects1/Reference_Genomes/Human/HG19/ \
+--bwaalnn 0.02 \
+--bwaalnl 1024 \
+--hostremoval_input_fastq \
+--hostremoval_mode remove \
+--skip_damage_calculation \
+--skip_qualimap \
+--email velsko@shh.mpg.de \
+-name cmc_strip \
+-with-tower
 
 
 
