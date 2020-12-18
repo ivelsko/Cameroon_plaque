@@ -47,7 +47,7 @@ metadata <- metadata %>%
          Market_economy_split = fct_relevel(Market_economy_split, "Logging road","Forrest camp","Farming","Yanomami",
                                       "Industrial plaque","Industrial calculus", "ExtractionGauze","ExtractionBlank","LibraryBlank"),
          Age_group = fct_relevel(Age_group, "10-18","18-29","30-39","40-49","50-59","60+","HMP","HMP10M"),
-         Sex = fct_relevel(Sex, "Male","Female"),
+         Sex = fct_relevel(Sex, "Female","Male"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior","Buccal_mucosa","HMP","HMP10M"),
          Type = fct_relevel(Type, "Calculus","Plaque","Blank"),
          Village = fct_relevel(Village, "202","205","204","203","206","Yanomami","HMP","HMP10M","JAE","JAE10M",
@@ -120,8 +120,8 @@ Market_economy_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 1
 Market_economy_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, Industrial = 4,
                            ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
-Market_economy_split_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Yanomami = "#C70E7B", `Industrial plaque` = "#737373",
-                           `Industrial calculus` = "#bdbdbd", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+Market_economy_split_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Yanomami = "#C70E7B", `Industrial plaque` = "#969696",
+                           `Industrial calculus` = "#feb24c", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
 Market_economy_split_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Yanomami = 14, `Industrial plaque` = 15,
                            `Industrial calculus` = 15, ExtractionGauze = 8, ExtractionBlank = 4, LibraryBlank = 3)
 Market_economy_split_size <- c(`Logging road` = 4, `Forrest camp` = 4, Farming = 6, Yanomami = 4, `Industrial plaque` = 4,

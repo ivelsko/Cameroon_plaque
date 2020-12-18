@@ -72,7 +72,7 @@ batch_table_os <- malt_species.decontam %>%
                filter(!is.na(LibraryBatch))
 
 # plot extraction batch
-batch_table_os %>%
+exb_unfiltered_os_plot <- batch_table_os %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -80,17 +80,31 @@ batch_table_os %>%
        # scale_fill_manual(values = ExtractionBatch_colors) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-       ylab("Observed species") +
-       ggtitle("Number of observed species")
+       ylab("Number of species") +
+       ggtitle("Extraction batches")
+exb_unfiltered_os_plot
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_os_plot.pdf", plot = exb_unfiltered_os_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_os_plot.png", plot = exb_unfiltered_os_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+lib_unfiltered_os_plot <- ggplot(batch_table_os, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-       ylab("Observed species") +
-       ggtitle("Number of observed species")
+       ylab("Number of species") +
+       ggtitle("Library batches")
+lib_unfiltered_os_plot
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_os_plot.pdf", plot = lib_unfiltered_os_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_os_plot.png", plot = lib_unfiltered_os_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_os <- batch_table_os %>%
@@ -122,6 +136,7 @@ wilcox <- batch_table_os %>%
 
 wilcox_os <-  pairwise.wilcox.test(wilcox$Observed_species, wilcox$LibraryBatch, p.adjust.method = "fdr")
 wilcox_os # none of the library batches are significantly different
+
 
 
 # and the filtered data
@@ -228,7 +243,7 @@ batch_table_og <- malt_genus.decontam %>%
                  filter(!is.na(LibraryBatch))
 
 # plot extraction batch
-batch_table_og %>%
+exb_unfiltered_og_plot <- batch_table_og %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = Observed_species, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -236,18 +251,31 @@ batch_table_og %>%
        # scale_fill_manual(values = ExtractionBatch_colors) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-       ylab("Observed species") +
-       ggtitle("Number of observed species")
+       ylab("Number of genera") +
+       ggtitle("Extraction batches")
+exb_unfiltered_og_plot
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_og_plot.pdf", plot = exb_unfiltered_og_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_og_plot.png", plot = exb_unfiltered_og_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
+lib_unfiltered_og_plot <- ggplot(batch_table_og, aes(x = LibraryBatch, y = Observed_species, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-       ylab("Observed species") +
-       ggtitle("Number of observed species")
+       ylab("Number of genera") +
+       ggtitle("Library batches")
+lib_unfiltered_og_plot
 
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_og_plot.pdf", plot = lib_unfiltered_og_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_og_plot.png", plot = lib_unfiltered_og_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_og <- batch_table_og %>%
@@ -360,7 +388,8 @@ Shannon diversity species
 ```{r species_shannon}
 # Shannon diversity with the package vegan
 malt_species.decontam.matrix <- as.matrix(malt_species.decontam %>%
-                                         select(-one_of(outliers)) %>%
+                                         select(-one_of(outliers),
+                                                -matches("JAE|SRR")) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam") %>%
                                          mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
                                          select(-one_of(c("Sum_species.decontam","Percent"))) %>%
@@ -380,7 +409,7 @@ malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
   filter(!is.na(LibraryBatch))
   
 # plot extraction batch
-malt_species.decontam.shannon %>%
+exb_unfiltered_shannon_sp_plot <- malt_species.decontam.shannon %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -389,17 +418,30 @@ malt_species.decontam.shannon %>%
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Shannon index") +
-       ggtitle("Shannon index - species")
+       ggtitle("Extraction batches")
+exb_unfiltered_shannon_sp_plot
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_shannon_sp_plot.pdf", plot = exb_unfiltered_shannon_sp_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_shannon_sp_plot.png", plot = exb_unfiltered_shannon_sp_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+lib_unfiltered_shannon_sp_plot <- ggplot(malt_species.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Shannon index") +
-       ggtitle("Shannon index - species")
+       ggtitle("Library batches")
+lib_unfiltered_shannon_sp_plot
 
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_shannon_sp_plot.pdf", plot = lib_unfiltered_shannon_sp_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_shannon_sp_plot.png", plot = lib_unfiltered_shannon_sp_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_ss <- malt_species.decontam.shannon %>%
@@ -519,7 +561,8 @@ Shannon diversity genus
 ```{r genus_shannon}
 # Shannon diversity with the package vegan
 malt_genus.decontam.matrix <- as.matrix(malt_genus.decontam %>%
-                                         select(-one_of(outliers)) %>%
+                                         select(-one_of(outliers),
+                                                -matches("JAE|SRR")) %>%
                                          adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
                                          mutate(Percent = Sum_genus.decontam/sum(Sum_genus.decontam)*100) %>%
                                          select(-one_of(c("Sum_genus.decontam","Percent"))) %>%
@@ -539,7 +582,7 @@ malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
   filter(!is.na(LibraryBatch))
   
 # plot extraction batch
-malt_genus.decontam.shannon %>%
+exb_unfiltered_shannon_gn_plot <- malt_genus.decontam.shannon %>%
   filter(!is.na(ExtractionBatch)) %>%
     ggplot(., aes(x = ExtractionBatch, y = `Shannon index`, fill = ExtractionBatch)) +
        geom_boxplot() +
@@ -549,16 +592,29 @@ malt_genus.decontam.shannon %>%
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Shannon index") +
        ggtitle("Shannon index - genus")
+exb_unfiltered_shannon_gn_plot
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_shannon_gn_plot.pdf", plot = exb_unfiltered_shannon_gn_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_unfiltered_shannon_gn_plot.png", plot = exb_unfiltered_shannon_gn_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # plot library batch
-ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
+lib_unfiltered_shannon_gn_plot <- ggplot(malt_genus.decontam.shannon, aes(x = LibraryBatch, y = `Shannon index`, fill = LibraryBatch)) +
        geom_boxplot() +
        geom_jitter(alpha = 0.5) +
        theme_minimal() +
        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
        ylab("Shannon index") +
        ggtitle("Shannon index - genus")
+lib_unfiltered_shannon_gn_plot
 
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_shannon_gn_plot.pdf", plot = lib_unfiltered_shannon_gn_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_unfiltered_shannon_gn_plot.png", plot = lib_unfiltered_shannon_gn_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # perform a kruskal-wallace test to determine if the extraction batches have significantly different diversity
 kw_sg <- malt_genus.decontam.shannon %>%

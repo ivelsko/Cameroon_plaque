@@ -583,7 +583,12 @@ allplots_noyanomami <- plot_grid(noyanomami_eg, noyanomami_ag,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
 
 
-ggsave("05-results.backup/allplots_noyanomami.pdf", plot = allplots_noyanomami, device = "pdf",
+# ggsave("05-results.backup/allplots_noyanomami.pdf", plot = allplots_noyanomami, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX13/SXX13_gn_lda_plots.pdf", plot = allplots_noyanomami, device = "pdf",
+       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX13/SXX13_gn_lda_plots.png", plot = allplots_noyanomami, device = "png",
        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
@@ -769,12 +774,12 @@ malt_genus.decontam_FA_all_clr_long <- malt_genus.decontam_FA_all_clr %>%
   as_tibble(.) %>%
   gather("SampleID","CLR", 2:ncol(.)) %>%
   inner_join(., metadata %>%
-               select(SampleID, Sex), by = "SampleID") %>%
-  inner_join(., Sex_colors %>%
+               select(SampleID, Village), by = "SampleID") %>%
+  inner_join(., Village_colors %>%
                as_data_frame(.) %>%
                rename(Color = value) %>%
-               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
-               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Village, "Yanomami|10M|Gauze|Blank")), by = "Village") %>%
   mutate(SampleID = fct_relevel(SampleID, malt_genus.decontam_FA_all_clr_smp_order)) %>%
   arrange(SampleID)
 
@@ -791,11 +796,17 @@ heatmap_smp_cluster <- ggplot(malt_genus.decontam_FA_all_clr_long, aes(SampleID,
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color), # 
+        axis.text.y = element_text(size = 10),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
         legend.position = "left")
 
 heatmap_smp_cluster
+
+ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.pdf", plot = heatmap_smp_cluster, device = "pdf",
+       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.png", plot = heatmap_smp_cluster, device = "png",
+       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -1198,8 +1209,13 @@ allplots_cmc <- plot_grid(cmc_eg, cmc_ag,
           cmc_ts, cmc_vi,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
 
-ggsave("05-results.backup/allplots_cmc.pdf", plot = allplots_cmc, device = "pdf",
-       scale = 1, width = 9, height = 10, units = c("in"), dpi = 300)
+# ggsave("05-results.backup/allplots_cmc.pdf", plot = allplots_cmc, device = "pdf",
+#        scale = 1, width = 9, height = 10, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX14/SXX14_cmc_gn_lda_plots.pdf", plot = allplots_cmc, device = "pdf",
+       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX14/SXX14_cmc_gn_lda_plots.png", plot = allplots_cmc, device = "png",
+       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
 
@@ -1311,12 +1327,12 @@ malt_genus.decontam_FA_cmc_clr_long <- malt_genus.decontam_FA_cmc_clr %>%
   arrange(Genus) %>%
   gather("SampleID","CLR", 2:ncol(.)) %>%
   inner_join(., metadata %>%
-               select(SampleID, Sex), by = "SampleID") %>%
-  inner_join(., Sex_colors %>%
+               select(SampleID, Village), by = "SampleID") %>%
+  inner_join(., Village_colors %>%
                as_data_frame(.) %>%
                rename(Color = value) %>%
-               mutate(Sex = c("Female","Male","Unknown","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
-               filter(!str_detect(Sex, "Gauze|Blank")), by = "Sex") %>%
+               mutate(Village = c("202","205","204","203","206","Yanomami","HMP","HMP10M","JAE10M","JAE","ExtractionGauze","ExtractionBlank","LibraryBlank")) %>%
+               filter(!str_detect(Village, "Yanomami|10M|Gauze|Blank")), by = "Village") %>%
   mutate(SampleID = fct_relevel(SampleID, malt_genus.decontam_FA_cmc_clr_smp_order)) %>%
   arrange(SampleID)
 
@@ -1332,11 +1348,17 @@ heatmap_cmc_smp_cluster <- ggplot(malt_genus.decontam_FA_cmc_clr_long, aes(Sampl
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+        axis.text.y = element_text(size = 10),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
         legend.position = "left")
 
 heatmap_cmc_smp_cluster
+
+ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.pdf", plot = heatmap_cmc_smp_cluster, device = "pdf",
+       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.png", plot = heatmap_cmc_smp_cluster, device = "png",
+       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above

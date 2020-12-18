@@ -1,5 +1,5 @@
 ---
-title: "Cameroon hunter-gatherer calculus/plaque MALT"
+title: "Cameroon hunter-gatherer calculus/plaque metadata stats"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output:
@@ -59,7 +59,8 @@ plot_pca <- function(df, pc1, pc2, metadata_group) {
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, 
+                                  Type, Decayed, Missing, Moving, Altered, Root_visible, Bleeding), by = "SampleID")
     
     metadata_group = df_X[[metadata_group]]
     
@@ -114,7 +115,8 @@ plot_pca_names <- function(df, pc1, pc2, metadata_group) {
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site,
+                                  Type, Decayed, Missing, Moving, Altered, Root_visible, Bleeding), by = "SampleID")
     
     metadata_group = df_X[[metadata_group]]
     
@@ -161,7 +163,7 @@ plot_pca_names <- function(df, pc1, pc2, metadata_group) {
 
 
 # plot PCA with colored dots and the title including the # of species or genera
-plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, ncomps) {
+plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, ncomps, title_text) {
     metadata_group_colors <- get(paste(color_group, "_colors", sep = ""))
     metadata_group_shapes <- get(paste(shape_group, "_shapes", sep = ""))
     metadata_group_size <- get(paste(size_group, "_size", sep = ""))
@@ -173,8 +175,13 @@ plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, 
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
-    
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, 
+                                  Type, Decayed, Missing, Moving, Altered, Root_visible, Bleeding), by = "SampleID") %>%
+      mutate(Decayed = ifelse(is.na(Decayed), "Yes", "No"),
+             Missing = ifelse(is.na(Missing), "Yes","No"),
+             Root_visible = ifelse(is.na(Root_visible), "Yes","No"),
+             Altered = ifelse(is.na(Altered), "Yes","No"))
+
     color_group = df_X[[color_group]]
     shape_group = df_X[[shape_group]]
     size_group = df_X[[size_group]]
@@ -207,11 +214,11 @@ plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, 
                            yaxis <- c("PC3")
                        }
 
-    title_text <- df %>%
-                     rownames_to_column("SampleID") %>%
-                     gather("Species","Counts",2:ncol(.)) %>%
-                     spread(SampleID, Counts) %>%
-                     count
+    # title_text <- df %>%
+    #                  rownames_to_column("SampleID") %>%
+    #                  gather("Species","Counts",2:ncol(.)) %>%
+    #                  spread(SampleID, Counts) %>%
+    #                  count
     
     pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = color_group, shape = shape_group, size = size_group)) +
                         geom_point() +
@@ -271,72 +278,121 @@ Let's also check the metadata categories - are there clear differences between g
 
 village_age <- metadata %>%
   filter(str_detect(SampleID, "CMC")) %>%
-  filter(str_detect(Tooth_site, "Posterior")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Age_group, Village) %>%
+  unique() %>%
+  # filter(str_detect(Tooth_site, "Posterior")) %>%
   group_by(Village, Age_group) %>%
+  count()
+village_age_sex <- metadata %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Age_group, Village, Sex) %>%
+  unique() %>%
+  # filter(str_detect(Tooth_site, "Posterior")) %>%
+  group_by(Village, Age_group, Sex) %>%
   count()
 
 village_sex <- metadata %>%
   filter(str_detect(SampleID, "CMC")) %>%
-  filter(str_detect(Tooth_site, "Posterior")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Sex, Village) %>%
+  unique() %>%
+  # filter(str_detect(Tooth_site, "Posterior")) %>%
   group_by(Village, Sex) %>%
   count()
 
 village_tooth <- metadata %>%
   filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Tooth_site, Village) %>%
+  unique() %>%
   # filter(str_detect(Tooth_site, "Posterior")) %>%
   group_by(Village, Tooth_site) %>%
   count()
 
 ethnicGroup_market <- metadata %>%
   filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Ethnic_Group, Market_economy) %>%
+  unique() %>%
   # filter(str_detect(Tooth_site, "Posterior")) %>%
   group_by(Ethnic_Group, Market_economy) %>%
   count()
 
-village_age %>%
+village_age_plot <- village_age %>%
   ggplot(., aes(x = Village, y = n, fill = Age_group)) +
-         geom_bar(stat = "identity", position = "dodge") +
+         geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
          scale_fill_manual(values = Age_group_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-         ylab("Count") #+
-         # ggtitle(title_text)
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") 
+village_age_plot
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_village_age_plot.pdf", plot = village_age_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-village_age %>%
+village_age_sex_plot <- village_age_sex %>%
+  ggplot(., aes(x = Village, y = n, fill = Age_group)) +
+         geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
+         scale_fill_manual(values = Age_group_colors) +
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") +
+  facet_wrap(~Sex, )
+village_age_sex_plot
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_village_age_sex_plot.pdf", plot = village_age_sex_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+age_village_plot <- village_age %>%
   ggplot(., aes(x = Age_group, y = n, fill = Village)) +
-         geom_bar(stat = "identity", position = "dodge") +
+         geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
          scale_fill_manual(values = Village_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-         ylab("Count") #+
-         # ggtitle(title_text)
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") #+
+age_village_plot
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_age_village_plot.pdf", plot = age_village_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-village_sex %>%
+village_sex_plot <- village_sex %>%
     ggplot(., aes(x = Village, y = n, fill = Sex)) +
-         geom_bar(stat = "identity", position = "dodge") +
+         geom_bar(stat = "identity", position = "dodge", color = "black") +
          scale_fill_manual(values = Sex_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-         ylab("Count") #+
-         # ggtitle(title_text)
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") #+
+village_sex_plot
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_village_sex_plot.pdf", plot = village_sex_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-village_tooth %>%
+village_tooth_plot <- village_tooth %>%
     ggplot(., aes(x = Village, y = n, fill = Tooth_site)) +
-         geom_bar(stat = "identity", position = "dodge") +
+         geom_bar(stat = "identity", position = "dodge", color = "black") +
          scale_fill_manual(values = Tooth_site_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-         ylab("Count") #+
-         # ggtitle(title_text)
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") #+
+village_tooth_plot
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_village_tooth_plot.pdf", plot = village_tooth_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-ethnicGroup_market %>%
+eg_market <- ethnicGroup_market %>%
     ggplot(., aes(x = Ethnic_Group, y = n, fill = Market_economy)) +
-         geom_bar(stat = "identity", position = "dodge") +
+         geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
          scale_fill_manual(values = Market_economy_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-         ylab("Count") #+
-         # ggtitle(title_text)
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 14)) +
+         ylab("Number of individuals") #+
+eg_market
+ggsave("./06-publication/supplemental_figures/SXX41/panel_parts/SXX41_eg_market_plot.pdf", plot = eg_market, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 ```
 Age groups are different between the villages (and therefore ethnic group and
@@ -404,7 +460,7 @@ anterior <- metadata %>%
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -423,15 +479,15 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "All age groups, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "All age groups, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "All age groups, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "All age groups, PC3-PC2")
 
 # no 18-29
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(age_18)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -450,15 +506,15 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "no 18-29, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "no 18-29, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 18-29, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 18-29, PC3-PC2")
 
 # no 30-39
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(age_30)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -477,15 +533,15 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "no 30-39, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "no 30-39, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 30-39, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 30-39, PC3-PC2")
 
 # no 40-49
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(age_40)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -504,15 +560,15 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "no 40-49, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "no 40-49, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 40-49, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 40-49, PC3-PC2")
 
 # no 50-59
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(age_50)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -531,15 +587,15 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "no 50-59, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "no 50-59, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 50-59, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 50-59, PC3-PC2")
 
 # no 60+
 malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(age_60)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -558,8 +614,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "no 60+, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "no 60+, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 60+, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "no 60+, PC3-PC2")
 
 
 ```
@@ -577,7 +633,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(matches("CMC|Species")) %>%
                                          select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -596,8 +652,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, all age groups, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, all age groups, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, all age groups, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, all age groups, PC3-PC2")
 
 # no 18-29
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -605,7 +661,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(-one_of(anterior)) %>%
                                          select(-one_of(age_18)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -624,8 +680,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 18-29, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 18-29, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 18-29, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 18-29, PC3-PC2")
 
 # no 30-39
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -633,7 +689,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(-one_of(anterior)) %>%
                                          select(-one_of(age_30)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -652,8 +708,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 30-39, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 30-39, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 30-39, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 30-39, PC3-PC2")
 
 # no 40-49
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -661,7 +717,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(-one_of(anterior)) %>%
                                          select(-one_of(age_40)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -680,8 +736,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 40-49, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 40-49, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 40-49, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 40-49, PC3-PC2")
 
 # no 50-59
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -689,7 +745,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(-one_of(anterior)) %>%
                                          select(-one_of(age_50)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -708,8 +764,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 50-59, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 50-59, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 50-59, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 50-59, PC3-PC2")
 
 # no 60+
 malt_species.decontam_filtered <- malt_species.decontam %>%
@@ -717,7 +773,7 @@ malt_species.decontam_filtered <- malt_species.decontam %>%
                                          select(-one_of(anterior)) %>%
                                          select(-one_of(age_60)) %>%
                                          adorn_totals(where = "col", name = "Sum_species.decontam_filtered") %>%
-                                         select(-one_of(outliersCMC)) %>%
+                                         # select(-one_of(outliersCMC)) %>%
                                          mutate(Percent = Sum_species.decontam_filtered/sum(Sum_species.decontam_filtered)*100) %>%
                                          filter(Percent > 0.005) %>%
                                          select(-one_of(c("Sum_species.decontam_filtered","Percent"))) %>%
@@ -736,8 +792,8 @@ tune.species.decontam_filtered_pca <- tune.pca(malt_species.decontam_filtered, l
 tune.species.decontam_filtered_pca
 
 # perform and plot a PCA to see how the data cluster
-plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 60+, PC1-PC2")
-plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", 3, "Posterior tooth site, no 60+, PC3-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC1", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 60+, PC1-PC2")
+plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Age_group", "Market_economy", "Market_economy", 3, "Posterior tooth site, no 60+, PC3-PC2")
 
 
 ```
@@ -745,18 +801,6 @@ Using only the posterior tooth sites gives a similar pattern, where removing
 each age group doesn't really change the plotting/clustering in a noteicable way. So no
 need to run linear modelling? There are very few samples (relatively
 speaking),so having more might change this.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

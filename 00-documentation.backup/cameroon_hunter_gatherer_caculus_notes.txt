@@ -208,7 +208,8 @@ SAMPLENAME=${SAMPLES[$SLURM_ARRAY_TASK_ID]}
 seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"/"$SAMPLENAME"_S0_L001_R1_000.fastq.gz 10000000 > /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 
-####
+##################################################################
+
 # to change the names of the HUMAnN2 folders that didn't match the basename do
 rename 's/_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz/.10M/' *_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz
 rename 's/_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz/.10M/' *_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz
@@ -522,8 +523,40 @@ nextflow run nf-core/eager \
 -name cmc_strip \
 -with-tower
 
+########################################################
 
+# During the final stages of analysis, a mistake was discovered in the index assignments of one 
+# library batch in Pandora (they had been shifted down by 1 line), as well as incorrect naming 
+# of 2 samples, one of which is in the batch with mixed indices. This means that when the raw 
+# read data was demultiplexed, the readsets with indices from this batch were assigned the wrong sequencing ID. 
 
+# This was corrected in Pandora and the reads de-multiplexed to have the correct ID assigned to each raw read set.
+
+# Rather than re-run all analyses with the newly demultiplexed data, which would take several months, 
+# the sample names were corrected in the names of all output files in 04-analysis folders. 
+
+# For MALT and AADDER tables, the re-named rma6 files were uploaded into MEGAN. New .megan comparison 
+# files were saved and new species and genus tables exported, with the same name as the original but 
+# adding '_corrected' to the end of the file name, with the exception of the nt database run.
+# The rma6 files for the MALT nt run had been deleted, so the output tables had the names corrected 
+# within the file, instead of generating a new file. 
+
+Initial	Correct
+CMC009.B0101	CMC008.A0101
+CMC011.B0101	CMC009.B0101
+CMC016.A0102	CMC011.B0101
+CMC018.A0101	CMC016.A0102
+CMC020.A0101	CMC018.A0101
+CMC024.A0101	CMC020.A0101
+CMC026.A0101	CMC024.A0101
+CMC028.A0101	CMC026.A0101
+CMC030.A0101	CMC028.A0101
+CMC034.A0101	CMC030.A0101
+CMC036.A0101	CMC034.A0101
+CMC042.B0101	CMC036.A0101
+CMC008.A0101	CMC042.B0101
+CMC016.A0101	CMC016.B0101
+CMC016.A0102	CMC016.A0101
 
 
 

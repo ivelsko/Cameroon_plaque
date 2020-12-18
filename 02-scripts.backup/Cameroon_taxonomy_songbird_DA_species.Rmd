@@ -145,13 +145,14 @@ zeros <- songbird_noblanks_species_env %>%
 
 ```{r plot_env}
 
-songbird_noblanks_species_env %>%
+songbird_HMP_CMC_plot <- songbird_noblanks_species_env %>%
   filter(`C(Env, Treatment('HunterGatherer'))[T.HMP]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.HMP]` <= -3) %>%
   rename(Species = featureid) %>%
   full_join(., ancomBC_noblanks_sp_HMP_HG %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = str_replace(ancomBC_da, "FALSE","No"),
          ancomBC_da = replace_na(ancomBC_da, "No")) %>%
   drop_na(Intercept) %>%
   arrange(`C(Env, Treatment('HunterGatherer'))[T.HMP]`) %>%
@@ -164,13 +165,16 @@ songbird_noblanks_species_env %>%
     xlab("Species") +
     ggtitle("Cameroon plaque vs HMP plaque")
 
-songbird_noblanks_species_env %>%
+songbird_HMP_CMC_plot
+
+songbird_JAE_CMC_plot <- songbird_noblanks_species_env %>%
   filter(`C(Env, Treatment('HunterGatherer'))[T.JAE]` >= 3 | `C(Env, Treatment('HunterGatherer'))[T.JAE]` <= -3) %>%
   rename(Species = featureid) %>%
   full_join(., ancomBC_noblanks_sp_JAE_HG %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = str_replace(ancomBC_da, "FALSE","No"),
          ancomBC_da = replace_na(ancomBC_da, "No")) %>%
   drop_na(Intercept) %>%
   arrange(`C(Env, Treatment('HunterGatherer'))[T.JAE]`) %>%
@@ -182,6 +186,19 @@ songbird_noblanks_species_env %>%
     ylab("Log fold change") +
     xlab("Species") +
     ggtitle("Cameroon plaque vs JAE calculus")
+
+songbird_JAE_CMC_plot
+
+ggsave("./06-publication/supplemental_figures/SXX20/panel_parts/SXX20_species_songbird_hmp.pdf", plot = songbird_HMP_CMC_plot,
+       device = "pdf", scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX20/panel_parts/SXX20_species_songbird_jae.pdf", plot = songbird_JAE_CMC_plot,
+       device = "pdf", scale = 1, width = 11, height = 5, units = c("in"), dpi = 300)
+
+ # ggsave("~/Desktop/songbird_HMP_CMC_plot.png", plot = songbird_HMP_CMC_plot, device = "png",
+ #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+ # 
+ # ggsave("~/Desktop/songbird_JAE_CMC_plot.png", plot = songbird_JAE_CMC_plot, device = "png",
+ #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
 
 ```
 
@@ -215,7 +232,7 @@ songbird_cmc_species_eg %>%
 ## Market Economy
 ```{r plot_me}
 
-songbird_cmc_species_me %>%
+me_FC <- songbird_cmc_species_me %>%
   filter(`C(Market_economy, Treatment('Farming'))[T.Forrest camp]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Forrest camp]` <= -1) %>%
   rename(Species = featureid) %>%
   full_join(., ancomBC_cmc_sp_Fa_FC %>%
@@ -234,7 +251,9 @@ songbird_cmc_species_me %>%
     xlab("Species") +
     ggtitle("Forrest Camp vs. Farming")
 
-songbird_cmc_species_me %>%
+me_FC
+
+me_LR <- songbird_cmc_species_me %>%
   filter(`C(Market_economy, Treatment('Farming'))[T.Logging road]` >= 1 | `C(Market_economy, Treatment('Farming'))[T.Logging road]` <= -1) %>%
   rename(Species = featureid) %>%
   full_join(., ancomBC_cmc_sp_Fa_LR %>%
@@ -252,6 +271,12 @@ songbird_cmc_species_me %>%
     ylab("Log fold change") +
     xlab("Species") +
     ggtitle("Logging Road vs. Farming")
+me_LR
+
+ggsave("./06-publication/supplemental_figures/SXX20/panel_parts/SXX20_species_songbird_me_FC.pdf", plot = me_FC,
+       device = "pdf", scale = 1, width = 9, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX20/panel_parts/SXX20_species_songbird_me_LR.pdf", plot = me_LR,
+       device = "pdf", scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 
@@ -259,13 +284,14 @@ songbird_cmc_species_me %>%
 ## Tooth Site
 ```{r plot_ts}
 
-songbird_cmc_species_ts %>%
-  filter(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]` >= 1 | `C(Tooth_site, Treatment('Posterior'))[T.Anterior]` <= -1) %>%
+songbird_ts <- songbird_cmc_species_ts %>%
+  filter(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]` >= 2 | `C(Tooth_site, Treatment('Posterior'))[T.Anterior]` <= -2) %>%
   rename(Species = featureid) %>%
   full_join(., ancomBC_cmc_sp_ts %>%
                select(Species, diff.abn) %>%
                rename(ancomBC_da = diff.abn)) %>%
   mutate(ancomBC_da = str_replace(ancomBC_da, "TRUE","Yes"),
+         ancomBC_da = str_replace(ancomBC_da, "FALSE","No"),
          ancomBC_da = replace_na(ancomBC_da, "No")) %>%
   drop_na(Intercept) %>%
   arrange(`C(Tooth_site, Treatment('Posterior'))[T.Anterior]`) %>%
@@ -277,6 +303,10 @@ songbird_cmc_species_ts %>%
     ylab("Log fold change") +
     xlab("Species")
 
+songbird_ts
+
+ggsave("./06-publication/supplemental_figures/SXX20/panel_parts/SXX20_species_songbird_tooth_site.pdf", plot = songbird_ts,
+       device = "pdf", scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
 
 ```
 

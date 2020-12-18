@@ -180,7 +180,7 @@ db_plot_village
 ```
 
 
-```{r uky_graphs, eval = F}
+```{r uky_graphs}
 
 malt_CMC_HMP_JAE_Yano_RSC_assignments_uky <- malt_CMC_HMP_JAE_Yano_RSC_assignments %>%
   filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
@@ -190,9 +190,27 @@ malt_CMC_HMP_JAE_Yano_RSC_assignments_uky <- malt_CMC_HMP_JAE_Yano_RSC_assignmen
 assigned <- plot_box_whisker(malt_CMC_HMP_JAE_Yano_RSC_assignments_uky, hasmtdta = F, "Percent", "Village", "Village", "Percent of reads assigned by MALT with RefSeqCustom")
 assigned
 
-ggsave("05-results.backup/malt_assignments_plots_pct_uky.pdf", plot = assigned, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
+malt_pct_plot <-malt_CMC_HMP_JAE_Yano_RSC_assignments_uky %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Percent, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("% of reads") +
+                         xlab("")
+malt_pct_plot
+
+ggsave("./06-publication/supplemental_figures/SXX4_malt_assignments_pct.pdf", plot = malt_pct_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX4_malt_assignments_pct.png", plot = malt_pct_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 

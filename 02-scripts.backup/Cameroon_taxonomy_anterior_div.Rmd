@@ -461,8 +461,11 @@ tune.pca(malt_species.decontam_filtered_noyanomami, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_ant_village <- plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("../06-publication/supplemental_figures/SXX17/panel_parts/Figure_SXX17_sp_anterior_village_pc12.pdf", plot = sp_ant_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -507,8 +510,7 @@ pca_malt_species_pc1pc2 <- ggplot(malt_species_decontam_filtered_noyanomami.pca.
 pca_malt_species_pc1pc2
 
 # ggsave("05-results.backup/pca_nt_species_pc1pc2.pdf", plot = pca_nt_species_pc1pc2, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"),
-#        dpi = 300)
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 
@@ -832,8 +834,11 @@ tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_ant_village_cmc <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("../06-publication/supplemental_figures/SXX17/panel_parts/Figure_SXX17_sp_anterior_village_cmc_pc12.pdf", plot = sp_ant_village_cmc, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -1166,8 +1171,11 @@ tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_ant_village <- plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("../06-publication/supplemental_figures/SXX18/panel_parts/Figure_SXX18_gn_anterior_village_pc12.pdf", plot = gn_ant_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -1491,8 +1499,12 @@ tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_ant_village_cmc <- plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_ant_village_cmc
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("../06-publication/supplemental_figures/SXX18/panel_parts/Figure_SXX18_gn_anterior_village_cmc_pc12.pdf", plot = gn_ant_village_cmc, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)

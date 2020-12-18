@@ -11,7 +11,7 @@ library(cuperdec)
 library(data.table)
 library(magrittr) ## for pipes!
 library(dplyr) # for mutate()!
-
+library(tidyverse)
 ```
 
 Set the working directory of the notebook to the parent directory of the 
@@ -70,7 +70,8 @@ metadata <- fread("00-documentation.backup/01-cameroon_hunter_gatherer_metadata.
 metadata <- metadata %>%
   rename(SampleID = `#SampleID`)  %>%
   as_tibble() %>%
-  mutate(Env = fct_relevel(Env, "HunterGatherer","HMP","HMP10M","JAE","JAE10M",
+  mutate(Env = str_replace_all(Env, "HunterGatherer", "Cameroon")) %>%
+  mutate(Env = fct_relevel(Env, "Cameroon","HMP","HMP10M","JAE","JAE10M",
                                 "ExtractionGauze","ExtractionBlank","LibraryBlank"))
 
 ```
@@ -115,32 +116,39 @@ plot_cuperdec(curves, metadata_map)
 
 ```{r filter_curve}
 
-filter_result <- simple_filter(curves, threshold = 81) # threshold = 82 starts to color some of the CMC samples red
+filter_result <- simple_filter(curves, percent_threshold = 81) # percent_threshold = 82 starts to color some of the CMC samples red
 
 plot_cuperdec(curves, metadata_map, filter_result)
 
 ```
 
-```{r hard_burnin}
+```{r hard_rank_burnin}
 
-burnin_result <- hard_burnin_filter(curves, threshold = 81, burnin = 0.9) # threshold = 50, burnin = 0.4 allows the highest ExtractionBlank line to turn turquoise; threshold = 81, burnin 0.1-0.9 keeps all CMC turquoise and all ExtractionBlank red
-# plot_cuperdec(curves, metadata_map, burnin_result)
+rank_burnin_result <- hard_burnin_filter(curves, percent_threshold = 81, rank_burnin = 0.9) # percent_threshold = 50, rank_burnin = 0.4 allows the highest ExtractionBlank line to turn turquoise; percent_threshold = 81, rank_burnin 0.1-0.9 keeps all CMC turquoise and all ExtractionBlank red
+# plot_cuperdec(curves, metadata_map, rank_burnin_result)
 
 # restrict the plot to only the 1st 250 taxa
-plot_cuperdec(curves, metadata_map, burnin_result, restrict_x = 250)
+plot_cuperdec(curves, metadata_map, rank_burnin_result, restrict_x = 250)
 
 ```
 
-```{r adaptive_burnin}
+```{r adaptive_rank_burnin}
 
-burnin_result <- adaptive_burnin_filter(curves, threshold = 59) # threshold = 50 allows the highest ExtractionBlank line to turn turquoise; threshold = 60 keeps the highest ExtractionBlank line red but turns one CMC sample line red; threshold = 59 keeps all CMC turquoise and all ExtractionBlanks red; going higher turns more CMC red
-plot_cuperdec(curves, metadata_map, burnin_result, restrict_x = 250)
+rank_burnin_result <- adaptive_burnin_filter(curves, percent_threshold = 59) # percent_threshold = 50 allows the highest ExtractionBlank line to turn turquoise; percent_threshold = 60 keeps the highest ExtractionBlank line red but turns one CMC sample line red; percent_threshold = 59 keeps all CMC turquoise and all ExtractionBlanks red; going higher turns more CMC red
+cd_curve_plot <- plot_cuperdec(curves, metadata_map, rank_burnin_result, restrict_x = 250)
+cd_curve_plot
+
+ggsave("./06-publication/supplemental_figures/SXX1_cuperdec_adaptive_59pct.pdf", plot = cd_curve_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX1_cuperdec_adaptive_59pct.png", plot = cd_curve_plot, device = "png",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 
 ```{r discard_list}
 # this will not have any CMC samples
-discard_list <- burnin_result %>% filter(!Passed)
+discard_list <- rank_burnin_result %>% filter(!Passed)
 discard_list
 
 ```

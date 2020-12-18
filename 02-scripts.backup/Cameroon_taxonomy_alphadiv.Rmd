@@ -64,10 +64,11 @@ plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, title_te
     bx_wh_plot <- ggplot(df_X, aes(x = metadata_group, y = stat_info_table, fill = fill_group)) +
                          geom_boxplot() +
                          scale_fill_manual(values = fill_group_colors) +
-                         theme_minimal() +
+                         theme_minimal(base_size = 18) +
                          #scale_y_continuous(trans='log10') +
                          #scale_y_continuous(trans='pseudo_log') +
-                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+                               text = element_text(size=20)) +
                          ylab(stat_info) +
                          xlab(metadata_group) +
                          ggtitle(title_text)
@@ -121,6 +122,25 @@ malt_species.decontam.os <- presabs_table %>%
 plot_box_whisker(malt_species.decontam.os, "Observed_species", "Env", "Env", "Number of species")
 plot_box_whisker(malt_species.decontam.os, "Observed_species", "Village", "Village", "Number of species")
 
+os_plot <-malt_species.decontam.os %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Observed_species, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Number of Species") +
+                         xlab("")
+os_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_os.pdf", plot = os_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 # now on filtered tables
 presabs_table_f <- malt_species.decontam %>%
   select(-one_of(outliers)) %>%
@@ -168,6 +188,25 @@ malt_genus.decontam.os <- presabs_table %>%
 
 plot_box_whisker(malt_genus.decontam.os, "Observed_genera", "Env", "Env", "Number of genera")
 plot_box_whisker(malt_genus.decontam.os, "Observed_genera", "Village", "Village", "Number of genera")
+
+og_plot <-malt_genus.decontam.os %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Observed_genera, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Number of Genera") +
+                         xlab("")
+og_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_og.pdf", plot = og_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 
 # now on the filtered table
@@ -218,6 +257,25 @@ malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
 plot_box_whisker(malt_species.decontam.shannon, "Shannon_index", "Env", "Env", "Shannon Index")
 plot_box_whisker(malt_species.decontam.shannon, "Shannon_index", "Village", "Village", "Shannon Index")
 
+shannon_sp_plot <-malt_species.decontam.shannon %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Shannon_index, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Shannon index") +
+                         xlab("")
+shannon_sp_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_shannon_sp.pdf", plot = shannon_sp_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 # now with the filtered data
 malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
@@ -265,6 +323,25 @@ malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
 plot_box_whisker(malt_genus.decontam.shannon, "Shannon_index", "Env", "Env", "Shannon Index")
 plot_box_whisker(malt_genus.decontam.shannon, "Shannon_index", "Village", "Village", "Shannon Index")
 
+shannon_gn_plot <-malt_genus.decontam.shannon %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Shannon_index, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Shannon index") +
+                         xlab("")
+shannon_gn_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_shannon_gn.pdf", plot = shannon_gn_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 # now with the filtered data
 malt_genus.decontam_filtered.matrix <- as.matrix(malt_genus.decontam %>%
@@ -300,27 +377,45 @@ samples appear to be, except relative to eachother.
 ```{r evenness_pielou}
 evenness.species <- diversity(malt_species.decontam.matrix)
 evenness.species <- as.data.frame(evenness.species/log(specnumber(malt_species.decontam.matrix)))
-names(evenness.species)[1] <- "Pielou_evenness"
+names(evenness.species)[1] <- "Pileou_evenness"
 
 # merge with the metadata file and plot
 evenness.species <- evenness.species %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(evenness.species, "Pielou_evenness", "Env", "Env", "Pielou's evenness")
-plot_box_whisker(evenness.species, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
+plot_box_whisker(evenness.species, "Pileou_evenness", "Env", "Env", "Pielou's evenness")
+plot_box_whisker(evenness.species, "Pileou_evenness", "Village", "Village", "Pielou's evenness")
 
+pe_sp_plot <-evenness.species %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Pileou_evenness, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Pielou's evenness") +
+                         xlab("")
+pe_sp_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_pe_sp.pdf", plot = pe_sp_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # now with filtered data
 evenness.species_filtered <- diversity(malt_species.decontam_filtered.matrix)
 evenness.species_filtered <- as.data.frame(evenness.species_filtered/log(specnumber(malt_species.decontam_filtered.matrix)))
-names(evenness.species_filtered)[1] <- "Pielou_evenness"
+names(evenness.species_filtered)[1] <- "Pileou_evenness"
 
 # merge with the metadata file and plot
 evenness.species_filtered <- evenness.species_filtered %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(evenness.species_filtered, "Pielou_evenness", "Env", "Env", "Pielou's evenness")
-plot_box_whisker(evenness.species_filtered, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
+plot_box_whisker(evenness.species_filtered, "Pileou_evenness", "Env", "Env", "Pielou's evenness")
+plot_box_whisker(evenness.species_filtered, "Pileou_evenness", "Village", "Village", "Pielou's evenness")
 
 ```
 In this dataset EXB059.A1601 has no detected genera, and this is the samples
@@ -331,27 +426,45 @@ At the genus level
 ```{r evenness_pielou_genus}
 evenness.genus <- diversity(malt_genus.decontam.matrix)
 evenness.genus <- as.data.frame(evenness.genus/log(specnumber(malt_genus.decontam.matrix)))
-names(evenness.genus)[1] <- "Pielou_evenness"
+names(evenness.genus)[1] <- "Pileou_evenness"
 
 # merge with the metadata file and plot
 evenness.genus <- evenness.genus %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(evenness.genus, "Pielou_evenness", "Env", "Env", "Pielou's evenness")
-plot_box_whisker(evenness.genus, "Pielou_evenness", "Village", "Village", "Pielou's evenness")
+plot_box_whisker(evenness.genus, "Pileou_evenness", "Env", "Env", "Pielou's evenness")
+plot_box_whisker(evenness.genus, "Pileou_evenness", "Village", "Village", "Pielou's evenness")
 
+pe_gn_plot <-evenness.genus %>%
+  inner_join(metadata %>%
+               select(SampleID, Env, Description, Ethnic_Group, Age_group,
+                      Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  ggplot(., aes(x = Village, y = Pileou_evenness, fill = Village)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Village_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                              text = element_text(size=18)) +
+                         ylab("Pielou's evenness") +
+                         xlab("")
+pe_gn_plot
+
+ggsave("./06-publication/supplemental_figures/SXX5/SXX5_pe_gn.pdf", plot = pe_gn_plot, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # now with the filtered data
 evenness_filtered.genus <- diversity(malt_genus.decontam_filtered.matrix)
 evenness_filtered.genus <- as.data.frame(evenness_filtered.genus/log(specnumber(malt_genus.decontam_filtered.matrix)))
-names(evenness_filtered.genus)[1] <- "Pielou_evenness"
+names(evenness_filtered.genus)[1] <- "Pileou_evenness"
 
 # merge with the metadata file and plot
 evenness_filtered.genus <- evenness_filtered.genus %>%
   rownames_to_column("SampleID") 
 
-plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Env", "Env", "Pielou's evenness - genus")
-plot_box_whisker(evenness_filtered.genus, "Pielou_evenness", "Village", "Village", "Pielou's evenness - genus")
+plot_box_whisker(evenness_filtered.genus, "Pileou_evenness", "Env", "Env", "Pielou's evenness - genus")
+plot_box_whisker(evenness_filtered.genus, "Pileou_evenness", "Village", "Village", "Pielou's evenness - genus")
 
 ```
 In this dataset EXB059.A1601 and LIB050.A0105 have no detected genera, and these
@@ -420,20 +533,71 @@ os_ethnicity <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed
 os_ethnicity
 os_market <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy", "Market_economy", "Market economy")
 os_market
+
 os_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_economy_split", "Market_economy_split", "Market economy")
 os_market_split
+shannon_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Market_economy_split", "Market_economy_split", "Market economy")
+shannon_market_split
+pe_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Market_economy_split", "Market_economy_split", "Market economy")
+pe_market_split
 
-# ggsave("./05-results.backup/os_env.pdf", plot = os_env, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/os_ethnicity.pdf", plot = os_ethnicity, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/os_market.pdf", plot = os_market, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/os_market_split.pdf", plot = os_market_split, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+os_age <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Age_group", "Age_group", "Age_group economy")
+os_age
+shannon_age <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Age_group", "Age_group", "Age_group")
+shannon_age
+pe_age <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Age_group", "Age_group", "Age_group")
+pe_age
+
+os_sex <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Sex", "Sex", "Sex")
+os_sex
+shannon_sex <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
+shannon_sex
+pe_sex <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
+pe_sex
+
+os_ts <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Tooth_site", "Tooth_site", "Tooth_site")
+os_ts
+shannon_ts <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth_site")
+shannon_ts
+pe_ts <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth_site")
+pe_ts
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_os_market_split.pdf", plot = os_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_shannon_market_split.pdf", plot = shannon_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_pe_market_split.pdf", plot = pe_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_os_age.pdf", plot = os_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_shannon_age.pdf", plot = shannon_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_pe_age.pdf", plot = pe_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_os_sex.pdf", plot = os_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_shannon_sex.pdf", plot = shannon_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_pe_sex.pdf", plot = pe_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_os_tooth_site.pdf", plot = os_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_shannon_tooth_site.pdf", plot = shannon_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX6/panel_parts/Figure_SXX6_pe_tooth_site.pdf", plot = pe_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 # add metadata to the table
 malt_species.decontam_filtered.alpha_meta <- malt_species.decontam_filtered.alpha %>%
@@ -469,9 +633,11 @@ pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
   arrange(p)
 species_kruskal_pvals
 
+fwrite(species_kruskal_pvals, "./06-publication/supplemental_tables/alphadiv_kruskal_wallace_all_sp.tsv", sep = "\t", quote = F)
+
 # pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
 Envmt_sig <- species_kruskal_pvals %>%
-  filter(p <= 0.05) %>%
+  filter(p <= 0.07) %>%
   distinct(Category) %>%
   pull(Category)
 
@@ -531,6 +697,8 @@ IC_species_p_es <- species_wilcox_pvals %>%
   arrange(p.adj)
   
 IC_species_p_es
+
+fwrite(IC_species_p_es, "./06-publication/supplemental_tables/alphadiv_wilcox_all_sp.tsv", sep = "\t", quote = F)
 
 ```
 Only Env (p = 0.0251), Ethnic group (p = 0.0379), and Market economy (p =
@@ -602,39 +770,131 @@ malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
 # now plot the observed genus
 og_env <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Env", "Env", "Environment")
 og_env
+shannon_env <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Env", "Env", "Environment")
+shannon_env
+pe_env <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Env", "Env", "Environment")
+pe_env
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_os_env_gn.pdf", plot = og_env, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_env_gn.pdf", plot = shannon_env, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_env_gn.pdf", plot = pe_env, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 og_ethnicity <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
 og_ethnicity
+shannon_ethnicity <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+shannon_ethnicity
+pe_ethnicity <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
+pe_ethnicity
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_os_ethnic_group_gn.pdf", plot = og_ethnicity, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_ethnic_group_gn.pdf", plot = shannon_ethnicity, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_ethnic_group_gn.pdf", plot = pe_ethnicity, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 og_market <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Market_economy", "Market_economy", "Market economy")
 og_market
-og_age <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Age_group", "Age_group", "Age group")
-og_age
+shannon_market <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Market_economy", "Market_economy", "Market economy")
+shannon_market
+pe_market <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Market_economy", "Market_economy", "Market economy")
+pe_market
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_os_market_gn.pdf", plot = og_market, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_market_gn.pdf", plot = shannon_market, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_market_gn.pdf", plot = pe_market, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 og_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
 og_village
-og_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth site")
-og_tooth
-evenness_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
-evenness_tooth
+shannon_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Village", "Village", "Village")
+shannon_village
+pe_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Village", "Village", "Village")
+pe_village
 
-# ggsave("./05-results.backup/og_env.pdf", plot = og_env, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/og_ethnicity.pdf", plot = og_ethnicity, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/og_market.pdf", plot = og_market, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/og_age.pdf", plot = og_age, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/og_village.pdf", plot = og_village, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/og_tooth.pdf", plot = og_tooth, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/evenness_tooth.pdf", plot = evenness_tooth, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_og_village_gn.pdf", plot = og_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_village_gn.pdf", plot = shannon_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_village_gn.pdf", plot = pe_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_market_split <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Market_economy_split", "Market_economy_split", "Market economy")
+og_market_split
+shannon_market_split <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Market_economy_split", "Market_economy_split", "Market economy")
+shannon_market_split
+pe_market_split <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Market_economy_split", "Market_economy_split", "Market economy")
+pe_market_split
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_og_market_split_gn.pdf", plot = og_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_market_split_gn.pdf", plot = shannon_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_market_split_gn.pdf", plot = pe_market_split, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_age <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Age_group", "Age_group", "Age_group economy")
+og_age
+shannon_age <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Age_group", "Age_group", "Age_group")
+shannon_age
+pe_age <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Age_group", "Age_group", "Age_group")
+pe_age
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_og_age_gn.pdf", plot = og_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_age_gn.pdf", plot = shannon_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_age_gn.pdf", plot = pe_age, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Sex", "Sex", "Sex")
+og_sex
+shannon_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
+shannon_sex
+pe_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
+pe_sex
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_og_sex_gn.pdf", plot = og_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_sex_gn.pdf", plot = shannon_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_sex_gn.pdf", plot = pe_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_ts <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth_site")
+og_ts
+shannon_ts <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth_site")
+shannon_ts
+pe_ts <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth_site")
+pe_ts
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_og_tooth_site_gn.pdf", plot = og_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_shannon_tooth_site_gn.pdf", plot = shannon_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX7/panel_parts/Figure_SXX7_pe_tooth_site_gn.pdf", plot = pe_ts, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
@@ -670,6 +930,8 @@ pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
   arrange(p)
 
 genus_kruskal_pvals
+
+fwrite(genus_kruskal_pvals, "./06-publication/supplemental_tables/alphadiv_kruskal_wallace_all_gn.tsv", sep = "\t", quote = F)
 
 # pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
 Envmt_sig <- genus_kruskal_pvals %>%
@@ -730,6 +992,8 @@ IC_genus_p_es <- genus_wilcox_pvals %>%
   arrange(p.adj)
 
 IC_genus_p_es
+
+fwrite(IC_genus_p_es, "./06-publication/supplemental_tables/alphadiv_wilcox_all_gn.tsv", sep = "\t", quote = F)
 
 ```
 Six metadata categories have significant differences in diversity. Number of
@@ -875,6 +1139,8 @@ pvalues_envmt <- malt_species.decontam_filtered.alpha_meta %>%
   arrange(p)
 species_kruskal_pvals
 
+fwrite(species_kruskal_pvals, "./06-publication/supplemental_tables/alphadiv_kruskal_wallace_cmc_sp.tsv", sep = "\t", quote = F)
+
 # pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
 Envmt_sig <- species_kruskal_pvals %>%
   filter(p <= 0.05) %>%
@@ -935,6 +1201,8 @@ IC_species_cmc_p_es <- species_wilcox_pvals %>%
   arrange(p.adj)
 
 IC_species_cmc_p_es
+
+fwrite(IC_species_cmc_p_es, "./06-publication/supplemental_tables/alphadiv_wilcox_cmc_sp.tsv", sep = "\t", quote = F)
 
 ```
 Two metadata categories have significant differences in diversity, Sex (Shannon
@@ -1003,19 +1271,51 @@ malt_genus.decontam_filtered.alpha <- malt_genus.decontam_filtered.alpha %>%
 plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Ethnic_Group", "Ethnic_Group", "Ethnic group")
 og_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Village", "Village", "Village")
 og_village
-shannong_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth site")
-shannong_tooth
-evennessg_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
-evennessg_tooth
+shannon_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Village", "Village", "Village")
+shannon_village
+pe_village <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Village", "Village", "Village")
+pe_village
 
-# ggsave("./05-results.backup/og_village.pdf", plot = og_village, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/shannong_tooth.pdf", plot = shannong_tooth, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-# 
-# ggsave("./05-results.backup/evennessg_tooth.pdf", plot = evennessg_tooth, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_og_village_cmc_gn.pdf", plot = og_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_shannon_village_cmc_gn.pdf", plot = shannon_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_pe_village_cmc_gn.pdf", plot = pe_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Tooth_site", "Tooth_site", "Tooth site")
+og_tooth
+shannon_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Tooth_site", "Tooth_site", "Tooth site")
+shannon_tooth
+pe_tooth <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Tooth_site", "Tooth_site", "Tooth site")
+pe_tooth
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_og_tooth_site_gn.pdf", plot = og_tooth, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_shannon_tooth_site_gn.pdf", plot = shannon_tooth, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_pe_tooth_site_gn.pdf", plot = pe_tooth, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+og_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Observed_genera", "Sex", "Sex", "Sex")
+og_sex
+shannon_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Shannon_index", "Sex", "Sex", "Sex")
+shannon_sex
+pe_sex <- plot_box_whisker(malt_genus.decontam_filtered.alpha, "Pileou_evenness", "Sex", "Sex", "Sex")
+pe_sex
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_og_sex_cmc_gn.pdf", plot = og_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_shannon_sex_cmc_gn.pdf", plot = shannon_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_pe_sex_cmc_gn.pdf", plot = pe_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # add metadata to the table
 malt_genus.decontam_filtered.alpha_meta <- malt_genus.decontam_filtered.alpha %>%
@@ -1051,6 +1351,8 @@ pvalues_envmt <- malt_genus.decontam_filtered.alpha_meta %>%
   arrange(p)
 
 genus_kruskal_pvals
+
+fwrite(genus_kruskal_pvals, "./06-publication/supplemental_tables/alphadiv_kruskal_wallace_cmc_gn.tsv", sep = "\t", quote = F)
 
 # pull out only the metadata categories that were significantly different between groups from the Kruskal-Wallace test
 Envmt_sig <- genus_kruskal_pvals %>%
@@ -1113,6 +1415,8 @@ IC_genus_cmc_p_es <- genus_wilcox_pvals %>%
 
 IC_genus_cmc_p_es
 
+fwrite(IC_genus_cmc_p_es, "./06-publication/supplemental_tables/alphadiv_wilcox_cmc_gn.tsv", sep = "\t", quote = F)
+
 ```
 Two metadata categories have significant differences in diversity, Tooth site
 (Shannon index (p = 0.0123), and Evenness (p = 0.00185)) and Village (number of
@@ -1173,7 +1477,7 @@ malt_species.decontam_filtered.alpha_meta %>%
          ggtitle("Observed species per village by sex")
 
 # make a plot of village split by sex
-malt_species.decontam_filtered.alpha_meta %>%
+shannon_village_split_sex <- malt_species.decontam_filtered.alpha_meta %>%
   mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
@@ -1184,6 +1488,8 @@ malt_species.decontam_filtered.alpha_meta %>%
          ylab("Shannon index") +
          xlab("Sex") +
          ggtitle("Species Shannon index per village by sex")
+
+shannon_village_split_sex
 
 # make a plot of village split by sex
 malt_species.decontam_filtered.alpha_meta %>%
@@ -1238,44 +1544,57 @@ wilcox_genus_sex_p_es <- wilcox_genus_sex %>%
 
 wilcox_genus_sex_p_es
 
+fwrite(wilcox_genus_sex_p_es, "./06-publication/supplemental_tables/alphadiv_wilcox_cmc_gn_village_sex.tsv", sep = "\t", quote = F)
+
 # make a plot of village split by sex
-malt_genus.decontam_filtered.alpha_meta %>%
+og_village_sex <- malt_genus.decontam_filtered.alpha_meta %>%
   mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Observed_genera, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
          scale_fill_manual(values = Sex_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         theme_minimal(base_size = 18) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 18)) +
          ylab("Observed genera") +
          xlab("Sex") +
          ggtitle("Observed genera per village by sex")
 
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_og_village_sex_gn.pdf", plot = og_village_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+
 # make a plot of village split by sex
-malt_genus.decontam_filtered.alpha_meta %>%
+shannon_village_sex <- malt_genus.decontam_filtered.alpha_meta %>%
   mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Shannon_index, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
          scale_fill_manual(values = Sex_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         theme_minimal(base_size = 18) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 18)) +
          ylab("Shannon index") +
          xlab("Sex") +
-         ggtitle("genus Shannon index per village by sex")
+         ggtitle("Genus Shannon index per village by sex")
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_shannon_village_sex_gn.pdf", plot = shannon_village_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # make a plot of village split by sex
-malt_genus.decontam_filtered.alpha_meta %>%
+pe_village_sex <- malt_genus.decontam_filtered.alpha_meta %>%
   mutate(Village = fct_relevel(Village, "202","205","204","203","206")) %>%
   ggplot(., aes(x = Village, y = Pileou_evenness, fill = Sex)) +
          geom_boxplot(outlier.size = 0) +
          geom_point(position = position_jitterdodge(jitter.width = 0), alpha = 0.5) +
          scale_fill_manual(values = Sex_colors) +
-         theme_minimal() +
-         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         theme_minimal(base_size = 18) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5, size = 18)) +
          ylab("Evenness") +
          xlab("Sex") +
          ggtitle("Genus evenness per village by sex")
+pe_village_sex
+
+ggsave("./06-publication/supplemental_figures/SXX32/panel_parts/Figure_SXX32_pe_village_sex_gn.pdf", plot = pe_village_sex, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 The only significant difference in genus-level diversity between females and
@@ -1828,12 +2147,19 @@ heatmap_base <- ggplot(malt_species.decontam_top50_each_clr_long, aes(SampleID, 
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, color = vector_color),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
         legend.position = "left")
 
 heatmap_base
+
+ggsave("./06-publication/supplemental_figures/SXX8/Figure_SXX8_top50_sp_heatmap_clustered.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX8/Figure_SXX8_top50_sp_heatmap_clustered.png", plot = heatmap_base, device = "png",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
 
 # Plot the heatmap with samples ordered by Village
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -2389,12 +2715,19 @@ heatmap_base <- ggplot(malt_genus.decontam_top50_each_clr_long, aes(SampleID, Sp
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, color = vector_color),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
         legend.position = "left")
 
 heatmap_base
+
+ggsave("./06-publication/supplemental_figures/SXX31/Figure_SXX31_top50_gn_heatmap_clustered.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
+ggsave("./06-publication/supplemental_figures/SXX31/Figure_SXX31_top50_gn_heatmap_clustered.png", plot = heatmap_base, device = "png",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
 
 # Plot the heatmap with samples ordered by Village
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -2426,16 +2759,18 @@ heatmap_base <- ggplot(malt_genus.decontam_top50_each_clr_long, aes(SampleID, Sp
   geom_tile() +
   scale_fill_viridis_c(option = "A") +
   theme_minimal(base_size = 7) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, color = vector_color),
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, color = vector_color),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
         legend.position = "left")
 
 heatmap_base
 
+ggsave("./06-publication/supplemental_figures/SXX30/Figure_SXX30_top50_gn_heatmap.pdf", plot = heatmap_base, device = "pdf",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
 
-# ggsave("./05-results.backup/top50species_each_heatmap.pdf", plot = heatmap_base, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX30/Figure_SXX30_top50_gn_heatmap.png", plot = heatmap_base, device = "png",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
 
 ```
 

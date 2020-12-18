@@ -369,7 +369,7 @@ malt_species.decontam_filtered_noblanks <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
@@ -448,7 +448,7 @@ malt_species.decontam_filtered_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
@@ -457,8 +457,12 @@ tune.pca(malt_species.decontam_filtered_noyanomami, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_post_village <- plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_post_village
 plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("./06-publication/supplemental_figures/SXX17/panel_parts/Figure_SXX17_sp_posterior_village_pc12.pdf", plot = sp_post_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_species.decontam_filtered_noyanomami, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -541,7 +545,7 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
@@ -702,7 +706,7 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
@@ -802,7 +806,7 @@ malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
@@ -811,8 +815,12 @@ tune.pca(malt_species.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_post_village_cmc <- plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+sp_post_village_cmc
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("./06-publication/supplemental_figures/SXX17/panel_parts/Figure_SXX17_sp_posterior_village_cmc_pc12.pdf", plot = sp_post_village_cmc, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_species.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -963,7 +971,7 @@ malt_species.decontam_filtered_nocontrols <- malt_species.decontam %>%
                                          mutate(Percent = Sum_species/sum(Sum_species)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_species","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 malt_species.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_species.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
@@ -1043,13 +1051,13 @@ resolution with genus data?
 ```{r pca_noblanks_genus}
 malt_genus.decontam_filtered <- malt_genus.decontam %>%
                                          select(-one_of(outliers)) %>%
-                                         select(-matches("EXB|LIB|10M")) %>%
+                                         select(-matches("EXB|LIB|10M|SRR164")) %>%
                                          select(-one_of(anterior)) %>%
                                          adorn_totals(where = "col", name = "Sum_genus") %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.01) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # prepare to run a PCA
@@ -1058,8 +1066,13 @@ tune.pca(malt_genus.decontam_filtered, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_post_village <- plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_post_village
 plot_pca_titles(malt_genus.decontam_filtered, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("./06-publication/supplemental_figures/SXX18/panel_parts/Figure_SXX18_gn_posterior_village_pc12.pdf", plot = gn_post_village, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 
 # by Sex
 plot_pca_titles(malt_genus.decontam_filtered, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -1127,7 +1140,7 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
@@ -1286,7 +1299,7 @@ malt_genus.decontam_filtered_noblanks_noyanomami <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 # perform PCA
@@ -1382,7 +1395,7 @@ malt_genus.decontam_filtered_cmc <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 
@@ -1392,8 +1405,12 @@ tune.pca(malt_genus.decontam_filtered_cmc, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Village
-plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_post_village_cmc <- plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+gn_post_village_cmc
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
+
+ggsave("./06-publication/supplemental_figures/SXX18/panel_parts/Figure_SXX18_gn_posterior_village_cmc_pc12.pdf", plot = gn_post_village_cmc, device = "pdf",
+       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 # by Sex
 plot_pca_titles(malt_genus.decontam_filtered_cmc, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -1527,7 +1544,7 @@ malt_genus.decontam_filtered_nocontrols <- malt_genus.decontam %>%
                                          mutate(Percent = Sum_genus/sum(Sum_genus)*100) %>%
                                          filter(Percent > 0.001) %>%
                                          select(-one_of(c("Sum_genus","Percent"))) %>%
-                                         gather("SampleID","Counts",2:ncol(.)) %>% muate(Counts = Counts + 1) %>%
+                                         gather("SampleID","Counts",2:ncol(.)) %>% mutate(Counts = Counts + 1) %>%
                                          spread(Species,Counts) %>% column_to_rownames("SampleID")
 
 malt_genus.decontam_filtered_nocontrols.pca <- mixOmics::pca(malt_genus.decontam_filtered_nocontrols, ncomp = 3, logratio = 'CLR')
