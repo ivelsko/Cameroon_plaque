@@ -147,6 +147,21 @@ Village_shapes <- c(`202` = 15, `203` = 16, `205` = 17,`204` = 18, `206` = 25, Y
 Village_size <- c(`202` = 4.5, `203` = 4, `205` = 4,`204` = 6, `206` = 4, Yanomami = 4, HMP = 4, HMP10M = 4, JAE = 4, JAE10M = 4,
                     ExtractionGauze = 4, ExtractionBlank = 4, LibraryBlank = 4)
 
+Decayed_colors = c("#065FA3","#FF3200")
+Decayed_shapes = c(17,19)
+Decayed_size = c(4,4)
+
+Missing_colors = c("#065FA3","#FF3200")
+Missing_shapes = c(17,19)
+Missing_size = c(4,4)
+
+Root_visible_colors = c("#065FA3","#FF3200")
+Root_visible_shapes = c(17,19)
+Root_visible_size = c(4,4)
+
+Altered_colors = c("#065FA3","#FF3200")
+Altered_shapes = c(17,19)
+Altered_size = c(4,4)
 
 ```
 
@@ -167,6 +182,10 @@ save(metadata,
      Sex_colors, Sex_shapes, Sex_size,
      Tooth_site_colors, Tooth_site_shapes, Tooth_site_size,
      Village_shapes, Village_colors, Village_size,
+     Decayed_colors, Decayed_shapes, Decayed_size,
+     Missing_colors, Missing_shapes, Missing_size,
+     Root_visible_colors, Root_visible_shapes, Root_visible_size,
+     Altered_colors, Altered_shapes, Altered_size,
      file = "./05-results.backup/CMC_metadata.RData")
 
 ```
