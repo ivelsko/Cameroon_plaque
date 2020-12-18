@@ -1,0 +1,616 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque MALT beta diversity"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(ape)
+library(mixOmics)
+library(compositions)
+library(vegan)
+library(janitor)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+# Oral-gut differences (rural/"traditional" vs urban/industrial)
+Load our data
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+We'll use the data from James' paper to use the gut samples that have been
+profiled by MALT with the same database. First load the metadata table, select
+out the gut samples, then read in the tables from James' paper keeping only the
+gut samples
+```{r deep_evo_meta}
+deep_evo_metadata <- fread("./00-documentation.backup/02-calculus_microbiome-deep_evolution-individualscontrolssources_metadata_20200219.tsv")
+
+gut_samples <- deep_evo_metadata %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(str_detect(Description, "gut")) %>%
+  pull(SampleID)
+  
+  
+```
+
+Combine the metadata tables
+```{r}
+new_metadata <- metadata %>%
+  select(SampleID, Env, Description) %>%
+  filter(!str_detect(SampleID,"SRR164")) %>%
+  mutate(Description = str_replace_all(Description, "HunterGatherer","CameroonPlaque"),
+         Env = str_replace_all(Env, "HunterGatherer","CameroonPlaque"),
+         Description = str_replace_all(Description, "subP","p"),
+         Description = str_replace_all(Description, "supP","p")) %>%
+  bind_rows(., deep_evo_metadata %>%
+              rename(SampleID = `#SampleID`) %>%
+              select(SampleID, Env, Description) %>%
+              filter(str_detect(Description, "gut")))
+
+```
+
+Set new colors and shapes
+```{r}
+
+Env_colors <- c(CameroonPlaque = "#FF3200", HMP = "#065FA3", JAE = "#172869", HMP10M = "#065FA3", JAE10M = "#172869", urbanGut = "#feb24c", ruralGut = "#C70E7B") # #ffeda0
+Env_shapes <- c(CameroonPlaque = 19, HMP = 13, JAE = 10, HMP10M = 18, JAE10M = 18, urbanGut = 12, ruralGut = 7)
+Env_size <- c(CameroonPlaque = 4, HMP = 4, JAE = 4 , urbanGut = 4, ruralGut = 4)
+
+Description_colors <- c(CameroonPlaque = "#FF3200", Yanomami = "#C70E7B", HMP_plaque = "#065FA3", JAE = "#feb24c",
+                        HMP_gut = "#172869", Norman_gut = "#172869", Matses_gut = "#ffeda0", Hadza_gut = "#252525")
+Description_shapes <- c(CameroonPlaque = 19, Yanomami = 14, HMP_plaque = 13, JAE = 10, 
+                        HMP_gut = 7, Norman_gut = 7, Matses_gut = 12, Hadza_gut = 12)
+Description_size <- c(CameroonPlaque = 4, Yanomami = 4, HMP_plaque = 4, HMP_plaque = 4, JAE = 4,
+                      HMP_gut = 4,  Norman_gut = 4, Matses_gut = 4, Hadza_gut = 4)
+
+
+```
+
+
+Load the data from James' paper 
+```{r deep_evo_tables}
+
+deep_evo_sp <- fread("./05-results.backup/Evolution-Comparison_MEGAN_20190410-ex_absolute_species_prokaryotes_summarised_refseq.txt") %>%
+  rename(Species = `#Datasets`) %>%
+  column_to_rownames("Species") %>%
+  select(matches(gut_samples %>% str_c(collapse = "|"))) %>%
+  rownames_to_column("Species") %>%
+# remove all species that aren't in the gut samples
+  adorn_totals(where = "col") %>%
+  filter(Total != 0) %>%
+  select(-Total)
+
+colnames(deep_evo_sp) <- gsub("_S0_L000_R1_000.fastq.merged.prefixed.hg19unmapped","", colnames(deep_evo_sp))
+
+
+deep_evo_gn <- fread("./05-results.backup/Evolution-Comparison_MEGAN_20190410-ex_absolute_genus_prokaryotes_summarised_refseq.txt") %>%
+  rename(Genus = `#Datasets`) %>%
+  column_to_rownames("Genus") %>%
+  select(matches(gut_samples %>% str_c(collapse = "|"))) %>%
+  rownames_to_column("Genus") %>%
+# remove all genera that aren't in the gut samples
+  adorn_totals(where = "col") %>%
+  filter(Total != 0) %>%
+  select(-Total)
+
+colnames(deep_evo_gn) <- gsub("_S0_L000_R1_000.fastq.merged.prefixed.hg19unmapped","", colnames(deep_evo_gn))
+
+```
+
+
+List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+```
+
+Join the gut tables with our plaque tables
+```{r}
+genus_table <- malt_genus.decontam %>%
+  rename(Genus = Species) %>%
+  select(-matches(outliers %>% str_c(collapse = "|"))) %>%
+  full_join(., deep_evo_gn) %>%
+  # remove the unneeded sub-sampled samples (10M reads each)
+  select(-matches("SRR164")) %>%
+  replace(is.na(.), 0) 
+
+species_table <- malt_species.decontam %>%
+  select(-matches(outliers %>% str_c(collapse = "|"))) %>%
+  full_join(., deep_evo_sp) %>%
+  # remove the unneeded sub-sampled samples (10M reads each)
+  select(-matches("SRR164")) %>%
+  replace(is.na(.), 0) %>%
+  filter(Species != "Homo sapiens")
+
+```
+
+
+#Sample Clustering with PCA
+
+Step-by-step removal of taxa based on decontam and a filter threshold, followed
+by PCA to see how contaminants/low abundance species affect the relationships of
+samples to eachother between groups.
+```{r pca_all_species}
+species_table_mat <- species_table %>%
+  select(-matches("EXB|LIB|10M")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
+
+species_table_mat.pca <- mixOmics::pca(species_table_mat, ncomp = 3, logratio = 'CLR')
+
+exp_var <- paste0(round(species_table_mat.pca$explained_variance * 100, 2), "%")
+species_table_mat_pca_values <- species_table_mat.pca$variates$X %>%
+          as.data.frame() %>%
+          rownames_to_column("SampleID") %>%
+          inner_join(new_metadata, by = "SampleID")
+
+
+species_table_mat10M <- species_table %>%
+  select(-matches("EXB|LIB")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
+
+species_table_mat10M.pca <- mixOmics::pca(species_table_mat10M, ncomp = 3, logratio = 'CLR')
+
+exp_var <- paste0(round(species_table_mat10M.pca$explained_variance * 100, 2), "%")
+species_table_mat10M_pca_values <- species_table_mat10M.pca$variates$X %>%
+          as.data.frame() %>%
+          rownames_to_column("SampleID") %>%
+          inner_join(new_metadata, by = "SampleID")
+
+# now with only the 10M
+species_table_mat10Monly <- species_table %>%
+  gather("SampleID","Counts", 2:ncol(.)) %>%
+  spread(Species, Counts) %>%
+  inner_join(., new_metadata %>% select(SampleID, Env)) %>%
+  filter(str_detect(Env, "Cameroon|10M|Gut")) %>%
+  select(-Env) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
+
+species_table_mat10Monly.pca <- mixOmics::pca(species_table_mat10Monly, ncomp = 3, logratio = 'CLR')
+
+exp_var <- paste0(round(species_table_mat10Monly.pca$explained_variance * 100, 2), "%")
+species_table_mat10M_only_pca_values <- species_table_mat10Monly.pca$variates$X %>%
+          as.data.frame() %>%
+          rownames_to_column("SampleID") %>%
+          inner_join(new_metadata, by = "SampleID")
+
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+
+oral_gut_gn <- ggplot(species_table_mat_pca_values, aes(PC1, PC2, colour = Env, shape = Env)) +
+       geom_point(size = 6) +
+       scale_colour_manual(values = Env_colors) +
+       scale_shape_manual(values = Env_shapes) +
+       xlab(paste("PC1 - ", exp_var[1])) +
+       ylab(paste("PC2 - ", exp_var[2])) +
+       theme_minimal(base_size = 20) +
+       theme(text = element_text(size=20)) +
+       theme(legend.text = element_text(size = 7))
+oral_gut_gn
+
+oral_gut_gn_10M <- ggplot(species_table_mat10M_pca_values, aes(PC1, PC2, colour = Env, shape = Env)) +
+       geom_point(size = 6) +
+       scale_colour_manual(values = Env_colors) +
+       scale_shape_manual(values = Env_shapes) +
+       xlab(paste("PC1 - ", exp_var[1])) +
+       ylab(paste("PC2 - ", exp_var[2])) +
+       theme_minimal(base_size = 20) +
+       theme(text = element_text(size=20)) +
+       theme(legend.text = element_text(size = 7))
+oral_gut_gn_10M
+
+oral_gut_gn_10Monly <- ggplot(species_table_mat10M_only_pca_values, aes(PC1, PC2, colour = Env, shape = Env)) +
+       geom_point(size = 6) +
+       scale_colour_manual(values = Env_colors) +
+       scale_shape_manual(values = Env_shapes) +
+       xlab(paste("PC1 - ", exp_var[1])) +
+       ylab(paste("PC2 - ", exp_var[2])) +
+       theme_minimal(base_size = 20) +
+       theme(text = element_text(size=20)) +
+       theme(legend.text = element_text(size = 7))
+oral_gut_gn_10Monly
+
+ggsave("./06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral-gut_species_pc12.pdf", plot = oral_gut_gn, device = "pdf",
+       scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral-gut_species_pc12.png", plot = oral_gut_gn, device = "png",
+       scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral-gut_species_10M_pc12.pdf", plot = oral_gut_gn_10M, device = "pdf",
+       scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral-gut_species_10Monly_pc12.pdf", plot = oral_gut_gn_10Monly, device = "pdf",
+       scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+
+
+```
+
+```{r betadiv}
+# use the CLR-transformed matrix from the mixOmics PCA above
+# Euclidean distance
+species_table_mat.euc <- vegdist(species_table_mat.pca$X, method = "euclidean", na.rm = T)
+species_table_mat.euc.pcoa <- ape::pcoa(species_table_mat.euc)
+
+species_table_mat.euc.pcoavectors <- as.data.frame(species_table_mat.euc.pcoa$vectors)
+species_table_mat.euc.pcoavectors <- species_table_mat.euc.pcoavectors %>%
+  rownames_to_column("SampleID")
+
+species_table_mat.euc.pcoavectors.vecmet <- inner_join(species_table_mat.euc.pcoavectors, new_metadata, by = "SampleID")
+
+plot1 <- species_table_mat.euc.pcoavectors.vecmet %>%
+  ggplot(., aes(Axis.1, Axis.2, colour = Env, shape = Env)) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = Env_colors) +
+  scale_shape_manual(values = Env_shapes) +
+  stat_ellipse(aes(colour = Env, group = Env)) +
+  theme_minimal(base_size = 10) +
+  ggtitle("Rural and Urban Oral and Stool")
+plot1
+
+# species_table_mat.pca$X
+ggsave("~/Desktop/SXX1_oral-gut_species_euc_pc12.pdf", plot = plot1, device = "pdf",
+       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+```
+
+```{r euc_dist_df}
+# make a long table of betadiversity (euclidean distance) values to plot as a box plot
+betadist <- as.matrix(species_table_mat.euc) %>%
+  # convert to a long table
+  as.data.frame(.) %>%
+  rownames_to_column("SampleID") %>% 
+  # select(SampleID, Group1) %>%
+  inner_join(., new_metadata %>%
+               select(SampleID, Env)) %>%
+  gather("Group1","distValue",2:ncol(.)) %>%
+  distinct() %>%
+  filter(distValue > 0)%>%
+  inner_join(., new_metadata) %>%
+  select(Group1, SampleID, distValue, Env,Description) %>%
+  rename(Sample = Group1,
+         Group1 = SampleID) %>%
+  rename(SampleID = Sample)
+
+# make a new column indicating the groups being compared
+betadist_info <- betadist %>%
+  filter(str_detect(SampleID, "CMC"), str_detect(Group1, "CMC")) %>%
+  mutate(CompGroup = "CMC-CMC") %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "CMC"), str_detect(Env, "JAE")) %>%
+            mutate(CompGroup = "CMC-JAE")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "CMC"), str_detect(Env, "HMP")) %>%
+            mutate(CompGroup = "CMC-HMP")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "CMC"), str_detect(Env, "urbanGut")) %>%
+            mutate(CompGroup = "CMC-urbanGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "CMC"), str_detect(Env, "ruralGut")) %>%
+            mutate(CompGroup = "CMC-ruralGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "JAE"), str_detect(Env, "HMP")) %>%
+            mutate(CompGroup = "JAE-HMP")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "JAE"), str_detect(Env, "urbanGut")) %>%
+            mutate(CompGroup = "JAE-urbanGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "JAE"), str_detect(Env, "ruralGut")) %>%
+            mutate(CompGroup = "JAE-ruralGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "HMP"), str_detect(Env, "urbanGut")) %>%
+            mutate(CompGroup = "HMP-urbanGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "HMP"), str_detect(Env, "urbanGut")) %>%
+            mutate(CompGroup = "HMP-ruralGut")) %>%
+  bind_rows(., betadist %>%
+            filter(str_detect(SampleID, "SRR17617|SRR1761698|SRR19"), str_detect(Env, "urbanGut")) %>%
+            mutate(CompGroup = "urbanGut-ruralGut")) %>%
+  mutate(SampleComp = ifelse(CompGroup == "CMC-JAE", "Oral",
+                             ifelse(CompGroup == "CMC-HMP", "Oral",
+                                    ifelse(CompGroup == "urbanGut-ruralGut", "Stool","not using")))) %>%
+  filter(!str_detect(SampleComp, "not using")) %>%
+  rename(oEnv = Env,
+         oDesc = Description) %>%
+  inner_join(., new_metadata) %>%
+  mutate(distValue = as.numeric(distValue))
+
+
+```
+
+```{r pcoa_df}
+# Make this Beta-dispersion, not the PCoA values
+# make a long table of betadiversity (euclidean distance) values to plot as a box plot
+pcoadist <- species_table_mat.euc.pcoavectors %>%
+  select(SampleID, Axis.1, Axis.2) %>%
+  inner_join(., new_metadata) %>%
+  mutate(CompGroup = ifelse(str_detect(Env, "Gut"), "Gut","Oral")) %>%
+  select(SampleID, Env, CompGroup, Axis.1, Axis.2) %>%
+  gather("Axis","Values",4:ncol(.))
+
+# Oral-Gut
+groups_comp <- new_metadata %>%
+  filter(!str_detect(SampleID, "10M|SRR164|EXB|LIB|CMC002.B0201|CMC032.B0101|CMC037.B0201|CMC047.A0201")) %>%
+  mutate(SampleComp = ifelse(Env == "CameroonPlaque","Oral",
+                             ifelse(Env == "JAE","Oral",
+                                    ifelse(Env == "HMP","Oral",
+                                           ifelse(Env == "urbanGut","Gut",
+                                                  ifelse(Env == "ruralGut", "Gut","other")))))) %>%
+  arrange(SampleID) %>%
+  select(SampleComp) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+betadisper_oral_gut <- betadisper(species_table_mat.euc, groups_comp, bias.adjust =TRUE)
+betadisper_oral_gut
+
+## Perform test
+anova(betadisper_oral_gut)
+
+## Permutation test for F
+permutest(betadisper_oral_gut, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+betadisper_oral_gut.HSD <- TukeyHSD(betadisper_oral_gut)
+plot(betadisper_oral_gut.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(betadisper_oral_gut, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(betadisper_oral_gut)
+
+
+```
+
+
+```{r dist_box_plots}
+# make a boxplot of beta-diversity values
+plot1 <- betadist_info %>%
+  ggplot(., aes(x = SampleComp, y = distValue, fill = SampleComp)) +
+         geom_boxplot() +
+         geom_dotplot(binaxis = "y", dotsize = 0.4, stackdir = "center", alpha = 0.5, binwidth = 0.75) +
+         scale_fill_manual(values = c("#FF3200","#065FA3")) +
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               text = element_text(size=20)) +
+         ylab("Euclidean distance") +
+         xlab("Sample type")
+
+ggsave("~/Desktop/SXX1_oral-gut_species_euc_box.pdf", plot = plot1, device = "pdf",
+       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+# pcoadist %>%
+#   mutate(CompGroup = fct_relevel(CompGroup, "Oral","Gut")) %>%
+#   ggplot(., aes(x = Axis, y = Values, fill = CompGroup)) +
+#          geom_boxplot(position = position_dodge(1)) +
+#          geom_dotplot(binaxis = "y", dotsize = 2, stackdir = "center", alpha = 0.5, position = position_dodge(1), binwidth = 0.75) +
+#          scale_fill_manual(values = c("#FF3200","#065FA3")) +
+#          theme_minimal(base_size = 14) +
+#          theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+#                text = element_text(size=20)) +
+#          ylab("PCoA value")
+
+beta_dist_df <- betadisper_oral_gut$distances %>%
+  as.data.frame()
+names(beta_dist_df)[1] <- "Distance"
+beta_dist_df <- beta_dist_df %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., new_metadata %>%
+  filter(!str_detect(SampleID, "10M|SRR164|EXB|LIB|CMC002.B0201|CMC032.B0101|CMC037.B0201|CMC047.A0201")) %>%
+  mutate(SampleComp = ifelse(Env == "CameroonPlaque","Oral",
+                             ifelse(Env == "JAE","Oral",
+                                    ifelse(Env == "HMP","Oral",
+                                           ifelse(Env == "urbanGut","Gut",
+                                                  ifelse(Env == "ruralGut", "Gut","other")))))))
+
+plot1 <- beta_dist_df %>%
+  mutate(SampleComp = fct_relevel(SampleComp, "Oral","Gut")) %>%
+   ggplot(., aes(x = SampleComp, y = Distance, fill = SampleComp)) +
+         geom_boxplot() +
+         geom_dotplot(binaxis = "y", dotsize = 0.8, stackdir = "center", alpha = 0.5, binwidth = 0.75) +
+         scale_fill_manual(values = c("#FF3200","#065FA3")) +
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               text = element_text(size=20)) +
+         ylab("Distance to centroid") +
+         xlab("Sample type")
+ plot1
+ggsave("~/Desktop/SXX1_oral-gut_species_centroids.pdf", plot = plot1, device = "pdf",
+       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+```
+
+my own distance to centroid calculations
+```{r}
+# Make a plot of the distances to centroids
+oral_gut.list <- new_metadata %>%
+  filter(!str_detect(SampleID, "10M|SRR164|EXB|LIB|CMC002.B0201|CMC032.B0101|CMC037.B0201|CMC047.A0201")) %>%
+  mutate(SampleComp = ifelse(Env == "CameroonPlaque","Oral",
+                             ifelse(Env == "JAE","Oral",
+                                    ifelse(Env == "HMP","Oral",
+                                           ifelse(Env == "urbanGut","Gut",
+                                                  ifelse(Env == "ruralGut", "Gut","other")))))) %>%
+  arrange(SampleID) %>%
+  select(SampleComp) %>% 
+  pull()
+
+oral_gut.env <- new_metadata %>%
+  filter(!str_detect(SampleID, "10M|SRR164|EXB|LIB|CMC002.B0201|CMC032.B0101|CMC037.B0201|CMC047.A0201")) %>%
+  arrange(SampleID) %>%
+  select(Env) %>% 
+  pull()
+
+# calculate distance to centroids for oral and gut samples
+oral_gut_dist <- usedist::dist_to_centroids(species_table_mat.euc, oral_gut.env) %>%
+  rename(SampleID = Item) %>%
+  inner_join(., new_metadata %>%
+               select(SampleID, Env)) %>%
+  mutate(Paired = CentroidGroup == Env) %>%
+  filter(Paired == TRUE) %>%
+  mutate(Site = ifelse(Env == "CameroonPlaque","Oral",
+                             ifelse(Env == "JAE","Oral",
+                                    ifelse(Env == "HMP","Oral",
+                                           ifelse(Env == "urbanGut","Gut",
+                                                  ifelse(Env == "ruralGut", "Gut","other"))))))
+
+# calculate centroids
+# build ggplot dataframe with points (x,y) and corresponding groups (cluster)
+pcoadist <- species_table_mat.euc.pcoavectors %>%
+  select(SampleID, Axis.1, Axis.2) %>%
+  inner_join(., new_metadata) %>%
+  mutate(CompGroup = ifelse(str_detect(Env, "Gut"), "Gut","Oral")) %>%
+  select(SampleID, Env, CompGroup, Axis.1, Axis.2)
+# calculate group centroid locations
+centroids <- aggregate(cbind(Axis.1,Axis.2)~CompGroup,data=pcoadist,mean)
+centroids_env <- aggregate(cbind(Axis.1,Axis.2)~Env,data=pcoadist,mean)
+# merge centroid locations into ggplot dataframe
+gg <- merge(pcoadist,centroids,by="CompGroup",suffixes=c("",".centroid"))
+gg_env <- merge(pcoadist,centroids_env,by="Env",suffixes=c("",".centroid")) %>%
+  select(SampleID, Env, everything())
+# generate star plot...
+ggplot(gg) +
+  geom_point(aes(x=Axis.1,y=Axis.2,color=CompGroup), size=2) +
+  geom_point(data=centroids, aes(x=Axis.1, y=Axis.2, color=CompGroup), size=4) +
+  geom_segment(aes(x=Axis.1.centroid, y=Axis.2.centroid, xend=Axis.1, yend=Axis.2, color=CompGroup))
+
+plot1 <- ggplot(gg_env) +
+  geom_point(aes(x=Axis.1,y=Axis.2,color=Env), size=2) +
+  geom_point(data=centroids_env, aes(x=Axis.1, y=Axis.2, color=Env), size=4) +
+  geom_segment(aes(x=Axis.1.centroid, y=Axis.2.centroid, xend=Axis.1, yend=Axis.2, color=Env))
+plot1
+
+ggsave("~/Desktop/SXX1_oral-gut_species_centroids_pc.pdf", plot = plot1, device = "pdf",
+       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+plot1 <- oral_gut_dist %>%
+  mutate(CentroidGroup = fct_relevel(CentroidGroup, "CameroonPlaque","JAE","HMP","urbanGut","ruralGut"),
+         Site = fct_relevel(Site, "Oral","Gut")) %>%
+   ggplot(., aes(x = Site, y = CentroidDistance, fill = CentroidGroup)) +
+         geom_boxplot(position = position_dodge(1)) +
+         geom_dotplot(binaxis = "y", dotsize = 0.8, stackdir = "center", alpha = 0.5, position = position_dodge(1), binwidth = 0.75) +
+         # scale_fill_manual(values = c("#FF3200","#065FA3")) +
+         theme_minimal(base_size = 14) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               text = element_text(size=14)) +
+         ylab("Distance to centroid") +
+         xlab("Sample type")
+plot1
+
+ggsave("~/Desktop/SXX1_oral-gut_species_centroids_box_sep.pdf", plot = plot1, device = "pdf",
+       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+```
+
+
+## Genus
+```{r pca_all_genus}
+# unfiltered, decontaminated
+genus_table_mat <- genus_table %>%
+  select(-matches("EXB|LIB|10M")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Genus, Counts) %>%
+  column_to_rownames("SampleID")
+
+genus_table_mat.pca <- mixOmics::pca(genus_table_mat, ncomp = 3, logratio = 'CLR')
+
+exp_var <- paste0(round(genus_table_mat.pca$explained_variance * 100, 2), "%")
+genus_table_mat_pca_values <- genus_table_mat.pca$variates$X %>%
+          as.data.frame() %>%
+          rownames_to_column("SampleID") %>%
+          inner_join(new_metadata, by = "SampleID")
+
+
+genus_table_mat10M <- genus_table %>%
+  select(-matches("EXB|LIB")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Genus, Counts) %>%
+  column_to_rownames("SampleID")
+
+genus_table_mat10M.pca <- mixOmics::pca(genus_table_mat10M, ncomp = 3, logratio = 'CLR')
+
+exp_var <- paste0(round(genus_table_mat10M.pca$explained_variance * 100, 2), "%")
+genus_table_mat10M_pca_values <- genus_table_mat10M.pca$variates$X %>%
+          as.data.frame() %>%
+          rownames_to_column("SampleID") %>%
+          inner_join(new_metadata, by = "SampleID")
+
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(genus_table_mat, logratio = 'CLR')
+
+oral_gut_gn <- ggplot(genus_table_mat_pca_values, aes(PC1, PC2, colour = Env, shape = Env)) +
+       geom_point(size = 2) +
+       scale_colour_manual(values = Env_colors) +
+       scale_shape_manual(values = Env_shapes) +
+       xlab(paste("PC1 - ", exp_var[1])) +
+       ylab(paste("PC2 - ", exp_var[2])) +
+       theme_minimal(base_size = 16) +
+       theme(text = element_text(size=16)) +
+       theme(legend.text = element_text(size = 7))
+
+ggplot(genus_table_mat10M_pca_values, aes(PC1, PC2, colour = Env, shape = Env)) +
+       geom_point(size = 2) +
+       scale_colour_manual(values = Env_colors) +
+       scale_shape_manual(values = Env_shapes) +
+       scale_y_reverse() +
+       xlab(paste("PC1 - ", exp_var[1])) +
+       ylab(paste("PC2 - ", exp_var[2])) +
+       theme_minimal(base_size = 16) +
+       theme(text = element_text(size=16)) +
+       theme(legend.text = element_text(size = 7))
+
+# ggsave("./06-publication/supplemental_figures/SXX39/SXX39_oral-gut_genus_pc12.pdf", plot = oral_gut_gn, device = "pdf",
+#        scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX39/SXX39_oral-gut_genus_pc12.png", plot = oral_gut_gn, device = "png",
+#        scale = 1, width = 14, height = 7, units = c("in"), dpi = 300)
+
+
+```
+
+
+
+
+
+
+
+
