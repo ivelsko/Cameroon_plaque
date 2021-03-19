@@ -1,0 +1,162 @@
+SampleID	Library_ID	Full	Type	Source
+SRS013942	SRS013942	Saliva - Industrial	Industrial	Saliva
+SRS014468	SRS014468	Saliva - Industrial	Industrial	Saliva
+SRS014692	SRS014692	Saliva - Industrial	Industrial	Saliva
+SRS015055	SRS015055	Saliva - Industrial	Industrial	Saliva
+SRS019120	SRS019120	Saliva - Industrial	Industrial	Saliva
+SRS043239	SRS043239	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS024281	SRS024281	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS058105	SRS058105	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS011310	SRS011310	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS015799	SRS015799	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS015436	SRS015436	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS056892	SRS056892	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS019587	SRS019587	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS013506	SRS013506	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS013945	SRS013945	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS019124	SRS019124	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS052874	SRS052874	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS018359	SRS018359	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+SRS011247	SRS011247	Buccal mucosa - Industrial	Industrial	Buccal mucosa
+ERR1474564	ERR1474564	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474565	ERR1474565	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474566	ERR1474566	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474567	ERR1474567	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474568	ERR1474568	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474569	ERR1474569	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474570	ERR1474570	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474571	ERR1474571	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474572	ERR1474572	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474573	ERR1474573	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474574	ERR1474574	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474575	ERR1474575	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474576	ERR1474576	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474577	ERR1474577	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474578	ERR1474578	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474579	ERR1474579	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474580	ERR1474580	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474581	ERR1474581	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474582	ERR1474582	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474583	ERR1474583	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474584	ERR1474584	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474585	ERR1474585	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474586	ERR1474586	Saliva - Non-industrial	Non-industrial	Saliva
+ERR1474587	ERR1474587	Saliva - Non-industrial	Non-industrial	Saliva
+SRR1646030	SRR1646030	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646031	SRR1646031	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646032	SRR1646032	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646033	SRR1646033	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646038	SRR1646038	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646039	SRR1646039	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646040	SRR1646040	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646041	SRR1646041	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646042	SRR1646042	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646043	SRR1646043	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646044	SRR1646044	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646045	SRR1646045	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646046	SRR1646046	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+SRR1646047	SRR1646047	Buccal mucosa - Non-industrial	Non-industrial	Buccal mucosa
+CMC001.A0101	CMC001.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC001.A0201	CMC001.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC001.B0201	CMC001.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC002.A0201	CMC002.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC002.B0201	CMC002.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC003.A0201	CMC003.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC003.B0101	CMC003.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC004.A0101	CMC004.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC004.B0201	CMC004.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC005.A0202	CMC005.A0202	Plaque - Non-industrial	Non-industrial	Plaque
+CMC005.B0101	CMC005.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC006.A0101	CMC006.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC006.B0201	CMC006.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC007.B0101	CMC007.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC008.A0101	CMC008.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC008.B0201	CMC008.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC009.A0202	CMC009.A0202	Plaque - Non-industrial	Non-industrial	Plaque
+CMC009.B0101	CMC009.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC010.A0101	CMC010.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC010.B0201	CMC010.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC011.A0201	CMC011.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC011.B0101	CMC011.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC012.A0201	CMC012.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC012.B0201	CMC012.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC013.A0201	CMC013.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC013.B0101	CMC013.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC014.A0101	CMC014.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC015.A0201	CMC015.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC015.B0201	CMC015.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC016.A0101	CMC016.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC016.B0101	CMC016.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC017.A0201	CMC017.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC017.B0201	CMC017.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC018.A0101	CMC018.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC018.B0101	CMC018.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC020.A0101	CMC020.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC020.B0101	CMC020.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC021.A0201	CMC021.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC021.B0201	CMC021.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC022.A0101	CMC022.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC022.B0101	CMC022.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC023.A0301	CMC023.A0301	Plaque - Non-industrial	Non-industrial	Plaque
+CMC023.B0201	CMC023.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC024.A0101	CMC024.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC024.B0101	CMC024.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC025.A0201	CMC025.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC026.A0101	CMC026.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC026.B0101	CMC026.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC027.A0201	CMC027.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC027.B0201	CMC027.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC028.A0101	CMC028.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC028.B0101	CMC028.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC029.A0201	CMC029.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC029.B0201	CMC029.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC030.A0101	CMC030.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC030.B0101	CMC030.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC031.A0201	CMC031.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC031.B0201	CMC031.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC032.A0101	CMC032.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC032.B0101	CMC032.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC033.A0201	CMC033.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC033.B0201	CMC033.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC034.A0101	CMC034.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC034.B0101	CMC034.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC035.A0201	CMC035.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC035.B0201	CMC035.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC036.A0101	CMC036.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC036.B0101	CMC036.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC037.A0201	CMC037.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC037.B0201	CMC037.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC038.A0101	CMC038.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC038.B0101	CMC038.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC039.B0201	CMC039.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC040.B0101	CMC040.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC041.A0201	CMC041.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC042.A0201	CMC042.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC042.B0101	CMC042.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC043.A0101	CMC043.A0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC043.B0101	CMC043.B0101	Plaque - Non-industrial	Non-industrial	Plaque
+CMC044.A0201	CMC044.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC045.A0201	CMC045.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC045.B0201	CMC045.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC046.B0201	CMC046.B0201	Plaque - Non-industrial	Non-industrial	Plaque
+CMC047.A0201	CMC047.A0201	Plaque - Non-industrial	Non-industrial	Plaque
+SRR061192	SRR061192	Plaque - Industrial	Industrial	Plaque
+SRR061294	SRR061294	Plaque - Industrial	Industrial	Plaque
+SRR061320	SRR061320	Plaque - Industrial	Industrial	Plaque
+SRR061365	SRR061365	Plaque - Industrial	Industrial	Plaque
+SRR061562	SRR061562	Plaque - Industrial	Industrial	Plaque
+SRR062083	SRR062083	Plaque - Industrial	Industrial	Plaque
+SRR062298	SRR062298	Plaque - Industrial	Industrial	Plaque
+SRR062299	SRR062299	Plaque - Industrial	Industrial	Plaque
+SRR063517	SRR063517	Plaque - Industrial	Industrial	Plaque
+SRR1804664	SRR1804664	Plaque - Industrial	Industrial	Plaque
+SRR1804823	SRR1804823	Plaque - Industrial	Industrial	Plaque
+SRR512767	SRR512767	Plaque - Industrial	Industrial	Plaque
+SRR513165	SRR513165	Plaque - Industrial	Industrial	Plaque
+SRR513768	SRR513768	Plaque - Industrial	Industrial	Plaque
+SRR513775	SRR513775	Plaque - Industrial	Industrial	Plaque
+SRR513828	SRR513828	Plaque - Industrial	Industrial	Plaque
+SRR514202	SRR514202	Plaque - Industrial	Industrial	Plaque
+SRR514239	SRR514239	Plaque - Industrial	Industrial	Plaque
+SRR514306	SRR514306	Plaque - Industrial	Industrial	Plaque
+SRR514329	SRR514329	Plaque - Industrial	Industrial	Plaque

@@ -1,0 +1,118 @@
+---
+title: "Cameroon plaque taxonomy analysis - MALT RefSeq database to compare plaque vs other oral sites"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(mixOmics)
+library(tidyverse)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+
+```{r load_non_plaque}
+
+# for the Lassalle2017 and hmp2012 non-plaque oral samples
+oral_non_pq <- fread("./05-results.backup/oral_non_plaque_species.txt") %>%
+  rename(Species = `#Datasets`)
+
+colnames(oral_non_pq) <- gsub(".unmapped","", colnames(oral_non_pq))
+
+```
+
+Read in the saved tables from `Cameroon_kraken_RSPM_add_taxonomy.Rmd` with CMC and Clemente2015 data
+
+```{r}
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+```
+
+
+Read in metadata for plotting
+```{r}
+oral_nonpq_metadata <- fread("~/projects1/users/velsko/oral_non_plaque/oral_nonpq_metadata.tsv")
+
+oral_nonpq_metadata <- oral_nonpq_metadata %>% 
+  mutate(Full = fct_relevel(Full, "Plaque - Industrial","Plaque - Non-industrial","Buccal mucosa - Industrial","Buccal mucosa - Non-industrial","Saliva - Industrial","Saliva - Non-industrial"))
+
+```
+
+Make a PCA plot
+```{r}
+# prep the table for input to PCA
+malt_otu_df <- malt_species.decontam %>%
+  select(matches("Species|CMC|SRR")) %>%
+  full_join(., oral_non_pq, by = "Species") %>%
+  replace(is.na(.), 0) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
+
+malt_otu.pca <- mixOmics::pca(malt_otu_df, ncomp = 3, logratio = 'CLR')
+plot(malt_otu.pca)
+
+# Select out the PC variates into a new table and add the metadata for plotting
+malt_otu.pca.variates <- as.data.frame(malt_otu.pca$variates$X)
+malt_otu.pca.variates <- malt_otu.pca.variates %>%
+  rownames_to_column("Library_ID")
+
+malt_otu.pca.varmet <- inner_join(malt_otu.pca.variates, oral_nonpq_metadata, by = "Library_ID")
+
+oral_non_pq_pc12 <- malt_otu.pca.varmet %>%
+  ggplot(., aes(PC1, PC2, colour = Full, shape = Full)) +
+    geom_point(size = 2.5) +
+    scale_shape_manual(values = c(1,16,2,17,0,15)) +
+    scale_color_manual(values = c("#FF3200","#FF3200","#ff00cd","#ff00cd","#00cdff","#00cdff")) +
+    xlab(paste("PC1 - ", 100*(round(malt_otu.pca$explained_variance[1], 2)), "%", sep = "")) +
+    ylab(paste("PC2 - ", 100*(round(malt_otu.pca$explained_variance[2], 2)), "%", sep = "")) +
+    theme_minimal(base_size = 14) +
+    labs(color = "Source", shape = "Source") +
+    theme(legend.title = element_text(size = 10))
+oral_non_pq_pc12
+# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral_non_pq_pc12.pdf", plot = oral_non_pq_pc12, device = "pdf",
+#        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral_non_pq_pc12.png", plot = oral_non_pq_pc12, device = "png",
+#        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
