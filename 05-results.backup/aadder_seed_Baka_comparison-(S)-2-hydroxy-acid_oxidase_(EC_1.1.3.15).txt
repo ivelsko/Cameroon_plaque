@@ -1,8 +1,0 @@
-"Desulfobulbus oralis"	2.0
-"Campylobacter fetus"	1.0
-"Campylobacter gracilis"	418.0
-"Campylobacter ureolyticus"	1.0
-"Sulfurospirillum cavolei"	1.0
-"Helicobacter pylori"	1.0
-"Actinomyces sp. oral taxon 848"	1.0
-"Pseudopropionibacterium propionicum"	1.0

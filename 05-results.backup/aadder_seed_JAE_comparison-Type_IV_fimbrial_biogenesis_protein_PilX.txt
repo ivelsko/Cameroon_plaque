@@ -1,7 +1,0 @@
-"Neisseria sp. HMSC056A03"	2.0
-"Neisseria sp. HMSC061B04"	1.0
-"Neisseria sp. HMSC066H01"	1.0
-"Neisseria sp. HMSC068C04"	3.0
-"Neisseria sp. HMSC069H12"	2.0
-"Neisseria sp. HMSC077D05"	1.0
-"Neisseria sp. oral taxon 014"	46.0

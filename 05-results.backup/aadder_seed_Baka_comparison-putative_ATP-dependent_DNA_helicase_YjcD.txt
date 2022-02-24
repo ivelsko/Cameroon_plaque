@@ -1,4 +1,0 @@
-"Prevotella intermedia"	1.0
-"Peptostreptococcus anaerobius"	3.0
-"Parvimonas micra"	59.0
-"Peptoniphilus sp. oral taxon 386"	1.0

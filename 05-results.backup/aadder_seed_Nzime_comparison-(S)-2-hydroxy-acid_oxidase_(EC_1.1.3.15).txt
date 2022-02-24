@@ -1,3 +1,0 @@
-"Campylobacter fetus"	1.0
-"Campylobacter gracilis"	289.0
-"Sulfurospirillum cavolei"	1.0

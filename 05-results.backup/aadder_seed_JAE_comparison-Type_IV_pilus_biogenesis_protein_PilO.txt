@@ -1,8 +1,0 @@
-"Lautropia mirabilis"	3.0
-"Neisseria wadsworthii"	1.0
-"Neisseria sp. HMSC056A03"	9.0
-"Neisseria sp. HMSC061B04"	2.0
-"Neisseria sp. HMSC063B05"	2.0
-"Neisseria sp. HMSC069H12"	2.0
-"Neisseria sp. HMSC078C12"	1.0
-"Neisseria sp. oral taxon 014"	47.0

@@ -1,8 +1,0 @@
-"Leptotrichia shahii"	482.0
-"Leptotrichia wadei"	1095.0
-"Leptotrichia sp. oral taxon 498"	153.0
-"Burkholderia sp. BDU8"	1.0
-"Streptococcus cristatus"	441.0
-"Streptococcus oralis"	58.0
-"Streptococcus sp. M143"	110.0
-"Streptococcus sp. oral taxon 058"	33.0

@@ -1,8 +1,0 @@
-"Neisseria cinerea"	1.0
-"Neisseria subflava"	11.0
-"Neisseria sp. HMSC056A03"	4.0
-"Neisseria sp. HMSC065C04"	1.0
-"Neisseria sp. HMSC066H01"	21.0
-"Neisseria sp. HMSC069H12"	2.0
-"Neisseria sp. HMSC078C12"	1.0
-"Acinetobacter sp. WCHA45"	1.0
