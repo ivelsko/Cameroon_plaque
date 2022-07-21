@@ -1,0 +1,45 @@
+iethnic group	age	sex	idsubjid	date	carbohydrate food	carbohydrate food	carbohydrate food	meat	meat	vegetables	vegetables	vegetables	Mushroom	Insect	Fatty intake	Fatty intake	Fatty intake		Fruits	Other	spices	spices	spices	spice	Beverage	Beverage
+Baka	28	0	20504430	25/09/18	grilled plantain	boiled plantain				cocoyam leaves					irvingia s nut salse				papaya		salt	stock cubes	chili			
+Baka	30	1	20504531	26/09/18	rice	plantain	yams			mushroom					irvingia s nut salse	moabi oil					salt	chili	stock cubes		soda	
+Baka	30	0	20504630	26/09/18	cassava	plantain				cocoyam leaves					irvingia s nuts salse	moabi oil	palm nuts			avocado	salt	chili				
+Baka	47	0	20504730	27/09/18	plantain					cassava leaves					irvingia s nuts salse	palm nuts					salt	chili				
+Baka	44	1	20504831	27/09/18	grilled plantain					cassava leaves	koko (gnetum africanum)				palm nuts	groundnuts					salt	stock cubes				
+Baka	32	0	20504930	27/09/18	plantain					cassava leaves					palm nuts	moabi oil				avocado	salt	stock cubes				
+Baka	61	1	20500231	27/09/18	plantain			smoked fish		koko (gnetum africanum)					irvingia s nuts salse						salt	chili	stock cubes			
+Baka	49	0	20505030	28/09/18	plantain	rice		bushmeat		koko (gnetum africanum)	cassava leaves				groundnuts	palm nuts					stock cubes	chili	salt			
+Baka	20	0	20505130	28/09/18	plantain	rice		bushmeat		koko (gnetum africanum)	cassava leaves				groundnuts	palm nuts					salt	stock cubes	chili			
+Baka	22	0	20505230	28/09/18	plantain					cassava leaves	cassava leaves				irvingia s nuts salse	moabi oil	groundnuts			mais grille	salt	stock cubes	chili			
+Baka	60	1	20400131	15/10/18	plantain			bushmeat		cassava leaves					groundnuts						salt	chili	stock cubes			
+Baka	55	0	20400132	15/10/18	plantain			bushmeat		cassava leaves					groundnuts						salt	chili	stock cubes			
+Baka	66	0	20400432	15/10/18	plantain			bushmeat							groundnuts	irvingia s nut salse					salt	chili	stock cubes			
+Baka	30	1	20400431	15/10/18	plantain			bushmeat							irvingia s nut salse						salt	chili	stock cubes		alcohol	
+Baka	33	1	20401331	16/10/18	plantain	yams				cassava leaves					irvingia s nut salse						salt	chili				
+Baka	66	0	20402630	16/10/18	plantain					cassava leaves					palm oil				papaya		stock cubes	salt	chili			
+Baka	52	0	20400130	16/10/18	plantain	yam		bushmeat		cassava leaves	koko (gnetum africanum)				irvingia s nut salse	groundnuts	palm oil				salt	chili				
+Baka	55	0	20402530	16/10/18	plantain					koko (gnetum africanum)	cassava leaves	cocoyam leaves			palm oil	irvingia s nuts salse			papaya		salt	chili	stock cubes			
+Baka	25	0	20403130	16/10/18	plantain			bushmeat		koko (gnetum africanum)	cocoyam leaves				groundnuts	irvingia s nut salse	palm oil				salt	chili	stock cubes			
+Baka	29	1	20403131	16/10/18	plantain					cocoyam leaves			mushroom mundugule		palm oil				papaya		salt	chili	stock cubes			
+Baka	35	1	20400731	16/10/18	plantain	yam				cocoyam leaves			mushroom	palm larves	palm oil	irvingia s nut salse	avocado		papaya		salt	chili	stock cubes			
+Baka	48	0	20401430	16/10/18	yams	plantain		snail		cassava leaves					irvingia s nut salse						salt	chili				
+Baka	49	0	20401030	16/10/18	plantain	yam				koko (gnetum africanum)			mushroom andu		palm oil	irvingia s nut salse					salt	stock cubes	chilli			
+Baka	65	0	20400930	16/10/18	plantain					cocoyam leaves			mushroom		palm oil						chili	stock cubes	salt			
+Baka	34	0	20400730	17/10/18	plantain					cocoyam leaves					irvingia s nut salse				papaya	avocado	chili	stock cubes	salt			
+Baka	48	0	20401330	17/10/18	plantain	yams		bushmeat							irvingia s nut salse						chili	stock cubes	salt			
+Nzime	56	0		20/10/18	plantain	cassava		bushmeat		koko (gnetum africanum)					papaye	palm oil	groundnuts				chili	stock cubes	salt		alcohol	
+Nzime	34	1	20600831	20/10/18	plantain	cassava		bushmeat	porc	koko (gnetum africanum)					palm oil	groundnuts	irvingia s nuts salse	oil (bought)		concentrated tomate	chili	stock cubes	salt	ricinodendron	palm fermentation	alcohol
+Nzime	53	1	20600231	20/10/18	plantain	cassava		bushmeat		cocoyam leaves					huile de palme	groundnuts					chili	stock cubes	salt			
+Nzime	50	0	20600230	20/10/18	plantain	cassava		bushmeat		cocoyam leaves					huile de palme	groundnuts					chili	stock cubes	salt			
+Nzime	51	1	20600631	20/10/18	plantain	rice	plantain			cassava leaves	koko (gnetum africanum)				palm oil	palm nuts					chili	stock cubes	salt			
+Nzime	48	1	20600531	20/10/18	plantain	cassava		bushmeat		koko (gnetum africanum)					groundnuts				sweet plantain		chili	stock cubes	salt			
+Nzime	54	0	20600430	20/10/18	plantain			bushmeat		koko (gnetum africanum)lo	cassava leaves				irvingia s nuts salse	groundnuts										
+Nzime	29	1		20/10/18	cassava			bushmeat		koko (gnetum africanum)lo					sauce groundnuts						chili	stock cubes	salt		palm fermentation (alcohol)	
+Nzime	46	1		20/10/18	cassava			bushmeat							irvingia s nuts salse						chili	stock cubes	salt			
+Nzime	53	0	20600530	20/10/18	plantain	cassava				koko (gnetum africanum)					groundnuts	palm oil				avocado	chili	stock cubes	salt			
+Nzime	63	0	20600330	20/10/18	plantain			bushmeat			cocoyam leaves				groundnuts	palm oil					chili	stock cubes	salt			
+Nzime	46	1	20600731	20/10/18	plantain	cassava		bushmeat							irvingia s nuts salse	palm oil	groundnuts			avocado	chili	stock cubes	salt			
+Nzime	40	0	20600730	20/10/18	plantain	cassava		bushmeat							irvingia s nuts salse	groundnuts	palm oil			avocado	chili	stock cubes	salt			
+Nzime	18	0	20600432	20/10/18	cassava	plantain		bushmeat							palm oil	groundnuts					chili	stock cubes	salt			
+Nzime	39	0		20/10/18	plantain			bushmeat							irvingia s nut salse						chili	stock cubes	salt			
+Nzime	47	0	20300830	05/10/18	cassava			bushmeat							irvingia s nut salse						chili	stock cubes	salt			
+Nzime	45	1	20300631	04/10/18	rice										groundnuts						chili	stock cubes	salt			
+Nzime	53	1	20300831	04/10/18	plantain			bushmeat							irvingia s nut salse						chili		salt			
