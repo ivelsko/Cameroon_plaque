@@ -1,0 +1,60 @@
+MetaCyc_reaction	Protein	Pathway
+1.21.4.1-RXN	D-proline reductase	L-proline degradation II (reductive Stickland reaction)
+1.8.1.15-RXN	mycothione reductase	mycothiol oxidation
+1.8.98.1-RXN	dihydromethanophenazine:CoB-CoM heterodisulfide reductase	coenzyme B/coenzyme M regeneration I (methanophenazine-dependent)
+2.1.1.64-RXN	3-demethylubiquinone-9 3-O-methyltransferase	ubiquinol-9 biosynthesis (early decarboxylation), ubiquinol-9 biosynthesis (late decarboxylation)
+2.1.1.79-RXN	cyclopropane fatty acyl phospholipid synthase	cyclopropane fatty acid (CFA) biosynthesis
+2.1.3.1-RXN	pyruvate fermentation to propanoate I	methylmalonyl-CoA carboxyltransferase
+3.4.13.18-RXN	peptidase D	protein breakdown to amino acids
+3.6.1.41-RXN	diadenosine tetraphosphatase	nucleoside processing
+5.3.1.23-RXN	methylthioribose-1-phosphate isomerase	S-methyl-5-thio-α-D-ribose 1-phosphate degradation I
+5.4.99.16-RXN	trehalose synthase	glycogen biosynthesis III (from α-maltose 1-phosphate), trehalose biosynthesis IV
+DHBDEHYD-RXN	2,3-dihydro-2,3-dihydroxybenzoate dehydrogenase	2,3-dihydroxybenzoate biosynthesis
+DHHB-METHYLTRANSFER-RXN	bifunctional 3-demethylubiquinone-8 3-O-methyltransferase and 2-octaprenyl-6-hydroxyphenol methylase	ubiquinol-8 biosynthesis (early decarboxylation), ubiquinol-8 biosynthesis (late decarboxylation)
+GLUCARDEHYDRA-RXN	D-glucarate dehydratase	D-glucarate degredation
+LIPIDXSYNTHESIS-RXN	UDP-2,3-diacylglucosamine diphosphatase	lipid IVA biosynthesis (E. coli)
+R322-RXN	precorrin-5 (C1)-methyltransferase	cob(II)yrinate a,c-diamide biosynthesis II (late cobalt incorporation)
+RXN-11080	decaprenylphospho-β-D-ribofuranose 2-dehydrogenase	mycolyl-arabinogalactan-peptidoglycan complex biosynthesis
+RXN-11475	malonyl-[acyl-carrier protein] O-methyltransferase	8-amino-7-oxononanoate biosynthesis I
+RXN-11758	3-demethylubiquinol 3-O-methyltransferase	ubiquinone biosynthesis
+RXN-15087	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+RXN-15162	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+RXN-15164	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+RXN-15165	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+RXN-20786	UDP-2,3-diacylglucosamine diphosphatase	lipid IVA biosynthesis
+RXN-21315	S-methyl-5-thioribose-1-phosphate isomerase	5'-deoxyadenosine degradation II, 5'-deoxyadenosine degradation I
+RXN-6622	aminopeptidase	glutathione degradation (DUG pathway - yeast), γ-glutamyl cycle
+RXN-7421	cyclopropane-fatty-acyl-phospholipid synthase	sterculate biosynthesis
+RXN-7737	LL-diaminopimelate aminotransferase	L-lysine biosynthesis VI
+RXN-8344	molybdopterin adenylyltransferase	molybdenum cofactor biosynthesis, bis(tungstenpterin) cofactor biosynthesis
+RXN-8807	succinyl-CoA:acetate CoA-transferase	succinate fermentation to butanoate, TCA cycle VII (acetate-producers), anaerobic energy metabolism (invertebrates, mitochondrial), acetate formation from acetyl-CoA (succinate)
+RXN-9229	3-demethylubiquinol 3-O-methyltransferase	ubiquinol-7 biosynthesis (early decarboxylation), ubiquinol-7 biosynthesis (late decarboxylation)
+RXN-9237	3-demethylubiquinol 3-O-methyltransferase	ubiquinol-10 biosynthesis (late decarboxylation), ubiquinol-10 biosynthesis (early decarboxylation)
+RXN0-6974	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6975	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6976	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6977	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6978	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6979	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6980	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6981	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6982	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6983	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6984	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6985	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6987	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN0-6988	glycyl-leucine dipeptidase	protein breakdown to amino acids
+RXN1G-1435	trehalose-phosphatase	mycolate biosynthesis
+RXN1G-1436	trehalose-phosphatase	mycolate biosynthesis
+RXN1G-1437	trehalose-phosphatase	mycolate biosynthesis
+RXN1G-1438	trehalose-phosphatase	mycolate biosynthesis
+RXN1G-1439	trehalose-phosphatase	mycolate biosynthesis
+RXN1G-2544	cyclopropane-fatty-acyl-phospholipid synthase	mycolate biosynthesis
+RXN1G-3641	cyclopropane-fatty-acyl-phospholipid synthase	mycolate biosynthesis
+RXN1G01-65	cyclopropane-fatty-acyl-phospholipid synthase	mycolate biosynthesis
+RXN3O-102	3-demethylubiquinol 3-O-methyltransferase	ubiquinol-6 biosynthesis from 4-aminobenzoate (yeast), ubiquinol-6 biosynthesis (late decarboxylation)
+RXN8J2-140	protein arginine kinase	regulation of the bacterial stress response
+SULFITE-REDUCT-RXN	assimilatory sulfite reductase (NADPH)	assimilatory sulfate reduction III, assimilatory sulfate reduction I
+TRANS-RXN-165	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+TRANS-RXN-167A	protein-Nπ-phosphohistidine—D-mannose phosphotransferase	D-mannose degradation I, mannose-specific phosphotransferase system
+TREHALOSEPHOSPHA-RXN	trehalose-phosphatase	trehalose biosynthesis III, glycogen biosynthesis III (from α-maltose 1-phosphate), trehalose biosynthesis I, trehalose biosynthesis II

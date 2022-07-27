@@ -1,0 +1,289 @@
+Ortholog	Residual
+ANAEROFRUCAT-PWY: homolactic fermentation	MR1
+ARG+POLYAMINE-SYN: superpathway of arginine and polyamine biosynthesis	MR1
+BIOTIN-BIOSYNTHESIS-PWY: biotin biosynthesis I	MR1
+CALVIN-PWY: Calvin-Benson-Bassham cycle	MR1
+CITRULBIO-PWY: L-citrulline biosynthesis	MR1
+COBALSYN-PWY: superpathway of adenosylcobalamin salvage from cobinamide I	MR1
+DENITRIFICATION-PWY: nitrate reduction I (denitrification)	MR1
+FASYN-ELONG-PWY: fatty acid elongation -- saturated	MR1
+FASYN-INITIAL-PWY: superpathway of fatty acid biosynthesis initiation (E. coli)	MR1
+FERMENTATION-PWY: mixed acid fermentation	MR1
+FUC-RHAMCAT-PWY: superpathway of fucose and rhamnose degradation	MR1
+GLCMANNANAUT-PWY: superpathway of N-acetylglucosamine, N-acetylmannosamine and N-acetylneuraminate degradation	MR1
+GLUCONEO-PWY: gluconeogenesis I	MR1
+GLYCOLYSIS-E-D: superpathway of glycolysis and the Entner-Doudoroff pathway	MR1
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	MR1
+GLYCOLYSIS: glycolysis I (from glucose 6-phosphate)	MR1
+GLYOXYLATE-BYPASS: glyoxylate cycle	MR1
+GOLPDLCAT-PWY: superpathway of glycerol degradation to 1,3-propanediol	MR1
+HEMESYN2-PWY: heme b biosynthesis II (oxygen-independent)	MR1
+NAD-BIOSYNTHESIS-II: NAD salvage pathway III (to nicotinamide riboside)	MR1
+NAGLIPASYN-PWY: lipid IVA biosynthesis (E. coli)	MR1
+P105-PWY: TCA cycle IV (2-oxoglutarate decarboxylase)	MR1
+P108-PWY: pyruvate fermentation to propanoate I	MR1
+P122-PWY: heterolactic fermentation	MR1
+P124-PWY: Bifidobacterium shunt	MR1
+P125-PWY: superpathway of (R,R)-butanediol biosynthesis	MR1
+P185-PWY: formaldehyde assimilation III (dihydroxyacetone cycle)	MR1
+P441-PWY: superpathway of N-acetylneuraminate degradation	MR1
+PHOSLIPSYN-PWY: superpathway of phospholipid biosynthesis I (bacteria)	MR1
+POLYISOPRENSYN-PWY: polyisoprenoid biosynthesis (E. coli)	MR1
+PWY-1269: CMP-3-deoxy-D-manno-octulosonate biosynthesis	MR1
+PWY-241: C4 photosynthetic carbon assimilation cycle, NADP-ME type	MR1
+PWY-4981: L-proline biosynthesis II (from arginine)	MR1
+PWY-4984: urea cycle	MR1
+PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP)	MR1
+PWY-5154: L-arginine biosynthesis III (via N-acetyl-L-citrulline)	MR1
+PWY-5173	MR1
+PWY-5345: superpathway of L-methionine biosynthesis (by sulfhydrylation)	MR1
+PWY-5347: superpathway of L-methionine biosynthesis (transsulfuration)	MR1
+PWY-5484: glycolysis II (from fructose 6-phosphate)	MR1
+PWY-5667: CDP-diacylglycerol biosynthesis I	MR1
+PWY-5695: inosine 5'-phosphate degradation	MR1
+PWY-5723: Rubisco shunt	MR1
+PWY-5838: superpathway of menaquinol-8 biosynthesis I	MR1
+PWY-5855: ubiquinol-7 biosynthesis (early decarboxylation)	MR1
+PWY-5856: ubiquinol-9 biosynthesis (early decarboxylation)	MR1
+PWY-5857: ubiquinol-10 biosynthesis (early decarboxylation)	MR1
+PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis I	MR1
+PWY-5913: partial TCA cycle (obligate autotrophs)	MR1
+PWY-5920: superpathway of heme b biosynthesis from glycine	MR1
+PWY-5971: palmitate biosynthesis (type II fatty acid synthase)	MR1
+PWY-5973: cis-vaccenate biosynthesis	MR1
+PWY-5989: stearate biosynthesis II (bacteria and plants)	MR1
+PWY-6168: flavin biosynthesis III (fungi)	MR1
+PWY-622: starch biosynthesis	MR1
+PWY-6282: palmitoleate biosynthesis I (from (5Z)-dodec-5-enoate)	MR1
+PWY-6285: superpathway of fatty acids biosynthesis (E. coli)	MR1
+PWY-6307: L-tryptophan degradation X (mammalian, via tryptamine)	MR1
+PWY-6313: serotonin degradation	MR1
+PWY-6317: D-galactose degradation I (Leloir pathway)	MR1
+PWY-6470: peptidoglycan biosynthesis V (&beta;-lactam resistance)	MR1
+PWY-6519: 8-amino-7-oxononanoate biosynthesis I	MR1
+PWY-6527: stachyose degradation	MR1
+PWY-6700: queuosine biosynthesis I (de novo)	MR1
+PWY-6703: preQ0 biosynthesis	MR1
+PWY-6708: ubiquinol-8 biosynthesis (early decarboxylation)	MR1
+PWY-6737: starch degradation V	MR1
+PWY-6803: phosphatidylcholine acyl editing	MR1
+PWY-6859: all-trans-farnesol biosynthesis	MR1
+PWY-6969: TCA cycle V (2-oxoglutarate synthase)	MR1
+PWY-7013: (S)-propane-1,2-diol degradation	MR1
+PWY-7115: C4 photosynthetic carbon assimilation cycle, NAD-ME type	MR1
+PWY-7117: C4 photosynthetic carbon assimilation cycle, PEPCK type	MR1
+PWY-7198: pyrimidine deoxyribonucleotides de novo biosynthesis IV	MR1
+PWY-7200: superpathway of pyrimidine deoxyribonucleoside salvage	MR1
+PWY-7282: 4-amino-2-methyl-5-diphosphomethylpyrimidine biosynthesis II	MR1
+PWY-7371: 1,4-dihydroxy-6-naphthoate biosynthesis II	MR1
+PWY-7388: octanoyl-[acyl-carrier protein] biosynthesis (mitochondria, yeast)	MR1
+PWY-7391: isoprene biosynthesis II (engineered)	MR1
+PWY-7431: aromatic biogenic amine degradation (bacteria)	MR1
+PWY-7663: gondoate biosynthesis (anaerobic)	MR1
+PWY-7664: oleate biosynthesis IV (anaerobic)	MR1
+PWY-922: mevalonate pathway I (eukaryotes and bacteria)	MR1
+PWY0-1261: anhydromuropeptides recycling I	MR1
+PWY0-1297: superpathway of purine deoxyribonucleosides degradation	MR1
+PWY0-1319: CDP-diacylglycerol biosynthesis II	MR1
+PWY0-1415: superpathway of heme b biosynthesis from uroporphyrinogen-III	MR1
+PWY0-1479: tRNA processing	MR1
+PWY0-1586: peptidoglycan maturation (meso-diaminopimelate containing)	MR1
+PWY0-781: aspartate superpathway	MR1
+PWY0-845: superpathway of pyridoxal 5'-phosphate biosynthesis and salvage	MR1
+PWY0-862: (5Z)-dodecenoate biosynthesis I	MR1
+PWY1F-823: leucopelargonidin and leucocyanidin biosynthesis	MR1
+PWY4FS-7: phosphatidylglycerol biosynthesis I (plastidic)	MR1
+PWY4FS-8: phosphatidylglycerol biosynthesis II (non-plastidic)	MR1
+PWY66-389: phytol degradation	MR1
+PWY66-399: gluconeogenesis III	MR1
+PWY66-422	MR1
+PYRIDNUCSAL-PWY: NAD salvage pathway I (PNC VI cycle)	MR1
+PYRIDOXSYN-PWY: pyridoxal 5'-phosphate biosynthesis I	MR1
+REDCITCYC: TCA cycle VI (Helicobacter)	MR1
+RIBOSYN2-PWY: flavin biosynthesis I (bacteria and plants)	MR1
+SO4ASSIM-PWY: assimilatory sulfate reduction I	MR1
+SULFATE-CYS-PWY: superpathway of sulfate assimilation and cysteine biosynthesis	MR1
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	MR1
+THISYNARA-PWY: superpathway of thiamine diphosphate biosynthesis III (eukaryotes)	MR1
+UBISYN-PWY: superpathway of ubiquinol-8 biosynthesis (early decarboxylation)	MR1
+UDPNACETYLGALSYN-PWY: UDP-N-acetyl-D-glucosamine biosynthesis II	MR1
+1CMET2-PWY: folate transformations III (E. coli)	MR2
+ANAGLYCOLYSIS-PWY: glycolysis III (from glucose)	MR2
+ARGSYN-PWY: L-arginine biosynthesis I (via L-ornithine)	MR2
+ARGSYNBSUB-PWY: L-arginine biosynthesis II (acetyl cycle)	MR2
+ARO-PWY: chorismate biosynthesis I	MR2
+BRANCHED-CHAIN-AA-SYN-PWY: superpathway of branched chain amino acid biosynthesis	MR2
+COA-PWY-1: superpathway of coenzyme A biosynthesis III (mammals)	MR2
+COA-PWY: coenzyme A biosynthesis I (prokaryotic)	MR2
+COMPLETE-ARO-PWY: superpathway of aromatic amino acid biosynthesis	MR2
+DAPLYSINESYN-PWY: L-lysine biosynthesis I	MR2
+DTDPRHAMSYN-PWY: dTDP-&beta;-L-rhamnose biosynthesis	MR2
+GLUTORN-PWY: L-ornithine biosynthesis I	MR2
+GLYCOCAT-PWY: glycogen degradation I	MR2
+GLYCOGENSYNTH-PWY: glycogen biosynthesis I (from ADP-D-Glucose)	MR2
+HEME-BIOSYNTHESIS-II: heme b biosynthesis I (aerobic)	MR2
+HISTSYN-PWY: L-histidine biosynthesis	MR2
+HOMOSER-METSYN-PWY: L-methionine biosynthesis I	MR2
+HSERMETANA-PWY: L-methionine biosynthesis III	MR2
+ILEUSYN-PWY: L-isoleucine biosynthesis I (from threonine)	MR2
+LACTOSECAT-PWY: lactose and galactose degradation I	MR2
+MET-SAM-PWY: superpathway of S-adenosyl-L-methionine biosynthesis	MR2
+METHGLYUT-PWY: superpathway of methylglyoxal degradation	MR2
+METSYN-PWY: superpathway of L-homoserine and L-methionine biosynthesis	MR2
+NONMEVIPP-PWY: methylerythritol phosphate pathway I	MR2
+NONOXIPENT-PWY: pentose phosphate pathway (non-oxidative branch) I	MR2
+OANTIGEN-PWY: O-antigen building blocks biosynthesis (E. coli)	MR2
+P164-PWY: purine nucleobases degradation I (anaerobic)	MR2
+P23-PWY: reductive TCA cycle I	MR2
+P4-PWY: superpathway of L-lysine, L-threonine and L-methionine biosynthesis I	MR2
+P461-PWY: hexitol fermentation to lactate, formate, ethanol and acetate	MR2
+PANTO-PWY: phosphopantothenate biosynthesis I	MR2
+PANTOSYN-PWY: superpathway of coenzyme A biosynthesis I (bacteria)	MR2
+PENTOSE-P-PWY: pentose phosphate pathway	MR2
+PEPTIDOGLYCANSYN-PWY: peptidoglycan biosynthesis I (meso-diaminopimelate containing)	MR2
+POLYAMSYN-PWY: superpathway of polyamine biosynthesis I	MR2
+PPGPPMET-PWY: ppGpp metabolism	MR2
+PWY-2941: L-lysine biosynthesis II	MR2
+PWY-2942: L-lysine biosynthesis III	MR2
+PWY-3001: superpathway of L-isoleucine biosynthesis I	MR2
+PWY-3841: folate transformations II (plants)	MR2
+PWY-4242	MR2
+PWY-5022: 4-aminobutanoate degradation V	MR2
+PWY-5088: L-glutamate degradation VIII (to propanoate)	MR2
+PWY-5097: L-lysine biosynthesis VI	MR2
+PWY-5100: pyruvate fermentation to acetate and lactate II	MR2
+PWY-5103: L-isoleucine biosynthesis III	MR2
+PWY-5188: tetrapyrrole biosynthesis I (from glutamate)	MR2
+PWY-5189: tetrapyrrole biosynthesis II (from glycine)	MR2
+PWY-5497: purine nucleobases degradation II (anaerobic)	MR2
+PWY-5686: UMP biosynthesis I	MR2
+PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate)	MR2
+PWY-5918: superpathway of heme b biosynthesis from glutamate	MR2
+PWY-6121: 5-aminoimidazole ribonucleotide biosynthesis I	MR2
+PWY-6122: 5-aminoimidazole ribonucleotide biosynthesis II	MR2
+PWY-6123: inosine-5'-phosphate biosynthesis I	MR2
+PWY-6124: inosine-5'-phosphate biosynthesis II	MR2
+PWY-6125: superpathway of guanosine nucleotides de novo biosynthesis II	MR2
+PWY-6126: superpathway of adenosine nucleotides de novo biosynthesis II	MR2
+PWY-6151: S-adenosyl-L-methionine salvage I	MR2
+PWY-6163: chorismate biosynthesis from 3-dehydroquinate	MR2
+PWY-6270: isoprene biosynthesis I	MR2
+PWY-6277: superpathway of 5-aminoimidazole ribonucleotide biosynthesis	MR2
+PWY-6385: peptidoglycan biosynthesis III (mycobacteria)	MR2
+PWY-6386: UDP-N-acetylmuramoyl-pentapeptide biosynthesis II (lysine-containing)	MR2
+PWY-6387: UDP-N-acetylmuramoyl-pentapeptide biosynthesis I (meso-diaminopimelate containing)	MR2
+PWY-6467: Kdo transfer to lipid IVA III (Chlamydia)	MR2
+PWY-6731: starch degradation III	MR2
+PWY-6936: seleno-amino acid biosynthesis (plants)	MR2
+PWY-7111: pyruvate fermentation to isobutanol (engineered)	MR2
+PWY-7208: superpathway of pyrimidine nucleobases salvage	MR2
+PWY-7219: adenosine ribonucleotides de novo biosynthesis	MR2
+PWY-7221: guanosine ribonucleotides de novo biosynthesis	MR2
+PWY-7228: superpathway of guanosine nucleotides de novo biosynthesis I	MR2
+PWY-7229: superpathway of adenosine nucleotides de novo biosynthesis I	MR2
+PWY-7234: inosine-5'-phosphate biosynthesis III	MR2
+PWY-724: superpathway of L-lysine, L-threonine and L-methionine biosynthesis II	MR2
+PWY-7383: anaerobic energy metabolism (invertebrates, cytosol)	MR2
+PWY-7400: L-arginine biosynthesis IV (archaebacteria)	MR2
+PWY-7560: methylerythritol phosphate pathway II	MR2
+PWY-841: superpathway of purine nucleotides de novo biosynthesis I	MR2
+PWY0-162: superpathway of pyrimidine ribonucleotides de novo biosynthesis	MR2
+SER-GLYSYN-PWY: superpathway of L-serine and glycine biosynthesis I	MR2
+THRESYN-PWY: superpathway of L-threonine biosynthesis	MR2
+TRPSYN-PWY: L-tryptophan biosynthesis	MR2
+UDPNAGSYN-PWY: UDP-N-acetyl-D-glucosamine biosynthesis I	MR2
+VALSYN-PWY: L-valine biosynthesis	MR2
+DENOVOPURINE2-PWY: superpathway of purine nucleotides de novo biosynthesis II	MR3
+FOLSYN-PWY: superpathway of tetrahydrofolate biosynthesis and salvage	MR3
+FUCCAT-PWY: fucose degradation	MR3
+GLUCOSE1PMETAB-PWY: glucose and glucose-1-phosphate degradation	MR3
+HEXITOLDEGSUPER-PWY: superpathway of hexitol degradation (bacteria)	MR3
+PRPP-PWY: superpathway of histidine, purine, and pyrimidine biosynthesis	MR3
+PWY-2723: trehalose degradation V	MR3
+PWY-4041: &gamma;-glutamyl cycle	MR3
+PWY-5005: biotin biosynthesis II	MR3
+PWY-5367: petroselinate biosynthesis	MR3
+PWY-5384: sucrose degradation IV (sucrose phosphorylase)	MR3
+PWY-5676: acetyl-CoA fermentation to butanoate II	MR3
+PWY-5837: 2-carboxy-1,4-naphthoquinol biosynthesis	MR3
+PWY-5840: superpathway of menaquinol-7 biosynthesis	MR3
+PWY-5897: superpathway of menaquinol-11 biosynthesis	MR3
+PWY-5898: superpathway of menaquinol-12 biosynthesis	MR3
+PWY-5899: superpathway of menaquinol-13 biosynthesis	MR3
+PWY-6284: superpathway of unsaturated fatty acids biosynthesis (E. coli)	MR3
+PWY-6353: purine nucleotides degradation II (aerobic)	MR3
+PWY-6471: peptidoglycan biosynthesis IV (Enterococcus faecium)	MR3
+PWY-6588: pyruvate fermentation to acetone	MR3
+PWY-6606: guanosine nucleotides degradation II	MR3
+PWY-6608: guanosine nucleotides degradation III	MR3
+PWY-6609: adenine and adenosine salvage III	MR3
+PWY-6612: superpathway of tetrahydrofolate biosynthesis	MR3
+PWY-6748: nitrate reduction VII (denitrification)	MR3
+PWY-6892: thiazole component of thiamine diphosphate biosynthesis I	MR3
+PWY-6897: thiamine diphosphate salvage II	MR3
+PWY-7003: glycerol degradation to butanol	MR3
+PWY-7031: protein N-glycosylation (bacterial)	MR3
+PWY-7187: pyrimidine deoxyribonucleotides de novo biosynthesis II	MR3
+PWY-7199: pyrimidine deoxyribonucleosides salvage	MR3
+PWY-7211: superpathway of pyrimidine deoxyribonucleotides de novo biosynthesis	MR3
+PWY-7328: superpathway of UDP-glucose-derived O-antigen building blocks biosynthesis	MR3
+PWY-7357: thiamine phosphate formation from pyrithiamine and oxythiamine (yeast)	MR3
+PWY-7392: taxadiene biosynthesis (engineered)	MR3
+PWY-7539: 6-hydroxymethyl-dihydropterin diphosphate biosynthesis III (Chlamydia)	MR3
+PWY0-1241: ADP-L-glycero-&beta;-D-manno-heptose biosynthesis	MR3
+PWY0-1298: superpathway of pyrimidine deoxyribonucleosides degradation	MR3
+PWY0-166: superpathway of pyrimidine deoxyribonucleotides de novo biosynthesis (E. coli)	MR3
+PWY4LZ-257: superpathway of fermentation (Chlamydomonas reinhardtii)	MR3
+PWY66-409: superpathway of purine nucleotide salvage	MR3
+SALVADEHYPOX-PWY: adenosine nucleotides degradation II	MR3
+TEICHOICACID-PWY: poly(glycerol phosphate) wall teichoic acid biosynthesis	MR3
+THISYN-PWY: superpathway of thiamine diphosphate biosynthesis I	MR3
+ASPASN-PWY: superpathway of L-aspartate and L-asparagine biosynthesis	MR4
+COLANSYN-PWY: colanic acid building blocks biosynthesis	MR4
+GLUCUROCAT-PWY: superpathway of &beta;-D-glucuronosides degradation	MR4
+HISDEG-PWY: L-histidine degradation I	MR4
+P163-PWY: L-lysine fermentation to acetate and butanoate	MR4
+POLYAMINSYN3-PWY: superpathway of polyamine biosynthesis II	MR4
+PWY-1042: glycolysis IV	MR4
+PWY-4702: phytate degradation I	MR4
+PWY-5030: L-histidine degradation III	MR4
+PWY-5104: L-isoleucine biosynthesis IV	MR4
+PWY-5675: nitrate reduction V (assimilatory)	MR4
+PWY-5690: TCA cycle II (plants and fungi)	MR4
+PWY-6263: superpathway of menaquinol-8 biosynthesis II	MR4
+PWY-6305: superpathway of putrescine biosynthesis	MR4
+PWY-6595: superpathway of guanosine nucleotides degradation (plants)	MR4
+PWY-6901: superpathway of glucose and xylose degradation	MR4
+PWY-7197: pyrimidine deoxyribonucleotide phosphorylation	MR4
+PWY-7220: adenosine deoxyribonucleotides de novo biosynthesis II	MR4
+PWY-7222: guanosine deoxyribonucleotides de novo biosynthesis II	MR4
+PWY-7456: &beta;-(1,4)-mannan degradation	MR4
+PWY0-1296: purine ribonucleosides degradation	MR4
+PWY66-398: TCA cycle III (animals)	MR4
+TRNA-CHARGING-PWY: tRNA charging	MR4
+ARGORNPROST-PWY	MR5
+GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation	MR5
+GALACTUROCAT-PWY: D-galacturonate degradation I	MR5
+GLYCOL-GLYOXDEG-PWY: superpathway of glycol metabolism and degradation	MR5
+P161-PWY: acetylene degradation (anaerobic)	MR5
+P42-PWY: incomplete reductive TCA cycle	MR5
+PWY-5392: reductive TCA cycle II	MR5
+PWY-5464: superpathway of cytosolic glycolysis (plants), pyruvate dehydrogenase and TCA cycle	MR5
+PWY-5659: GDP-mannose biosynthesis	MR5
+PWY-6147: 6-hydroxymethyl-dihydropterin diphosphate biosynthesis I	MR5
+PWY-6507: 4-deoxy-L-threo-hex-4-enopyranuronate degradation	MR5
+PWY-6545: pyrimidine deoxyribonucleotides de novo biosynthesis III	MR5
+PWY-6549: L-glutamine biosynthesis III	MR5
+PWY-6562: norspermidine biosynthesis	MR5
+PWY-7184: pyrimidine deoxyribonucleotides de novo biosynthesis I	MR5
+PWY-7210: pyrimidine deoxyribonucleotides biosynthesis from CTP	MR5
+PWY-7242: D-fructuronate degradation	MR5
+PWY-7254: TCA cycle VII (acetate-producers)	MR5
+PWY-7323: superpathway of GDP-mannose-derived O-antigen building blocks biosynthesis	MR5
+PWY-7332: superpathway of UDP-N-acetylglucosamine-derived O-antigen building blocks biosynthesis	MR5
+PWY-7384: anaerobic energy metabolism (invertebrates, mitochondrial)	MR5
+PWY-7389: superpathway of anaerobic energy metabolism (invertebrates)	MR5
+PWY1G-0: mycothiol biosynthesis	MR5
+PYRIDNUCSYN-PWY: NAD de novo biosynthesis I (from aspartate)	MR5
+RHAMCAT-PWY: L-rhamnose degradation I	MR5
+TCA: TCA cycle I (prokaryotic)	MR5
