@@ -33,6 +33,9 @@ oral_non_pq <- fread("./05-results.backup/oral_non_plaque_species.txt") %>%
 
 colnames(oral_non_pq) <- gsub(".unmapped","", colnames(oral_non_pq))
 
+oral_non_pq <- oral_non_pq  %>%
+  filter(!str_detect(Species, "Homo sapiens|Not assigned"))
+
 ```
 
 Read in the saved tables from `Cameroon_kraken_RSPM_add_taxonomy.Rmd` with CMC and Clemente2015 data
@@ -45,7 +48,7 @@ load("./05-results.backup/CMC_taxonomy_tables.RData")
 
 Read in metadata for plotting
 ```{r}
-oral_nonpq_metadata <- fread("~/projects1/users/velsko/oral_non_plaque/oral_nonpq_metadata.tsv")
+oral_nonpq_metadata <- fread("./00-documentation.backup/oral_nonpq_metadata.tsv")
 
 oral_nonpq_metadata <- oral_nonpq_metadata %>% 
   mutate(Full = fct_relevel(Full, "Plaque - Industrial","Plaque - Non-industrial","Buccal mucosa - Industrial","Buccal mucosa - Non-industrial","Saliva - Industrial","Saliva - Non-industrial"))
@@ -59,6 +62,10 @@ malt_otu_df <- malt_species.decontam %>%
   select(matches("Species|CMC|SRR")) %>%
   full_join(., oral_non_pq, by = "Species") %>%
   replace(is.na(.), 0) %>%
+  adorn_totals(where = "col") %>%
+  mutate(Percent = Total / sum(Total)) %>%
+  filter(Percent >=  0.0001) %>%
+  select(-c("Total", "Percent")) %>%
   gather("SampleID","Counts",2:ncol(.)) %>%
   mutate(Counts = Counts + 1) %>%
   spread(Species,Counts) %>%
@@ -79,15 +86,15 @@ oral_non_pq_pc12 <- malt_otu.pca.varmet %>%
     geom_point(size = 2.5) +
     scale_shape_manual(values = c(1,16,2,17,0,15)) +
     scale_color_manual(values = c("#FF3200","#FF3200","#ff00cd","#ff00cd","#00cdff","#00cdff")) +
-    xlab(paste("PC1 - ", 100*(round(malt_otu.pca$explained_variance[1], 2)), "%", sep = "")) +
-    ylab(paste("PC2 - ", 100*(round(malt_otu.pca$explained_variance[2], 2)), "%", sep = "")) +
+    xlab(paste("PC1 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[1]), digits = 4)), "%", sep = "")) +
+    ylab(paste("PC2 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[2]), digits = 4)), "%", sep = "")) +
     theme_minimal(base_size = 14) +
     labs(color = "Source", shape = "Source") +
     theme(legend.title = element_text(size = 10))
 oral_non_pq_pc12
-# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral_non_pq_pc12.pdf", plot = oral_non_pq_pc12, device = "pdf",
+# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/supplemental_figures/SXX39/SXX39_oral_non_pq_pc12.pdf", plot = oral_non_pq_pc12, device = "pdf",
 #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
-# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/main_figures/Figure_XX1/panel_parts/SXX1_oral_non_pq_pc12.png", plot = oral_non_pq_pc12, device = "png",
+# ggsave("~/Dropbox (Personal)/MPI-SHH/git-projects/Cameroon_plaque/06-publication/supplemental_figures/SXX39/SXX39_oral_non_pq_pc12.png", plot = oral_non_pq_pc12, device = "png",
 #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
 
 

@@ -54,9 +54,9 @@ mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
 
 List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
 ```{r outliers}
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+outliers <- c("CMC032.B0101",
               "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
-              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+              "SRR1646041")
 
 outliersF <- str_c(outliers, collapse = "|")
 
@@ -69,17 +69,17 @@ metadata <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadat
 metadata <- metadata %>%
   rename(SampleID = `#SampleID`) %>%
   filter(!SampleID %in% outliers,
-         !str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+         !str_detect(SampleID, "EXB|LIB|10M|SRR164|SRS|ERR")) %>%
   # rename(Sample.ID = SampleID) %>%
   as_tibble() %>%
-  mutate(Market_economy = str_replace(Market_economy, "Forrest camp", "ForrestCamp"),
-         Market_economy = str_replace(Market_economy, "Logging road", "LoggingRoad"),
-         Market_economy_split = str_replace(Market_economy_split, "Forrest camp", "ForrestCamp"),
-         Market_economy_split = str_replace(Market_economy_split, "Logging road", "LoggingRoad"),
-         Market_economy_split = str_replace(Market_economy_split, "Industrial calculus", "IndustrialCalculus"),
-         Market_economy_split = str_replace(Market_economy_split, "Industrial plaque", "IndustrialPlaque"),
+  mutate(Market_integration = str_replace(Market_integration, "Forrest camp", "ForrestCamp"),
+         Market_integration = str_replace(Market_integration, "Logging road", "LoggingRoad"),
+         Market_integration_split = str_replace(Market_integration_split, "Forrest camp", "ForrestCamp"),
+         Market_integration_split = str_replace(Market_integration_split, "Logging road", "LoggingRoad"),
+         Market_integration_split = str_replace(Market_integration_split, "Industrial calculus", "IndustrialCalculus"),
+         Market_integration_split = str_replace(Market_integration_split, "Industrial plaque", "IndustrialPlaque"),
          Industry = str_replace(Industry, "Non-industrial","nonIndustrial")) %>%
-  select(SampleID, Env, Industry, Age_group, Env, Ethnic_Group, Market_economy, Market_economy_split, Sex, Tooth_site, Village)
+  select(SampleID, Env, Industry, Age_group, Env, Ethnic_Group, Market_integration, Market_integration_split, Sex, Tooth_site, Village)
 
 # now re-name it for input to ancom-bc so I have to change fewer names
 meta_data <- metadata
@@ -88,7 +88,7 @@ meta_data <- metadata
 # species, no blanks, no Yanomami
 malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
   select(-one_of(outliers)) %>%
-  select(-matches("EXB|LIB|10M|SRR164")) %>%
+  select(-matches("EXB|LIB|10M|SRR164|ERR|SRS")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)
@@ -96,7 +96,7 @@ malt_species.decontam_filtered_noblanks_noyanomami <- malt_species.decontam %>%
 # species, CMC samples only
 malt_species.decontam_filtered_cmc <- malt_species.decontam %>%
  select(-one_of(outliers)) %>%
- select(-matches("EXB|LIB|JAE|SRR")) %>%
+ select(matches("Species|CMC")) %>%
   adorn_totals(where = "col") %>%
   filter(Total > 0) %>%
   select(-Total)
@@ -218,159 +218,159 @@ res_noblanks <- cbind(taxon = rownames(out_noblanks$feature.table), out_noblanks
 # fwrite(res_noblanks, "./05-results.backup/ancomBC_noblanks_ethnic_group.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
-res_noblanks.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
+res_noblanks.ANCOM_BC_IP_CMC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
-alpha.adj=0.05/nrow(res_noblanks.ANCOM_BC)
+alpha.adj=0.05/nrow(res_noblanks.ANCOM_BC_IP_CMC)
 critic.val=qnorm(1-alpha.adj/2)
-res_noblanks.ANCOM_BC <- res_noblanks.ANCOM_BC %>% transmute(species,
-                                      `log fold change (HunterGatherer - HMP)` = `mean.difference (HunterGatherer - HMP)`,
-                                      se = `se (HunterGatherer - HMP)`,
-                                      ci.lo.adj=`log fold change (HunterGatherer - HMP)`-critic.val*se, 
-                                      ci.up.adj=`log fold change (HunterGatherer - HMP)`+critic.val*se, 
+res_noblanks.ANCOM_BC_IP_CMC <- res_noblanks.ANCOM_BC_IP_CMC %>% transmute(species,
+                                      `log fold change (Industrial plaque - CMC)` = `mean.difference (Industrial plaque - CMC)`,
+                                      se = `se (Industrial plaque - CMC)`,
+                                      ci.lo.adj=`log fold change (Industrial plaque - CMC)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Industrial plaque - CMC)`+critic.val*se, 
                                       p.val, q.val, diff.abn, 
-                                      `structural.zero (HMP)`, 
-                                      `structural.zero (HunterGatherer)`)
+                                      `structural.zero (Industrial plaque)`, 
+                                      `structural.zero (CMC)`)
 
 # I think in the structural zero columns, 0 indicates False (not a structural 0) and 1 indicates True (is a structural 0)
-ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
+ancom_bc_noblanks_IP_CMC <- res_noblanks.ANCOM_BC_IP_CMC %>%
   rename(Species = species) %>%
   arrange(q.val) 
 # %>%
 #   filter(diff.abn == "TRUE") 
 # %>%
-#   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
+#   filter(`log fold change (Industrial plaque - CMC)` < -1 | `log fold change (Industrial plaque - CMC)` > 1)
 
-fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_species_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
+fwrite(ancom_bc_noblanks_IP_CMC, "./05-results.backup/ancomBC_species_noblanks_IP_CMC.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
-res.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
+res_noblanks.ANCOM_BC_IC_CMC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
                         row.names = NULL, stringsAsFactors=FALSE, check.names = FALSE)
-alpha.adj=0.05/nrow(res.ANCOM_BC)
+alpha.adj=0.05/nrow(res_noblanks.ANCOM_BC_IC_CMC)
 critic.val=qnorm(1-alpha.adj/2)
-res.ANCOM_BC <- res.ANCOM_BC %>% transmute(species,
-                                      `log fold change (HunterGatherer - JAE)` = -`mean.difference (JAE - HunterGatherer)`,
-                                      se = `se (JAE - HunterGatherer)`,
-                                      ci.lo.adj=`log fold change (HunterGatherer - JAE)`-critic.val*se, 
-                                      ci.up.adj=`log fold change (HunterGatherer - JAE)`+critic.val*se, 
+res_noblanks.ANCOM_BC_IC_CMC <- res_noblanks.ANCOM_BC_IC_CMC %>% transmute(species,
+                                      `log fold change (Industrial calculus - CMC)` = -`mean.difference (Industrial calculus - CMC)`,
+                                      se = `se (Industrial calculus - CMC)`,
+                                      ci.lo.adj=`log fold change (Industrial calculus - CMC)`-critic.val*se, 
+                                      ci.up.adj=`log fold change (Industrial calculus - CMC)`+critic.val*se, 
                                       p.val, q.val, diff.abn, 
-                                      `structural.zero (HunterGatherer)`, 
-                                      `structural.zero (JAE)`)
-ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
+                                      `structural.zero (CMC)`, 
+                                      `structural.zero (Industrial calculus)`)
+ancom_bc_noblanks_IC_CMC <- res_noblanks.ANCOM_BC_IC_CMC %>%
   rename(Species = species) %>%
   arrange(q.val) 
 # %>%
 #   filter(diff.abn == "TRUE")
   # possiblly filter out the species that have a differential abundance of less than |1|
-  # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
+  # filter(`log fold change (Industrial calculus - CMC)` < -1 | `log fold change (Industrial calculus - CMC)` > 1)
   
-fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_species_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_noblanks_IC_CMC, "./05-results.backup/ancomBC_species_noblanks_IC_CMC.tsv", sep = "\t", quote = F)
 
 ```
 
 Make a quick plot like with Songbird that shows all species w/log-fold difference >1
 ```{r env_plots}
 # Cameroon vs HMP
-res.ANCOM_BC_env_HMP_HG <- res_noblanks.ANCOM_BC %>%
+res.ANCOM_BC_env_IP_CMC <- res_noblanks.ANCOM_BC_IP_CMC %>%
   rename(Species = species) %>%
-  filter(`log fold change (HunterGatherer - HMP)` > 0) %>%
+  filter(`log fold change (Industrial plaque - CMC)` > 0) %>%
   mutate(star_up = ifelse(q.val<0.001, "***",
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))),
          star_down = "") %>%
-  bind_rows(., res_noblanks.ANCOM_BC %>%
+  bind_rows(., res_noblanks.ANCOM_BC_IP_CMC %>%
   rename(Species = species) %>%
-  filter(`log fold change (HunterGatherer - HMP)` < 0) %>%
+  filter(`log fold change (Industrial plaque - CMC)` < 0) %>%
   mutate(star_up = "",
          star_down = ifelse(q.val<0.001, "***",
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", "")))))
 
-ancom_HMP_CMC_plot <- res.ANCOM_BC_env_HMP_HG %>%
-  filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
-  arrange(`log fold change (HunterGatherer - HMP)`) %>%
+ancom_IP_CMC_plot <- res.ANCOM_BC_env_IP_CMC %>%
+  filter(`log fold change (Industrial plaque - CMC)` >= 5.0 | `log fold change (Industrial plaque - CMC)` <= -5.0) %>%
+  arrange(`log fold change (Industrial plaque - CMC)`) %>%
   mutate(Species = as_factor(Species)) %>%
-  ggplot(., aes(x = Species, y = `log fold change (HunterGatherer - HMP)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+  ggplot(., aes(x = Species, y = `log fold change (Industrial plaque - CMC)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
     geom_col() +
     geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12)) +
     ylab("Log fold change") +
     xlab("Species") +
-    ggtitle("Cameroon - HMP") +
-    geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_up),
+    ggtitle("Industrial plaque - CMC") +
+    geom_text(aes(y=`log fold change (Industrial plaque - CMC)`+4*sign(`log fold change (Industrial plaque - CMC)`), label=star_up),
               vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
-    geom_text(aes(y=`log fold change (HunterGatherer - HMP)`+4*sign(`log fold change (HunterGatherer - HMP)`), label=star_down),
+    geom_text(aes(y=`log fold change (Industrial plaque - CMC)`+4*sign(`log fold change (Industrial plaque - CMC)`), label=star_down),
               vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
-    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (HMP)` == 1) %>%
-                      filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
-                      arrange(`log fold change (HunterGatherer - HMP)`) %>%
+    geom_point(data = res.ANCOM_BC_env_IP_CMC %>% filter(`structural.zero (Industrial plaque)` == 1) %>%
+                      filter(`log fold change (Industrial plaque - CMC)` >= 5.0 | `log fold change (Industrial plaque - CMC)` <= -5.0) %>%
+                      arrange(`log fold change (Industrial plaque - CMC)`) %>%
                       mutate(Species = as_factor(Species)), 
-               aes(x=Species, y=`log fold change (HunterGatherer - HMP)`),
+               aes(x=Species, y=`log fold change (Industrial plaque - CMC)`),
                    position=position_dodge(width = 0.4), shape=18) +
-    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (HunterGatherer)` == 1) %>%
-                      filter(`log fold change (HunterGatherer - HMP)` >= 4.0 | `log fold change (HunterGatherer - HMP)` <= -4.0) %>%
-                      arrange(`log fold change (HunterGatherer - HMP)`) %>%
+    geom_point(data = res.ANCOM_BC_env_IP_CMC %>% filter(`structural.zero (CMC)` == 1) %>%
+                      filter(`log fold change (Industrial plaque - CMC)` >= 5.0 | `log fold change (Industrial plaque - CMC)` <= -5.0) %>%
+                      arrange(`log fold change (Industrial plaque - CMC)`) %>%
                       mutate(Species = as_factor(Species)), 
-               aes(x=Species, y=`log fold change (HunterGatherer - HMP)`),
+               aes(x=Species, y=`log fold change (Industrial plaque - CMC)`),
                    position=position_dodge(width = 0.4), shape=18)
 
-ancom_HMP_CMC_plot
+ancom_IP_CMC_plot
 
-# Cameroon vs JAE
-res.ANCOM_BC_env_JAE_HG <- res.ANCOM_BC %>%
+# Cameroon vs Industrial calculus
+res.ANCOM_BC_env_IC_CMC <- res_noblanks.ANCOM_BC_IC_CMC %>%
   rename(Species = species) %>%
-  filter(`log fold change (HunterGatherer - JAE)` > 0) %>%
+  filter(`log fold change (Industrial calculus - CMC)` > 0) %>%
   mutate(star_up = ifelse(q.val<0.001, "***",
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))),
          star_down = "") %>%
-  bind_rows(., res.ANCOM_BC %>%
+  bind_rows(., res_noblanks.ANCOM_BC_IC_CMC %>%
   rename(Species = species) %>%
-  filter(`log fold change (HunterGatherer - JAE)` < 0) %>%
+  filter(`log fold change (Industrial calculus - CMC)` < 0) %>%
   mutate(star_up = "",
          star_down = ifelse(q.val<0.001, "***",
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", "")))))
 
-ancom_JAE_CMC_plot <- res.ANCOM_BC_env_JAE_HG %>%
-  filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
-  arrange(`log fold change (HunterGatherer - JAE)`) %>%
+ancom_IC_CMC_plot <- res.ANCOM_BC_env_IC_CMC %>%
+  filter(`log fold change (Industrial calculus - CMC)` >= 5.0 | `log fold change (Industrial calculus - CMC)` <= -5.0) %>%
+  arrange(`log fold change (Industrial calculus - CMC)`) %>%
   mutate(Species = as_factor(Species)) %>%
-  ggplot(., aes(x = Species, y = `log fold change (HunterGatherer - JAE)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
+  ggplot(., aes(x = Species, y = `log fold change (Industrial calculus - CMC)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
     geom_col() +
     geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     # coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12)) +
     ylab("Log fold change") +
     xlab("Species") +
-    ggtitle("Cameroon - JAE") +
-    geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_up),
+    ggtitle("Industrial calculus - CMC") +
+    geom_text(aes(y=`log fold change (Industrial calculus - CMC)`+4*sign(`log fold change (Industrial calculus - CMC)`), label=star_up),
               vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
-    geom_text(aes(y=`log fold change (HunterGatherer - JAE)`+4*sign(`log fold change (HunterGatherer - JAE)`), label=star_down),
+    geom_text(aes(y=`log fold change (Industrial calculus - CMC)`+4*sign(`log fold change (Industrial calculus - CMC)`), label=star_down),
               vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
-    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (JAE)` == 1) %>%
-                      filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
-                      arrange(`log fold change (HunterGatherer - JAE)`) %>%
+    geom_point(data = res.ANCOM_BC_env_IC_CMC %>% filter(`structural.zero (Industrial calculus)` == 1) %>%
+                      filter(`log fold change (Industrial calculus - CMC)` >= 5.0 | `log fold change (Industrial calculus - CMC)` <= -5.0) %>%
+                      arrange(`log fold change (Industrial calculus - CMC)`) %>%
                       mutate(Species = as_factor(Species)), 
-               aes(x=Species, y=`log fold change (HunterGatherer - JAE)`),
+               aes(x=Species, y=`log fold change (Industrial calculus - CMC)`),
                    position=position_dodge(width = 0.4), shape=18) +
-    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (HunterGatherer)` == 1) %>%
-                      filter(`log fold change (HunterGatherer - JAE)` >= 4.0 | `log fold change (HunterGatherer - JAE)` <= -4.0) %>%
-                      arrange(`log fold change (HunterGatherer - JAE)`) %>%
+    geom_point(data = res.ANCOM_BC_env_IC_CMC %>% filter(`structural.zero (CMC)` == 1) %>%
+                      filter(`log fold change (Industrial calculus - CMC)` >= 5.0 | `log fold change (Industrial calculus - CMC)` <= -5.0) %>%
+                      arrange(`log fold change (Industrial calculus - CMC)`) %>%
                       mutate(Species = as_factor(Species)), 
-               aes(x=Species, y=`log fold change (HunterGatherer - JAE)`),
+               aes(x=Species, y=`log fold change (Industrial calculus - CMC)`),
                    position=position_dodge(width = 0.4), shape=18)
 
-ancom_JAE_CMC_plot
+ancom_IC_CMC_plot
 
- # ggsave("~/Desktop/ancom_HMP_CMC_plot.png", plot = ancom_HMP_CMC_plot, device = "png",
+ # ggsave("~/Desktop/ancom_IP_CMC_plot.png", plot = ancom_IP_CMC_plot, device = "png",
  #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
  # 
- # ggsave("~/Desktop/ancom_JAE_CMC_plot.png", plot = ancom_JAE_CMC_plot, device = "png",
+ # ggsave("~/Desktop/ancom_IC_CMC_plot.png", plot = ancom_IC_CMC_plot, device = "png",
  #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
 
 ```
@@ -378,28 +378,28 @@ ancom_JAE_CMC_plot
 ```{r noblanks_mr_filter_env}
 
 # filter the table to include only the species that are in MR1 (if any)
-ancom_bc_noblanks_JAE_HG_mr1 <- ancom_bc_noblanks_JAE_HG %>%
+ancom_bc_noblanks_IC_CMC_mr1 <- ancom_bc_noblanks_IC_CMC %>%
   # inner_join(., mr_species %>%
   #              select(Species), by = "Species") %>%
-  filter(`log fold change (HunterGatherer - JAE)` < -2 | `log fold change (HunterGatherer - JAE)` > 2) %>%
+  filter(`log fold change (Industrial calculus - CMC)` < -2 | `log fold change (Industrial calculus - CMC)` > 2) %>%
   transmute(Species, 
-            log_fold_change = `log fold change (HunterGatherer - JAE)`, 
+            log_fold_change = `log fold change (Industrial calculus - CMC)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
             ci.up = ci.up.adj, 
             struct.zero = ifelse(se == 0, 1, 0), 
             q.val, 
-            Env = "Cameroon vs JAE", 
+            Env = "Cameroon vs Industrial calculus", 
             star = ifelse(q.val<0.001, "***", 
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
 
-ancom_bc_noblanks_HMP_HG_mr1 <- ancom_bc_noblanks_HMP_HG %>%
+ancom_bc_noblanks_IP_CMC_mr1 <- ancom_bc_noblanks_IP_CMC %>%
   # inner_join(., mr_species %>%
   #              select(Species), by = "Species") %>%
-  filter(`log fold change (HunterGatherer - HMP)` < -2 | `log fold change (HunterGatherer - HMP)` > 2) %>%
+  filter(`log fold change (Industrial plaque - CMC)` < -2 | `log fold change (Industrial plaque - CMC)` > 2) %>%
   transmute(Species, 
-            log_fold_change = `log fold change (HunterGatherer - HMP)`, 
+            log_fold_change = `log fold change (Industrial plaque - CMC)`, 
             se = se, 
             ci.lo = ci.lo.adj, 
             ci.up = ci.up.adj, 
@@ -411,14 +411,14 @@ ancom_bc_noblanks_HMP_HG_mr1 <- ancom_bc_noblanks_HMP_HG %>%
                          ifelse(q.val<0.05, "*", ""))))
 
 # list the species shared between the 2 comparisons
-Env_species = unique(c(ancom_bc_noblanks_JAE_HG_mr1$Species, ancom_bc_noblanks_HMP_HG_mr1$Species))
+Env_species = unique(c(ancom_bc_noblanks_IC_CMC_mr1$Species, ancom_bc_noblanks_IP_CMC_mr1$Species))
 
 ```
 
 Plots showing fold changes
 ```{r noblanks_plot_env}
 
-ancom_bc_noblanks_env_mr1 <- bind_rows(ancom_bc_noblanks_JAE_HG_mr1, ancom_bc_noblanks_HMP_HG_mr1) 
+ancom_bc_noblanks_env_mr1 <- bind_rows(ancom_bc_noblanks_IC_CMC_mr1, ancom_bc_noblanks_IP_CMC_mr1) 
 # %>%
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
@@ -452,9 +452,9 @@ For plots (from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/script
 ```{r, eval = F}
 ## 3.1 MA vs US
 ma_us_0_2=read_csv("./05-results.backup/ma_us_phylum_age2.csv") # HMP-HG
-ma_us_18_40=read_csv("./05-results.backup/ma_us_phylum_age18_40.csv") # JAE-HG
+ma_us_18_40=read_csv("./05-results.backup/ma_us_phylum_age18_40.csv") # Industrial calculus-HG
 ma_us_phyla=unique(c(ma_us_0_2$phylum, ma_us_18_40$phylum)) # list the species shared between the 2 comparisons
-ma_us_0_2=ma_us_0_2%>%transmute(phylum, log.fold.change=`log fold change (MA - US)`, # HMP-HunterGatherer
+ma_us_0_2=ma_us_0_2%>%transmute(phylum, log.fold.change=`log fold change (MA - US)`, # HMP-CMC
                                 se=se, ci.lo=ci.lo.adj, ci.up=ci.up.adj,
                                 struc.zero=ifelse(se==0, 1, 0), 
                                 q.val, age.group = "Infants", # Env = "HMP"
@@ -590,7 +590,7 @@ Make a quick plot like with Songbird that shows all species w/log-fold differenc
 ```{r}
 res.ANCOM_BC %>%
   rename(Species = species) %>%
-  filter(`log fold change (Baka - Nzime)` >= 1 | `log fold change (Baka - Nzime)` <= -1) %>%
+  filter(`log fold change (Baka - Nzime)` >= 1.5 | `log fold change (Baka - Nzime)` <= -1) %>%
   arrange(`log fold change (Baka - Nzime)`) %>%
   mutate(Species = as_factor(Species)) %>%
   mutate(star = ifelse(q.val<0.001, "***", 
@@ -688,7 +688,7 @@ p1
 
 
 
-## Market Economy
+## Market integration
 ```{r ancomBC_cmc_me}
 
 otu_data <- malt_species.decontam_filtered_cmc
@@ -699,7 +699,7 @@ otu_data <- otu_data %>%
 # Pre-processing
 feature.table = otu_data
 sample.var = "SampleID"
-group.var = "Market_economy"
+group.var = "Market_integration"
 zero.cut = 0.90
 lib.cut = 1000
 neg.lb = TRUE
@@ -796,7 +796,7 @@ res.ANCOM_BC_Fa_FC_star <- res.ANCOM_BC_Fa_FC %>%
                          ifelse(q.val<0.05, "*", "")))))
 
 res.ANCOM_BC_Fa_FC_star %>%
-  filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+  filter(`log fold change (ForrestCamp - Farming)` >= 2.0 | `log fold change (ForrestCamp - Farming)` <= -2.0) %>%
   arrange(`log fold change (ForrestCamp - Farming)`) %>%
   mutate(Species = as_factor(Species)) %>%
   ggplot(., aes(x = Species, y = `log fold change (ForrestCamp - Farming)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
@@ -813,13 +813,13 @@ res.ANCOM_BC_Fa_FC_star %>%
     geom_text(aes(y=`log fold change (ForrestCamp - Farming)`+4*sign(`log fold change (ForrestCamp - Farming)`), label=star_down),
               vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
     geom_point(data = res.ANCOM_BC_Fa_FC_star %>% filter(`structural.zero (Farming)` == 1) %>%
-                      filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+                      filter(`log fold change (ForrestCamp - Farming)` >= 2.0 | `log fold change (ForrestCamp - Farming)` <= -2.0) %>%
                       arrange(`log fold change (ForrestCamp - Farming)`) %>%
                       mutate(Species = as_factor(Species)), 
                aes(x=Species, y=`log fold change (ForrestCamp - Farming)`),
                    position=position_dodge(width = 0.4), shape=18) +
     geom_point(data = res.ANCOM_BC_Fa_FC_star %>% filter(`structural.zero (ForrestCamp)` == 1) %>%
-                      filter(`log fold change (ForrestCamp - Farming)` >= 1.5 | `log fold change (ForrestCamp - Farming)` <= -1.5) %>%
+                      filter(`log fold change (ForrestCamp - Farming)` >= 2.0 | `log fold change (ForrestCamp - Farming)` <= -2.0) %>%
                       arrange(`log fold change (ForrestCamp - Farming)`) %>%
                       mutate(Species = as_factor(Species)), 
                aes(x=Species, y=`log fold change (ForrestCamp - Farming)`),
@@ -895,7 +895,7 @@ ancom_bc_cmc_Fa_FC_mr1 <- ancom_bc_cmc_Fa_FC %>%
             ci.up = ci.up.adj, 
             struct.zero = ifelse(se == 0, 1, 0), 
             q.val, 
-            Market_economy = "ForrestCamp", 
+            Market_integration = "ForrestCamp", 
             star = ifelse(q.val<0.001, "***", 
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
@@ -911,7 +911,7 @@ ancom_bc_cmc_Fa_LR_mr1 <- ancom_bc_cmc_Fa_LR %>%
             ci.up = ci.up.adj,
             struct.zero = ifelse(se == 0, 1, 0),
             q.val,
-            Market_economy = "LoggingRoad",
+            Market_integration = "LoggingRoad",
             star = ifelse(q.val<0.001, "***",
                       ifelse(q.val<0.01, "**",
                          ifelse(q.val<0.05, "*", ""))))
@@ -931,8 +931,8 @@ ancom_bc_cmc_mareco_mr1 <- bind_rows(ancom_bc_cmc_Fa_FC_mr1, ancom_bc_cmc_Fa_LR_
 #   filter(se != 0) # thes have error bars in both directions as big as each data bar
 
 # plot the fold change as a bar plot (also adapted from (https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd))  
-p1 = ggplot(ancom_bc_cmc_mareco_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Market_economy)) + 
-  geom_bar(aes(fill=Market_economy), stat="identity", width=0.4, position=position_dodge())+
+p1 = ggplot(ancom_bc_cmc_mareco_mr1, aes(x=Species, y=log_fold_change, ymin=ci.lo, ymax=ci.up, group=Market_integration)) + 
+  geom_bar(aes(fill=Market_integration), stat="identity", width=0.4, position=position_dodge())+
   geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4))+
   geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5)+
   labs(x=NULL, y="Log Fold Change")+coord_flip()+
@@ -1014,7 +1014,7 @@ ancom_bc_cmc_An_Po <- res.ANCOM_BC %>%
 #   filter(diff.abn == "TRUE")
   # filter(`log fold change (Anterior - Posterior)` < -1 | `log fold change (Anterior - Posterior)` > 1)
 
-# fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_species_cmc_toothsite.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_An_Po, "./05-results.backup/ancomBC_species_cmc_toothsite.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -1037,7 +1037,7 @@ res.ANCOM_BC_ts <- res.ANCOM_BC %>%
                          ifelse(q.val<0.05, "*", "")))))
 
 res.ANCOM_BC_ts %>%
-  filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+  filter(`log fold change (Anterior - Posterior)` >= 3.0 | `log fold change (Anterior - Posterior)` <= -5.0) %>%
   arrange(`log fold change (Anterior - Posterior)`) %>%
   mutate(Species = as_factor(Species)) %>%
   ggplot(., aes(x = Species, y = `log fold change (Anterior - Posterior)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = diff.abn)) +
@@ -1054,13 +1054,13 @@ res.ANCOM_BC_ts %>%
     geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_down),
               vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
     geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Posterior)` == 1) %>%
-                      filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 3.0 | `log fold change (Anterior - Posterior)` <= -3.0) %>%
                       arrange(`log fold change (Anterior - Posterior)`) %>%
                       mutate(Species = as_factor(Species)), 
                aes(x=Species, y=`log fold change (Anterior - Posterior)`),
                    position=position_dodge(width = 0.4), shape=18) +
     geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Anterior)` == 1) %>%
-                      filter(`log fold change (Anterior - Posterior)` >= 2.5 | `log fold change (Anterior - Posterior)` <= -2.5) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 4.5 | `log fold change (Anterior - Posterior)` <= -4.5) %>%
                       arrange(`log fold change (Anterior - Posterior)`) %>%
                       mutate(Species = as_factor(Species)), 
                aes(x=Species, y=`log fold change (Anterior - Posterior)`),

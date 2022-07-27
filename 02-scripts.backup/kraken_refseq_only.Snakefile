@@ -10,7 +10,7 @@
 # obtain a higher assignment rate than what was observed for default database
 # when using simulated data from Velsko et al. (2018).
 #
-# Alex velsko, 17/10/19
+# Alex Huebner, 17/10/19
 ################################################################################
 
 from glob import glob

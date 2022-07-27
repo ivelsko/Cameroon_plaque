@@ -326,17 +326,18 @@ head(malt_genus.decontam_filtered_noblanks_noyanomami.fa.df)
 
 # save the species using in downstream discriminant analyses as a table
 malt_genus.decontam_filtered_noblanks_noyanomami.fa_genus <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   select(Genus, Residual)
 
-fwrite(malt_genus.decontam_filtered_noblanks_noyanomami.fa_genus, file = "./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv", quote = F, sep = "\t")
+# fwrite(malt_genus.decontam_filtered_noblanks_noyanomami.fa_genus, file = "./05-results.backup/minres_oblimin_noyanomami.fa_genus.tsv", quote = F, sep = "\t")
 
 ```
+
 
 ```{r lda_genus_decontam_noblanks_noyanomami_eg}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -377,7 +378,7 @@ noyanomami_eg
 ```{r lda_genus_decontam_noblanks_noyanomami_age}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -414,7 +415,7 @@ noyanomami_ag
 ```{r lda_genus_decontam_noblanks_noyanomami_me}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -452,7 +453,7 @@ noyanomami_me
 ```{r lda_genus_decontam_noblanks_noyanomami_sex}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -505,7 +506,7 @@ noyanomami_sex
 ```{r lda_genus_decontam_noblanks_noyanomami_ts}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -536,13 +537,24 @@ noyanomami_ts <- ggplot(lda.data, aes(LD1, LD2, colour = Tooth_site, shape = Too
 
 noyanomami_ts
 
+lda.data %>%
+  rownames_to_column("SampleID") %>%
+  ggplot(., aes(LD1, LD2, colour = Tooth_site, shape = Tooth_site)) +
+                        geom_text(aes(label = SampleID), size = 3) +
+                        scale_colour_manual(values = Tooth_site_colors) +
+                        scale_shape_manual(values = Tooth_site_shapes) +
+                        xlab("LD1") +
+                        ylab("LD2") +
+                        theme_minimal(base_size = 10) +
+                        theme(legend.position = "top") +
+                        theme(legend.title = element_blank())
 ```
 
 
 ```{r lda_genus_decontam_noblanks_noyanomami_vi}
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_noblanks_noyanomami <- malt_genus.decontam_filtered_noblanks_noyanomami.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -581,7 +593,7 @@ allplots_noyanomami <- plot_grid(noyanomami_eg, noyanomami_ag,
           noyanomami_me, noyanomami_sex,
           noyanomami_ts, noyanomami_vi,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
-
+allplots_noyanomami
 
 # ggsave("05-results.backup/allplots_noyanomami.pdf", plot = allplots_noyanomami, device = "pdf",
 #        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
@@ -716,7 +728,7 @@ malt_genus.decontam_FA_all_clr_order <- malt_genus.decontam_FA_all_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Genus","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(GnOrder = as.character(seq(1,23))) %>% # MR1+MR2 31; MR1 23
+  mutate(GnOrder = as.character(seq(1,23))) %>% 
   select(Genus, GnOrder, everything()) %>%
   mutate(GnOrder = fct_relevel(GnOrder, sp_all_order)) %>%
   arrange(GnOrder) %>%
@@ -803,10 +815,10 @@ heatmap_smp_cluster <- ggplot(malt_genus.decontam_FA_all_clr_long, aes(SampleID,
 
 heatmap_smp_cluster
 
-ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.pdf", plot = heatmap_smp_cluster, device = "pdf",
-       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
-ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.png", plot = heatmap_smp_cluster, device = "png",
-       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.pdf", plot = heatmap_smp_cluster, device = "pdf",
+#        scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX15/SXX15_all_gn_fa_heatmaps.png", plot = heatmap_smp_cluster, device = "png",
+#        scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -941,10 +953,10 @@ head(malt_genus.decontam_filtered_cmc.fa.df)
 
 # save the species using in downstream discriminant analyses as a table
 malt_genus.decontam_filtered_cmc.fa_genus <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   select(Genus, Residual)
 
-fwrite(malt_genus.decontam_filtered_cmc.fa_genus, file = "./05-results.backup/minres_oblimin_cmc.fa_genus.tsv", quote = F, sep = "\t")
+# fwrite(malt_genus.decontam_filtered_cmc.fa_genus, file = "./05-results.backup/minres_oblimin_cmc.fa_genus.tsv", quote = F, sep = "\t")
 
 ```
 
@@ -952,7 +964,7 @@ fwrite(malt_genus.decontam_filtered_cmc.fa_genus, file = "./05-results.backup/mi
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1001,7 +1013,7 @@ cmc_eg
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1039,7 +1051,7 @@ cmc_ag
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1078,7 +1090,7 @@ cmc_me
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1121,7 +1133,7 @@ cmc_sex
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1166,7 +1178,7 @@ cmc_ts
 
 # select only the species that make up the 1st 2 residuals, based on the scree plot above
 fa_genus_cmc <- malt_genus.decontam_filtered_cmc.fa.df %>% 
-  filter(Residual %in% c("MR1","MR2","MR3")) %>%
+  filter(Residual %in% c("MR1")) %>%
   pull(Genus)
 
 # sub-sample the species table for only those species
@@ -1208,7 +1220,7 @@ allplots_cmc <- plot_grid(cmc_eg, cmc_ag,
           cmc_me, cmc_sex,
           cmc_ts, cmc_vi,
           nrow=3, labels = c("A", "B", "C", "D", "E", "F"), rel_widths = c(1, 1))
-
+allplots_cmc
 # ggsave("05-results.backup/allplots_cmc.pdf", plot = allplots_cmc, device = "pdf",
 #        scale = 1, width = 9, height = 10, units = c("in"), dpi = 300)
 
@@ -1272,7 +1284,7 @@ malt_genus.decontam_FA_cmc_clr_order <- malt_genus.decontam_FA_cmc_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Genus","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(GnOrder = as.character(seq(1,29))) %>% # MR1+MR2 50; MR1 29
+  mutate(GnOrder = as.character(seq(1,29))) %>% 
   select(Genus, GnOrder, everything()) %>%
   mutate(GnOrder = fct_relevel(GnOrder, sp_cmc_order)) %>%
   arrange(GnOrder) %>%
@@ -1355,10 +1367,10 @@ heatmap_cmc_smp_cluster <- ggplot(malt_genus.decontam_FA_cmc_clr_long, aes(Sampl
 
 heatmap_cmc_smp_cluster
 
-ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.pdf", plot = heatmap_cmc_smp_cluster, device = "pdf",
-       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
-ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.png", plot = heatmap_cmc_smp_cluster, device = "png",
-       scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.pdf", plot = heatmap_cmc_smp_cluster, device = "pdf",
+#        scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX16/SXX16_cmc_gn_fa_heatmaps.png", plot = heatmap_cmc_smp_cluster, device = "png",
+#        scale = 1, width = 10, height = 7, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above
@@ -1431,8 +1443,8 @@ cmc_fa_pca <- plot_pca(malt_genus.decontam_filtered_cmc_FA.pca, "PC1", "PC2", "T
 cmc_fa_pca
 plot_pca(malt_genus.decontam_filtered_cmc_FA.pca, "PC3", "PC2", "Sex")
 
-ggsave("05-results.backup/cmc_fa_pca.pdf", plot = cmc_fa_pca, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("05-results.backup/cmc_fa_pca.pdf", plot = cmc_fa_pca, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 

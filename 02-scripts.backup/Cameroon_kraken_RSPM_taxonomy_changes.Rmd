@@ -31,7 +31,11 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 ```{r load_data}
 load("./05-results.backup/kraken_refseq_run1.RData") # this has the files with OTU counts needed to create the taxa environments
+load("./05-results.backup/kraken_refseqO_reports.RData") # this has the files with OTU counts needed to create the taxa environments
 
+```
+
+```{r}
 # this file has the full taxonomy string for all samples (by hand added in all missing taxonomy from taxize or NCBI taxonomy page online, etc)
 all_taxonomy_raw <- fread("./00-documentation.backup/all_taxonomy_filtered_hand.csv")
 all_taxonomy <- all_taxonomy_raw %>%

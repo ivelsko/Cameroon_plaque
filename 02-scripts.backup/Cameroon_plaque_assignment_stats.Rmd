@@ -14,6 +14,8 @@ output:
 library(knitr)
 library(vegan)
 library(data.table)
+library(janitor)
+library(rstatix)
 library(tidyverse)
 library(gplots)
 library(cowplot)
@@ -28,61 +30,182 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 ```
 
 # MALT read stats
-The number of reads assigned in each sample appears very low (~50%). We want to check this so we know how many were assinged in each sample. We used the cleaned and merged reads that didn't align to the human genome (hg19). 
-```{r load_data}
-# load the table generated from the MALT log file with the # reads and # aligned reads
-maltnt_assignments <- fread("./00-documentation.backup/CMC_nt_aligned_stats.tsv")
-maltRSC_assignments <- fread("./00-documentation.backup/CMC_RSC_aligned_stats.tsv")
-malt_CMC_HMP_RSC_assignments <- fread("./00-documentation.backup/CMC_HMP_RSC_aligned_stats.tsv")
-malt_CMC_HMP_JAE_RSC_assignments <- fread("./00-documentation.backup/CMC_HMP_JAE_RSC_aligned_stats.tsv")
-malt_CMC_HMP_JAE_Yano_RSC_assignments <- fread("./00-documentation.backup/CMC_HMP_JAE_Yano_RSC_aligned_stats.tsv")
-
-# clean the file names
-maltnt_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltnt_assignments$SampleID)
-maltRSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", maltRSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","_10M", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.rma6","", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.rma6","_10M", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub(".fastq.truncated.rma6","", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-
-maltnt_assignments$SampleID <- gsub("../04-analysis/malt/nt/","", maltnt_assignments$SampleID)
-maltRSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", maltRSC_assignments$SampleID)
-malt_CMC_HMP_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", malt_CMC_HMP_RSC_assignments$SampleID)
-malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID <- gsub("../04-analysis/malt/RefSeqCustom/","", malt_CMC_HMP_JAE_Yano_RSC_assignments$SampleID)
-
+The number of reads assigned in each sample appears very low (~50%). We want to
+check this so we know how many were assinged in each sample. We used the cleaned
+and merged reads that didn't align to the human genome (hg19).
+```{r}
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+```{r load_data}
+# read in the species table
+malt_species <- fread("./05-results.backup/MALT_all_data_combined_Comparison_species_names.tsv")
+
+# clean the file names
+malt_species <- rename(malt_species, Species = `#Datasets`)
+colnames(malt_species) <- gsub(".SG1.unmapped","", colnames(malt_species))
+colnames(malt_species) <- gsub(".unmapped","", colnames(malt_species))
+colnames(malt_species) <- gsub("-1","", colnames(malt_species))
+
+# remove human and unassigned reads, and remove the sub-sampled HMP and JAE samples
+malt_species <- malt_species %>% 
+  filter(!str_detect(Species, "Homo sapiens|Not assigned")) %>%
+  select(-matches("VLC")) %>%
+  # remove extra samples from Clemente study (these might be industrial samples) 
+  select(-matches("SRR1646026|SRR1646027|SRR1646028|SRR1646029|SRR1646034|SRR1646035|SRR1646036|SRR1646037"))
+
+```
+
+
+```{r}
+
+malt_species %>% 
+  filter(str_detect(Species, "Anaerolineaceae")) %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(Counts = Counts + 1) %>% # for log-transform
+  left_join(., metadata %>%
+              select(SampleID, Tooth_site,Ethnic_Group), by = "SampleID") %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  group_by(Ethnic_Group) %>%
+  ggplot(., aes(x = Tooth_site, y = Counts, color = Ethnic_Group)) +
+         geom_boxplot() +
+         # geom_violin() +
+         geom_point(position = position_jitterdodge(dodge.width = 0.8, jitter.width = 0.7)) +
+         scale_color_manual(values = Ethnic_Group_colors) +
+         theme_minimal(base_size = 14) +
+         scale_y_continuous(trans='log10') +
+         #scale_y_continuous(trans='pseudo_log') +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Assigned reads") +
+         ggtitle("")
+
+```
+
+
+
+```{r}
+
+malt_missed_table <- fread("~/archgen/projects1/microbiome_calculus/iberian/05-results.backup/Iberian_samples-controls_comparison_species.txt") %>%
+  select(matches("Data|JAE014|JAE015|VLC|SRR061192|SRR061294|SRR061320|SRR061365|SRR061562|SRR062083|SRR062298|SRR062299|SRR063517|SRR1804664|SRR1804823|SRR512767|SRR513165|SRR513768|SRR513775|SRR513828|SRR514202|SRR514239|SRR514306|SRR514329")) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total )%>%
+  rename(Species = `#Datasets`) %>%
+  filter(!str_detect(Species, "Homo sapiens|Not assigned"))
+
+colnames(malt_missed_table) <- gsub(".unmapped","", colnames(malt_missed_table))
+
+```
+
+```{r}
+
+malt_species_raw <- malt_species %>%
+  full_join(., malt_missed_table, by = "Species") %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(Counts = replace_na(Counts, 0)) %>%
+  arrange(SampleID) %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts") %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total)
+
+attr(malt_species_raw, "totals") <- NULL
+
+```
+
+```{r}
+# read in malt log files to get total reads and number of assigned reads
+malt_all_log <- fread("~/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/eager2/multiqc/multiqc_data/mqc_malt-mappability-plot_1.txt") %>%
+  filter(!str_detect(Sample, "VLC002.A0101")) %>%
+  rename(Library_ID = Sample) %>%
+  filter(!str_detect(Library_ID, "SRR|VLC002|ERR"))
+
+# select just CMC046.B0201 from the maniac_allen eager run where it completed
+# Num. of queries:   12017427
+# Aligned queries:    9574829
+# Num. alignments:   76981736
+
+`Mapped reads` <- c(9574829)
+`Total reads` <- c(12017427) 
+
+missed46 <- data.frame(`Mapped reads`, `Total reads`) %>%
+  mutate(`Non Mapped reads` = Total.reads - Mapped.reads,
+         Library_ID = "CMC046.B0201") %>%
+  rename(`Mapped reads` = Mapped.reads) %>%
+  select(Library_ID, `Mapped reads`, `Non Mapped reads`)
+
+# get the rest from the Iberian project
+iber <- c("JAE014.A0101","JAE015.A0101","VLC001.A0101","VLC002.A0101","VLC003.A0101","VLC004.A0101","VLC005.A0101","VLC008.A0101","VLC009.A0101","VLC010.A0101","SRR061192","SRR061294","SRR061320","SRR061365","SRR061562","SRR062083","SRR062298","SRR062299","SRR063517","SRR1804664","SRR1804823","SRR512767","SRR513165","SRR513768","SRR513775","SRR513828","SRR514202","SRR514239","SRR514306","SRR514329")
+iberinfo <- fread("~/archgen/projects1/microbiome_calculus/iberian/03-preprocessing/screening/eager2/multiqc/multiqc_data/mqc_malt-mappability-plot_1.txt") %>%
+  filter(Sample %in% iber) %>%
+  rename(Library_ID = Sample)
+
+# put them together
+queries <- malt_all_log %>%
+  bind_rows(., missed46) %>%
+  bind_rows(., iberinfo)
 
 ```
 
 
 ```{r outliers}
 # these sampls are outliers based on PCA of the taxonomic profile in Cameroon_h-g_taxonomy.Rmd
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201","EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901")
+outliers <- c("CMC032.B0101","EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901")
 
 ```
 
 
 ```{r percents}
-maltnt_assignments <- maltnt_assignments %>%
-  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
-  mutate(Percent = Aligned/Queries*100)
-
-maltRSC_assignments <- maltRSC_assignments %>%
-  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
-  mutate(Percent = Aligned/Queries*100)
-
-malt_CMC_HMP_RSC_assignments <- malt_CMC_HMP_RSC_assignments %>%
-  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
-  mutate(Percent = Aligned/Queries*100)
-
-malt_CMC_HMP_JAE_Yano_RSC_assignments <- malt_CMC_HMP_JAE_Yano_RSC_assignments %>%
-  filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
-  mutate(Percent = Aligned/Queries*100)
+malt_assignments <- queries %>%
+  mutate(Percent = `Mapped reads` / (`Mapped reads` + `Non Mapped reads`) * 100)
  
 ```
+
+```{r}
+
+readplot <- malt_assignments %>%
+  mutate(Library_ID = str_replace_all(Library_ID, ".SG1","")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Village) %>%
+              rename(Library_ID = SampleID), by = "Library_ID") %>%
+  drop_na(Village) %>%
+  filter(!str_detect(Village, "Blank|Gauze")) %>%
+  mutate(Village = fct_relevel(Village, "202","205","204","203","206","Industrial plaque","Industrial calculus")) %>%
+  ggplot(., aes(x = Village, y = Percent, fill = Village)) +
+         geom_boxplot() +
+         geom_jitter(alpha = 0.5, width = 0.1) +
+         scale_fill_manual(values = Village_colors) +
+         theme_minimal(base_size = 14) +
+         #scale_y_continuous(trans='log10') +
+         #scale_y_continuous(trans='pseudo_log') +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+         ylab("Percent assigned reads") +
+         ggtitle("")
+readplot
+
+# ggsave("./06-publication/supplemental_figures/SXX4/SXX4_malt_assignments_pct.pdf", plot = readplot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r stats}
+
+malt_assignments %>%
+  mutate(Library_ID = str_replace_all(Library_ID, ".SG1","")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Village) %>%
+              rename(Library_ID = SampleID), by = "Library_ID") %>%
+  drop_na(Village) %>%
+  filter(!str_detect(Village, "Blank|Gauze")) %>%
+  mutate(Village = as.character(Village)) %>%
+  pairwise_wilcox_test(Percent ~ Village, p.adjust.method = "fdr") %>%
+  arrange(p.adj)
+
+```
+
+
 
 ```{r graphing_functions}
 
@@ -129,7 +252,7 @@ metadata %>%
 ```
 
 
-```{r graphs_nt}
+```{r graphs_nt, eval = F}
 
 plot_box_whisker(maltnt_assignments, hasmtdta = F, "Percent", "Env", "Env", "Percent of reads assigned by MALT with nt2017")
 plot_box_whisker(maltnt_assignments, hasmtdta = F, "Percent", "Village", "Village", "Percent of reads assigned by MALT with nt2017")
@@ -138,7 +261,7 @@ plot_box_whisker(maltnt_assignments, hasmtdta = F, "Queries", "Village", "Villag
 
 ```
 
-```{r graphs_RSC}
+```{r graphs_RSC, eval = F}
 
 plot_box_whisker(malt_CMC_HMP_JAE_Yano_RSC_assignments, hasmtdta = F, "Queries", "Env", "Env", "Number of reads submitted to MALT for classification")
 plot_box_whisker(malt_CMC_HMP_JAE_Yano_RSC_assignments, hasmtdta = F, "Queries", "Village", "Village", "Number of reads submitted to MALT for classification")
@@ -152,7 +275,7 @@ plot_box_whisker(malt_CMC_HMP_JAE_Yano_RSC_assignments, hasmtdta = F, "Percent",
 
 
 Now combine the data to see how much of a difference there is the % assignments between databases
-```{r compare}
+```{r compare, eval = F}
 
 malt_stats_new <- as_tibble(bind_rows(maltnt_assignments %>%
                           mutate(Database = 'nt') %>%
@@ -177,10 +300,26 @@ db_plot_village
 #        scale = 1, width = 7, height = 5, units = c("in"),
 #        dpi = 300)
 
+nt_rs <- malt_stats_new %>%
+  filter(!str_detect(Village, "Yanomami|HMP|JAE|Blank|Gauze")) %>%
+  ggplot(., aes(x = Village, y = Percent, fill = Database)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = Database_colors) +
+                         theme_minimal(base_size = 18) +
+                         #scale_y_continuous(trans='log10') +
+                         #scale_y_continuous(trans='pseudo_log') +
+                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+                              text = element_text(size=18)) +
+                         ylab("% of reads") +
+                         xlab("")
+nt_rs
+# ggsave("./06-publication/supplemental_figures/SXX4/SXX4_malt_assignments_nt_rs.pdf", plot = nt_rs, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
 ```
 
 
-```{r uky_graphs}
+```{r uky_graphs, eval = F}
 
 malt_CMC_HMP_JAE_Yano_RSC_assignments_uky <- malt_CMC_HMP_JAE_Yano_RSC_assignments %>%
   filter(!str_detect(SampleID, outliers %>% str_c(collapse = "|"))) %>%
@@ -194,23 +333,27 @@ malt_pct_plot <-malt_CMC_HMP_JAE_Yano_RSC_assignments_uky %>%
   inner_join(metadata %>%
                select(SampleID, Env, Description, Ethnic_Group, Age_group,
                       Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID") %>%
+  filter(Village != "Yanomami") %>%
   ggplot(., aes(x = Village, y = Percent, fill = Village)) +
                          geom_boxplot() +
                          scale_fill_manual(values = Village_colors) +
                          theme_minimal(base_size = 18) +
                          #scale_y_continuous(trans='log10') +
                          #scale_y_continuous(trans='pseudo_log') +
-                         theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
                               text = element_text(size=18)) +
                          ylab("% of reads") +
                          xlab("")
 malt_pct_plot
 
-ggsave("./06-publication/supplemental_figures/SXX4_malt_assignments_pct.pdf", plot = malt_pct_plot, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX4/SXX4_malt_assignments_pct.pdf", plot = malt_pct_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./06-publication/supplemental_figures/SXX4/SXX4_malt_assignments_pct.png", plot = malt_pct_plot, device = "png",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-ggsave("./06-publication/supplemental_figures/SXX4_malt_assignments_pct.png", plot = malt_pct_plot, device = "png",
-       scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# ggsave("~/Desktop/SXX4_malt_assignments_pct.pdf", plot = malt_pct_plot, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
 ```
 

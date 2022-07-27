@@ -33,7 +33,7 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 # SEED category assignment stats
 ```{r load_data}
 ## load the species and genus tables generated with HUMAnN2
-seed_full <- fread("./05-results.backup/aadder_SEED_counts.txt")
+seed_full <- fread("./05-results.backup/aadder_SEED_counts_corrected.txt")
 seed_full <- as_tibble(seed_full)
 
 # clean the file names
@@ -44,6 +44,12 @@ colnames(seed_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractu
 colnames(seed_full) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","", colnames(seed_full))
 colnames(seed_full) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.blastn.sam.gz","_10M", colnames(seed_full))
 
+seed_full <- seed_full %>%
+  gather("SampleID", "Counts",2:ncol(.)) %>%
+  spread(Pathway, Counts) %>%
+  arrange(SampleID) %>%
+  gather("Pathway","Counts",2:ncol(.)) %>%
+  spread(SampleID, Counts)
 # remove unmapped and ungrouped reads
 # humann2_KOs <- humann2_KOs_full %>% filter(Ortholog != "UNMAPPED") %>% filter(!str_detect(Ortholog, "UNGROUPED"))
 
@@ -466,8 +472,8 @@ seed_L4.decontam <- seed_L4.decontam %>%
 save(seed_full, seed_L4.decontam,
      file = "./05-results.backup/CMC_seed_tables.RData")
 
-# write.table(malt_species.decontam, file = "05-results.backup/malt_species.decontam.tsv", sep="\t", quote=F, row.names = F)
-# write.table(malt_species, "05-results.backup/malt_species.tsv", sep="\t", quote=F, row.names = F)
-# write.table(contaminants_species, "05-results.backup/malt_contaminants_species.tsv", sep="\t", quote=F, row.names = F)
+# write.table(malt_species.decontam, file = "05-results.backup/aadder_seed.decontam.tsv", sep="\t", quote=F, row.names = F)
+# write.table(malt_species, "05-results.backup/aadder_seed.tsv", sep="\t", quote=F, row.names = F)
+# write.table(contaminants_species, "05-results.backup/aadder_seed_contaminants_species.tsv", sep="\t", quote=F, row.names = F)
 
 ```

@@ -37,39 +37,13 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 
 # HUMAnN2 assignment stats
-```{r load_data, eval = F}
-## load the species and genus tables generated with HUMAnN2
-humann2_path <- fread("./05-results.backup/humann2.pathabundance.all.tss.tsv")
-humann2_path <- as_tibble(humann2_path)
-humann2_KOs_full <- fread("./05-results.backup/humann2.genefamilies.all.i.tss.renorm.ko.tsv")
-humann2_KOs_full <- as_tibble(humann2_KOs_full)
-
-# clean the file names
-humann2_KOs_full <- rename(humann2_KOs_full, Ortholog = `# Gene Family`)
-colnames(humann2_KOs_full) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
-colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
-colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M_Abundance-RPKs","_10M", colnames(humann2_KOs_full))
-colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","_10M", colnames(humann2_KOs_full))
-colnames(humann2_KOs_full) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance-RPKs","", colnames(humann2_KOs_full))
-colnames(humann2_KOs_full) <- gsub(".fastq.truncated_Abundance-RPKs","", colnames(humann2_KOs_full))
-
-humann2_path <- rename(humann2_path, Pathway = `# Pathway`)
-colnames(humann2_path) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
-colnames(humann2_path) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
-colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M_Abundance","_10M", colnames(humann2_path))
-colnames(humann2_path) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","_10M", colnames(humann2_path))
-colnames(humann2_path) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam_Abundance","", colnames(humann2_path))
-colnames(humann2_path) <- gsub(".fastq.truncated_Abundance","", colnames(humann2_path))
-
-
-```
-
 ```{r load_data}
 load("./05-results.backup/CMC_humann2_tables.RData")
 load("./05-results.backup/CMC_metadata.RData")
 
 # remove unmapped and ungrouped reads
-humann2_KOs <- humann2_KOs_full %>% filter(Ortholog != "UNMAPPED") %>% filter(!str_detect(Ortholog, "UNGROUPED"))
+humann2_KOs <- humann2_KOs_full %>% filter(!str_detect(Ortholog, "UNMAPPED|UNGROUPED"))
+humann2_path.decontam <- humann2_path.decontam %>% filter(!str_detect(Pathway, "UNMAPPED|UNINTEGRATED"))
 
 ```
 
@@ -85,12 +59,12 @@ plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
     metadata_group_shapes <- get(paste(shape_group, "_shapes", sep = ""))
     metadata_group_size <- get(paste(size_group, "_size", sep = ""))
 
-    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
+    exp_var <- paste0(round(df$prop_expl_var$X * 100, 2), "%")
     df_X <- df$variates$X %>%
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_integration, Market_integration_split, Village, Tooth_site, Type), by = "SampleID")
     
     color_group = df_X[[color_group]]
     shape_group = df_X[[shape_group]]
@@ -132,7 +106,7 @@ plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
                         # stat_ellipse() +
                         xlab(paste(xaxis, " - ", exp_var_pc1)) +
                         ylab(paste(yaxis, " - ", exp_var_pc2)) +
-                        theme_minimal(base_size = 10) +
+                        theme_minimal(base_size = 14) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
 
@@ -143,12 +117,12 @@ plot_pca <- function(df, pc1, pc2, color_group, shape_group, size_group) {
 plot_pca_names <- function(df, pc1, pc2, metadata_group) {
     metadata_group_colors <- get(paste(metadata_group, "_colors", sep = ""))
 
-    exp_var <- paste0(round(df$explained_variance * 100, 2), "%")
+    exp_var <- paste0(round(df$prop_expl_var$X * 100, 2), "%")
     df_X <- df$variates$X %>%
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_integration, Market_integration_split, Village, Tooth_site, Type), by = "SampleID")
     
     metadata_group = df_X[[metadata_group]]
     
@@ -187,7 +161,7 @@ plot_pca_names <- function(df, pc1, pc2, metadata_group) {
                         # stat_ellipse() +
                         xlab(paste(xaxis, " - ", exp_var_pc1)) +
                         ylab(paste(yaxis, " - ", exp_var_pc2)) +
-                        theme_minimal(base_size = 10) +
+                        theme_minimal(base_size = 14) +
                         theme(legend.position = "top") +
                         theme(legend.title = element_blank())
 
@@ -201,14 +175,14 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle, pathways = c(
    
     arrow_pc <- enquo(columntitle)
     
-    exp_var <- paste0(round(df$explained_variance * 100, 2), "%") # explained variance for x- and y-labels
+    exp_var <- paste0(round(df$prop_expl_var$X * 100, 2), "%") # explained variance for x- and y-labels
     
     # select only the PCs from the PCA and add metadata
     df_X <- df$variates$X %>%
               as.data.frame() %>%
               rownames_to_column("SampleID") %>%
               inner_join(metadata %>%
-                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_economy, Village, Tooth_site, Type), by = "SampleID")
+                           select(SampleID, Description, Ethnic_Group, Age_group, Sex, Market_integration, Market_integration_split, Village, Tooth_site, Type), by = "SampleID")
     
     metadata_group = df_X[[metadata_group]]
     
@@ -297,7 +271,7 @@ plot_pca_bi <- function(df, pc1, pc2, metadata_group, columntitle, pathways = c(
            y = paste(yaxis, " - ", exp_var_pc2)) +
       scale_colour_manual(values = metadata_group_colors) +
       scale_shape_manual(values = metadata_group_shapes) +
-      theme_minimal() + theme(text = element_text(size = 10)) +
+      theme_minimal() + theme(text = element_text(size = 14)) +
       theme(legend.position = "top")
 
     return(pca_plot_bi)
@@ -317,304 +291,131 @@ This has to be done with a table for which the samples were renormed
 individually and then joined, and not renormed after they were joined (with
 HUMAnN2 scripts).
 
-Plot the proportion of assigned reads in each group.
-```{r read_assignment_stats}
-
-humann2_alignment_stats <- fread("./05-results.backup/humann2_alignment_stats.tsv")
-humann2_alignment_stats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", humann2_alignment_stats$SampleID)
-humann2_alignment_stats$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", humann2_alignment_stats$SampleID)
-humann2_alignment_stats$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", humann2_alignment_stats$SampleID)
-humann2_alignment_stats$SampleID <- gsub(".fastq.truncated.prefixed.gz","", humann2_alignment_stats$SampleID)
-humann2_alignment_stats$SampleID <- gsub(".SG1.1","", humann2_alignment_stats$SampleID)
-
-humann2_alignment_stats <- humann2_alignment_stats %>%
-  arrange(SampleID) %>%
-  inner_join(., metadata %>% select(SampleID, Individual_Seq_Depth_NonHuman, Ethnic_Group, Village, Description), by = "SampleID") %>%
-  mutate(UnalignedReads = round(Individual_Seq_Depth_NonHuman*(UnalignedPct/100)),
-         AlignedReads = Individual_Seq_Depth_NonHuman - UnalignedReads, 
-         AlignedPct = 100 - UnalignedPct) %>%
-  select(SampleID, Individual_Seq_Depth_NonHuman, UnalignedReads, AlignedReads, UnalignedPct, AlignedPct, everything())
-
-humann2_alignment_stats_box <- humann2_alignment_stats %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, AlignedPct, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Percent") +
-    ggtitle("Percent of reads aligned by HUMAnN2")
-humann2_alignment_stats_box
-
-# ggsave("./05-results.backup/presentation_pdfs/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-humann2_alignment_stats_w <- humann2_alignment_stats %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
-pairwise.wilcox.test(humann2_alignment_stats_w$AlignedPct, humann2_alignment_stats_w$Village, p.adjust.method = "fdr")
-
-```
 
 # Pathway analysis
 
-How many pathways were identified in each of the groups? Are there significant
-differences?
-```{r pathways_boxes}
-
-# all pathways
-humann2_path_noblanks_long <- humann2_path %>%
-  filter(!str_detect(Pathway, "\\|")) %>%
-  select(-CMC032.B0101) %>% # this sample has very few reads
-  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Paths = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Paths, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of pathways detected") +
-    ggtitle("Total number of pathways ID'd by HUMAnN2")
-humann2_path_noblanks_long_box
-
-ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_total.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
-
-humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
-pairwise.wilcox.test(humann2_path_noblanks_long_w$Paths, humann2_path_noblanks_long_w$Village, p.adjust.method = "fdr")
-
-
-# potential contaminant pathways removed
-humann2_path.decontam_noblanks_long <- humann2_path.decontam %>%
-  filter(!str_detect(Pathway, "\\|")) %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Paths = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_path.decontam_noblanks_long_box <- humann2_path.decontam_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
-  ggplot(., aes(Village, Paths, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of pathways detected") +
-    ggtitle("Number of pathways with potential contaminants removed")
-humann2_path.decontam_noblanks_long_box
-
-ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_decontam.pdf", plot = humann2_path.decontam_noblanks_long_box, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
-
-humann2_path.decontam_noblanks_long_box_w <- humann2_path.decontam_noblanks_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
-pairwise.wilcox.test(humann2_path.decontam_noblanks_long_box_w$Paths, humann2_path.decontam_noblanks_long_box_w$Village, p.adjust.method = "fdr")
-
-
-# potential contaminant pathways removed and only pathways present in at least 33% of one ethnic group
-h2_path_test <- humann2_path.decontam %>%
-  filter(!str_detect(Pathway, "\\|")) %>%
-  select(-matches("EXB|LIB|SRR164|10M")) %>%
-  mutate_if(is.numeric, ~1 * (. > 0)) %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  inner_join(., metadata %>%
-               select(SampleID, Ethnic_Group), by = "SampleID") %>%
-  group_by(Ethnic_Group, Pathway) %>%
-  summarize(Percent_presence = sum(CPM)/length(SampleID)*100) %>%
-  # select the SEED proteins that are present in at least 30% of at least one group
-  ungroup() %>%
-  filter(Percent_presence >= 33.33) %>%
-  distinct(Pathway) %>%
-  # pull out these proteins to keep
-  select(Pathway)
-
-humann2_path.decontam_noblanks_33_long <- humann2_path.decontam %>%
-  inner_join(., h2_path_test, by = "Pathway") %>%
-  select(-matches("EXB|LIB|SRR164|10M")) %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Paths = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_path.decontam_noblanks_33_long_box <- humann2_path.decontam_noblanks_33_long %>%
-  ggplot(., aes(Village, Paths, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of pathways detected") +
-    ggtitle("Number of pathways w/o contaminants and 33% prevalence")
-humann2_path.decontam_noblanks_33_long_box
-
-# ggsave("./05-results.backup/presentation_pdfs/humann2_path.decontam_noblanks_33_long_box.pdf", plot = humann2_path.decontam_noblanks_33_long, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-humann2_path.decontam_noblanks_33_long_w <- humann2_path.decontam_noblanks_33_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
-pairwise.wilcox.test(humann2_path.decontam_noblanks_33_long_w$Paths, humann2_path.decontam_noblanks_33_long_w$Village, p.adjust.method = "fdr")
-
-
-```
-HMP and JAE both have significantly more pathways identified than each of the
-villages, for all pathways, when potential contaminants are removed, as well as
-when potential contaminants are removed and only pathways present in at least
-1/3 of one ethnic group are included. There are no differences between the
-villages in any of these.
-
 Now plot some PCAs to see the relationship of the samples to eachother and between groups.
 We don't need to look at PCAs with the Yanomamis samples b/c we're excluding them. 
-```{r pca_paths_noblanks_metadata, eval = F}
-# this uses the full pathway table (not decontaminated) and includes the Yanomami samples. We're not including those, so it's not necessary to run
-# create the input matrix
-humann2_path_noblanks_mat <- humann2_path %>%
-  filter(!str_detect(Pathway, "\\|")) %>%
-  select(-CMC032.B0101) %>% # this sample has very few reads
-  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.humann2_path_pca <- tune.pca(humann2_path_noblanks_mat, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_path_noblanks.pca <- pca(humann2_path_noblanks_mat, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-pca_EG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_EG_plot
-plot_pca(humann2_path_noblanks.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-
-pca_AG_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-pca_AG_plot
-
-pca_ME_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-pca_ME_plot
-
-pca_S_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-pca_S_plot
-
-pca_TS_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-pca_TS_plot
-
-pca_V_plot <- plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
-pca_V_plot
-
-```
-The plaque (HMP) and calculus (JAE) samples separate along PC2, but the CMC
-samples have more overlap with JAE than HMP. There is much more spread of the
-samples along PC1. Do any other metadata categories appear to drive separation
-of the CMC samples along PC1?
-
-Only the tooth site (anterior vs posterior) appears to be separating along PC1.
-Let's also run these without the HMP and JAE samples to see how the CMC samples
-cluster without industrialized samples included.
-
-```{r adonis_paths_samples, eval = F}
-# Use the CLR-transformed matrix from the mixOmics PCA in the section above
-# Euclidean distance
-humann2_path_noblanks_mat.euc <- vegdist(humann2_path_noblanks.pca$X, method = "euclidean", na.rm = T)
-humann2_path_noblanks_mat.euc.pcoa <- ape::pcoa(humann2_path_noblanks_mat.euc)
-
-humann2_path_noblanks_mat.euc.pcoavectors <- as.data.frame(humann2_path_noblanks_mat.euc.pcoa$vectors)
-humann2_path_noblanks_mat.euc.pcoavectors <- humann2_path_noblanks_mat.euc.pcoavectors %>%
-  rownames_to_column("SampleID")
-
-humann2_path_noblanks_mat.euc.vecmet <- inner_join(humann2_path_noblanks_mat.euc.pcoavectors, metadata, by = "SampleID")
-
-humann2_path_noblanks_mat.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 4) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
-
-# test for difference between different metadata categories 
-adonis(humann2_path_noblanks_mat.euc ~ Tooth_site, humann2_path_noblanks_mat.euc.vecmet, perm=999)
-
-adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_path_noblanks_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin")
-
-# controlled for tooth site
-adonis2(humann2_path_noblanks_mat.euc ~ ExtractionBatch + Village + Sex + Industry + Ethnic_Group + Age_group +  LibraryBatch + Market_economy, humann2_path_noblanks_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_noblanks_mat.euc.vecmet$Tooth_site)
-
-```
 
 Do the pathway profiles of the Cameroon plaque samples plot closer to industrial
 plaque or industrial calculus?
+```{r mr_paths}
+# factor analysis MRs
+humann2_path_noblanks.fa.df <- fread("./05-results.backup/minres_oblimin_noblanks.fa_path.tsv")
+humann2_path_cmc.fa.df <- fread("./05-results.backup/minres_oblimin_cmc.fa_path.tsv")
+
+```
+
+
 ```{r pca_paths_noyanomami_metadata}
 # create the input matrix
-humann2_path_noyanomami_mat <- humann2_path.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+humann2_path.decontam_noblanks_presence_more_30 <- humann2_path.decontam %>%
+  select(-matches("EXB|LIB|10M|ERR|SRS|SRR164")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the pathways that are present in at least 1/3 of at least 2 groups
+  ungroup() %>%
+  # pathways present in > 1/3 of samples in each group
+  filter(Percent_presence >= 33.33) %>%
+  group_by(Pathway) %>%
+  count() %>%
+  # only pathways that are present in 1/3 of samples of 2 or more groups
+  filter(n > 1) %>%
+  # pull out these proteins to keep
+  select(Pathway)
+
+humann2_path_noblanks <- humann2_path.decontam %>%
+  select(-matches("ERR|SRR164|SRS|EXB|LIB|10M")) %>%
+  inner_join(., humann2_path.decontam_noblanks_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
-tune.humann2_path_pca <- tune.pca(humann2_path_noyanomami_mat, logratio = 'CLR')
+tune.humann2_path_pca <- tune.pca(humann2_path_noblanks, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
-humann2_path_noyanomami.pca <- pca(humann2_path_noyanomami_mat, ncomp = 3, logratio = 'CLR')
+humann2_path_noblanks.pca <- pca(humann2_path_noblanks, ncomp = 3, logratio = 'CLR')
 
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_EG_plot
-plot_pca(humann2_path_noyanomami.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-
-pca_AG_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-pca_AG_plot
-
-pca_ME_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-pca_ME_plot
-
-### there's a problem with this one about the size of the points. Using a different size_group lets it work
-pca_S_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-pca_S_plot
-
-pca_TS_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-pca_TS_plot
-
-pca_V_plot <- plot_pca(humann2_path_noyanomami.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
-pca_V_plot
-
-ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+plot_pca(humann2_path_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
 ```
-Some of the samles plot closer to the industrial calculus, but generally they
-are distinct, and separate from both industrial sample types along PC1. This
-appears to be related to anterior/posterior tooth sampling site, where anterior
-samples plot closer to the industrial samples and posterior samples plot further
-from industrial samples.
+
+```{r mr1_paths_noblanks}
+fa_paths_noblanks <- humann2_path_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_noblanks_mr1 <- humann2_path.decontam %>%
+  select(-matches("ERR|SRR164|SRS|EXB|LIB|10M")) %>%
+  filter(Pathway %in% fa_paths_noblanks) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_noblanks_mr1_pca <- tune.pca(humann2_path_noblanks_mr1, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path_noblanks_mr1.pca <- pca(humann2_path_noblanks_mr1, ncomp = 3, logratio = 'CLR')
+
+# plot the PCA
+plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+```
+
+
+```{r}
+# plot the PCA
+plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+plot_pca(humann2_path_noblanks_mr1.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+
+
+plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split")
+
+### there's a problem with this one about the size of the points. Using a different size_group lets it work
+pca_S_plot <- plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+pca_S_plot
+
+pca_TS_plot <- plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
+pca_TS_plot
+
+# ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_ts_pc12.pdf", plot = pca_TS_plot, device = "pdf",
+#        scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
+
+pca_V_plot <- plot_pca(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
+pca_V_plot
+
+# ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
+#        scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
+
+```
 
 Are there significant differences in beta-diversity between any of the metadata groups?
 ```{r adonis_paths_noyanomami}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-humann2_path_noyanomami_mat.euc <- vegdist(humann2_path_noyanomami.pca$X, method = "euclidean", na.rm = T)
-humann2_path_noyanomami_mat.euc.pcoa <- ape::pcoa(humann2_path_noyanomami_mat.euc)
+humann2_path_noblanks_mr1.euc <- vegdist(humann2_path_noblanks_mr1.pca$X, method = "euclidean", na.rm = T)
+humann2_path_noblanks_mr1.euc.pcoa <- ape::pcoa(humann2_path_noblanks_mr1.euc)
 
-humann2_path_noyanomami_mat.euc.pcoavectors <- as.data.frame(humann2_path_noyanomami_mat.euc.pcoa$vectors)
-humann2_path_noyanomami_mat.euc.pcoavectors <- humann2_path_noyanomami_mat.euc.pcoavectors %>%
+humann2_path_noblanks_mr1.euc.pcoavectors <- as.data.frame(humann2_path_noblanks_mr1.euc.pcoa$vectors)
+humann2_path_noblanks_mr1.euc.pcoavectors <- humann2_path_noblanks_mr1.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-humann2_path_noyanomami_mat.euc.vecmet <- inner_join(humann2_path_noyanomami_mat.euc.pcoavectors, metadata, by = "SampleID")
+humann2_path_noblanks_mr1.euc.vecmet <- inner_join(humann2_path_noblanks_mr1.euc.pcoavectors, metadata, by = "SampleID")
 
-humann2_path_noyanomami_mat.euc.vecmet %>%
+humann2_path_noblanks_mr1.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -624,24 +425,39 @@ humann2_path_noyanomami_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_path_noyanomami_mat.euc ~ ExtractionBatch +  LibraryBatch, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_path_noyanomami_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_noblanks_mr1.euc ~ Industry +  Market_integration, humann2_path_noblanks_mr1.euc.vecmet, permutations = 999, by = "margin")
 
-# controlled for tooth site
-adonis2(humann2_path_noyanomami_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_path_noyanomami_mat.euc.vecmet, permutations = 999, by = "margin", strata = metadata_noblanks$Tooth_site)
 
 ```
-Tooth site (p = 0.001) and village (p < 0.01) are significantly different. When
-controlling for tooth site, village is significant (p < 0.01).
 
 What are the relationships of the Cameroon plaque samples to eachother without
 the industrial samples?
 ```{r pca_paths_cmc_metadata}
+humann2_path.decontam_noblanks_presence_more_30 <- humann2_path.decontam %>%
+  select(matches("Pathway|CMC")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Pathway) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the pathways that are present in at least 1/3 of at least 2 groups
+  ungroup() %>%
+  # pathways present in > 1/3 of samples in each group
+  filter(Percent_presence >= 33.33) %>%
+  group_by(Pathway) %>%
+  count() %>%
+  # only pathways that are present in 1/3 of samples of 2 or more groups
+  filter(n > 1) %>%
+  # pull out these proteins to keep
+  select(Pathway)
+
 humann2_path_cmc_mat <- humann2_path.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Pathway, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
+  select(matches("Pathway|CMC")) %>%
+  inner_join(., humann2_path.decontam_noblanks_presence_more_30, by = "Pathway") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
@@ -650,32 +466,58 @@ tune.humann2_path_pca <- tune.pca(humann2_path_cmc_mat, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 humann2_path_cmc.pca <- pca(humann2_path_cmc_mat, ncomp = 3, logratio = 'CLR')
 
+plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
+
+```
+
+```{r mr1_paths_noblanks}
+fa_paths_cmc <- humann2_path_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_cmc_mr1 <- humann2_path.decontam %>%
+  select(matches("Pathway|CMC")) %>%
+  filter(Pathway %in% fa_paths_cmc) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
+
+# check the number of components to retain by tuning the PCA
+tune.humann2_path_cmc_mr1_pca <- tune.pca(humann2_path_cmc_mr1, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+humann2_path_cmc_mr1.pca <- pca(humann2_path_cmc_mr1, ncomp = 3, logratio = 'CLR')
+
 # plot the PCA
-pca_EG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_EG_plot
+plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-pca_AG_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-pca_AG_plot
+```
 
-pca_ME_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-pca_ME_plot
+```{r}
+# plot the PCA
+plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 
-pca_S_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-pca_S_plot
-plot_pca(humann2_path_cmc.pca, "PC3", "PC1", "Sex", "Sex", "Sex")
+plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
+
+plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split")
+
+plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
+plot_pca(humann2_path_cmc_mr1.pca, "PC3", "PC1", "Sex", "Sex", "Sex")
 
 
-pca_TS_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
+pca_TS_plot <- plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
 pca_TS_plot
 
-ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_ts_pc12.pdf", plot = pca_TS_plot, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_ts_pc12.pdf", plot = pca_TS_plot, device = "pdf",
+#        scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
-pca_V_plot <- plot_pca(humann2_path_cmc.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
+pca_V_plot <- plot_pca(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
 pca_V_plot
 
-ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_cmc_path_pc12.pdf", plot = pca_V_plot, device = "pdf",
+#        scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
 ```
 Again the only sort-of clustering that we see is by tooth site (anterior or
@@ -685,16 +527,16 @@ Are there significant differences in beta-diversity between any of the metadata 
 ```{r adonis_paths_cmc}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
-humann2_path_cmc_mat.euc <- vegdist(humann2_path_cmc.pca$X, method = "euclidean", na.rm = T)
-humann2_path_cmc_mat.euc.pcoa <- ape::pcoa(humann2_path_cmc_mat.euc)
+humann2_path_cmc_mr1_mat.euc <- vegdist(humann2_path_cmc_mr1.pca$X, method = "euclidean", na.rm = T)
+humann2_path_cmc_mr1_mat.euc.pcoa <- ape::pcoa(humann2_path_cmc_mr1_mat.euc)
 
-humann2_path_cmc_mat.euc.pcoavectors <- as.data.frame(humann2_path_cmc_mat.euc.pcoa$vectors)
-humann2_path_cmc_mat.euc.pcoavectors <- humann2_path_cmc_mat.euc.pcoavectors %>%
+humann2_path_cmc_mr1_mat.euc.pcoavectors <- as.data.frame(humann2_path_cmc_mr1_mat.euc.pcoa$vectors)
+humann2_path_cmc_mr1_mat.euc.pcoavectors <- humann2_path_cmc_mr1_mat.euc.pcoavectors %>%
   rownames_to_column("SampleID")
 
-humann2_path_cmc_mat.euc.vecmet <- inner_join(humann2_path_cmc_mat.euc.pcoavectors, metadata, by = "SampleID")
+humann2_path_cmc_mr1_mat.euc.vecmet <- inner_join(humann2_path_cmc_mr1_mat.euc.pcoavectors, metadata, by = "SampleID")
 
-humann2_path_cmc_mat.euc.vecmet %>%
+humann2_path_cmc_mr1_mat.euc.vecmet %>%
   ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
   geom_point(size = 4) +
   scale_colour_manual(values = Tooth_site_colors) +
@@ -704,21 +546,22 @@ humann2_path_cmc_mat.euc.vecmet %>%
   ggtitle("Tooth site")
 
 # test for difference between different metadata categories 
-adonis2(humann2_path_cmc_mat.euc ~ ExtractionBatch +  LibraryBatch, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_path_cmc_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group +  Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_cmc_mr1_mat.euc ~ ExtractionBatch +  LibraryBatch, humann2_path_cmc_mr1_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_path_cmc_mr1_mat.euc ~ Tooth_site + Ethnic_Group + Market_integration, humann2_path_cmc_mr1_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_path_cmc_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_path_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_path_cmc_mat.euc$Tooth_site)
+perm <- how(nperm = 999)
+setBlocks(perm) <- with(humann2_path_cmc_mr1_mat.euc.vecmet, Tooth_site)
+adonis2(humann2_path_cmc_mr1_mat.euc ~  Market_integration, humann2_path_cmc_mr1_mat.euc.vecmet, permutations = perm, by = "margin")
 
 ```
-Tooth site and village (both p < 0.01) are significantly different, but when
-controlling for tooth site only village is significantly different.
+Tooth site (p < 0.01) is significantly different
 
 Now let's look at which pathways are driving separation of the sample groups.
 Which of the pathways have the strongest loadings in PC1 and PC2?
 ```{r pca_path_biplot}
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc1 <- plot_pca_bi(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_biplot_pc1 <- plot_pca_bi(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_biplot_pc1
 
 # ggsave("./05-results.backup/presentation_pdfs/pca_EG_bi_noyanomami_paths.pdf", plot = pca_EG_biplot_pc1, device = "pdf",
@@ -740,12 +583,12 @@ pandoc.table(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange
              caption = "PC1 negative loadings")
 
 # make a table of the pathways to save, to use again later in another R notebook
-# humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC") 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+humann2_pathway_biplot_list <- pca_EG_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(humann2_path_noyanomami.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_biplot_pc2 <- plot_pca_bi(humann2_path_noblanks_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
 pca_EG_biplot_pc2
 
 # what are those pathways?
@@ -763,14 +606,14 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
 
 
 # which paths distinguish sample groups when only CMC samples are included?
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
+pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = T)
 pca_EG_cmc_biplot_pc1
 
 # ggsave("./05-results.backup/presentation_pdfs/pca_EG_bi_cmc_paths.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
@@ -791,12 +634,12 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arr
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC1)) %>% select(pathway) %>% mutate(Direction = "PC1-", Samples = "CMC"))
 
-pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_path_cmc.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
+pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_path_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = T)
 pca_EG_cmc_biplot_pc2
 
 pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)),
@@ -813,121 +656,19 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arr
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>% 
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc1$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2+", Samples = "CMC"))
+humann2_pathway_biplot_list <- humann2_pathway_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% select(-Function) %>% arrange(desc(PC2)) %>% select(pathway) %>% mutate(Direction = "PC2-", Samples = "CMC"))
 # 
-# fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
+fwrite(humann2_pathway_biplot_list, file = "./05-results.backup/humann2_pathway_biplot_list.tsv", quote = F, sep = "\t")
 
 ```
-_*All samples*_
-_PC1+:_
-PWY-6285: superpathway of fatty acids biosynthesis (E. coli) - standard fatty acid biosynthesis 
-PWY-5971: palmitate biosynthesis II (bacteria and plants) - common saturated fatty acid 
-PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
-PWY-6803: phosphatidylcholine acyl editing -  production of triacylglycerols
-PWY-6113: superpathway of mycolate biosynthesis - found in mycobacterial cell walls
-P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
-PWY-5675: nitrate reduction V (assimilatory) - environmental nitrogen-containing compounds (nitrate, nitrite) must be reduced to be used by bacteria in producing their own N-containing compounds such as amino acids
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-PWY-6859: all-trans-farnesol biosynthesis - found in eukaryia such as yeast; part of terpenoid synthesis
-
-_PC1-:_
-GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
-PWY-7204: pyridoxal5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
-GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
-PWY-5104: L-isoleucine biosynthesis IV - common alternate pathway to synthesize L-isoleucine; known to exist in *Methanobrevibacter* and *Desulfovibrio*.
-PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
-PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
-PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
-PWY-7371: 1,4-dihydroxy-6-naphthoate biosynthesis II - this is converted to menaquinone; menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; comes from chorismate (intermediate of aromatic amino acid biosynthesis)
-PWY1G-0: mycothiol biosynthesis - major thiol found in Actinobacteria (opposed to glutathione); detoxifies stress-inducing factors, maintains reducing envt within the cell
-
-_PC2+:_
-PWY0-1241: ADP-L-glycero-&beta;-D-manno-heptose biosynthesis - glycero-manno-heptoses are found in the cell surface polymers of many bacteria, particularly LPS
-PWY-6895: superpathway of thiamin diphosphate biosynthesis II - vitamin B1, an essential cofactor for enzymes involved in energy metabolism
-THISYN-PWY: superpathway of thiamin diphosphate biosynthesis I - vitamin B1, an essential cofactor for enzymes involved in energy metabolism; different version from above, carried by different organisms
-PWY-5083: NAD/NADH phosphorylation and dephosphorylation - very common cofactors
-PWY-5838: superpathway of menaquinol-8 biosynthesis I - menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; menaquinol-8 is common in facultatively anaerobic Gram - organisms
-PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis - menaquinones and demethylmenaquinones (vitamin K2) are reversible redox component of the electron transfer chain; Gram +s, and anaerobic G+ and G- have either; dimethylmenaquinol-8 is common in facultatively anaerobic Gram - organisms
-PWY-5675: nitrate reduction V (assimilatory) - environmental nitrogen-containing compounds (nitrate, nitrite) must be reduced to be used by bacteria in producing their own N-containing compounds such as amino acids
-PWY-6892: thiazole biosynthesis I (E. coli) - only the synthesis of the thiazole moiety of thiamin; part of the thiamin phosphate synthesis pathway (vitamin B1) (E. coli version)
-PWY-6891: thiazole biosynthesis II (Bacillus) - only the synthesis of the thiazole moiety of thiamin; part of the thiamin phosphate synthesis pathway (vitamin B1) (Bacillus version)
-PWY-4041: gamma-glutamyl cycle - glutathione metabolism; maintains a reduced environment
-
-_PC2-:_
-P23-PWY: reductive TCA cycle I - carbon dioxide fixation pathway found in autotrophic eubacteria and archaea; considered to be a primordial pathway for production of starting organic molecules for biosynthesis of sugars, lipids, amino acids, pyrimidines and pyrroles
-PWY-5104: L-isoleucine biosynthesis IV - synthesis from propanoate
-PWY-7003: glycerol degradation to butanol - butanol biosynthesis pathway from glycerol
-PWY4LZ-257: superpathway of fermentation (Chlamydomonas reinhardtii) - fermentation from pyruvate
-PWY-6588: pyruvate fermentation to acetone - anaerobic
-PWY66-398: TCA cycle III (animals) - energy metabolism
-PWY-6269: adenosylcobalamin salvage from cobinamide II - production of cobamides, which are enzyme cofactors; found in bacteria and archaea
-PWY-6549: L-glutamine biosynthesis III - amino acid biosynthesis in plants
-PWY-7254: TCA cycle VII (acetate-producers) - used by acetic acid bacteria are Gram-negative acidophilic α-proteobacteria that oxidize ethanol to acetate
-PWY-5690: TCA cycle II (plants and fungi) - aerobic respiration
 
 
-_*CMC samples*_
-_PC1+:_
-GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
-PWY-7204: pyridoxal 5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
-PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
-GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
-PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
-RHAMCAT-PWY: L-rhamnose degradation I - common bacterial cell wall component, also used for energy
-PWY-5101: L-isoleucine biosynthesis II - synthesis from pyruvate
-PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
-PWY-7209: superpathway of pyrimidine ribonucleosides degradation - pyrimidine salvage pathway; uridine broken down to uracil and a ribose or to beta-alanine
 
-_PC1-:_
-PWY-6803: phosphatidylcholine acyl editing - production of triacylglycerols
-PWY-7431: aromatic biogenic amine degradation (bacteria) - synthesis of aromatic and aliphatic biogenic amines by decarboxylation of amino acids; biogenic amines have physiologic roles in prokaryotes (not listed)
-PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-PWY-7392: taxadiene biosynthesis (engineered) - taxadiene is an intermediate in taxadiol biosynthesis (from Pacific yew tree, used in chemotherapy)
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass - energy metabolism
-P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
-PWY-6353: purine nucleotides degradation II (aerobic) - degradation of purine nucleotides to purine nucleosides, purine bases; nitrogen metabolism for nitrogen utilization
-TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA - bypasses steps that lead to loss of CO2, saving carbon
-
-_PC2+:_
-PWY-5101: L-isoleucine biosynthesis II - synthesis from pyruvate
-GALACTUROCAT-PWY: D-galacturonate degradation I - breaks down D-galacturonate (common in plant cell walls and the environment) to a modified glucose that enters the Entner-Doudoroff shunt
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation - D-glucuronate, D-fructuronate and D-galacturonate (main monomer of pectin); shuffles these till they can enter the Entner-Doudoroff pathway
-GLYCOCAT-PWY: glycogen degradation I (bacterial) - breaks (internally stored?) long chain carbohydrates into short, processible ones that are further broken down into maltoses and glucose for glycolysis
-PWY-5005: biotin biosynthesis II - biotin is a cofactor that facilitates transfer of CO2 in fatty acid and carbohydrate metabolism
-PWY-6630: superpathway of L-tyrosine biosynthesis - standard pathway
-PWY-5941: glycogen degradation II (eukaryotic) - same idea as GLYCOCAT-PWY, but found in fungi and animals
-RHAMCAT-PWY: L-rhamnose degradation I - common bacterial cell wall component, also used for energy
-PWY-7204: pyridoxal 5'-phosphate salvage II (plants) - vitamin B6 salvage pathway; plants and bacteria have a similar system; roles in sphingolipid biosynthesis and carbohydrate metabolism
-PWY-7209: superpathway of pyrimidine ribonucleosides degradation - pyrimidine salvage pathway; uridine broken down to uracil and a ribose or to beta-alanine
-
-_PC2-:_
-TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA - bypasses steps that lead to loss of CO2, saving carbon
-GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass - energy metabolism
-PWY-7391: isoprene biosynthesis II (engineered) - volatile compound produced by plants, incorporated into cell membranes in response to heat stress
-PWY-7431: aromatic biogenic amine degradation (bacteria) - synthesis of aromatic and aliphatic biogenic amines by decarboxylation of amino acids; biogenic amines have physiologic roles in prokaryotes (not listed)
-P122-PWY: heterolactic fermentation - found in Firmicutes, particularly lactic acid bacteria; this fermentation pathway produces substantial amounts of volatile compounds and C02 along with lactic acid; this produces lactate, EtOH, CO2 and trace acetate
-PWY-6803: phosphatidylcholine acyl editing - production of triacylglycerols
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP) - crucial compound involved in biosynthesis of a variety of terpenes and terpenoids, including central compounds such as ubiquinones and menaquinones
-PWY-7392: taxadiene biosynthesis (engineered) - taxadiene is an intermediate in taxadiol biosynthesis (from Pacific yew tree, used in chemotherapy)
-PWY-6353: purine nucleotides degradation II (aerobic) - degradation of purine nucleotides to purine nucleosides, purine bases; nitrogen metabolism for nitrogen utilization
-
-
-# Community-level functional analysis with individual gene families assigned KEGG Orthology numbers
-## KEGG ortholog distribution
-We will start analysis of KEGG orthologs by looking at the total number of KOs
-assigned to each population to see if this may bias further analyses. Is the
-proportion of genefamilies that were re-grouped by HUMAnN2 script into KOs
-consistent and high across all sample types? That would be good b/c we have no
-major group biases.
+# Community-level functional analysis with individual gene families assigned UniRef90 identities
+## Gene family distribution
 
 ```{r mr1_orthologs}
 # Now keep only the orthologs that are in MR1 from the factor analysis
@@ -935,107 +676,35 @@ mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_KO.tsv")
 
 ```
 
-
-```{r orthologs_boxes}
-# use the full table
-humann2_KO_long <- humann2_KOs %>%
-  filter(!str_detect(Ortholog, "\\|")) %>%
-  select(-CMC032.B0101) %>% # this sample has very few reads
-  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Orthologs = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_KO_box <- humann2_KO_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Orthologs, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of KEGG orthologs detected") +
-    ggtitle("Total number of KEGG orthologs ID'd by HUMAnN2 (no filtering)")
-humann2_KO_box
-
-ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_total.pdf", plot = humann2_KO_box, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
-
-humann2_KO_long_w <- humann2_KO_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
-pairwise.wilcox.test(humann2_KO_long_w$Orthologs, humann2_KO_long_w$Village, p.adjust.method = "fdr")
-
-# use the decontaminated table, with KOs identified as potential contaminants removed
-humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Orthologs = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Orthologs, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of KEGG orthologs detected") +
-    ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 (decontaminated)")
-humann2_KOs.decontam_box
-
-ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_decontam.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
-
-humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
-pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Village, p.adjust.method = "fdr")
-
-# how many orthologs are in each group from the MR1 proteins?
-# use the decontaminated table, with KOs identified as potential contaminants removed
-humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|10M")) %>%
-  inner_join(., mr1_proteins %>%
-               filter(Residual == "MR1") %>%
-               select(Ortholog), by = "Ortholog") %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate_if(is.numeric, ~1 * (. != 0)) %>%
-  group_by(SampleID) %>%
-  summarize(Orthologs = sum(CPM)) %>%
-  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Village), by = "SampleID")
-
-humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
-  ggplot(., aes(Village, Orthologs, fill = Village)) +
-    geom_boxplot() +
-    scale_fill_manual(values = Village_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-    ylab("Number of KEGG orthologs detected") +
-    ggtitle("Number of KEGG orthologs ID'd by HUMAnN2 in MR1")
-humann2_KOs.decontam_box
-
-
-humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) 
-pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Village, p.adjust.method = "fdr")
-
-```
-There are significantly more orthologs identified in HMP samples than each of
-the villates, and in JAE samples than each of the villages. There are no
-significant difrerences between any villages, or between HMP and JAE samples.
-This is true for the full table, the decontaminated table. and the MR1 orthologs
-table.
-
 Now perform a PCA to see if there is more distinct clustering of the samples
 based on any of the metadata categories than we see with the pathways.
 ```{r pca_KOs_with_controls}
 # create the input matrix
+humann2_KOs.decontam_noblanks_presence_more_30 <- humann2_KOs.decontam %>%
+  select(-matches("10M|ERR|SRS|SRR164")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Ortholog) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 1/3 of at least 2 groups
+  ungroup() %>%
+  # pathways present in > 1/3 of samples in each group
+  filter(Percent_presence >= 33.33) %>%
+  group_by(Ortholog) %>%
+  count() %>%
+  # only pathways that are present in 1/3 of samples of 2 or more groups
+  filter(n > 1) %>%
+  # pull out these proteins to keep
+  select(Ortholog)
+
 humann2_KO_mat <- humann2_KOs.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog, CPM) %>%
+  select(-matches("ERR|SRR164|SRS|10M")) %>%
+  inner_join(., humann2_KOs.decontam_noblanks_presence_more_30, by = "Ortholog") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
@@ -1044,6 +713,9 @@ tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
 # perform a PCA to see how the data cluster
 humann2_KO_allsamples.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
 
+```
+
+```{r}
 # plot the PCA
 plot_pca(humann2_KO_allsamples.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(humann2_KO_allsamples.pca, "PC3", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
@@ -1062,11 +734,31 @@ Plot a PCA without the blanks.
 ```{r pca_KOs_no_blanks}
 
 # create the input matrix
+humann2_KOs.decontam_noblanks_presence_more_30 <- humann2_KOs.decontam %>%
+  select(-matches("EXB|LIB|10M|ERR|SRS|SRR164")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Ortholog) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 1/3 of at least 2 groups
+  ungroup() %>%
+  # pathways present in > 1/3 of samples in each group
+  filter(Percent_presence >= 33.33) %>%
+  group_by(Ortholog) %>%
+  count() %>%
+  # only pathways that are present in 1/3 of samples of 2 or more groups
+  filter(n > 1) %>%
+  # pull out these proteins to keep
+  select(Ortholog)
+
 humann2_KO_noblanks_mat <- humann2_KOs.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB")) %>%
+  select(-matches("EXB|LIB|ERR|SRR164|SRS|10M")) %>%
+  inner_join(., humann2_KOs.decontam_noblanks_presence_more_30, by = "Ortholog") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
@@ -1079,119 +771,16 @@ humann2_KO_noblanks.pca <- pca(humann2_KO_noblanks_mat, ncomp = 3, logratio = 'C
 pca_EG_plot <- plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 pca_EG_plot
 
-# create the input matrix
-humann2_KO_noblanks_mat2 <- humann2_KOs.decontam %>%
-  select(-matches("10M")) %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB")) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.pca(humann2_KO_noblanks_mat2, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KO_noblanks2.pca <- pca(humann2_KO_noblanks_mat2, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-pca_EG_plot <- plot_pca(humann2_KO_noblanks2.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-pca_EG_plot
-
 ```
 The HMP and JAE samples that were subsampled to 10M reads each are plotting
 exactly on top of their counterpart full samples, so we can keep using the full
 samples. The difference in sequencing depth isn't responsible for the
 differences we observe between the sample types.
 
-How does the relationship of the samples change when we filter out orthologs that
-are low abundance or low prevalence?
-```{r pca_KOs_filtering}
-# filter low-abundance orthologs
-humann2_KO_mat <- humann2_KOs.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  spread(Ortholog, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M"))%>%
-  adorn_totals(where = "row", name = "Sum") %>%
-  gather("Ortholog","CPM", 2:ncol(.)) %>%
-  spread(SampleID, CPM) %>%
-  mutate(Percent = Sum/sum(Sum)*100) %>%
-  filter(Percent > 0.01) %>%
-  select(-c("Sum","Percent")) %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog, CPM) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.humann2_KO_pca <- tune.pca(humann2_KO_mat, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KO_noblanks.pca <- pca(humann2_KO_mat, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-
-
-# filter low-prevalence orthologs
-h2_KO_lowprev <- humann2_KOs.decontam %>%
-  mutate_if(is.numeric, ~1 * (. > 0)) %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  inner_join(., metadata %>%
-               select(SampleID, Ethnic_Group), by = "SampleID") %>%
-  group_by(Ethnic_Group, Ortholog) %>%
-  summarize(Percent_presence = sum(CPM)/length(SampleID)*100) %>%
-  # select the KEGG orthologs that are present in at least 30% of at least one group
-  ungroup() %>%
-  filter(Percent_presence >= 33.33) %>%
-  distinct(Ortholog) %>%
-  # pull out these proteins to keep
-  select(Ortholog)
-
-# this still has ~3000 orthologs
-humann2_KOs.decontam_noblanks_33 <- humann2_KOs.decontam %>%
-  inner_join(., h2_KO_lowprev, by = "Ortholog") %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog,CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.pca(humann2_KOs.decontam_noblanks_33, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KOs.decontam_noblanks_33.pca <- pca(humann2_KOs.decontam_noblanks_33, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-
-
-```
-
-```{r pca_filtering_plots}
-# decontam and abundance >0.01% filtered plots
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KO_noblanks.pca, "PC1", "PC2", "Village", "Village", "Village")
-
-# # decontam and prevalence >33% filtered plots
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-# plot_pca(humann2_KOs.decontam_noblanks_33.pca, "PC1", "PC2", "Village", "Village", "Village")
-
-```
-
 ```{r mr1_orthologs}
 
 humann2_KOs.decontam_mr1 <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|10M")) %>%
+  select(-matches("EXB|LIB|10M|ERR|SRS|SRR164")) %>%
   inner_join(., mr1_proteins %>%
                filter(Residual == "MR1") %>%
                select(Ortholog), by = "Ortholog") %>%
@@ -1209,25 +798,24 @@ humann2_KOs.decontam_mr1.pca <- pca(humann2_KOs.decontam_mr1, ncomp = 3, lograti
 # plot the PCA
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split")
 plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
 h2_mr1_ts <- plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
 h2_mr1_ts
 
 ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_ts_pc12.pdf", plot = h2_mr1_ts, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+       scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
-h2_mr1_village <- plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Village", "Ethnic_Group", "Ethnic_Group")
-h2_mr1_village
+h2_mr1_mi <- plot_pca(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Market_integration_split", "Ethnic_Group", "Ethnic_Group")
+h2_mr1_mi
 
-ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_pc12.pdf", plot = h2_mr1_village, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_pc12.pdf", plot = h2_mr1_mi, device = "pdf",
+       scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
 ```
 
 
-We'll use the mr1 orthologs, not the abundance cut-off or the prevalence cut-off. Are there
-significant differences between metadata groups?
+Are there significant differences between metadata groups?
 ```{r adonis_KOs_noblanks}
 # Use the CLR-transformed matrix from the mixOmics PCA in the section above
 # Euclidean distance
@@ -1241,43 +829,49 @@ humann2_KO_mat.euc.pcoavectors <- humann2_KO_mat.euc.pcoavectors %>%
 humann2_KO_mat.euc.vecmet <- inner_join(humann2_KO_mat.euc.pcoavectors, metadata, by = "SampleID")
 
 humann2_KO_mat.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
+  ggplot(., aes(Axis.1, Axis.2, colour = Ethnic_Group, shape = Ethnic_Group)) +
   geom_point(size = 3) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  # stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
+  scale_colour_manual(values = Ethnic_Group_colors) +
+  scale_shape_manual(values = Ethnic_Group_shapes) +
+  # stat_ellipse(aes(colour = Ethnic_Group, group = Ethnic_Group)) +
   theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
+  ggtitle("Ethnic Group")
 
 # test for difference between different metadata categories 
-adonis2(humann2_KO_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_KO_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group +  Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_mat.euc ~ Ethnic_Group +  Market_integration, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_KO_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_mat.euc.vecmet$Tooth_site)
+# perm <- how(nperm = 999)
+# setBlocks(perm) <- with(humann2_KO_mat.euc.vecmet, Ethnic_Group)
+# adonis2(humann2_KO_mat.euc ~ Market_integration, humann2_KO_mat.euc.vecmet, permutations = perm, by = "margin")
 
 ```
-When using the MR1 orthologs, there are significant differences between tooth
-site, but none when controlling for tooth site.  If using the abundance cut-off,
-only tooth site is significantly different (p < 0.01), and when controlling for
-tooth site, none are significantly different.
+
 
 What is the relationship of the Cameroon plaque samples without the industrial samples?
 ```{r pca_KOs_cmc_metadata}
 # filter low-abundance orthologs
+humann2_KOs.decontam_cmc_presence_more_30 <- humann2_KOs.decontam %>%
+  select(matches("Ortholog|CMC")) %>%
+  mutate_if(is.numeric, ~1 * (. > 0)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group), by = "SampleID") %>%
+  group_by(Ethnic_Group, Ortholog) %>%
+  summarize(Percent_presence = sum(Counts)/length(SampleID)*100) %>%
+  # select the SEED proteins that are present in at least 30% of at least one group
+  ungroup() %>%
+  filter(Percent_presence >= 33.33) %>%
+  distinct(Ortholog) %>%
+  # pull out these proteins to keep
+  select(Ortholog)
+
 humann2_KO_cmc_mat <- humann2_KOs.decontam %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  spread(Ortholog, CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|SRR|JAE")) %>%
-  adorn_totals(where = "row", name = "Sum") %>%
-  gather("Ortholog","CPM", 2:ncol(.)) %>%
-  spread(SampleID, CPM) %>%
-  mutate(Percent = Sum/sum(Sum)*100) %>%
-  filter(Percent > 0.01) %>%
-  select(-c("Sum","Percent")) %>%
-  gather("SampleID","CPM", 2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog, CPM) %>%
+  select(matches("Ortholog|CMC")) %>%
+  inner_join(., humann2_KOs.decontam_cmc_presence_more_30, by = "Ortholog") %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
   column_to_rownames("SampleID")
 
 # check the number of components to retain by tuning the PCA
@@ -1292,62 +886,6 @@ plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethn
 # ggsave("./05-results.backup/presentation_pdfs/pca_EG_KOs_cmc.pdf", plot = pca_EG_plot, device = "pdf",
 #        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
 
-
-# filter low-prevalence samples
-h2_KO_lowprev <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|JAE|SRR")) %>%
-  mutate_if(is.numeric, ~1 * (. > 0)) %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  inner_join(., metadata %>%
-               select(SampleID, Ethnic_Group), by = "SampleID") %>%
-  group_by(Ethnic_Group, Ortholog) %>%
-  summarize(Percent_presence = sum(CPM)/length(SampleID)*100) %>%
-  # select the KEGG orthologs that are present in at least 30% of at least one group
-  ungroup() %>%
-  filter(Percent_presence >= 33.33) %>%
-  distinct(Ortholog) %>%
-  # pull out these proteins to keep
-  select(Ortholog)
-
-humann2_KOs.decontam_cmc_33 <- humann2_KOs.decontam %>%
-  inner_join(., h2_KO_lowprev, by = "Ortholog") %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog,CPM) %>%
-  filter(!str_detect(SampleID, "EXB|LIB|JAE|SRR")) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.pca(humann2_KOs.decontam_cmc_33, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KOs.decontam_cmc_33.pca <- pca(humann2_KOs.decontam_cmc_33, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-
-
-```
-
-```{r pca_filtering_plots}
-# decontam and abundance >0.01% filtered plots
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-h2_mr1_ts <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-h2_mr1_ts
-h2_mr1_village <- plot_pca(humann2_KO_cmc.pca, "PC1", "PC2", "Village", "Village", "Village")
-h2_mr1_village
-
-# # decontam and prevalence >33% filtered plots
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-# plot_pca(humann2_KOs.decontam_cmc_33.pca, "PC1", "PC2", "Village", "Village", "Village")
-
 ```
 
 ```{r mr1_orthologs_cmc}
@@ -1355,7 +893,7 @@ h2_mr1_village
 mr1_orthologs_cmc <- fread("./05-results.backup/minres_oblimin_cmc.fa_KO.tsv")
 
 humann2_KOs.decontam_cmc_mr1 <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|JAE|SRR")) %>%
+  select(matches("Ortholog|CMC")) %>%
   inner_join(., mr1_orthologs_cmc %>%
                filter(Residual == "MR1") %>%
                select(Ortholog), by = "Ortholog") %>%
@@ -1373,18 +911,18 @@ humann2_KOs.decontam_cmc_mr1.pca <- pca(humann2_KOs.decontam_cmc_mr1, ncomp = 3,
 # plot the PCA
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
+plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split")
 plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-h2_mr1_ts <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
+h2_mr1_ts <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group")
 h2_mr1_ts
-h2_mr1_village <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Village", "Village", "Village")
-h2_mr1_village
+h2_mr1_mi <- plot_pca(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Market_integration_split", "Ethnic_Group", "Ethnic_Group")
+h2_mr1_mi
 
-ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_cmc_pc12.pdf", plot = h2_mr1_village, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_cmc_pc12.pdf", plot = h2_mr1_mi, device = "pdf",
+       scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
 ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_cmc_ts_pc12.pdf", plot = h2_mr1_ts, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+       scale = 1, width = 7, height = 6, units = c("in"), dpi = 300)
 
 
 ```
@@ -1416,17 +954,14 @@ humann2_KO_cmc_mat.euc.vecmet %>%
 
 # test for difference between different metadata categories 
 adonis2(humann2_KO_cmc_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_KO_cmc_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
+adonis2(humann2_KO_cmc_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_integration, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
-adonis2(humann2_KO_cmc_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_mat.euc.vecmet$Tooth_site)
+perm <- how(nperm = 999)
+setBlocks(perm) <- with(humann2_KO_cmc_mat.euc.vecmet, Tooth_site)
+adonis2(humann2_KO_cmc_mat.euc ~ Tooth_site, humann2_KO_cmc_mat.euc.vecmet, permutations = 999, by = "margin")
 
 ```
-When using only the orthologs in MR1 from the factor analysis, only tooth site
-is significantly different, and none when controlling for tooth site. When using
-the abundance cut-off, only tooth site is significantly different (p < 0.01),
-and when controlling for tooth site, only sex is significantly different (p <
-0.05).
 
 
 Now to see which of the orthologs have the strongest loadings in PC1 and PC2,
@@ -1454,9 +989,9 @@ pandoc.table(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_KO_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
+humann2_KO_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+  bind_rows(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample types when HMP and JAE are included?
 pca_EG_biplot_pc2 <- plot_pca_bi(humann2_KOs.decontam_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
@@ -1477,10 +1012,10 @@ pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
 
 # which paths distinguish sample groups when only CMC samples are included?
 pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
@@ -1504,10 +1039,10 @@ pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
              split.tables = Inf,
              caption = "PC1 negative loadings")
 
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "CMC"))
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "CMC"))
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
+  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "CMC"))
 
 pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_KOs.decontam_cmc_mr1.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
 pca_EG_cmc_biplot_pc2
@@ -1526,557 +1061,25 @@ pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10  %>% arrange(PC2),
              split.tables = Inf,
              caption = "PC2 negative loadings")
 
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-# humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
-#   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "CMC"))
-# 
-# fwrite(humann2_KO_biplot_list, file = "./05-results.backup/humann2_KO_biplot_list.tsv", quote = F, sep = "\t")
-
-```
-
-_*All samples MR1 orthologs*_
-_PC1+_
-K17320 - putative aldouronate transport system permease protein lplC; membrane transport
-K04653 - hydrogenase expression/formation protein HypC
-K09777 - uncharacterized protein
-K08722 - 5'-deoxynucleotidase yfbR; nucleotide metabolism
-K17319 - putative aldouronate transport system permease protein lplB; membrane transport
-K11705 - iron/zinc/manganese/copper transport system permease protein mtsC; membrane transport
-K02471 - vitamin B12/bleomycin/antimicrobial peptide transport system ATP-binding/permease protein bacA; membrane transport
-K05352 - ribitol-5-phosphate 2-dehydrogenase (NADP+) tarJ; carbohydrate metabolism
-K04651 - hydrogenase nickel incorporation protein HypA/HybF; chaperones and folding catalysts
-K07015 - uncharacterized protein
-
-_PC1-_
-K09138 - uncharacterized protein
-K00096 - glycerol-1-phosphate dehydrogenase [NAD(P)+] [EC:1.1.1.261] araM, egsA; lipid metabolism
-K07131 - uncharacterized protein
-K02438 - glycogen debranching enzyme [EC:3.2.1.196] glgX; carbohydrate metabolism
-K13541 - cobalt-precorrin 5A hydrolase / precorrin-3B C17-methyltransferase [EC:3.7.1.12 2.1.1.131] cbiGH-cobJ; metabolism of cofactors and vitamins
-K03795 - sirohydrochlorin cobaltochelatase [EC:4.99.1.3] cbiX; metabolism of cofactors and vitamins
-K07101 - uncharacterized protein
-K07653 - two-component system, OmpR family, sensor histidine kinase MprB [EC:2.7.13.3] mprB; membrane transport
-K07979 - GntR family transcriptional regulator ytrA; transcription factors
-K05567 - multicomponent Na+:H+ antiporter subunit C mnhC, mrpC; membrane transport
-
-_PC2+_
-K09791 - uncharacterized protein
-K09858 - SEC-C motif domain protein; poorly characterized (?)
-K07062 - toxin FitB [EC:3.1.-.-]; hydrolase
-K02783 - glucitol/sorbitol PTS system EIIC component srlA; carbohydrate metabolism
-K00658 - 2-oxoglutarate dehydrogenase E2 component (dihydrolipoamide succinyltransferase) [EC:2.3.1.61] DLST, sucB; carbohydrate metabolism
-K06221 - 2,5-diketo-D-gluconate reductase A [EC:1.1.1.346] dkgA; Oxidoreductases
-K06980 - tRNA-modifying protein YgfZ; transfer RNA biogenesis
-K03684 - ribonuclease D [EC:3.1.13.5] rnd; transfer RNA biogenesis
-K00982 - [glutamine synthetase] adenylyltransferase / [glutamine synthetase]-adenylyl-L-tyrosine phosphorylase [EC:2.7.7.42 2.7.7.89] glnE; Nucleotidyltransferases
-K03578 - ATP-dependent helicase HrpA [EC:3.6.4.13]; DNA replication and repair`8
-
-_PC2-_
-K11784 - cyclic dehypoxanthinyl futalosine synthase [EC:1.21.98.1] mqnC; metabolism of cofactors and vitamins
-K18285 - aminodeoxyfutalosine synthase [EC:2.5.1.120] mqnE; metabolism of cofactors and vitamins
-K06001 - tryptophan synthase beta chain [EC:4.2.1.20] trpB; amino acid metabolism
-K02032 -  peptide/nickel transport system ATP-binding protein ddpF; membrane transport
-K00175 - 2-oxoglutarate/2-oxoacid ferredoxin oxidoreductase subunit beta [EC:1.2.7.3 1.2.7.11] korB, oorB, oforB; citrate cycle
-K00852 - ribokinase [EC:2.7.1.15] rbsK, RBKS; carbohydrate metabolism
-K02401 - flagellar biosynthetic protein FlhB; cell motility
-K16789 - thiamine transporter thiT; transport
-K15876 - cytochrome c nitrite reductase small subunit nrfH; energy metabolism
-K01950 - NAD+ synthase (glutamine-hydrolysing) [EC:6.3.5.1] NADSYN1, QNS1, nadE; metabolism of cofactors and vitamins
-
-_*CMC samples only*_
-_PC1+_
-K03406 - methyl-accepting chemotaxis protein mcp; signal transduction
-K00266 - glutamate synthase (NADPH) small chain [EC:1.4.1.13] gltD; energy metabolism (N fixation)
-K10206 - LL-diaminopimelate aminotransferase [EC:2.6.1.83]; amino acid metabolims
-K09777 - uncharacterized protein; poorly characterized (?)
-K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] fumB; carbon fixation
-K02499 - tetrapyrrole methylase family protein / MazG family protein yabN; DNA replication
-K11784 - cyclic dehypoxanthinyl futalosine synthase [EC:1.21.98.1] mqnC; metabolism of cofactors and vitamins
-K06409 - stage V sporulation protein B spoVB; transporter
-K18285 - aminodeoxyfutalosine synthase [EC:2.5.1.120] mqnE; metabolism of cofactors and vitamins
-K09691 - lipopolysaccharide transport system ATP-binding protein ABC-2.LPSE.A; membrane transport
-
-_PC1-_
-K09791 - uncharacterized protein
-K02783 - glucitol/sorbitol PTS system EIIC component srlA; carbohydrate metabolism
-K00096 - glycerol-1-phosphate dehydrogenase [NAD(P)+] [EC:1.1.1.261] araM, egsA; lipid metabolism
-K16163 - maleylpyruvate isomerase [EC:5.2.1.4]; amino acid metabolism
-K07101 - uncharacterized protein
-K07131 - uncharacterized protein
-K02438 - glycogen debranching enzyme [EC:3.2.1.196] glgX; carbohydrate metabolism
-K03795 - sirohydrochlorin cobaltochelatase [EC:4.99.1.3] cbiX; metabolism of cofactors and vitamins
-K09138 - uncharacterized protein
-K07979 - GntR family transcriptional regulator ytrA; transcription factor
-
-_PC2+_
-K03406 - methyl-accepting chemotaxis protein mcp; signal transduction
-K02406 - flagellin fliC; cell motility
-K02392 - flagellar basal-body rod protein FlgG; coll motility
-K07138 - uncharacterized protein
-K02385 - flagellar protein FlbD; cell motility
-K02241 - competence protein ComFB; competence
-K10907 - aminotransferase [EC:2.6.1.-]; amino acid transferrase
-K02588 - nitrogenase iron protein NifH; energy metabolism (N metabolism)
-K11358 - aspartate aminotransferase [EC:2.6.1.1] yhdR; amino acid metabolism
-K06284 - AbrB family transcriptional regulator, transcriptional pleiotropic regulator of transition state genes abrB; transcription factor
-
-_PC2-_
-K03571 - rod shape-determining protein MreD; DNA replication and repair
-K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194] ulaC, sgaA; carbohydrate metabolism
-K09780 - uncharacterized protein
-K05337 - ferredoxin fer; energy metabolism
-K02794 - mannose PTS system EIIAB component [EC:2.7.1.191] manX; carbohydrate metabolism
-K11072 - spermidine/putrescine transport system ATP-binding protein [EC:7.6.2.11] potA; membrane transport
-K07461 - putative endonuclease; DNA replication and repair
-K03801 - lipoyl(octanoyl) transferase [EC:2.3.1.181] lipB; metabolism of cofactors and vitamins
-K06920 - 7-cyano-7-deazaguanine synthase [EC:6.3.4.20] queC; metabolism of cofactors and vitamins
-K00991 - 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase [EC:2.7.7.60] ispd; metabolism of terpenoids and polyketides
-
-
-
-*_Abundance cut-off_* - *Needs to be checked, abundance cut-off calculation was wrong earlier*
-_*All samples*_
-_PC1+:_
-K01839 - phosphopentomutase [EC:5.4.2.7]; carbohydrate metabolism
-K01989 - putative ABC transport system substrate-binding protein; membrane transport
-K01819 - galactose-6-phosphate isomerase [EC:5.3.1.26]; carbohydrate metabolism
-K07088 - uncharacterized protein
-K01223 - 6-phospho-beta-glucosidase [EC:3.2.1.86]; carbohydrate metabolism
-K03839 - flavodoxin I; energy metabolism
-K15986 - manganese-dependent inorganic pyrophosphatase [EC:3.6.1.1]; energy metabolism
-K03650 - tRNA modification GTPase [EC:3.6.-.-]; tRNA biosynthesis
-K03569 - rod shape-determining protein MreB and related proteins
-K15580 - oligopeptide transport system substrate-binding protein; membrane transport
-
-_PC1-:_
-K09791 - uncharacterized protein (ycaR)
-K07481 - transposase, IS5 family
-K01494 - dCTP deaminase [EC:3.5.4.13]; nucleotide metabolism
-K03801 - lipoyl(octanoyl) transferase [EC:2.3.1.181]; metabolism of cofactors and vitamins
-K00033 - 6-phosphogluconate dehydrogenase [EC:1.1.1.44 1.1.1.343]; carbohydrate metabolism
-K07054 - uncharacterized protein (ypfJ)
-K02897 - large subunit ribosomal protein L25; translation
-K02050 - NitT/TauT family transport system permease protein; membrane transport
-K00340 - NADH-quinone oxidoreductase subunit K [EC:7.1.1.2]; energy metabolism
-K02437 - glycine cleavage system H protein; carbohydrate metabolism
-
-_PC2+:_
-K02032 - peptide/nickel transport system ATP-binding protein; membrane transport
-K07114 - Ca-activated chloride channel homolog; membrane transport
-K07133 - uncharacterized protein
-K11710 - manganese/zinc/iron transport system ATP- binding protein [EC:7.2.2.5]; membrane transport
-K02031 - peptide/nickel transport system ATP-binding protein; membrane transport
-K10441 - ribose transport system ATP-binding protein [EC:7.5.2.7]; membrane transport
-K03924 - MoxR-like ATPase [EC:3.6.3.-]
-K02034 - peptide/nickel transport system permease protein; membrane transport
-K02033 - peptide/nickel transport system permease protein; membrane transport
-K02026 - multiple sugar transport system permease protein; membrane transport
-
-_PC2-:_
-K07729 - putative transcriptional regulator; transcription factor
-K06199 - fluoride exporter; membrane transport
-K02825 - pyrimidine operon attenuation protein / uracil phosphoribosyltransferase [EC:2.4.2.9]; nucleotide metabolism
-K03621 - phosphate acyltransferase [EC:2.3.1.274]; lipid metabolism
-K00991 - 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase [EC:2.7.7.60]; biosynthesis of secondary metabolites
-K02793 - mannose PTS system EIIA component [EC:2.7.1.191]; carbohydrate metabolism
-K02794 - mannose PTS system EIIAB component [EC:2.7.1.191]; carbohydrate metabolism
-K07166 - ACT domain-containing protein; signaling protein
-K01091 - phosphoglycolate phosphatase [EC:3.1.3.18]; carbohydrate metabolism
-K07058 - membrane protein (yhjD, yihH, rbn)
-
-_*CMC samples only*_
-_PC1+:_
-K00260 - glutamate dehydrogenase [EC:1.4.1.2]; amino acid metabolism, arginine biosynthesis
-K01819 - galactose-6-phosphate isomerase [EC:5.3.1.26]; carbohydrate metabolism
-K01839 - phosphopentomutase [EC:5.4.2.7]; carbohydrate metabolism
-K03856 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
-K01989 - putative ABC transport system substrate-binding protein
-K01223 - 6-phospho-beta-glucosidase [EC:3.2.1.86]; carbohydrate metabolism
-K07088 - uncharacterized protein
-K16957 - L-cystine transport system substrate-binding protein; membrane transport
-K15986 - manganese-dependent inorganic pyrophosphatase [EC:3.6.1.1]; energy metabolism
-K04486 - histidinol-phosphatase (PHP family) [EC:3.1.3.15]; amino acid metabolism
-
-_PC1-:_
-K09791 - uncharacterized protein (ycaR)
-K07481 - transposase, IS5 family
-K07054 - uncharacterized protein (ypfJ)
-K01494 - dCTP deaminase [EC:3.5.4.13]; nucleotide metabolism
-K04759 - ferrous iron transport protein B; membrane transport
-K02050 - NitT/TauT family transport system permease protein
-K10441 - ribose transport system ATP-binding protein [EC:7.5.2.7]; membrane transport
-K02027 - multiple sugar transport system substrate-binding protein (ycjN); membrane transport
-K02897 - large subunit ribosomal protein L25
-K00340 - NADH-quinone oxidoreductase subunit K [EC:7.1.1.2]; energy metabolism
-
-_PC2+:_
-K00260 - glutamate dehydrogenase [EC:1.4.1.2]; energy metabolism, amino acid metabolism
-K04031 - ethanolamine utilization protein EutS
-K01623 - fructose-bisphosphate aldolase, class I [EC:4.1.2.13]; carbohydrate metabolism
-K11708 - manganese/zinc/iron transport system permease protein; membrane transport
-K02032 - peptide/nickel transport system ATP-binding protein; membrane transport
-K02009 - cobalt/nickel transport protein; membrane transport
-K01995 - branched-chain amino acid transport system ATP-binding protein; membrane transport
-K03839 - flavodoxin I; eneregy metabolism
-K11707 - manganese/zinc/iron transport system substrate-binding protein; membrane transport
-K03856 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
-
-_PC2-:_
-K03060 - DNA-directed RNA polymerase subunit omega [EC:2.7.7.6]; transcription
-K02036 - phosphate transport system ATP-binding protein [EC:7.3.2.1]; membrane transport
-K03402 - transcriptional regulator of arginine metabolism; transcription factor
-K01626 - 3-deoxy-7-phosphoheptulonate synthase [EC:2.5.1.54]; amino acid metabolism
-K00969 - nicotinate-nucleotide adenylyltransferase [EC:2.7.7.18]; metabolism of cofactors and vitamins
-K07166 - ACT domain-containing protein; signaling protein (gvcR)
-K02529 - LacI family transcriptional regulator; transcription factor
-K02970 - small subunit ribosomal protein S21
-K05896 - segregation and condensation protein A; DNA replication
-K00016 - L-lactate dehydrogenase [EC:1.1.1.27]; carbohydrate metabolism
-
-## KEGG Carbohydrate orthologs
-Just because, let's look at only the orthologs in KEGG Carbohydrate pathways. 
-```{r carbohydrate_KOs}
-kegg_carbohydrate_KOs <- fread("./05-results.backup/kegg_carbohydrates.tsv")
-kegg_carbohydrate_KOs <- kegg_carbohydrate_KOs %>% rename(Ortholog = KOrtholog)
-```
-
-Industrial and non-industrial samples
-```{r carb_KOs_pca_noblanks}
-
-humann2_KO_carbs <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|10M")) %>%
-  inner_join(., kegg_carbohydrate_KOs %>%
-               select(Ortholog) %>% distinct(), by = "Ortholog") %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog,CPM) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.pca(humann2_KO_carbs, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KO_carbs.pca <- pca(humann2_KO_carbs, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KO_carbs.pca, "PC1", "PC2", "Village", "Village", "Village")
-
-```
-
-Are there significant differences between metadata groups?
-```{r adonis_carb_KOs_cmc}
-# Use the CLR-transformed matrix from the mixOmics PCA in the section above
-# Euclidean distance
-humann2_KO_carbs_mat.euc <- vegdist(humann2_KO_carbs.pca$X, method = "euclidean", na.rm = T)
-humann2_KO_carbs_mat.euc.pcoa <- ape::pcoa(humann2_KO_carbs_mat.euc)
-
-humann2_KO_carbs_mat.euc.pcoavectors <- as.data.frame(humann2_KO_carbs_mat.euc.pcoa$vectors)
-humann2_KO_carbs_mat.euc.pcoavectors <- humann2_KO_carbs_mat.euc.pcoavectors %>%
-  rownames_to_column("SampleID")
-
-humann2_KO_carbs_mat.euc.vecmet <- inner_join(humann2_KO_carbs_mat.euc.pcoavectors, metadata, by = "SampleID")
-
-humann2_KO_carbs_mat.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 3) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  # stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
-
-# test for difference between different metadata categories 
-adonis2(humann2_KO_carbs_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_KO_carbs_mat.euc ~ Village + Sex + Industry + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
-
-# controlled for tooth site
-adonis2(humann2_KO_carbs_mat.euc ~ Village + Sex + Industry + Ethnic_Group + Age_group + Market_economy, humann2_KO_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_carbs_mat.euc.vecmet$Tooth_site)
-
-```
-Only village (p < 0.05) and tooth site (p < 0.01) are significantly different.
-When controlling for tooth site, no village (p < 0.05) is different.
-
-
-Cameroon plaque samples only
-```{r carb_KOs_pca_cmc}
-
-humann2_KO_cmc_carbs <- humann2_KOs.decontam %>%
-  select(-matches("EXB|LIB|JAE|SRR")) %>%
-  inner_join(., kegg_carbohydrate_KOs %>%
-               select(Ortholog) %>% distinct(), by = "Ortholog") %>%
-  gather("SampleID","CPM",2:ncol(.)) %>%
-  mutate(CPM = CPM + 1) %>%
-  spread(Ortholog,CPM) %>%
-  column_to_rownames("SampleID")
-
-# check the number of components to retain by tuning the PCA
-tune.pca(humann2_KO_cmc_carbs, logratio = 'CLR')
-
-# perform a PCA to see how the data cluster
-humann2_KO_cmc_carbs.pca <- pca(humann2_KO_cmc_carbs, ncomp = 3, logratio = 'CLR')
-
-# plot the PCA
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Ethnic_Group", "Ethnic_Group", "Ethnic_Group")
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Age_group", "Age_group", "Age_group")
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Market_economy", "Market_economy", "Market_economy")
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Sex", "Sex", "Sex")
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Tooth_site", "Tooth_site", "Tooth_site")
-plot_pca(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Village", "Village", "Village")
-
-```
-
-Are there significant differences between metadata groups?
-```{r adonis_carb_KOs_cmc}
-# Use the CLR-transformed matrix from the mixOmics PCA in the section above
-# Euclidean distance
-humann2_KO_cmc_carbs_mat.euc <- vegdist(humann2_KO_cmc_carbs.pca$X, method = "euclidean", na.rm = T)
-humann2_KO_cmc_carbs_mat.euc.pcoa <- ape::pcoa(humann2_KO_cmc_carbs_mat.euc)
-
-humann2_KO_cmc_carbs_mat.euc.pcoavectors <- as.data.frame(humann2_KO_cmc_carbs_mat.euc.pcoa$vectors)
-humann2_KO_cmc_carbs_mat.euc.pcoavectors <- humann2_KO_cmc_carbs_mat.euc.pcoavectors %>%
-  rownames_to_column("SampleID")
-
-humann2_KO_cmc_carbs_mat.euc.vecmet <- inner_join(humann2_KO_cmc_carbs_mat.euc.pcoavectors, metadata, by = "SampleID")
-
-humann2_KO_cmc_carbs_mat.euc.vecmet %>%
-  ggplot(., aes(Axis.1, Axis.2, colour = Tooth_site, shape = Tooth_site)) +
-  geom_point(size = 3) +
-  scale_colour_manual(values = Tooth_site_colors) +
-  scale_shape_manual(values = Tooth_site_shapes) +
-  # stat_ellipse(aes(colour = Tooth_site, group = Tooth_site)) +
-  theme_minimal(base_size = 7) +
-  ggtitle("Tooth site")
-
-# test for difference between different metadata categories 
-adonis2(humann2_KO_cmc_carbs_mat.euc ~ ExtractionBatch + LibraryBatch, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
-adonis2(humann2_KO_cmc_carbs_mat.euc ~ Village + Sex + Tooth_site + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin")
-
-# controlled for tooth site
-adonis2(humann2_KO_cmc_carbs_mat.euc ~ Village + Sex + Ethnic_Group + Age_group + Market_economy, humann2_KO_cmc_carbs_mat.euc.vecmet, permutations = 999, by = "margin", strata = humann2_KO_cmc_carbs_mat.euc.vecmet$Tooth_site)
-
-```
-Only village (p < 0.05) and tooth site (p < 0.01) are significantly different.
-When controlling for tooth site, no categories are different.
-
-Now to see which of the orthologs have the strongest loadings in PC1 and PC2
-```{r pca_KO_biplot}
-# which paths distinguish sample types when HMP and JAE are included?
-pca_EG_KO_biplot_pc1 <- plot_pca_bi(humann2_KO_carbs.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
-pca_EG_KO_biplot_pc1
-
-# ggsave("./05-results.backup/presentation_pdfs/humann2_KO_bi_noblanks.pdf", plot = pca_EG_KO_biplot_pc1, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-# what are those pathways?
-pandoc.table(pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC1 positive loadings")
-
-pandoc.table(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC1 negative loadings")
-
-humann2_KO_carbs_biplot_list <- pca_EG_KO_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "Industrial+CMC")
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  bind_rows(pca_EG_KO_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "Industrial+CMC"))
-
-# which paths distinguish sample types when HMP and JAE are included?
-pca_EG_biplot_pc2 <- plot_pca_bi(humann2_KO_carbs.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
-pca_EG_biplot_pc2
-
-# what are those pathways?
-pandoc.table(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC2 positive loadings")
-
-pandoc.table(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(PC2),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC2 negative loadings")
-
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  bind_rows(pca_EG_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "Industrial+CMC"))
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  bind_rows(pca_EG_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "Industrial+CMC"))
-
-# which paths distinguish sample groups when only CMC samples are included?
-pca_EG_cmc_biplot_pc1 <- plot_pca_bi(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Ethnic_Group", PC1, pathways = F)
-pca_EG_cmc_biplot_pc1
-
-# ggsave("./05-results.backup/presentation_pdfs/humann2_KO_bi_cmc.pdf", plot = pca_EG_cmc_biplot_pc1, device = "pdf",
-#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
-
-# what are those pathways?
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC1 positive loadings")
-
-pandoc.table(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(PC1),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC1 negative loadings")
-
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$pws_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1+", Samples = "CMC"))
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  bind_rows(pca_EG_cmc_biplot_pc1$plot_env$neg_10 %>% arrange(desc(PC1)) %>% select(Function) %>% mutate(Direction = "PC1-", Samples = "CMC"))
-
-pca_EG_cmc_biplot_pc2 <- plot_pca_bi(humann2_KO_cmc_carbs.pca, "PC1", "PC2", "Ethnic_Group", PC2, pathways = F)
-pca_EG_cmc_biplot_pc2
-
-pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC2 positive loadings")
-
-pandoc.table(pca_EG_cmc_biplot_pc2$plot_env$neg_10  %>% arrange(PC2),
-             digits = 5,
-             keep.trailing.zeros = T,
-             justify = "lccr",
-             split.tables = Inf,
-             caption = "PC2 negative loadings")
-
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$pws_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2+", Samples = "CMC"))
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
+humann2_KO_biplot_list <- humann2_KO_biplot_list %>%
   bind_rows(pca_EG_cmc_biplot_pc2$plot_env$neg_10 %>% arrange(desc(PC2)) %>% select(Function) %>% mutate(Direction = "PC2-", Samples = "CMC"))
 
-# fwrite(humann2_KO_biplot_list, file = "./05-results.backup/humann2_KO_biplot_list.tsv", quote = F, sep = "\t")
-
-humann2_KO_carbs_biplot_list <- humann2_KO_carbs_biplot_list %>%
-  rename(Ortholog = Function) %>%
-  inner_join(., kegg_carbohydrate_KOs, by = "Ortholog")
-
-# here look at which pathways are most dominant in each group. None are specific to CMC samples
-humann2_KO_carbs_biplot_list %>%
-  group_by(Samples, Direction, Pathway_name) %>%
-  summarize(Counts = length(Pathway_name)) %>%
-  arrange(Pathway_name)
+fwrite(humann2_KO_biplot_list, file = "./05-results.backup/humann2_KO_biplot_list.tsv", quote = F, sep = "\t")
 
 ```
 
-_*All samples*_
-_PC1+:_
-K01848 - methylmalonyl-CoA mutase, N-terminal domain [EC:5.4.99.2] E5.4.99.2A, mcmA1; Glyoxylate and dicarboxylate metabolism
-K15633 - 2,3-bisphosphoglycerate-independent phosphoglycerate mutase [EC:5.4.2.12] gpmI; Glycolysis / Gluconeogenesis
-K00209 - enoyl-[acyl-carrier protein] reductase / trans-2-enoyl-CoA reductase (NAD+) [EC:1.3.1.9 1.3.1.44] fabV, ter; Butanoate metabolism
-K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] E4.2.1.2AB, fumB; Citrate cycle (TCA cycle)
-K01849 - methylmalonyl-CoA mutase, C-terminal domain [EC:5.4.99.2] E5.4.99.2B, mcmA2; Glyoxylate and dicarboxylate metabolism
-K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
-K00030 - isocitrate dehydrogenase (NAD+) [EC:1.1.1.41], IDH3; Citrate cycle (TCA cycle)
-K01711 - GDPmannose 4,6-dehydratase [EC:4.2.1.47], gmd, GMDS; Fructose and mannose metabolism
-K01571 - oxaloacetate decarboxylase (Na+ extruding) subunit alpha [EC:7.2.4.2], oadA; Pyruvate metabolism
-K01858 - myo-inositol-1-phosphate synthase [EC:5.5.1.4], INO1, ISYNA1; Inositol phosphate metabolism
+```{r gf_info}
 
-_PC1-:_
-K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194], ulaC, sgaA; Ascorbate and aldarate metabolism
-K02783 - glucitol/sorbitol PTS system EIIC component, srlA; Fructose and mannose metabolism
-K01433 - formyltetrahydrofolate deformylase [EC:3.5.1.10], purU; Glyoxylate and dicarboxylate metabolism
-K03335 - inosose dehydratase [EC:4.2.1.44], iolE; Inositol phosphate metabolism
-K02782 - glucitol/sorbitol PTS system EIIB component [EC:2.7.1.198], srlE; Fructose and mannose metabolism
-K00068 - sorbitol-6-phosphate 2-dehydrogenase [EC:1.1.1.140], srlE; Fructose and mannose metabolism
-K13788 - phosphate acetyltransferase [EC:2.3.1.8], pta; Pyruvate metabolism
-K07248 - lactaldehyde dehydrogenase / glycolaldehyde dehydrogenase [EC:1.2.1.22 1.2.1.21], aldA; Pyruvate metabolism
-K00010 - myo-inositol 2-dehydrogenase / D-chiro-inositol 1-dehydrogenase [EC:1.1.1.18 1.1.1.369], iolG; Inositol phosphate metabolism
-K09788 - 2-methylaconitate isomerase [EC:5.3.3.-], prpF; Propanoate metabolism
+gf_info <- fread("./05-results.backup/gene_family_info.tsv")
 
-_PC2+:_
-K00008 - L-iditol 2-dehydrogenase [EC:1.1.1.14], SORD, gutB; Pentose and glucuronate interconversions
-K02438 - glycogen debranching enzyme [EC:3.2.1.196], glgX; Starch and sucrose metabolism
-K17489 - methylmalonyl-CoA carboxyltransferase 12S subunit [EC:2.1.3.1], E2.1.3.1-12S; Propanoate metabolism
-K13922 - propionaldehyde dehydrogenase [EC:1.2.1.87], pduP; Propanoate metabolism
-K16148 - alpha-maltose-1-phosphate synthase [EC:2.4.1.342], glgM; Starch and sucrose metabolism
-K06044 - (1->4)-alpha-D-glucan 1-alpha-D-glucosylmutase [EC:5.4.99.15], treY, glgY; Starch and sucrose metabolism
-K03338 - 5-dehydro-2-deoxygluconokinase [EC:2.7.1.92], iolC; Inositol phosphate metabolism
-K05341 - amylosucrase [EC:2.4.1.4], E2.4.1.4; Starch and sucrose metabolism
-K03336 - 3D-(3,5/4)-trihydroxycyclohexane-1,2-dione acylhydrolase (decyclizing) [EC:3.7.1.22], iolD; Inositol phosphate metabolism
-K01236 - maltooligosyltrehalose trehalohydrolase [EC:3.2.1.141], treZ, glgZ; Starch and sucrose metabolism
+gf_annotations <- humann2_KO_biplot_list %>%
+  rename(`GeneFamily` = Function) %>%
+  full_join(., gf_info %>%
+              rename(`GeneFamily` = MetaCyc_reaction), by = "GeneFamily")
 
-_PC2-:_
-K18369 - alcohol dehydrogenase [EC:1.1.1.-], adh2; Propanoate metabolism
-K00123 - formate dehydrogenase major subunit [EC:1.17.1.9], fdoG, fdhF, fdwA; Glyoxylate and dicarboxylate metabolism
-K01792 - glucose-6-phosphate 1-epimerase [EC:5.1.3.15], E5.1.3.15; Glycolysis / Gluconeogenesis
-K01654 - N-acetylneuraminate synthase [EC:2.5.1.56], neuB, nnaB; Amino sugar and nucleotide sugar metabolism
-K11258 - acetolactate synthase II small subunit [EC:2.2.1.6], ilvM; Butanoate metabolism
-K03781 - catalase [EC:1.11.1.6], katE, CAT, catB, srpA; Glyoxylate and dicarboxylate metabolism
-K00246 - fumarate reductase subunit C, frdC; Citrate cycle (TCA cycle)
-K01092 - myo-inositol-1(or 4)-monophosphatase [EC:3.1.3.25], E3.1.3.25, IMPA, suhB; Inositol phosphate metabolism
-K00127 - formate dehydrogenase subunit gamma, fdoI, fdsG; Glyoxylate and dicarboxylate metabolism
-K01512 - 
-
-_*CMC samples only*_
-_PC1+:_
-K01848 - methylmalonyl-CoA mutase, N-terminal domain [EC:5.4.99.2] E5.4.99.2A, mcmA1; Glyoxylate and dicarboxylate metabolism
-K01849 - methylmalonyl-CoA mutase, C-terminal domain [EC:5.4.99.2] E5.4.99.2B, mcmA2; Glyoxylate and dicarboxylate metabolism
-K15633 - 2,3-bisphosphoglycerate-independent phosphoglycerate mutase [EC:5.4.2.12] gpmI; Glycolysis / Gluconeogenesis
-K01678 - fumarate hydratase subunit beta [EC:4.2.1.2] E4.2.1.2AB, fumB; Citrate cycle (TCA cycle)
-K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
-K01220 - 6-phospho-beta-galactosidase [EC:3.2.1.85], E3.2.1.85, lacG; Galactose metabolism
-K00030 - isocitrate dehydrogenase (NAD+) [EC:1.1.1.41], IDH3; Citrate cycle (TCA cycle)
-K02787 - ???
-K02788 - lactose PTS system EIICB component [EC:2.7.1.207], lacE; Galactose metabolism
-K00209 - enoyl-[acyl-carrier protein] reductase / trans-2-enoyl-CoA reductase (NAD+) [EC:1.3.1.9 1.3.1.44] fabV, ter; Butanoate metabolism
-
-_PC1-:_
-K02783 - glucitol/sorbitol PTS system EIIC component, srlA; Fructose and mannose metabolism
-K02821 - ascorbate PTS system EIIA or EIIAB component [EC:2.7.1.194], ulaC, sgaA; Ascorbate and aldarate metabolism
-K01433 - formyltetrahydrofolate deformylase [EC:3.5.1.10], purU; Glyoxylate and dicarboxylate metabolism
-K00854 - xylulokinase [EC:2.7.1.17], xylB, XYLB; Pentose and glucuronate interconversions
-K03079 - L-ribulose-5-phosphate 3-epimerase [EC:5.1.3.22], ulaE, sgaU, sgbU; Pentose and glucuronate interconversions
-K00694 - cellulose synthase (UDP-forming) [EC:2.4.1.12], bcsA; Starch and sucrose metabolism
-K03078 - 3-dehydro-L-gulonate-6-phosphate decarboxylase [EC:4.1.1.85], ulaD, sgaH, sgbH; Pentose and glucuronate interconversions
-K02438 - glycogen debranching enzyme [EC:3.2.1.196], glgX; Starch and sucrose metabolism
-K03335 - inosose dehydratase [EC:4.2.1.44], iolE; Inositol phosphate metabolism
-K02782 - glucitol/sorbitol PTS system EIIB component [EC:2.7.1.198], srlE; Fructose and mannose metabolism
-
-_PC2+:_
-K00009 - mannitol-1-phosphate 5-dehydrogenase [EC:1.1.1.17], mtlD; Fructose and mannose metabolism
-K01006 - pyruvate, orthophosphate dikinase [EC:2.7.9.1], ppdK; Glycolysis / Gluconeogenesis
-K17489 - methylmalonyl-CoA carboxyltransferase 12S subunit [EC:2.1.3.1], E2.1.3.1-12S; Propanoate metabolism
-K00008 - L-iditol 2-dehydrogenase [EC:1.1.1.14], SORD, gutB; Pentose and glucuronate interconversions
-K01218 - mannan endo-1,4-beta-mannosidase [EC:3.2.1.78], gmuG; Fructose and mannose metabolism
-K01580 - glutamate decarboxylase [EC:4.1.1.15], E4.1.1.15, gadB, gadA, GAD; Butanoate metabolism
-K03737 - pyruvate-ferredoxin/flavodoxin oxidoreductase [EC:1.2.7.1 1.2.7.-], por, nifJ; Glycolysis / Gluconeogenesis
-K03336 - 3D-(3,5/4)-trihydroxycyclohexane-1,2-dione acylhydrolase (decyclizing) [EC:3.7.1.22], iolD; Inositol phosphate metabolism
-K00692 - levansucrase [EC:2.4.1.10], sacB; Starch and sucrose metabolism
-K03416 - methylmalonyl-CoA carboxyltransferase 5S subunit [EC:2.1.3.1], E2.1.3.1-5S, pcyB; Propanoate metabolism
-
-_PC2-:_
-K07248 - lactaldehyde dehydrogenase / glycolaldehyde dehydrogenase [EC:1.2.1.22 1.2.1.21], aldA; Pyruvate metabolism
-K01092 - myo-inositol-1(or 4)-monophosphatase [EC:3.1.3.25], E3.1.3.25, IMPA, suhB; Inositol phosphate metabolism
-K18369 - alcohol dehydrogenase [EC:1.1.1.-], adh2; Propanoate metabolism
-K01595 - phosphoenolpyruvate carboxylase [EC:4.1.1.31], ppc; Pyruvate metabolism
-K03777 - D-lactate dehydrogenase (quinone) [EC:1.1.5.12], dld; Pyruvate metabolism
-K00029 - malate dehydrogenase (oxaloacetate-decarboxylating)(NADP+) [EC:1.1.1.40], E1.1.1.40, maeB; Pyruvate metabolism
-K01690 - phosphogluconate dehydratase [EC:4.2.1.12], edd; Pentose phosphate pathway
-K00121 - S-(hydroxymethyl)glutathione dehydrogenase / alcohol dehydrogenase [EC:1.1.1.284 1.1.1.1], frmA, ADH5, adhC; Glycolysis / Gluconeogenesis
-K01069 - hydroxyacylglutathione hydrolase [EC:3.1.2.6], gloB, gloc, HAGH; Pyruvate metabolism
-K09788 - 2-methylaconitate isomerase [EC:5.3.3.-], prpF; Propanoate metabolism
-
+```
 
 
 

@@ -173,7 +173,7 @@ seed_L4.decontam_FA_all_clr_order <- seed_L4.decontam_FA_all_clr %>%
   rownames_to_column("SampleID") %>%
   gather("Protein","CLR",2:ncol(.)) %>%
   spread(SampleID,CLR) %>%
-  mutate(SpOrder = as.character(seq(1,700))) %>% # MR1 - 700; MR2 - 869
+  mutate(SpOrder = as.character(seq(1,701))) %>% # MR1 - 701; MR2 - 869
   select(Protein, SpOrder, everything()) %>%
   mutate(SpOrder = fct_relevel(SpOrder, sp_all_order)) %>%
   arrange(SpOrder) %>%

@@ -28,60 +28,58 @@ are cleaned up.
 
 Read in the full species and genus tables.
 ```{r load_data}
-malt_species_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_species_bacteria_archaea.txt")
-malt_genus_raw <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_genus_bacteria_archaea.txt")
+# read in the species table
+malt_species <- fread("./05-results.backup/MALT_all_data_combined_Comparison_species_names.tsv")
 
 # clean the file names
-malt_species_raw <- rename(malt_species_raw, Species = `#Datasets`)
-colnames(malt_species_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
-colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
-colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_species_raw))
-colnames(malt_species_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_species_raw))
-colnames(malt_species_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_species_raw))
-colnames(malt_species_raw) <- gsub(".fastq.truncated","", colnames(malt_species_raw))
+malt_species <- rename(malt_species, Species = `#Datasets`)
+colnames(malt_species) <- gsub(".SG1.unmapped","", colnames(malt_species))
+colnames(malt_species) <- gsub(".unmapped","", colnames(malt_species))
+colnames(malt_species) <- gsub("-1","", colnames(malt_species))
 
-
-# remove human and unassigned reads
-malt_species_raw <- malt_species_raw %>% filter(!str_detect(Species, "Homo sapiens"))
-malt_species_raw <- malt_species_raw %>% filter(!str_detect(Species, "Not assigned"))
-# get rid of the extra column
-malt_species_raw <- malt_species_raw %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
-
-malt_genus_raw <- rename(malt_genus_raw, Species = `#Datasets`)
-colnames(malt_genus_raw) <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
-colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
-colnames(malt_genus_raw) <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam","_10M", colnames(malt_genus_raw))
-colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M","_10M", colnames(malt_genus_raw))
-colnames(malt_genus_raw) <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam","", colnames(malt_genus_raw))
-colnames(malt_genus_raw) <- gsub(".fastq.truncated","", colnames(malt_genus_raw))
-
-# remove human and unassigned reads
-malt_genus_raw <- malt_genus_raw %>% filter(!str_detect(Species, "Homo"))
-malt_genus_raw <- malt_genus_raw %>% filter(!str_detect(Species, "Not assigned"))
-# get rid of the extra column at the begining
-malt_genus_raw <- malt_genus_raw %>% select(-Comparison_CMC_HMP_JAE_MALT_RSC)
+# remove human and unassigned reads, and remove the sub-sampled HMP and JAE samples
+malt_species <- malt_species %>% 
+  filter(!str_detect(Species, "Homo sapiens|Not assigned")) %>%
+  select(-matches("VLC")) %>%
+  # remove extra samples from Clemente study (these might be industrial samples) 
+  select(-matches("SRR1646026|SRR1646027|SRR1646028|SRR1646029|SRR1646034|SRR1646035|SRR1646036|SRR1646037"))
 
 ```
 
-Read in the table with NCBItaxIDs
 ```{r}
-malt_species_id <- fread("./05-results.backup/CMC_HMP_JAE_Yano_MALT_RSC_speciesIDs_bacteria_archaea.txt")
 
-species_IDs <- malt_species_id %>%
-  rename(NCBItaxID = `#Datasets`) %>%
-  select(NCBItaxID) %>%
-  filter(NCBItaxID != 9606) %>%
-  bind_cols(., malt_species_raw %>%
-              select(Species))
+malt_missed_table <- fread("~/archgen/projects1/microbiome_calculus/iberian/05-results.backup/Iberian_samples-controls_comparison_species.txt") %>%
+  select(matches("Data|JAE014|JAE015|VLC|SRR061192|SRR061294|SRR061320|SRR061365|SRR061562|SRR062083|SRR062298|SRR062299|SRR063517|SRR1804664|SRR1804823|SRR512767|SRR513165|SRR513768|SRR513775|SRR513828|SRR514202|SRR514239|SRR514306|SRR514329")) %>%
+  rename(Species = `#Datasets`) %>%
+  filter(!str_detect(Species, "Homo sapiens|Not assigned"))
+
+colnames(malt_missed_table) <- gsub(".unmapped","", colnames(malt_missed_table))
+
+```
+
+```{r}
+
+malt_species_raw <- malt_species %>%
+  full_join(., malt_missed_table, by = "Species") %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(Counts = replace_na(Counts, 0)) %>%
+  arrange(SampleID) %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts") %>%
+  adorn_totals(where = "col") %>%
+  filter(Total > 0) %>%
+  select(-Total) %>%
+  filter(!str_detect(Species, "Homo sapiens|Not assigned"))
+
+attr(malt_species_raw, "totals") <- NULL
 
 ```
 
 
 List samples that appear to be outliers from a PCA w/o any filtering of samples or species
 ```{r outliers}
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+outliers <- c("CMC032.B0101",
               "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
-              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+              "SRR1646041")
 
 ```
 
@@ -92,57 +90,39 @@ contaminants_species <- fread("05-results.backup/malt_contaminants_species.tsv",
 contaminants_genus <- fread("05-results.backup/malt_contaminants_genus.tsv")
 
 malt_species.decontam <- malt_species_raw %>%
-  anti_join(., contaminants_species)
+  anti_join(., contaminants_species) %>%
+  select(-one_of(outliers))
 
-malt_genus.decontam <- malt_genus_raw %>%
-  anti_join(., contaminants_genus)
+# malt_genus.decontam <- malt_genus_raw %>%
+#   anti_join(., contaminants_genus)
 
 # create tsv files to convert to biom files for Songbird differential abundance analysis
 # be sure to remove all species that sum to 0 after removing samples
 
-malt_species.decontam_songbird <- malt_species.decontam %>%
-  select(-one_of(outliers)) %>%
-  select(-matches("EXB|LIB|10M|SRR164")) %>%
-  adorn_totals(where = "col") %>%
-  filter(Total > 0) %>%
-  select(-Total)
-
-malt_species_cmc.decontam_songbird <- malt_species.decontam %>%
-  select(-matches("EXB|LIB|10M|SRR164")) %>%
-  adorn_totals(where = "col") %>%
-  filter(Total > 0) %>%
-  select(-Total)
+# malt_species.decontam_songbird <- malt_species.decontam %>%
+#   select(-one_of(outliers)) %>%
+#   select(-matches("EXB|LIB|10M|SRR164")) %>%
+#   adorn_totals(where = "col") %>%
+#   filter(Total > 0) %>%
+#   select(-Total)
+# 
+# malt_species_cmc.decontam_songbird <- malt_species.decontam %>%
+#   select(-matches("EXB|LIB|10M|SRR164")) %>%
+#   adorn_totals(where = "col") %>%
+#   filter(Total > 0) %>%
+#   select(-Total)
   
-malt_genus.decontam_songbird <- malt_genus.decontam %>%
-  select(-one_of(outliers)) %>%
-  select(-matches("EXB|LIB|10M|SRR164")) %>%
-  adorn_totals(where = "col") %>%
-  filter(Total > 0) %>%
-  select(-Total)
-
-malt_genus_cmc.decontam_songbird <- malt_genus.decontam %>%
-  select(-one_of(outliers)) %>%
-  select(-matches("EXB|LIB|10M|SRR164")) %>%
-  adorn_totals(where = "col") %>%
-  filter(Total > 0) %>%
-  select(-Total)
 
 ```
 
 
 ```{r save_data}
 save(malt_species_raw,
-     malt_genus_raw,
      malt_species.decontam,
-     malt_genus.decontam,
      file = "./05-results.backup/CMC_taxonomy_tables.RData")
 
-fwrite(species_IDs, "./05-results.backup/ncbi_taxIDs_species.tsv", sep ="\t", quote = F)
-
-fwrite(malt_species.decontam_songbird, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
-fwrite(malt_species_cmc.decontam_songbird, "05-results.backup/malt_species_cmc_decontam.tsv", sep = "\t", quote = F)
-fwrite(malt_genus.decontam_songbird, "05-results.backup/malt_genus_decontam.tsv", sep = "\t", quote = F)
-fwrite(malt_genus_cmc.decontam_songbird, "05-results.backup/malt_genus_cmc_decontam.tsv", sep = "\t", quote = F)
+# fwrite(malt_species.decontam_songbird, "05-results.backup/malt_species_decontam.tsv", sep = "\t", quote = F)
+# fwrite(malt_species_cmc.decontam_songbird, "05-results.backup/malt_species_cmc_decontam.tsv", sep = "\t", quote = F)
 
 
 ```

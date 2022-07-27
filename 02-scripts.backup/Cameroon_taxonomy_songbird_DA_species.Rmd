@@ -9,6 +9,11 @@ output:
         toc: true
 ---
 
+*_NOTE - Very Important!_* - This uses tables where the samples were not corrected after
+discovering that there was a mistake with index labeling. Do not use these
+results. Songbird will need to be run again with the corrected tables. I'm just
+too busy to do so and don't need it for publication.
+
 ```{r load_libraries, echo = F, message = F}
 library(knitr)
 library(data.table)

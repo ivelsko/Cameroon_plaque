@@ -15,9 +15,6 @@ library(data.table)
 library(janitor)
 library(tidyverse)
 library(gplots)
-library(ggrepel)
-library(viridis)
-library(cowplot)
 opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
 ```
 
@@ -30,91 +27,54 @@ knitr::opts_knit$set(root.dir = normalizePath(".."))
 
 Load data files 
 ```{r load_data}
-rso_readstats <- fread("./05-results.backup/readclassification_stats.rso.tsv")
-rspm_readstats <- fread("./05-results.backup/readclassification_stats.rspm.tsv")
+rs_readstats <- fread("./05-results.backup/read_classification_stats.rs.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
 
-# shorten sample names
-rso_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub("_S0_L001_R1_000","", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub("_S0_L001_R1_001","", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rso_readstats$SampleID)
-rso_readstats$SampleID <- gsub(".kraken","", rso_readstats$SampleID)
+rspm_readstats <- fread("./05-results.backup/read_classification_stats.rspm.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
 
-rspm_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz","_10M", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub("_S0_L001_R1_000.10M","_10M", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub("_S0_L001_R1_000","", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub("_S0_L001_R1_001","", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub(".fastq.truncated.prefixed.gz","", rspm_readstats$SampleID)
-rspm_readstats$SampleID <- gsub(".kraken","", rspm_readstats$SampleID)
-
-# # these are for the mpa-format output runs
-# rso_readstats$SampleID <- gsub(".A0101.output",".A0101_10M.output", rso_readstats$SampleID)
-# rso_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
-# rso_readstats$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rso_readstats$SampleID)
-# rso_readstats$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
-# rso_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rso_readstats$SampleID)
-# rso_readstats$SampleID <- gsub(".kraken","", rso_readstats$SampleID)
-
-# rspm_readstats$SampleID <- gsub(".A0101.output",".A0101_10M.output", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub("_S0_L001_R1_000.10M.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","_10M", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub("_S0_L001_R1_000.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub("_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.fastq.gz","", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub(".kraken","", rspm_readstats$SampleID)
-# rspm_readstats$SampleID <- gsub(".SG1.1_S0_L001_R1_001","", rspm_readstats$SampleID)
-
-# split the names into new columns
-rso_readstats <- rso_readstats %>% 
-  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.output\\.") %>%
-  separate(col = "Run", into =c("Run","Database"), sep = "\\.") %>%
-  as_tibble(.) %>%
-  mutate(Database = recode(Database, rso = "RefSeqOnly"))
-
-rspm_readstats <- rspm_readstats %>% 
-  separate(col = "SampleID", into = c("SampleID","Run"), sep = "\\.output\\.") %>%
-  mutate(Database = "RefSeqPasolliMAGs") %>%
-  select(SampleID,Run,Database,Classified,Unclassified) %>%
-  as_tibble(.)
-rspm_readstats$Run <- gsub(".rspm","", rspm_readstats$Run)
-
-
-# merge the tables into 1
-kraken_readstats <- bind_rows(rso_readstats,rspm_readstats)
 
 # load the metadata file
 load("./05-results.backup/CMC_metadata.RData")
 
-Kraken_db_colors
-
-# merge data and metadata
-kraken_readstats <- kraken_readstats %>%
-  mutate(Percent_classified = Classified/(Classified+Unclassified)*100) %>%
+# merge the tables into 1
+kraken_readstats <- rs_readstats %>%
+  mutate(Unclassified_T = Unclassified + Classified_0,
+         Percent_classified = Classified / (Classified + Unclassified_T) *100) %>%
+  select(SampleID, Classified, Unclassified_T, Percent_classified) %>%
+  pivot_longer(!SampleID, names_to = "Classification", values_to = "Counts") %>%
+  mutate(DB = "RefSeqOnly") %>%
+  bind_rows(., rspm_readstats %>%
+            mutate(Unclassified_T = Unclassified + Classified_0,
+         Percent_classified = Classified / (Classified + Unclassified_T) *100) %>%
+            select(SampleID, Classified, Unclassified_T, Percent_classified) %>%
+            pivot_longer(!SampleID, names_to = "Classification", values_to = "Counts") %>%
+            mutate(DB = "RefSeqPasolliMAGs")) %>%
   inner_join(., metadata %>%
-               select(SampleID,Env,Description,Ethnic_Group,Market_economy,Age_group,Sex,Tooth_site,Type,Village))
+               select(SampleID,Env,Description,Ethnic_Group,Market_integration_split,Age_group,Sex,Tooth_site,Type,Village)) %>%
+  # remove unneeded sample groups
+  filter(!str_detect(Description, "Saliva|Buccal"))
+
+
+# Kraken_db_colors
 
 ```
 
 
 ```{r plot_data}
-kraken_readstats %>%
-  # filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
-  ggplot(., aes(x = Village, y = Percent_classified, fill = Database)) +
-    geom_boxplot() +
-    geom_jitter(size = 0.5, alpha = 0.5) +
-    scale_fill_manual(values = Kraken_db_colors) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    xlab("Village") +
-    ylab("Percent of reads classified")
-
 RSPM_kraken_compare <- kraken_readstats %>%
-  filter(!str_detect(SampleID, "EXB|LIB|10M")) %>%
-  ggplot(., aes(x = Village, y = Percent_classified, fill = Database)) +
+  filter(Classification == "Percent_classified") %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164")) %>%
+  ggplot(., aes(x = Village, y = Counts, fill = DB)) +
     geom_boxplot() +
-    geom_jitter(size = 0.5, alpha = 0.5) +
+    geom_point(alpha = 0.5, size = 0.5, position=position_jitterdodge(dodge.width = 0.75, jitter.width = 0.1)) +
+    # geom_jitter(size = 0.5, alpha = 0.5, width = 0.4) +
     scale_fill_manual(values = Kraken_db_colors) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -123,17 +83,44 @@ RSPM_kraken_compare <- kraken_readstats %>%
 
 RSPM_kraken_compare
 
-ggsave("05-results.backup/RSPM_kraken_compare_UKY.pdf", plot = RSPM_kraken_compare, device = "pdf",
-       scale = 1, width = 7, height = 5, units = c("in"),
-       dpi = 300)
+# ggsave("05-results.backup/RSPM_kraken_compare_UKY.pdf", plot = RSPM_kraken_compare, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
 
 ```
+
+```{r}
+
+RSPM_kraken_compare <- kraken_readstats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+  filter(Classification == "Percent_classified") %>%
+  ggplot(., aes(x = Market_integration_split, y = Counts, fill = DB)) +
+    geom_boxplot() +
+    geom_point(position = position_jitterdodge(dodge.width = 0.85, jitter.width = 0.2), size = 0.5, alpha = 0.5) +
+    scale_fill_manual(values = Kraken_db_colors) +
+    theme_minimal(base_size = 16) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    xlab("Village") +
+    ylab("Reads classified (%)")
+
+RSPM_kraken_compare
+
+# ggsave("05-results.backup/RSPM_kraken_compare_UKY.pdf", plot = RSPM_kraken_compare, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"),
+#        dpi = 300)
+
+
+
+```
+
 
 ```{r stats}
 
 wilcox_p <- kraken_readstats %>%
-group_by(Village) %>%
-summarise(pvalue = pairwise.wilcox.test(Classified, Database, p.adjust.method = "fdr")$p.value)
+  filter(Classification == "Percent_classified") %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164")) %>%
+  group_by(Market_integration_split) %>%
+  summarise(pvalue = pairwise.wilcox.test(Counts, DB, p.adjust.method = "fdr")$p.value)
 
 wilcox_p %>% filter(pvalue <= 0.05)
 

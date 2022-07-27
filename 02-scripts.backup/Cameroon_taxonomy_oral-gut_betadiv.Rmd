@@ -50,7 +50,7 @@ load("./05-results.backup/CMC_metadata.RData")
 We'll use the data from James' paper to use the gut samples that have been
 profiled by MALT with the same database. First load the metadata table, select
 out the gut samples, then read in the tables from James' paper keeping only the
-gut samples
+gut samples. From `https://github.com/jfy133/Hominid_Calculus_Microbiome_Evolution/tree/master/06-additional_data_files/Data_R11_S12_MALTMEGANTables/`
 ```{r deep_evo_meta}
 deep_evo_metadata <- fread("./00-documentation.backup/02-calculus_microbiome-deep_evolution-individualscontrolssources_metadata_20200219.tsv")
 

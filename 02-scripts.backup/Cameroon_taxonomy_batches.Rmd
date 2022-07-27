@@ -41,9 +41,9 @@ load("./05-results.backup/CMC_metadata.RData")
 
 List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
 ```{r outliers}
-outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+outliers <- c("CMC032.B0101",
               "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
-              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+              "SRR1646041")
 
 outliersF <- str_c(outliers, collapse = "|")
 
@@ -68,8 +68,9 @@ batch_table_os <- malt_species.decontam %>%
                select(SampleID, Observed_species) %>%
                inner_join(metadata %>%
                            select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-               filter(!is.na(LibraryBatch))
+                                  Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+               filter(!is.na(LibraryBatch)) %>%
+               filter(!str_detect(SampleID, "VLC"))
 
 # plot extraction batch
 exb_unfiltered_os_plot <- batch_table_os %>%
@@ -157,8 +158,9 @@ batch_table_os <- malt_species.decontam %>%
                select(SampleID, Observed_species) %>%
                inner_join(metadata %>%
                            select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-               filter(!is.na(LibraryBatch))
+                                  Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+               filter(!is.na(LibraryBatch)) %>%
+               filter(!str_detect(SampleID, "VLC"))
 
 # plot extraction batch
 extraction_os <- batch_table_os %>%
@@ -223,7 +225,7 @@ wilcox_os # none of the library batches are significantly different
 ```
 
 Now at the genus level
-```{r genus_os}
+```{r genus_os, eval = F}
 batch_table_og <- malt_genus.decontam %>%
                  select(-one_of(outliers)) %>%
                  adorn_totals(where = "col", name = "Sum_genus.decontam") %>%
@@ -239,8 +241,9 @@ batch_table_og <- malt_genus.decontam %>%
                  select(SampleID, Observed_species) %>%
                  inner_join(metadata %>%
                            select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-                 filter(!is.na(LibraryBatch))
+                                  Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+                 filter(!is.na(LibraryBatch)) %>%
+               filter(!str_detect(SampleID, "VLC"))
 
 # plot extraction batch
 exb_unfiltered_og_plot <- batch_table_og %>%
@@ -326,8 +329,9 @@ batch_table_og <- malt_genus.decontam %>%
                  select(SampleID, Observed_species) %>%
                  inner_join(metadata %>%
                            select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                                  Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-                 filter(!is.na(LibraryBatch))
+                                  Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+                 filter(!is.na(LibraryBatch)) %>%
+               filter(!str_detect(SampleID, "VLC"))
 
 # plot extraction batch
 batch_table_og %>%
@@ -405,8 +409,9 @@ malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 exb_unfiltered_shannon_sp_plot <- malt_species.decontam.shannon %>%
@@ -494,8 +499,9 @@ malt_species.decontam.shannon <- malt_species.decontam.shannon %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 extraction_shannon <- malt_species.decontam.shannon %>%
@@ -558,7 +564,7 @@ wilcox_shannons # none of the library batches are significantly different
 ```
 
 Shannon diversity genus
-```{r genus_shannon}
+```{r genus_shannon, eval = F}
 # Shannon diversity with the package vegan
 malt_genus.decontam.matrix <- as.matrix(malt_genus.decontam %>%
                                          select(-one_of(outliers),
@@ -578,8 +584,9 @@ malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 exb_unfiltered_shannon_gn_plot <- malt_genus.decontam.shannon %>%
@@ -666,8 +673,9 @@ malt_genus.decontam.shannon <- malt_genus.decontam.shannon %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 malt_genus.decontam.shannon %>%
@@ -736,8 +744,9 @@ evenness.species <- evenness.species %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 evenness.species %>%
@@ -803,8 +812,9 @@ evenness.species <- evenness.species %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+  filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 evenness.species %>%
@@ -861,7 +871,7 @@ wilcox_pileous # none of the library batches are significantly different
 ```
 
 Pileou's evenness genus
-```{r pileou_genus}
+```{r pileou_genus, eval = F}
 evenness.genus <- diversity(malt_genus.decontam.matrix)
 evenness.genus <- as.data.frame(evenness.genus/log(specnumber(malt_genus.decontam.matrix)))
 names(evenness.genus)[1] <- "Pileou's evenness"
@@ -871,8 +881,9 @@ evenness.genus <- evenness.genus %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
-  filter(!is.na(LibraryBatch))
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+  filter(!is.na(LibraryBatch)) %>%
+               filter(!str_detect(SampleID, "VLC"))
   
 # plot extraction batch
 evenness.genus %>%
@@ -938,7 +949,7 @@ evenness.genus <- evenness.genus %>%
   rownames_to_column("SampleID") %>%
   inner_join(metadata %>%
              select(SampleID, Env, Description, Ethnic_Group, Age_group,
-                    Sex, Market_economy, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
+                    Sex, Market_integration, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type), by = "SampleID") %>%
   filter(!is.na(LibraryBatch))
   
 # plot extraction batch

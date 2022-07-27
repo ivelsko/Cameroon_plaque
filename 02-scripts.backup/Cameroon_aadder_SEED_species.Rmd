@@ -741,7 +741,8 @@ heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 3, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        axis.text.y =  element_text(size = 16), # element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1+") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -775,7 +776,8 @@ heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        axis.text.y =  element_text(size = 16), # element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1-") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -788,10 +790,10 @@ heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
 
 heatmapplots_all
 
-ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap.pdf", plot = heatmapplots_all,
-       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
-# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
-#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
 
@@ -1129,7 +1131,8 @@ heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        axis.text.y =  element_text(size = 16), # element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1+") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -1162,8 +1165,8 @@ heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, f
   theme_minimal(base_size = 10) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
-        axis.text.y =  element_text(size = 16), # element_blank(),
-        axis.title.y = element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1-") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -1177,10 +1180,10 @@ heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
 
 heatmapplots_all
 
-ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap.pdf", plot = heatmapplots_all,
-       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
-# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
-#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
 
@@ -1569,7 +1572,8 @@ heatmap_pc1pws <- ggplot(seed_L4.decontam_pc1pws_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        axis.text.y =  element_text(size = 16), # element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1+") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -1606,7 +1610,8 @@ heatmap_pc1neg <- ggplot(seed_L4.decontam_pc1neg_clr_l, aes(SampleID, Pathway, f
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95),
         plot.margin = margin(0, 0, 0, 0, "pt"),
         axis.title.y = element_blank(),
-        axis.text.y =  element_text(size = 16), # element_blank(),
+        # axis.text.y =  element_text(size = 16),
+        axis.text.y =  element_blank(),
         legend.position = "left") +
   ggtitle("PC1-") +
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -1619,10 +1624,10 @@ heatmapplots_all <- plot_grid(heatmap_pc1neg, heatmap_pc1pws,
 
 heatmapplots_all
 
-ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap.pdf", plot = heatmapplots_all,
-       device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
-# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
-#        device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap.pdf", plot = heatmapplots_all,
+#        device = "pdf", scale = 1, width = 12, height = 10, units = c("in"), dpi = 300)
+ggsave("./06-publication/supplemental_figures/SXX37/panel_parts/SXX37_seed_cmc_ts_pc12_heatmap_nolabel.pdf", plot = heatmapplots_all,
+       device = "pdf", scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 ```
 

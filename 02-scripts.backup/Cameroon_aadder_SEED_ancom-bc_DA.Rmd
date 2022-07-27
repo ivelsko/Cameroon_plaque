@@ -175,7 +175,7 @@ ancom_bc_noblanks_HMP_HG <- res_noblanks.ANCOM_BC %>%
 # %>%
 #   filter(`log fold change (HunterGatherer - HMP)` < -1 | `log fold change (HunterGatherer - HMP)` > 1)
 
-# fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_seed_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
+fwrite(ancom_bc_noblanks_HMP_HG, "./05-results.backup/ancomBC_seed_noblanks_HMP_HG.tsv", sep = "\t", quote = F) # equivalent to ma_us_phylum_age2.csv in the example below
 
 res.ANCOM_BC <- data.frame(species=rownames(out_noblanks$feature.table), out_noblanks$res, 
                         struc.zero[rownames(out_noblanks$feature.table), ], 
@@ -198,7 +198,7 @@ ancom_bc_noblanks_JAE_HG <- res.ANCOM_BC %>%
   # possiblly filter out the species that have a differential abundance of less than |1|
   # filter(`log fold change (HunterGatherer - JAE)` < -1 | `log fold change (HunterGatherer - JAE)` > 1)
   
-# fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_seed_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_noblanks_JAE_HG, "./05-results.backup/ancomBC_seed_noblanks_JAE_HG.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -234,6 +234,7 @@ ancom_seed_HMP_CMC_plot <- res.ANCOM_BC_env_HMP_HG %>%
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("Cameroon - HMP") +
@@ -250,7 +251,7 @@ ancom_seed_HMP_CMC_plot <- res.ANCOM_BC_env_HMP_HG %>%
 
 ancom_seed_HMP_CMC_plot
 
-# fwrite(res.ANCOM_BC_env_HMP_HG, "./05-results.backup/res_ANCOM_BC_env_HMP_HG_seed.tsv", sep = "\t")
+fwrite(res.ANCOM_BC_env_HMP_HG, "./05-results.backup/res_ANCOM_BC_env_HMP_HG_seed.tsv", sep = "\t")
 
 # Cameroon vs JAE
 res.ANCOM_BC_env_JAE_HG <- res.ANCOM_BC %>%
@@ -280,6 +281,7 @@ ancom_seed_JAE_CMC_plot <- res.ANCOM_BC_env_JAE_HG %>%
     # coord_flip() +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("Cameroon - JAE") +
@@ -302,7 +304,7 @@ ancom_seed_JAE_CMC_plot <- res.ANCOM_BC_env_JAE_HG %>%
 
 ancom_seed_JAE_CMC_plot
 
-# fwrite(res.ANCOM_BC_env_JAE_HG, "./05-results.backup/res_ANCOM_BC_env_JAE_HG_seed.tsv", sep = "\t")
+fwrite(res.ANCOM_BC_env_JAE_HG, "./05-results.backup/res_ANCOM_BC_env_JAE_HG_seed.tsv", sep = "\t")
 
 # ggsave("~/Desktop/ancom_seed_HMP_CMC_plot.png", plot = ancom_seed_HMP_CMC_plot, device = "png",
 #        scale = 1, width = 16, height = 10, units = c("in"), dpi = 300)
@@ -445,7 +447,7 @@ ancom_bc_cmc_Nz_Ba <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Baka - Nzime)` < -1 | `log fold change (Baka - Nzime)` > 1)
 
-# fwrite(ancom_bc_cmc_Nz_Ba, "./05-results.backup/ancomBC_species_cmc_ethnicgroup.tsv", sep = "\t", quote = F)
+fwrite(ancom_bc_cmc_Nz_Ba, "./05-results.backup/ancomBC_seed_cmc_ethnic_group.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -467,6 +469,7 @@ res.ANCOM_BC %>%
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     # coord_flip() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("Baka - Nzime") +
@@ -600,7 +603,7 @@ out_cmc <- ANCOM_BC(feature.table, grp.name, grp.ind, struc.zero,
                adj.method, tol.EM, max.iterNum, perNum, alpha)
 res_cmc <- cbind(taxon = rownames(out_cmc$feature.table), out_cmc$res)
 
-# fwrite(res_cmc, "./05-results.backup/ancomBC_cmc_ethnic_group.tsv", sep = "\t", quote = F)
+# fwrite(res_cmc, "./05-results.backup/ancomBC_seed_cmc_market_economy.tsv", sep = "\t", quote = F)
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
 res.ANCOM_BC <- data.frame(species=rownames(out_cmc$feature.table), out_cmc$res, 
@@ -624,7 +627,7 @@ ancom_bc_cmc_Fa_FC <- res.ANCOM_BC_Fa_FC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (ForrestCamp - Farming)` < -1 | `log fold change (ForrestCamp - Farming)` > 1)
 
-# fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_species_cmc_FA_FC.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_Fa_FC, "./05-results.backup/ancomBC_seed_cmc_FA_FC.tsv", sep = "\t", quote = F)
 
 
 # Test result (taken from https://github.com/FrederickHuangLin/ANCOM-BC/blob/master/scripts/figure_6_table_s1_s2_s3.Rmd)
@@ -649,7 +652,7 @@ ancom_bc_cmc_Fa_LR <- res.ANCOM_BC_Fa_LR %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (LoggingRoad - Farming)` < -1 | `log fold change (LoggingRoad - Farming)` > 1)
 
-# fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_species_cmc_FA_LR.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_Fa_LR, "./05-results.backup/ancomBC_seed_cmc_FA_LR.tsv", sep = "\t", quote = F)
 
 
 ```
@@ -683,6 +686,7 @@ res.ANCOM_BC_Fa_FC_star %>%
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("ForrestCamp - Farming") +
@@ -732,6 +736,7 @@ res.ANCOM_BC_Fa_LR_star %>%
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("LoggingRoad - Farming") +
@@ -926,6 +931,7 @@ res.ANCOM_BC_ts %>%
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("Anterior - Posterior") +
@@ -1074,7 +1080,7 @@ ancom_bc_cmc_M_F <- res.ANCOM_BC %>%
   filter(diff.abn == "TRUE")
   # filter(`log fold change (Female - Male)` < -1 | `log fold change (Female - Male)` > 1)
 
-# fwrite(ancom_bc_cmc_M_F, "./05-results.backup/ancomBC_species_cmc_sex.tsv", sep = "\t", quote = F)
+# fwrite(ancom_bc_cmc_M_F, "./05-results.backup/ancomBC_seed_cmc_sex.tsv", sep = "\t", quote = F)
 
 ```
 
@@ -1107,6 +1113,7 @@ res.ANCOM_BC_sex %>%
     geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
     geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_fill_viridis_d(option = "C") +
     ylab("Log fold change") +
     xlab("Proteins") +
     ggtitle("Female - Male") +
