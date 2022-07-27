@@ -209,6 +209,9 @@ seqtk sample -s100 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/ma
 pigz -8 /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/malt/input-temp_JAE/"$SAMPLENAME"10M/"$SAMPLENAME"_S0_L001_R1_000.10M.fastq
 
 ##################################################################
+HUMAnn2/HUMAnN3
+##################################################################
+# None of this is used, all re-run with HUMAnN3 in 027-humann3_cmc.Snakefile
 
 # to change the names of the HUMAnN2 folders that didn't match the basename do
 rename 's/_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz/.10M/' *_S0_L001_R1_001.fastq.combined.fq.prefixed.extractunmapped.bam.10M.fastq.gz
@@ -259,6 +262,44 @@ for f in *.out; do grep "Creating output" $f | sed 's/Creating\ output\ director
 for f in *.out; do grep "Unaligned reads after translated alignment:" $f | sed 's/Unaligned\ reads\ after\ translated\ alignment\://g' | sed 's/\ \%//g' >> unaligned.pcts; done
 # add a header to each file (SampleID, UnalignedPct)
 paste files.names unaligned.pcts > ../../../05-results.backup/humann2_alignment_stats.tsv
+
+
+###########################
+HUMAnN3
+###########################
+# run humann3 with this
+snakemake -s ../../../02-scripts.backup/027-humann3_cmc.Snakefile --cluster-config /mnt/archgen/microbiome_calculus/abpCapture/02-scripts.backup/snakemake_default.config --cluster "qsub -pe smp 16 -l virtual_free={cluster.mem},h_vmem={cluster.mem} -o {cluster.out} -e {cluster.err}" -j 6 --latency-wait 20 -n
+
+conda activate humann3
+
+# gene families
+humann_join_tables -i output/ -o genefamilies_joined.tsv --file_name unmapped_genefamilies
+humann_renorm_table --input genefamilies_joined.tsv --output genefamilies_joined_cpm.tsv --units cpm
+humann_regroup_table --input genefamilies_joined_cpm.tsv --output genefamilies_joined_cpm_ur90rxn.tsv --groups uniref90_rxn
+humann_rename_table --input genefamilies_joined_cpm_ur90rxn.tsv --output genefamilies_joined_cpm_ur90rxn_names.tsv -n metacyc-rxn
+
+# pathway abundance
+humann_join_tables -i output/ -o pathabundance_joined.tsv --file_name unmapped_pathabundance
+humann_renorm_table --input pathabundance_joined.tsv --output pathabundance_joined_cpm.tsv --units cpm
+humann_regroup_table --input pathabundance_joined_cpm.tsv --output pathabundance_joined_cpm_ur90ko.tsv --groups uniref90_ko
+
+
+# To determine the # of reads that were aligned (or rather unaligned) by HUMAnN3
+# working dir /mnt/archgen/microbiome_calculus/Cameroon_plaque/04-analysis/humann2/all_data_combined/input
+ls *.gz > samples.list
+touch samples.lines
+for f in *.gz; do zcat $f | wc -l >> samples.lines; done
+# add a header to each file (SampleID, Lines)
+paste samples.list samples.lines > ../../../05-results.backup/sample_lines.tsv 
+# check that these numbers, divided by 4, are the same as those in the metadata file column Individual_Seq_Depth_NonHuman
+# if they are, use that metadata column for the R analyses, otherwise figure out why that column is wrong and fix it to match these. Use it with the correct numbers
+
+cd ../snakemake_tmp/
+touch files.names unaligned.pcts
+for f in *.o; do grep "genefamilies.tsv" $f | sed 's/\/mnt\/archgen\/microbiome_calculus\/Cameroon_plaque\/04-analysis\/humann2\/all_data_combined\/output\///g' >> files.names; done
+for f in *.o; do grep "Unaligned reads after translated alignment:" $f | sed 's/Unaligned\ reads\ after\ translated\ alignment\://g' | sed 's/\ \%//g' >> unaligned.pcts; done
+# add a header to each file (SampleID, UnalignedPct)
+paste files.names unaligned.pcts > ../../../../05-results.backup/humann2_alignment_stats.tsv
 
 
 ###########################
@@ -318,6 +359,95 @@ cat /projects1/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/output/mpa
 # open file and add column names SciName and Taxonomy
 
 # open taxonomy_na.tsv and add in the appropriate taxonomy
+
+###########################
+Kraken2 RefSeq only or RefSeq + Pasolli MAGs
+
+# run here /mnt/archgen/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/all_data_combined
+# this runs with both RefSeq only databases and the RefSeq+Pasolli MAGs database
+snakemake -s ../../../02-scripts.backup/kraken2_all_data_combined_RS_MAGs.Snakefile --cluster-config /mnt/archgen/microbiome_calculus/abpCapture/02-scripts.backup/snakemake_default.config --cluster "qsub -pe smp 32 -l virtual_free={cluster.mem},h_vmem={cluster.mem} -o {cluster.out} -e {cluster.err}" -j 8 --latency-wait 20 -n
+
+######
+# **Note this section isn't needed!!**
+# the eager1 processed files were symlinked to the input folder and old HMP data was processed with the rest
+Kraken2 from old data - see if can recover original HMP plaque set and convert reports to mpa-style out
+# using krakenTools scripts
+
+# first need to run make_ktaxonomy.py twice, once for refseqOnly database, once for refseqPM database
+make_ktaxonomy.py --nodes taxonomy/nodes.dmp --names taxonomy/names.dmp --seqid2taxid seqid2taxid.map -o ktaxonomy.out
+
+/mnt/archgen/users/velsko/bin/krakenTools/make_ktaxonomy.py --nodes /mnt/archgen/microbiome_sciences/reference_databases/built/refseq/refseq20191017/kraken2_db/RefSeq1910/taxonomy/nodes.dmp \
+--names /mnt/archgen/microbiome_sciences/reference_databases/built/refseq/refseq20191017/kraken2_db/RefSeq1910/taxonomy/names.dmp \
+--seqid2taxid /mnt/archgen/microbiome_sciences/reference_databases/built/refseq/refseq20191017/kraken2_db/MiniKraken_RefSeq1910/seqid2taxid.map \
+-o ktaxonomy_rs.out
+
+/mnt/archgen/users/velsko/bin/krakenTools/make_ktaxonomy.py \
+--nodes /mnt/archgen/microbiome_sciences/reference_databases/built/refseq20191017_Pasolli2019/kraken2_db/RefSeq1910PlusPasolliSGBs/taxonomy/nodes.dmp \
+--names /mnt/archgen/microbiome_sciences/reference_databases/built/refseq20191017_Pasolli2019/kraken2_db/RefSeq1910PlusPasolliSGBs/taxonomy/names.dmp \
+--seqid2taxid /mnt/archgen/microbiome_sciences/reference_databases/built/refseq20191017_Pasolli2019/kraken2_db/MiniKraken_RefSeq1910PlusPasolliSGBs/seqid2taxid.map \
+-o ktaxonomy_rspm.out
+
+# then ungzip the .kraken output files (can't be read when gzip'd)
+then run make_kreport.py and kreport2mpa.py in snakemake files
+snakemake -s ../../../02-scripts.backup/kraken2_HMP_recovery_rs.Snakefile --cluster-config /mnt/archgen/microbiome_calculus/abpCapture/02-scripts.backup/snakemake_default.config --cluster "qsub -pe smp 4 -l virtual_free={cluster.mem},h_vmem={cluster.mem} -o {cluster.out} -e {cluster.err}" -j 8 --latency-wait 20 -n
+snakemake -s ../../../02-scripts.backup/kraken2_HMP_recovery_rspm.Snakefile --cluster-config /mnt/archgen/microbiome_calculus/abpCapture/02-scripts.backup/snakemake_default.config --cluster "qsub -pe smp 4 -l virtual_free={cluster.mem},h_vmem={cluster.mem} -o {cluster.out} -e {cluster.err}" -j 8 --latency-wait 20 -n
+######
+
+# use the krakenTools script to combine mpa-style output
+/mnt/archgen/users/velsko/bin/krakenTools/combine_mpa.py -i output/CMC001.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC001.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC001.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC002.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC002.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC003.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC003.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC004.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC004.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC005.A0202.SG1.kraken2.report_mpa.rs.tsv output/CMC005.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC006.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC006.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC007.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC008.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC008.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC009.A0202.SG1.kraken2.report_mpa.rs.tsv output/CMC009.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC010.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC010.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC011.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC011.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC012.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC012.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC013.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC013.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC014.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC015.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC015.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC016.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC016.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC017.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC017.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC018.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC018.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC020.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC020.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC021.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC021.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC022.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC022.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC023.A0301.SG1.kraken2.report_mpa.rs.tsv output/CMC023.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC024.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC024.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC025.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC025.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC026.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC026.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC027.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC027.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC028.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC028.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC029.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC029.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC030.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC030.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC031.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC031.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC032.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC032.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC033.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC033.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC034.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC034.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC035.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC035.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC036.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC036.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC037.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC037.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC038.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC038.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC039.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC040.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC041.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC042.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC042.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC043.A0101.SG1.kraken2.report_mpa.rs.tsv output/CMC043.B0101.SG1.kraken2.report_mpa.rs.tsv output/CMC044.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC045.A0201.SG1.kraken2.report_mpa.rs.tsv output/CMC045.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC046.B0201.SG1.kraken2.report_mpa.rs.tsv output/CMC047.A0201.SG1.kraken2.report_mpa.rs.tsv output/ERR1474564.kraken2.report_mpa.rs.tsv output/ERR1474565.kraken2.report_mpa.rs.tsv output/ERR1474566.kraken2.report_mpa.rs.tsv output/ERR1474567.kraken2.report_mpa.rs.tsv output/ERR1474568.kraken2.report_mpa.rs.tsv output/ERR1474569.kraken2.report_mpa.rs.tsv output/ERR1474570.kraken2.report_mpa.rs.tsv output/ERR1474571.kraken2.report_mpa.rs.tsv output/ERR1474572.kraken2.report_mpa.rs.tsv output/ERR1474573.kraken2.report_mpa.rs.tsv output/ERR1474574.kraken2.report_mpa.rs.tsv output/ERR1474575.kraken2.report_mpa.rs.tsv output/ERR1474576.kraken2.report_mpa.rs.tsv output/ERR1474577.kraken2.report_mpa.rs.tsv output/ERR1474578.kraken2.report_mpa.rs.tsv output/ERR1474579.kraken2.report_mpa.rs.tsv output/ERR1474580.kraken2.report_mpa.rs.tsv output/ERR1474581.kraken2.report_mpa.rs.tsv output/ERR1474582.kraken2.report_mpa.rs.tsv output/ERR1474583.kraken2.report_mpa.rs.tsv output/ERR1474584.kraken2.report_mpa.rs.tsv output/ERR1474585.kraken2.report_mpa.rs.tsv output/ERR1474586.kraken2.report_mpa.rs.tsv output/ERR1474587.kraken2.report_mpa.rs.tsv output/EXB059.A0901.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1001.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1101.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1201.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1301.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1401.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1501.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1601.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1701.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1801.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A1901.SG1.kraken2.report_mpa.rs.tsv output/EXB059.A2001.SG1.kraken2.report_mpa.rs.tsv output/JAE006.A0101.kraken2.report_mpa.rs.tsv output/JAE007.A0101.kraken2.report_mpa.rs.tsv output/JAE008.A0101.kraken2.report_mpa.rs.tsv output/JAE009.A0101.kraken2.report_mpa.rs.tsv output/JAE010.A0101.kraken2.report_mpa.rs.tsv output/JAE012.A0101.kraken2.report_mpa.rs.tsv output/JAE013.A0101.kraken2.report_mpa.rs.tsv output/JAE014.A0101.kraken2.report_mpa.rs.tsv output/JAE015.A0101.kraken2.report_mpa.rs.tsv output/JAE016.A0101.kraken2.report_mpa.rs.tsv output/LIB050.A0101.SG1.kraken2.report_mpa.rs.tsv output/LIB050.A0102.SG1.kraken2.report_mpa.rs.tsv output/LIB050.A0103.SG1.kraken2.report_mpa.rs.tsv output/LIB050.A0105.SG1.kraken2.report_mpa.rs.tsv output/LIB050.A0106.SG1.kraken2.report_mpa.rs.tsv output/LIB050.A0107.SG1.kraken2.report_mpa.rs.tsv output/SRR061192.kraken2.report_mpa.rs.tsv output/SRR061294.kraken2.report_mpa.rs.tsv output/SRR061320.kraken2.report_mpa.rs.tsv output/SRR061365.kraken2.report_mpa.rs.tsv output/SRR061562.kraken2.report_mpa.rs.tsv output/SRR062083.kraken2.report_mpa.rs.tsv output/SRR062298.kraken2.report_mpa.rs.tsv output/SRR062299.kraken2.report_mpa.rs.tsv output/SRR063517.kraken2.report_mpa.rs.tsv output/SRR1646026.kraken2.report_mpa.rs.tsv output/SRR1646027.kraken2.report_mpa.rs.tsv output/SRR1646028.kraken2.report_mpa.rs.tsv output/SRR1646029.kraken2.report_mpa.rs.tsv output/SRR1646030.kraken2.report_mpa.rs.tsv output/SRR1646031.kraken2.report_mpa.rs.tsv output/SRR1646032.kraken2.report_mpa.rs.tsv output/SRR1646033.kraken2.report_mpa.rs.tsv output/SRR1646034.kraken2.report_mpa.rs.tsv output/SRR1646035.kraken2.report_mpa.rs.tsv output/SRR1646036.kraken2.report_mpa.rs.tsv output/SRR1646037.kraken2.report_mpa.rs.tsv output/SRR1646038.kraken2.report_mpa.rs.tsv output/SRR1646039.kraken2.report_mpa.rs.tsv output/SRR1646040.kraken2.report_mpa.rs.tsv output/SRR1646041.kraken2.report_mpa.rs.tsv output/SRR1646042.kraken2.report_mpa.rs.tsv output/SRR1646043.kraken2.report_mpa.rs.tsv output/SRR1646044.kraken2.report_mpa.rs.tsv output/SRR1646045.kraken2.report_mpa.rs.tsv output/SRR1646046.kraken2.report_mpa.rs.tsv output/SRR1646047.kraken2.report_mpa.rs.tsv output/SRR1804664.kraken2.report_mpa.rs.tsv output/SRR1804823.kraken2.report_mpa.rs.tsv output/SRR512767.kraken2.report_mpa.rs.tsv output/SRR513165.kraken2.report_mpa.rs.tsv output/SRR513768.kraken2.report_mpa.rs.tsv output/SRR513775.kraken2.report_mpa.rs.tsv output/SRR513828.kraken2.report_mpa.rs.tsv output/SRR514202.kraken2.report_mpa.rs.tsv output/SRR514239.kraken2.report_mpa.rs.tsv output/SRR514306.kraken2.report_mpa.rs.tsv output/SRR514329.kraken2.report_mpa.rs.tsv output/SRS011247.kraken2.report_mpa.rs.tsv output/SRS011310.kraken2.report_mpa.rs.tsv output/SRS013252.kraken2.report_mpa.rs.tsv output/SRS013506.kraken2.report_mpa.rs.tsv output/SRS013942.kraken2.report_mpa.rs.tsv output/SRS013945.kraken2.report_mpa.rs.tsv output/SRS013949.kraken2.report_mpa.rs.tsv output/SRS013950.kraken2.report_mpa.rs.tsv output/SRS014107.kraken2.report_mpa.rs.tsv output/SRS014468.kraken2.report_mpa.rs.tsv output/SRS014477.kraken2.report_mpa.rs.tsv output/SRS014578.kraken2.report_mpa.rs.tsv output/SRS014691.kraken2.report_mpa.rs.tsv output/SRS014692.kraken2.report_mpa.rs.tsv output/SRS015055.kraken2.report_mpa.rs.tsv output/SRS015063.kraken2.report_mpa.rs.tsv output/SRS015064.kraken2.report_mpa.rs.tsv output/SRS015436.kraken2.report_mpa.rs.tsv output/SRS015799.kraken2.report_mpa.rs.tsv output/SRS016331.kraken2.report_mpa.rs.tsv output/SRS017445.kraken2.report_mpa.rs.tsv output/SRS017814.kraken2.report_mpa.rs.tsv output/SRS018359.kraken2.report_mpa.rs.tsv output/SRS018665.kraken2.report_mpa.rs.tsv output/SRS019029.kraken2.report_mpa.rs.tsv output/SRS019120.kraken2.report_mpa.rs.tsv output/SRS019124.kraken2.report_mpa.rs.tsv output/SRS019129.kraken2.report_mpa.rs.tsv output/SRS019587.kraken2.report_mpa.rs.tsv output/SRS024281.kraken2.report_mpa.rs.tsv output/SRS043239.kraken2.report_mpa.rs.tsv output/SRS047100.kraken2.report_mpa.rs.tsv output/SRS051930.kraken2.report_mpa.rs.tsv output/SRS052874.kraken2.report_mpa.rs.tsv output/SRS056892.kraken2.report_mpa.rs.tsv output/SRS058105.kraken2.report_mpa.rs.tsv output/SRS063215.kraken2.report_mpa.rs.tsv output/VLC001.A0101.kraken2.report_mpa.rs.tsv output/VLC002.A0101.kraken2.report_mpa.rs.tsv output/VLC003.A0101.kraken2.report_mpa.rs.tsv output/VLC004.A0101.kraken2.report_mpa.rs.tsv output/VLC005.A0101.kraken2.report_mpa.rs.tsv output/VLC008.A0101.kraken2.report_mpa.rs.tsv output/VLC009.A0101.kraken2.report_mpa.rs.tsv output/VLC010.A0101.kraken2.report_mpa.rs.tsv -o ../../../05-results.backup/combined.kraken2.report_mpa.rs.tsv
+/mnt/archgen/users/velsko/bin/krakenTools/combine_mpa.py -i output/CMC001.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC001.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC001.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC002.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC002.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC003.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC003.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC004.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC004.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC005.A0202.SG1.kraken2.report_mpa.rspm.tsv output/CMC005.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC006.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC006.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC007.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC008.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC008.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC009.A0202.SG1.kraken2.report_mpa.rspm.tsv output/CMC009.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC010.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC010.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC011.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC011.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC012.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC012.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC013.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC013.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC014.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC015.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC015.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC016.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC016.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC017.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC017.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC018.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC018.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC020.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC020.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC021.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC021.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC022.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC022.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC023.A0301.SG1.kraken2.report_mpa.rspm.tsv output/CMC023.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC024.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC024.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC025.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC025.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC026.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC026.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC027.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC027.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC028.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC028.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC029.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC029.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC030.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC030.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC031.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC031.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC032.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC032.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC033.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC033.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC034.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC034.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC035.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC035.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC036.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC036.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC037.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC037.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC038.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC038.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC039.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC040.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC041.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC042.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC042.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC043.A0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC043.B0101.SG1.kraken2.report_mpa.rspm.tsv output/CMC044.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC045.A0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC045.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC046.B0201.SG1.kraken2.report_mpa.rspm.tsv output/CMC047.A0201.SG1.kraken2.report_mpa.rspm.tsv output/ERR1474564.kraken2.report_mpa.rspm.tsv output/ERR1474565.kraken2.report_mpa.rspm.tsv output/ERR1474566.kraken2.report_mpa.rspm.tsv output/ERR1474567.kraken2.report_mpa.rspm.tsv output/ERR1474568.kraken2.report_mpa.rspm.tsv output/ERR1474569.kraken2.report_mpa.rspm.tsv output/ERR1474570.kraken2.report_mpa.rspm.tsv output/ERR1474571.kraken2.report_mpa.rspm.tsv output/ERR1474572.kraken2.report_mpa.rspm.tsv output/ERR1474573.kraken2.report_mpa.rspm.tsv output/ERR1474574.kraken2.report_mpa.rspm.tsv output/ERR1474575.kraken2.report_mpa.rspm.tsv output/ERR1474576.kraken2.report_mpa.rspm.tsv output/ERR1474577.kraken2.report_mpa.rspm.tsv output/ERR1474578.kraken2.report_mpa.rspm.tsv output/ERR1474579.kraken2.report_mpa.rspm.tsv output/ERR1474580.kraken2.report_mpa.rspm.tsv output/ERR1474581.kraken2.report_mpa.rspm.tsv output/ERR1474582.kraken2.report_mpa.rspm.tsv output/ERR1474583.kraken2.report_mpa.rspm.tsv output/ERR1474584.kraken2.report_mpa.rspm.tsv output/ERR1474585.kraken2.report_mpa.rspm.tsv output/ERR1474586.kraken2.report_mpa.rspm.tsv output/ERR1474587.kraken2.report_mpa.rspm.tsv output/EXB059.A0901.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1001.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1101.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1201.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1301.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1401.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1501.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1601.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1701.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1801.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A1901.SG1.kraken2.report_mpa.rspm.tsv output/EXB059.A2001.SG1.kraken2.report_mpa.rspm.tsv output/JAE006.A0101.kraken2.report_mpa.rspm.tsv output/JAE007.A0101.kraken2.report_mpa.rspm.tsv output/JAE008.A0101.kraken2.report_mpa.rspm.tsv output/JAE009.A0101.kraken2.report_mpa.rspm.tsv output/JAE010.A0101.kraken2.report_mpa.rspm.tsv output/JAE012.A0101.kraken2.report_mpa.rspm.tsv output/JAE013.A0101.kraken2.report_mpa.rspm.tsv output/JAE014.A0101.kraken2.report_mpa.rspm.tsv output/JAE015.A0101.kraken2.report_mpa.rspm.tsv output/JAE016.A0101.kraken2.report_mpa.rspm.tsv output/LIB050.A0101.SG1.kraken2.report_mpa.rspm.tsv output/LIB050.A0102.SG1.kraken2.report_mpa.rspm.tsv output/LIB050.A0103.SG1.kraken2.report_mpa.rspm.tsv output/LIB050.A0105.SG1.kraken2.report_mpa.rspm.tsv output/LIB050.A0106.SG1.kraken2.report_mpa.rspm.tsv output/LIB050.A0107.SG1.kraken2.report_mpa.rspm.tsv output/SRR061192.kraken2.report_mpa.rspm.tsv output/SRR061294.kraken2.report_mpa.rspm.tsv output/SRR061320.kraken2.report_mpa.rspm.tsv output/SRR061365.kraken2.report_mpa.rspm.tsv output/SRR061562.kraken2.report_mpa.rspm.tsv output/SRR062083.kraken2.report_mpa.rspm.tsv output/SRR062298.kraken2.report_mpa.rspm.tsv output/SRR062299.kraken2.report_mpa.rspm.tsv output/SRR063517.kraken2.report_mpa.rspm.tsv output/SRR1646026.kraken2.report_mpa.rspm.tsv output/SRR1646027.kraken2.report_mpa.rspm.tsv output/SRR1646028.kraken2.report_mpa.rspm.tsv output/SRR1646029.kraken2.report_mpa.rspm.tsv output/SRR1646030.kraken2.report_mpa.rspm.tsv output/SRR1646031.kraken2.report_mpa.rspm.tsv output/SRR1646032.kraken2.report_mpa.rspm.tsv output/SRR1646033.kraken2.report_mpa.rspm.tsv output/SRR1646034.kraken2.report_mpa.rspm.tsv output/SRR1646035.kraken2.report_mpa.rspm.tsv output/SRR1646036.kraken2.report_mpa.rspm.tsv output/SRR1646037.kraken2.report_mpa.rspm.tsv output/SRR1646038.kraken2.report_mpa.rspm.tsv output/SRR1646039.kraken2.report_mpa.rspm.tsv output/SRR1646040.kraken2.report_mpa.rspm.tsv output/SRR1646041.kraken2.report_mpa.rspm.tsv output/SRR1646042.kraken2.report_mpa.rspm.tsv output/SRR1646043.kraken2.report_mpa.rspm.tsv output/SRR1646044.kraken2.report_mpa.rspm.tsv output/SRR1646045.kraken2.report_mpa.rspm.tsv output/SRR1646046.kraken2.report_mpa.rspm.tsv output/SRR1646047.kraken2.report_mpa.rspm.tsv output/SRR1804664.kraken2.report_mpa.rspm.tsv output/SRR1804823.kraken2.report_mpa.rspm.tsv output/SRR512767.kraken2.report_mpa.rspm.tsv output/SRR513165.kraken2.report_mpa.rspm.tsv output/SRR513768.kraken2.report_mpa.rspm.tsv output/SRR513775.kraken2.report_mpa.rspm.tsv output/SRR513828.kraken2.report_mpa.rspm.tsv output/SRR514202.kraken2.report_mpa.rspm.tsv output/SRR514239.kraken2.report_mpa.rspm.tsv output/SRR514306.kraken2.report_mpa.rspm.tsv output/SRR514329.kraken2.report_mpa.rspm.tsv output/SRS011247.kraken2.report_mpa.rspm.tsv output/SRS011310.kraken2.report_mpa.rspm.tsv output/SRS013252.kraken2.report_mpa.rspm.tsv output/SRS013506.kraken2.report_mpa.rspm.tsv output/SRS013942.kraken2.report_mpa.rspm.tsv output/SRS013945.kraken2.report_mpa.rspm.tsv output/SRS013949.kraken2.report_mpa.rspm.tsv output/SRS013950.kraken2.report_mpa.rspm.tsv output/SRS014107.kraken2.report_mpa.rspm.tsv output/SRS014468.kraken2.report_mpa.rspm.tsv output/SRS014477.kraken2.report_mpa.rspm.tsv output/SRS014578.kraken2.report_mpa.rspm.tsv output/SRS014691.kraken2.report_mpa.rspm.tsv output/SRS014692.kraken2.report_mpa.rspm.tsv output/SRS015055.kraken2.report_mpa.rspm.tsv output/SRS015063.kraken2.report_mpa.rspm.tsv output/SRS015064.kraken2.report_mpa.rspm.tsv output/SRS015436.kraken2.report_mpa.rspm.tsv output/SRS015799.kraken2.report_mpa.rspm.tsv output/SRS016331.kraken2.report_mpa.rspm.tsv output/SRS017445.kraken2.report_mpa.rspm.tsv output/SRS017814.kraken2.report_mpa.rspm.tsv output/SRS018359.kraken2.report_mpa.rspm.tsv output/SRS018665.kraken2.report_mpa.rspm.tsv output/SRS019029.kraken2.report_mpa.rspm.tsv output/SRS019120.kraken2.report_mpa.rspm.tsv output/SRS019124.kraken2.report_mpa.rspm.tsv output/SRS019129.kraken2.report_mpa.rspm.tsv output/SRS019587.kraken2.report_mpa.rspm.tsv output/SRS024281.kraken2.report_mpa.rspm.tsv output/SRS043239.kraken2.report_mpa.rspm.tsv output/SRS047100.kraken2.report_mpa.rspm.tsv output/SRS051930.kraken2.report_mpa.rspm.tsv output/SRS052874.kraken2.report_mpa.rspm.tsv output/SRS056892.kraken2.report_mpa.rspm.tsv output/SRS058105.kraken2.report_mpa.rspm.tsv output/SRS063215.kraken2.report_mpa.rspm.tsv output/VLC001.A0101.kraken2.report_mpa.rspm.tsv output/VLC002.A0101.kraken2.report_mpa.rspm.tsv output/VLC003.A0101.kraken2.report_mpa.rspm.tsv output/VLC004.A0101.kraken2.report_mpa.rspm.tsv output/VLC005.A0101.kraken2.report_mpa.rspm.tsv output/VLC008.A0101.kraken2.report_mpa.rspm.tsv output/VLC009.A0101.kraken2.report_mpa.rspm.tsv output/VLC010.A0101.kraken2.report_mpa.rspm.tsv -o ../../../05-results.backup/combined.kraken2.report_mpa.rspm.tsv
+
+# make a separate table for the HMP data b/c the species names have underscores and the more recent data doesn't
+# so the program treats them as different entries and all species are doubled
+# combine these tables with the rest of the data in R, and need to change in the HMP files k__ to d__
+/mnt/archgen/users/velsko/bin/krakenTools/combine_mpa.py -i ../output/RefSeqOnly/SRR061192.report_mpa.rs.kraken ../output/RefSeqOnly/SRR061294.report_mpa.rs.kraken ../output/RefSeqOnly/SRR061320.report_mpa.rs.kraken ../output/RefSeqOnly/SRR061365.report_mpa.rs.kraken ../output/RefSeqOnly/SRR061562.report_mpa.rs.kraken ../output/RefSeqOnly/SRR062083.report_mpa.rs.kraken ../output/RefSeqOnly/SRR062298.report_mpa.rs.kraken ../output/RefSeqOnly/SRR062299.report_mpa.rs.kraken ../output/RefSeqOnly/SRR063517.report_mpa.rs.kraken ../output/RefSeqOnly/SRR1804664.report_mpa.rs.kraken ../output/RefSeqOnly/SRR1804823.report_mpa.rs.kraken ../output/RefSeqOnly/SRR512767.report_mpa.rs.kraken ../output/RefSeqOnly/SRR513165.report_mpa.rs.kraken ../output/RefSeqOnly/SRR513768.report_mpa.rs.kraken ../output/RefSeqOnly/SRR513775.report_mpa.rs.kraken ../output/RefSeqOnly/SRR513828.report_mpa.rs.kraken ../output/RefSeqOnly/SRR514202.report_mpa.rs.kraken ../output/RefSeqOnly/SRR514239.report_mpa.rs.kraken ../output/RefSeqOnly/SRR514306.report_mpa.rs.kraken ../output/RefSeqOnly/SRR514329.report_mpa.rs.kraken -o ../../../05-results.backup/hmp.kraken2.report_mpa.rs.tsv 
+/mnt/archgen/users/velsko/bin/krakenTools/combine_mpa.py -i ../output/RefSeqPasolliMAGs/SRR061192.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR061294.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR061320.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR061365.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR061562.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR062083.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR062298.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR062299.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR063517.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR1804664.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR1804823.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR512767.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR513165.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR513768.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR513775.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR513828.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR514202.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR514239.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR514306.report_mpa.rspm.kraken ../output/RefSeqPasolliMAGs/SRR514329.report_mpa.rspm.kraken -o ../../../05-results.backup/hmp.kraken2.report_mpa.rspm.tsv 
+
+# Note that this doesn't use file names for column headers, but instead adds 'Sample #1' 'Sample #2' etc, so names will need to be added back somehow
+# either in commandline or in R
+
+# copy into 05-results.backup
+cp combined.kraken2.report_mpa.rs.tsv ../../../05-results.backup/
+cp combined.kraken2.report_mpa.rspm.tsv ../../../05-results.backup/
+
+# count the number of classified/unclassified reads
+# classified
+for f in output/*.kraken2.output.rs.tsv; do grep "^C" $f | grep -v "taxid 0" | wc -l >> classified.kraken2.output.rs.tsv; done
+for f in output/*.kraken2.output.rspm.tsv; do grep "^C" $f | grep -v "taxid 0" | wc -l >> classified.kraken2.output.rspm.tsv; done
+# for f in ../output/RefSeqOnly/*.output.1.rso.kraken; do grep "^C" $f | grep -v "taxid 0" | wc -l >> classified.kraken2.output.rs.tsv; done
+# for f in ../output/RefSeqPasolliMAGs/*.output.1.rspm.kraken; do grep "^C" $f | grep -v "taxid 0" | wc -l >> classified.kraken2.output.rspm.tsv; done
+
+# unclassified
+for f in output/*.kraken2.output.rs.tsv; do grep "^U" $f | wc -l >> unclassified.kraken2.output.rs.tsv; done
+for f in output/*.kraken2.output.rspm.tsv; do grep "^U" $f | wc -l >> unclassified.kraken2.output.rspm.tsv; done
+# for f in ../output/RefSeqOnly/*.output.1.rso.kraken; do grep "^U" $f | wc -l >> unclassified.kraken2.output.rs.tsv; done
+# for f in ../output/RefSeqPasolliMAGs/*.output.1.rspm.kraken; do grep "^U" $f | wc -l >> unclassified.kraken2.output.rspm.tsv; done
+
+# marked classified but at the root (taxid 0) - add to unclassified
+for f in output/*.kraken2.output.rs.tsv; do grep "^C" $f | grep "taxid 0" | wc -l >> classified0.kraken2.output.rs.tsv; done
+for f in output/*.kraken2.output.rspm.tsv; do grep "^C" $f | grep "taxid 0" | wc -l >> classified0.kraken2.output.rspm.tsv; done
+# for f in ../output/RefSeqOnly/*.output.1.rso.kraken; do grep "^C" $f | awk '{print $3"\t"$1}' | grep "^0" | wc -l >> classified0.kraken2.output.rs.tsv; done
+# for f in ../output/RefSeqPasolliMAGs/*.output.1.rspm.kraken; do grep "^C" $f | awk '{print $3"\t"$1}' | grep "^0" | wc -l >> classified0.kraken2.output.rspm.tsv; done
+
+# get the list of samples
+ls *.kraken2.output.rs.tsv | sed 's/\.kraken2\.output\.rs\.tsv//g' | sed 's/\.SG1//g' > ../sampleorder.rs.list
+ls *.kraken2.output.rspm.tsv | sed 's/\.kraken2\.output\.rspm\.tsv//g' | sed 's/\.SG1//g' > ../sampleorder.rspm.list
+# ls ../output/RefSeqOnly/*.report.rs.kraken | sed 's/\.report\.rs\.kraken//g' | sed 's/\.\.\/output\/RefSeqOnly\///g' >> sampleorder.rs.list
+# ls ../output/RefSeqPasolliMAGs/*.report.rspm.kraken | sed 's/\.report\.rspm\.kraken//g' | sed 's/\.\.\/output\/RefSeqPasolliMAGs\///g' >> sampleorder.rspm.list
+
+# paste files together
+paste sampleorder.rs.list classified.kraken2.output.rs.tsv unclassified.kraken2.output.rs.tsv classified0.kraken2.output.rs.tsv > ../../../05-results.backup/read_classification_stats.rs.tsv
+paste sampleorder.rs.list classified.kraken2.output.rspm.tsv unclassified.kraken2.output.rspm.tsv classified0.kraken2.output.rspm.tsv > ../../../05-results.backup/read_classification_stats.rspm.tsv
+
+####
+# Now use this to compare bacteriodes/prevotella or firmicutes/bacteriodetes
+
+
+
+
+###########################
+
+
 
 ###########################
 To download oral bacteriophage sequences from MG-RAST
@@ -506,15 +636,14 @@ https://bacdive.dsmz.de/advsearch?site=advsearch&searchparams%5B42%5D%5Bsearchte
 
 nextflow run nf-core/eager \
 -r 2.2.1 \
--profile microbiome_screening,shh \
+-profile microbiome_screening,sdag,shh \
 --outdir /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/eager2 \
 -work-dir /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/work \
 --input /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/cmc_eager2.tsv \
 --complexity_filter_poly_g \
 --fasta /projects1/Reference_Genomes/Human/HG19/hg19_complete.fasta \
 --bwa_index /projects1/Reference_Genomes/Human/HG19/ \
---bwaalnn 0.02 \
---bwaalnl 1024 \
+--bwaalnn 0.04 \
 --hostremoval_input_fastq \
 --hostremoval_mode remove \
 --skip_damage_calculation \
@@ -530,9 +659,8 @@ nextflow run nf-core/eager \
 # of 2 samples, one of which is in the batch with mixed indices. This means that when the raw 
 # read data was demultiplexed, the readsets with indices from this batch were assigned the wrong sequencing ID. 
 
-# This was corrected in Pandora and the reads de-multiplexed to have the correct ID assigned to each raw read set.
+# This was corrected in Pandora HOWEVER the reads were NOT de-multiplexed to have the correct ID assigned to each raw read set.
 
-# Rather than re-run all analyses with the newly demultiplexed data, which would take several months, 
 # the sample names were corrected in the names of all output files in 04-analysis folders. 
 
 # For MALT and AADDER tables, the re-named rma6 files were uploaded into MEGAN. New .megan comparison 
@@ -557,6 +685,284 @@ CMC042.B0101	CMC036.A0101
 CMC008.A0101	CMC042.B0101
 CMC016.A0101	CMC016.B0101
 CMC016.A0102	CMC016.A0101
+
+# Somehow the rma6 file for CMC017.B0102 is gone, and this needs to be added back by taking it from the original files.
+# Open both in OfficeLibre, copy from the original file, and paste into the _corrected.txt file
+# At the same time, delete the Comparison column, I don't know why it's there
+
+~/.aspera/cli/bin/ascp -QT -l100M -L /projects1/clusterhomes/velsko /projects1/microbiome_calculus/Cameroon_plaque/01-data/eager2_for_ENA/correct_IDs_for_ENA_upload/*.gz Webin-42290@webin.ebi.ac.uk:/Cameroon_modern_plaque
+
+ERA3418006
+
+
+####################################
+
+CMC library 2nd round shotgun screening (SG2)
+
+# run on sdag instead
+
+nextflow pull nf-core/eager -r 2.3.4
+
+nextflow run nf-core/eager \
+-r 2.3.4 \
+-profile shh,singularity,microbiome_screening \
+--outdir /projects1/users/velsko/Cameroon_plaque/SG2/eager2 \
+-work-dir /projects1/users/velsko/Cameroon_plaque/SG2/SG2/work \
+--input /projects1/users/velsko/Cameroon_plaque/SG2/cmc_SG2_eager2tsv.tsv \
+--fasta /projects1/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--seq_dict /projects1/Reference_Genomes/Human/HG19/hg19_complete.dict \
+--bwa_index /projects1/Reference_Genomes/Human/HG19/ \
+--bwaalnn 0.02 \
+--bwaalnl 1024 \
+--run_bam_filtering \
+--bam_unmapped_type fastq \
+--hostremoval_input_fastq \
+--hostremoval_mode remove \
+--skip_damage_calculation \
+--skip_qualimap \
+--email velsko@shh.mpg.de \
+-name cmc_sg2 \
+-with-tower
+
+
+# run both SG2 and SG3 together on sdag
+
+nextflow pull nf-core/eager -r 70e3d27 # for 2.3.5
+
+nextflow run nf-core/eager \
+-r 2.3.5 \
+-profile shh,singularity,microbiome_screening \
+--outdir /projects1/users/velsko/Cameroon_plaque/SG23/eager2 \
+-work-dir /projects1/users/velsko/Cameroon_plaque/SG23/work \
+--input /projects1/users/velsko/Cameroon_plaque/SG23/CMC_sg2_sg3_eager2.tsv \
+--fasta /projects1/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--seq_dict /projects1/Reference_Genomes/Human/HG19/hg19_complete.dict \
+--bwa_index /projects1/Reference_Genomes/Human/HG19/ \
+--bwaalnn 0.02 \
+--bwaalnl 1024 \
+--run_bam_filtering \
+--bam_unmapped_type fastq \
+--hostremoval_input_fastq \
+--hostremoval_mode remove \
+--skip_damage_calculation \
+--email velsko@shh.mpg.de \
+-name cmc_sg23 \
+-with-tower
+
+
+
+
+
+####################################
+# Process everything together to re-run all analyses
+
+# First get a list of all sequenced data from sidora/Pandora
+# Be sure to remove the NanoPore entries and the 6 deeply sequenced libraries
+
+library(sidora.core)
+library(data.table)
+library(tidyverse)
+con <- get_pandora_connection("~/.credentials_sidora")
+df_list <- get_df_list(c(
+  "TAB_Library", "TAB_Capture", "TAB_Sequencing"
+), con = con)
+lib_info <- join_pandora_tables(df_list)
+lib_info <- convert_all_ids_to_values(lib_info, con)
+cmc_list <- lib_info %>% filter(str_detect(library.Full_Library_Id, "CMC")) %>% select(library.Full_Library_Id, library.Protocol, sequencing.Full_Sequencing_Id, library.Batch) %>% 
+  filter(!str_detect(library.Protocol, "Oxford"),
+         !str_detect(library.Batch, "Li13")) %>%
+  select(sequencing.Full_Sequencing_Id) %>%
+  arrange(sequencing.Full_Sequencing_Id)
+
+blanks <- lib_info %>% filter(str_detect(library.Full_Library_Id, "CMC")) %>% select(library.Full_Library_Id, library.Protocol, sequencing.Full_Sequencing_Id, library.Batch) %>% 
+  filter(!str_detect(library.Protocol, "Oxford"),
+         !str_detect(library.Batch, "Li13")) %>%
+  select(library.Batch) %>%
+  distinct()
+
+blank_list <- lib_info %>%
+  filter(str_detect(sequencing.Full_Sequencing_Id, "EXB|LIB")) %>%
+  mutate(library.Batch = ifelse(library.Batch == "",NA,library.Batch)) %>%
+  select(library.Batch, sequencing.Full_Sequencing_Id) %>%
+  inner_join(., blanks) %>%
+  select(sequencing.Full_Sequencing_Id)
+  
+cmc_list <- cmc_list %>%
+  bind_rows(., blank_list) %>%
+  drop_na()
+    
+fwrite(cmc_list, "/mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/combined/sequencing_list.tsv", sep = "\t", col.names = F, quote = F)
+
+# now generate an eager2 input file
+# here /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/combined
+/mnt/archgen/tools/pandora2eager/beta/pandora2eager.sif /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/combined/sequencing_list.tsv > all_cmc_eager2_input.tsv
+
+# remove these b/c they have no associated sequencing data: CMC025.B0201.SG1, CMC016.B0101.SG1
+# adjust the entries in the Library_ID column to remove the .SG1.X in the hopes that this means that the data will be merged for the MALT run
+# also need to adjust the Library_IDs for the library batch where the indices got swapped
+# then add the non-plaque oral samples (buccal mucosa, saliva, calculus) (use /mnt/archgen/tools/pandora2eager/0.2.1-beta/pandora2eager.sh calculus_list.tsv > calculus_eager2_table.tsv)
+# this is the non-plaque samples (saliva HMP, saliva Lassalle, buccal mucosa HMP, buccal mucosa Clemente, calculus JAE, calculus VLC)
+
+nextflow pull nf-core/eager -r 2.4.0
+
+NXF_VER="21.04.2" nextflow run nf-core/eager \
+-r 2.4.0 \
+-profile eva,archgen,big_data,malt_big \
+-c /mnt/archgen/users/velsko/nextflow/eva_big_malt.config \
+--outdir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/eager2 \
+-work-dir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/work \
+--input /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/all_cmc_eager2_input.tsv \
+--complexity_filter_poly_g \
+--fasta /mnt/archgen/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--seq_dict /mnt/projects1/Reference_Genomes/Human/HG19/hg19_complete.dict \
+--bwa_index /mnt/archgen/Reference_Genomes/Human/HG19/ \
+--run_bam_filtering \
+--bam_unmapped_type fastq \
+--skip_damage_calculation \
+--skip_qualimap \
+--run_metagenomic_screening \
+--metagenomic_tool malt \
+--database /mnt/archgen/microbiome_sciences/reference_databases/built/refseq/bacteria_archea_homo_20181122/malt/refseq-bac-arch-homo-2018_11 \
+--malt_sam_output \
+--email irina_marie_velsko@eva.mpg.de \
+-name cmc_all_combined \
+-with-tower
+
+# Resumed as "tiny_carson" 
+# resumed as "maniac_allen"
+CMC046.B0201
+Num. of queries:   12017427
+Aligned queries:    9574829
+Num. alignments:   76981736
+# malt job 1413430
+# resumed as "stupefied_bartik"
+# malt job 1556509
+
+# Need to run eager2 on the supragingival and subgingival plaque samples b/c they were missed in the other run
+nextflow pull nf-core/eager -r 2.4.0
+
+NXF_VER="21.04.2" nextflow run nf-core/eager \
+-r 2.4.0 \
+-profile eva,archgen,big_data,malt_big \
+-c /mnt/archgen/users/velsko/nextflow/eva_big_malt.config \
+--outdir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/hmp_pq_eager2 \
+-work-dir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/hmp_pq_work \
+--input /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined/hmp_pq_eager2.tsv \
+--complexity_filter_poly_g \
+--fasta /mnt/archgen/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--seq_dict /mnt/projects1/Reference_Genomes/Human/HG19/hg19_complete.dict \
+--bwa_index /mnt/archgen/Reference_Genomes/Human/HG19/ \
+--run_bam_filtering \
+--bam_unmapped_type fastq \
+--skip_damage_calculation \
+--skip_qualimap \
+--run_metagenomic_screening \
+--metagenomic_tool malt \
+--database /mnt/archgen/microbiome_sciences/reference_databases/built/refseq/bacteria_archea_homo_20181122/malt/refseq-bac-arch-homo-2018_11 \
+--malt_sam_output \
+--email irina_marie_velsko@eva.mpg.de \
+-name hmp_pq \
+-with-tower
+
+# b/c Rigo switched MALT over to bigmem, eager crashed and didn't finish
+# copy all .rma6 and .ssam.gz files from work into the main output folder and make a multiqc folder
+# then run multiqc
+mkdir multiqc
+cd multiqc
+multiqc --config /r1/people/irina_marie_velsko/.nextflow/assets/nf-core/eager/assets/multiqc_config.yaml ..
+
+# then clean up the work folder
+
+# then load into MEGAN and get species tables
+
+####################################
+# Run the data through Kraken2 instead of MALT for time issues
+
+# build a normal kraken2 db w/only bacteria and archaea and human
+# run in /mnt/archgen/microbiome_calculus/Cameroon_plaque/04-analysis/kraken/all_data_combined/databases/
+kraken2-build --download-taxonomy --db bact_arch_06122021
+# correct line 46 in rsync_from_ncbi.pl to change ftp to https
+kraken2-build --download-library bacteria --db bact_arch_06122021
+kraken2-build --download-library archaea --db bact_arch_06122021
+kraken2-build --download-library human --db bact_arch_06122021
+
+### 
+# Various errors that I finally didn't have
+# rsync_from_ncbi.pl: unexpected FTP path (new server?) for https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/128/725/GCF_900128725.1_BCifornacula_v1.0
+awk -v FS='\t' '$20 != "na" {print $0}' bact_arch_06122021/library/bacteria/assembly_summary.txt > bact_arch_06122021/library/bacteria/new_assembly_summary.txt
+mv bact_arch_06122021/library/bacteria/assembly_summary.txt bact_arch_06122021/library/bacteria/assembly_summary_original.txt
+cp bact_arch_06122021/library/bacteria/new_assembly_summary.txt bact_arch_06122021/library/bacteria/assembly_summary.txt
+# The script isn't completing b/c of this rsync error. After the above correction and re-running, it just gives the same error
+# rsync: change_dir "/refseq/archaea" (in genomes) failed: No such file or directory (2)
+# rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1816) [Receiver=3.2.3]
+# Error downloading assembly summary file for archaea, exiting.
+# https://github.com/DerrickWood/kraken2/issues/532#issuecomment-984502061 to fix issue
+# then the same rsync error as above, fixed the same way
+awk -v FS='\t' '$20 != "na" {print $0}' bact_arch_06122021/library/archaea/assembly_summary.txt > bact_arch_06122021/library/archaea/new_assembly_summary.txt
+mv bact_arch_06122021/library/archaea/assembly_summary.txt bact_arch_06122021/library/archaea/assembly_summary_original.txt
+cp bact_arch_06122021/library/archaea/new_assembly_summary.txt bact_arch_06122021/library/archaea/assembly_summary.txt
+###
+
+# add additional MAGS to a library (for comparison w/ and w/o MAGs)
+kraken2-build --add-to-library chr1.fa --db $DBNAME
+# or
+for file in chr*.fa
+do
+    kraken2-build --add-to-library $file --db $DBNAME
+done
+# or
+find genomes/ -name '*.fa' -print0 | xargs -0 -I{} -n1 kraken2-build --add-to-library {} --db $DBNAME
+
+# then actually build the database
+kraken2-build --build --db bact_arch_06122021 --threads 8 &> kraken_std_db_build.log &
+
+# build the database with this
+snakemake -s ../../../../02-scripts.backup/kraken2_all_data_combined.Snakefile --cluster-config /mnt/archgen/microbiome_calculus/abpCapture/02-scripts.backup/snakemake_default.config --cluster "qsub -pe smp 32 -l virtual_free={cluster.mem},h_vmem={cluster.mem} -o {cluster.out} -e {cluster.err}" -j 1 --latency-wait 20 -n
+
+
+# and classify
+kraken2 --db $DBNAME \
+seqs.fa \
+--threads 32 \
+--output <filename> \
+--report <filename> \
+--report-zero-counts \
+--use-mpa-style \
+--use-names  \
+--gzip-compressed
+
+
+###############################################################
+# download additional oral samples with aspera
+# example: /mnt/archgen/microbiome_sciences/raw_data/public/eisenhoffer2020/download_aspera.sh
+~/.aspera/cli/bin/ascp -QT -l 300m -P33001 -i ~/.aspera/cli/etc/asperaweb_id_dsa.openssh era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/ERR164/ERR164407/ERR164407.fastq.gz /mnt/archgen/microbiome_sciences/raw_data/public/ottoni2021
+
+
+###############################################################
+# upload data to ENA
+###############################################################
+# run all data through eager w/o collapse here /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined
+
+# input tsv
+all_cmc_eager2_input_not_collapsed.tsv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
