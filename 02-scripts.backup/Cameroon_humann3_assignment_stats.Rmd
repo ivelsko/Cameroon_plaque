@@ -1,0 +1,519 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque HUMAnN3 assignment stats"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(decontam)
+library(data.table)
+library(vegan)
+library(ape)
+library(mixOmics)
+library(janitor)
+library(rstatix)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r}
+metadata_nofactors <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv") %>%
+  rename(SampleID = `#SampleID`)
+
+```
+
+
+```{r load_data}
+load("./05-results.backup/CMC_humann2_tables.RData")
+load("./05-results.backup/CMC_metadata.RData")
+
+# remove unmapped and ungrouped reads
+humann2_KOs <- humann2_KOs_full %>% 
+  filter(!str_detect(Ortholog, "UNMAPPED|UNGROUPED"))
+
+```
+
+
+```{r read_assignment_stats_tables}
+
+humann2_alignment_stats <- fread("./05-results.backup/humann2_alignment_stats.tsv")
+humann2_alignment_stats$SampleID <- gsub(".unmapped_genefamilies.tsv","", humann2_alignment_stats$SampleID)
+humann2_alignment_stats$SampleID <- gsub(".SG1","", humann2_alignment_stats$SampleID)
+
+humann2_alignment_stats <- humann2_alignment_stats %>%
+  arrange(SampleID) %>%
+  inner_join(., metadata %>% select(SampleID, Combined_Seq_Depth_NonHuman, Ethnic_Group, Village, Description), by = "SampleID") %>%
+  mutate(UnalignedReads = round(Combined_Seq_Depth_NonHuman*(UnalignedPct/100)),
+         AlignedReads = Combined_Seq_Depth_NonHuman - UnalignedReads, 
+         AlignedPct = 100 - UnalignedPct) %>%
+  select(SampleID, Combined_Seq_Depth_NonHuman, UnalignedReads, AlignedReads, UnalignedPct, AlignedPct, everything())
+
+humann2_alignment_stats_box <- humann2_alignment_stats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) %>%
+  ggplot(., aes(Village, AlignedPct, fill = Village)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2),
+    # ggpointgrid::geom_pointrect(scale_x = 0.5, scale_y = 0.5, alpha = 0.5) +
+    scale_fill_manual(values = Village_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Percent") +
+    ggtitle("Percent of reads aligned by HUMAnN2")
+humann2_alignment_stats_box
+
+# ggsave("./05-results.backup/presentation_pdfs/humann2_alignment_stats_box.pdf", plot = humann2_alignment_stats_box, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+humann2_alignment_stats_w <- humann2_alignment_stats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
+pairwise.wilcox.test(humann2_alignment_stats_w$AlignedPct, humann2_alignment_stats_w$Village, p.adjust.method = "fdr")
+
+```
+
+
+## Pathways Unintegrated/Unmapped
+```{r paths_un}
+# all unmapped/unintegrated Pathways
+h3_path_un <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  # adorn_totals(where = "row") %>%
+  pivot_longer(!Pathway, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(!str_detect(Library_ID, "EXB|LIB|10M|SRR164|ERR|SRS")) %>%
+  # fix the library IDs
+  mutate(Library_ID = str_replace_all(Library_ID, ".unmapped.Abundance",""),
+         Library_ID = str_replace_all(Library_ID, ".SG1","")) %>%
+  filter(Library_ID != "CMC032.B0101") %>%
+  mutate(together = ifelse(str_detect(Pathway, "UNMAPPED"), "UNMAPPED",
+                           ifelse(str_detect(Pathway, "UNINTEGRATED"), "UNINTEGRATED","Classified"))) %>%
+  group_by(Library_ID, together) %>%
+  summarize(Totals = sum(Counts)) %>%
+  left_join(., metadata_nofactors %>% 
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Market_integration_split), by = "Library_ID") %>%
+  ungroup()
+
+h3_path_un
+
+```
+
+
+```{r paths_un_plot}
+# all unmapped/unintegrated Pathways
+h3_path_un_plot <- h3_path_un  %>%
+   mutate(Market_integration_split = fct_relevel(Market_integration_split, "Logging road","Forest camp","Farming","Industrial plaque", "Industrial calculus")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Village) %>%
+              rename(Library_ID = SampleID), by = "Library_ID") %>%
+   ggplot(., aes(Market_integration_split, Totals, fill = Market_integration_split)) + # , fill = Market_integration_split
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2),
+    # ggpointgrid::geom_pointrect(scale_x = 0.05, scale_y = 0.18, alpha = 0.5) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_blank()) +
+    # theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    ylab("Copies per Million (CPM)") +
+    # scale_y_continuous(trans = 'log10') +
+    ggtitle("") +
+   facet_wrap(~together)
+h3_path_un_plot
+
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_h3_path_un_plot.pdf", plot = h3_path_un_plot, device = "pdf",
+       scale = 1, width = 10, height = 6, units = c("in"), dpi = 300)
+
+```
+
+### Stats for UN path tables
+Will need to be adjusted, just copied at this point
+```{r kruskal_paths}
+# test for significant differences in diversity between the metadata categories
+
+paths_kruskal_pvals <- h3_path_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~kruskal_test(data = .x, Totals ~ Market_integration_split)$p)) %>%
+  unnest(p.value)
+ 
+paths_kruskal_pvals
+
+```
+
+```{r wilcox_paths}
+
+paths_wilcox_pvals <- h3_path_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~wilcox_test(data = .x, Totals ~ Market_integration_split))) %>%
+  select(-data) %>%
+  unnest(p.value) %>%
+  bind_rows() %>%
+  select(-`.y.`) %>%
+  rename(HUMAnN3 = together) %>%
+  arrange(HUMAnN3, p.adj)
+ 
+paths_wilcox_pvals
+
+
+```
+
+```{r efsize_paths}
+# and check the effect size
+paths_wilcox_efs <- h3_path_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~wilcox_effsize(data = .x, Totals ~ Market_integration_split))) %>%
+  select(-data) %>%
+  unnest(p.value) %>%
+  bind_rows() %>%
+  select(-`.y.`) %>%
+  rename(HUMAnN3 = together)
+ 
+paths_wilcox_efs
+
+h3_paths_p_es <- paths_wilcox_pvals %>%
+  full_join(., paths_wilcox_efs, by = c("HUMAnN3","group1","group2","n1","n2")) %>%
+  select(HUMAnN3, everything()) %>%
+  arrange(HUMAnN3, p.adj)
+  
+h3_paths_p_es
+
+# fwrite(h3_species_p_es, "./06-publication/supplemental_tables/h3_paths_p_es.tsv", sep = "\t", quote = F)
+```
+
+
+## Gene families Ungrouped/Unmapped
+```{r genes_un}
+# all unmapped/ungrouped Gene Families
+h3_gf_un <- humann2_KOs_full %>%
+  filter(!str_detect(Ortholog, "\\|")) %>%
+  # adorn_totals(where = "row") %>%
+  pivot_longer(!Ortholog, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(!str_detect(Library_ID, "EXB|LIB|10M|SRR164|ERR|SRS")) %>%
+  # fix the library IDs
+  mutate(Library_ID = str_replace_all(Library_ID, ".unmapped.Abundance-RPKs",""),
+         Library_ID = str_replace_all(Library_ID, ".SG1","")) %>%
+  filter(Library_ID != "CMC032.B0101") %>%
+  mutate(together = ifelse(str_detect(Ortholog, "UNMAPPED"), "UNMAPPED",
+                           ifelse(str_detect(Ortholog, "UNGROUPED"), "UNGROUPED","Classified"))) %>%
+  group_by(Library_ID, together) %>%
+  summarize(Totals = sum(Counts)) %>%
+  ungroup() %>%
+  left_join(., metadata %>% 
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Market_integration_split), by = "Library_ID") %>%
+  mutate(Market_integration_split = fct_drop(Market_integration_split))
+
+```
+
+```{r}
+h3_gf_un_plot <- h3_gf_un %>%
+  mutate(Market_integration_split = fct_relevel(Market_integration_split, "Logging road", "Forest camp", "Farming", "Industrial plaque", "Industrial calculus")) %>%
+  ggplot(., aes(Market_integration_split, Totals, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    # ggpointgrid::geom_pointrect(scale_x = 0.16, scale_y = 0.18) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_blank()) +
+    ylab("Copies per Million (CPM)") +
+    # scale_y_continuous(trans = 'log10') +
+    ggtitle("") +
+    facet_wrap(~together)
+h3_gf_un_plot
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_h3_gf_un_plot.pdf", plot = h3_gf_un_plot, device = "pdf",
+       scale = 1, width = 9, height = 6, units = c("in"), dpi = 300)
+
+```
+
+### Stats for UN gene family tables
+Will need to be adjusted, just copied at this point
+```{r kruskal_paths}
+# test for significant differences in diversity between the metadata categories
+
+gf_kruskal_pvals <- h3_gf_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~kruskal_test(data = .x, Totals ~ Market_integration_split)$p)) %>%
+  unnest(p.value)
+ 
+gf_kruskal_pvals
+
+```
+
+```{r wilcox_paths}
+
+gf_wilcox_pvals <- h3_gf_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~wilcox_test(data = .x, Totals ~ Market_integration_split))) %>%
+  select(-data) %>%
+  unnest(p.value) %>%
+  bind_rows() %>%
+  arrange(p.adj) %>%
+  select(-`.y.`) %>%
+  rename(HUMAnN3 = together)
+ 
+gf_wilcox_pvals
+
+```
+
+```{r efsize_gf}
+# and check the effect size
+gf_wilcox_efs <- h3_gf_un %>%
+  group_by(together) %>%
+  nest() %>%
+  mutate(p.value = purrr::map(.x = data, .f = ~wilcox_effsize(data = .x, Totals ~ Market_integration_split))) %>%
+  select(-data) %>%
+  unnest(p.value) %>%
+  bind_rows() %>%
+  select(-`.y.`) %>%
+  rename(HUMAnN3 = together)
+ 
+gf_wilcox_efs
+
+h3_gf_p_es <- gf_wilcox_pvals %>%
+  full_join(., gf_wilcox_efs, by = c("HUMAnN3","group1","group2","n1","n2")) %>%
+  select(HUMAnN3, everything()) %>%
+  arrange(HUMAnN3, p.adj)
+  
+h3_gf_p_es
+
+# fwrite(h3_gf_p_es, "./06-publication/supplemental_tables/h3_gf_p_es.tsv", sep = "\t", quote = F)
+```
+
+## Pathways Identified
+How many pathways were identified in each of the groups? Are there significant
+differences?
+```{r pathways_boxes}
+
+# all pathways
+humann2_path_noblanks_long <- humann2_path %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-matches("SRR164|ERR|SRS|10M")) %>% # these plot with EXB and LIB controls in the PCA above
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Paths = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_path_noblanks_long_box <- humann2_path_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB")) %>%
+  ggplot(., aes(Market_integration_split, Paths, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    ylab("Number of pathways detected") +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=6)) +
+    ggtitle("Total number of pathways ID'd by HUMAnN2")
+humann2_path_noblanks_long_box
+
+# ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_total.pdf", plot = humann2_path_noblanks_long_box, device = "pdf",
+#        scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+
+humann2_path_noblanks_long_w <- humann2_path_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M")) 
+pairwise.wilcox.test(humann2_path_noblanks_long_w$Paths, humann2_path_noblanks_long_w$Market_integration_split, p.adjust.method = "fdr")
+
+# potential contaminant pathways removed
+humann2_path.decontam_noblanks_long <- humann2_path.decontam %>%
+  filter(!str_detect(Pathway, "\\|")) %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Paths = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_path.decontam_noblanks_long_box <- humann2_path.decontam_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164|ERR|SRS")) %>%
+  ggplot(., aes(Market_integration_split, Paths, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    ylab("Number of pathways detected") +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=6)) +
+    ggtitle("No. pathways after decontam")
+humann2_path.decontam_noblanks_long_box
+
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_decontam_box.pdf", plot = humann2_path.decontam_noblanks_long_box, device = "pdf",
+       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+
+humann2_path.decontam_noblanks_long_box_w <- humann2_path.decontam_noblanks_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164|ERR|SRS")) 
+pairwise.wilcox.test(humann2_path.decontam_noblanks_long_box_w$Paths, humann2_path.decontam_noblanks_long_box_w$Market_integration_split, p.adjust.method = "fdr")
+
+
+
+# mr1 pathways only
+mr1_paths <- fread("./05-results.backup/minres_oblimin_noblanks.fa_path.tsv")
+
+humann2_path.mr1_long <- humann2_path.decontam %>%
+  select(-matches("EXB|LIB|10M|SRS|ERR|SRR164")) %>%
+  inner_join(., mr1_paths %>%
+               filter(Residual == "MR1") %>%
+               rename(Pathway = Ortholog) %>%
+               select(Pathway), by = "Pathway") %>%
+  pivot_longer(!Pathway, names_to = "SampleID", values_to = "CPM") %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Pathway = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_path.mr1_long_box <- humann2_path.mr1_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB")) %>%
+  ggplot(., aes(Market_integration_split, Pathway, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    ylab("Number of pathways detected") +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=6)) +
+    ggtitle("Number of pathways in MR1")
+humann2_path.mr1_long_box
+
+ggsave("./06-publication/supplemental_figures/SXX26/panel_parts/SXX26_humann2_path_mr1.pdf", plot = humann2_path.mr1_long_box, device = "pdf",
+       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+
+humann2_path.mr1_long_box_w <- humann2_path.mr1_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164|ERR|SRS")) 
+pairwise.wilcox.test(humann2_path.mr1_long_box_w$Pathway, humann2_path.mr1_long_box_w$Market_integration_split, p.adjust.method = "fdr")
+
+
+```
+
+## Gene Families Identified
+```{r mr1_orthologs}
+# Now keep only the orthologs that are in MR1 from the factor analysis
+mr1_proteins <- fread("./05-results.backup/minres_oblimin_noblanks.fa_KO.tsv")
+
+```
+
+```{r orthologs_boxes}
+# use the full table
+humann2_KO_long <- humann2_KOs %>%
+  filter(!str_detect(Ortholog, "\\|")) %>%
+  select(-CMC032.B0101) %>% # this sample has very few reads
+  select(-c("SRR1646032","SRR1646041")) %>% # these plot with EXB and LIB controls in the PCA above
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Orthologs = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_KO_box <- humann2_KO_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M|SRS|ERR")) %>%
+  ggplot(., aes(Market_integration_split, Orthologs, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    ylab("Number of gene families detected") +
+    ggtitle("Total number of genes ID'd by HUMAnN2 (no filtering)")
+humann2_KO_box
+
+humann2_KO_long_w <- humann2_KO_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M|SRS|ERR")) 
+pairwise.wilcox.test(humann2_KO_long_w$Orthologs, humann2_KO_long_w$Market_integration_split, p.adjust.method = "fdr")
+
+# use the decontaminated table, with KOs identified as potential contaminants removed
+humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Orthologs = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M|SRS|ERR")) %>%
+  ggplot(., aes(Market_integration_split, Orthologs, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    ylab("Number of gene clusters detected") +
+    ggtitle("Number of genes ID'd by HUMAnN2 (decontaminated)")
+humann2_KOs.decontam_box
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_decontam.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
+       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+
+
+humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRS|ERR|SRR164")) 
+pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Market_integration_split, p.adjust.method = "fdr")
+
+# how many orthologs are in each group from the MR1 proteins?
+# use the decontaminated table, with KOs identified as potential contaminants removed
+humann2_KOs.decontam_long <- humann2_KOs.decontam %>%
+  select(-matches("EXB|LIB|10M|SRS|ERR|SRR164")) %>%
+  inner_join(., mr1_proteins %>%
+               filter(Residual == "MR1") %>%
+               select(Ortholog), by = "Ortholog") %>%
+  gather("SampleID","CPM", 2:ncol(.)) %>%
+  mutate_if(is.numeric, ~1 * (. != 0)) %>%
+  group_by(SampleID) %>%
+  summarize(Orthologs = sum(CPM)) %>%
+  inner_join(., metadata %>% select(SampleID, Ethnic_Group, Market_integration_split), by = "SampleID")
+
+humann2_KOs.decontam_box <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164|10M|SRS|ERR")) %>%
+  ggplot(., aes(Market_integration_split, Orthologs, fill = Market_integration_split)) +
+    geom_boxplot() +
+    geom_point(alpha = 0.5, size = 1, position = position_jitter(width = 0.2)) + # position = position_jitterdodge(jitter.width = 0.2), 
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(hjust = 0.5),
+          axis.text = element_text(size = 14)) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    ylab("Number of gene families detected") +
+    ggtitle("Number of gene clusters ID'd by HUMAnN2 in MR1")
+humann2_KOs.decontam_box
+
+ggsave("./06-publication/supplemental_figures/SXX27/panel_parts/SXX27_humann2_ko_mr1.pdf", plot = humann2_KOs.decontam_box, device = "pdf",
+       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+
+humann2_KOs.decontam_long_w <- humann2_KOs.decontam_long %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRS|ERR|SRR164")) 
+pairwise.wilcox.test(humann2_KOs.decontam_long_w$Orthologs, humann2_KOs.decontam_long_w$Market_integration_split, p.adjust.method = "fdr")
+
+```
+
+
+
+
+
+

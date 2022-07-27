@@ -1,0 +1,884 @@
+---
+title: "Cameroon plaque - Kraken RefSeq database w/ & w/o Pasolli MAGs taxonomy"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+Load data files 
+```{r load_data}
+# get the sample names from here
+rs_readstats <- fread("./05-results.backup/read_classification_stats.rs.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
+
+```
+
+```{r full_data}
+# all data except original HMP plaque
+rs_mpa_full <- fread("./05-results.backup/combined.kraken2.report_mpa.rs.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleNo", values_to = "Counts") %>%
+  pivot_wider(names_from = "Taxonomy", values_from = "Counts") %>%
+  bind_cols(., rs_readstats %>%
+              select(SampleID)) %>%
+  select(-SampleNo) %>%
+  select(SampleID, everything()) %>%
+  pivot_longer(!SampleID, names_to = "Taxonomy", values_to = "Counts") %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts")
+
+rspm_mpa_full <- fread("./05-results.backup/combined.kraken2.report_mpa.rspm.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleNo", values_to = "Counts") %>%
+  pivot_wider(names_from = "Taxonomy", values_from = "Counts") %>%
+  bind_cols(., rs_readstats %>%
+              select(SampleID)) %>%
+  select(-SampleNo) %>%
+  select(SampleID, everything()) %>%
+  pivot_longer(!SampleID, names_to = "Taxonomy", values_to = "Counts") %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts")
+
+rs_mpa_sp <- rs_mpa_full %>%
+  filter(str_detect(Taxonomy, "s__"),
+         !str_detect(Taxonomy, "t__"))
+
+rspm_mpa_sp <- rspm_mpa_full %>%
+  filter(str_detect(Taxonomy, "s__"),
+         !str_detect(Taxonomy, "t__"))
+
+```
+
+```{r old_hmp_data, eval = F}
+# RS read in and clean up for species
+rs_mpa_hmp_full <- fread("./05-results.backup/hmp.kraken2.report_mpa.rs.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(SampleID = str_replace_all(SampleID, ".report.rs.kraken",""),
+         Taxonomy = str_replace_all(Taxonomy, "k__","d__")) %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts") %>%
+  # need to fill in missing taxonomic levels in the taxonomy here to make the format better match the new kraken taxonomy
+  mutate(Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|c__","d__Bacteria\\|p__\\|c__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|o__","d__Bacteria\\|p__\\|c__\\|o__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|f__","d__Bacteria\\|p__\\|c__\\|o__\\|f__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|g__","d__Bacteria\\|p__\\|c__\\|o__\\|f__\\|g__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|s__","d__Bacteria\\|p__\\|c__\\|o__\\|f__\\|g__\\|s__"))
+
+rs_mpa_hmp_sp <- rs_mpa_hmp_full %>%
+  # select only bacteria, then only species-level assignments
+  filter(str_detect(Taxonomy, "d__Bacteria"),
+         str_detect(Taxonomy, "s__")) %>%
+  # now replace the underscores in the species names with spaces so they can be combined with the other table
+  separate(Taxonomy, into = c("Domain","Phylum","Class","Order","Family","Genus","Species"), sep = "\\|") %>%
+  # some species still dont have the complete taxonomic lineage and it needs to be added
+  # for now we'll just take the species names and we'll combine with the other tables using just the species names
+  mutate(Species = ifelse(is.na(Species) & str_detect(Phylum, "s__"), Phylum,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Class, "s__"), Class,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Order, "s__"), Order,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Family, "s__"), Family,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Genus, "s__"), Genus,Species)) %>%
+  select(-c("Domain","Phylum","Class","Order","Family","Genus")) %>%
+  mutate(Species = str_replace_all(Species, "s__",""),
+         Species = str_replace_all(Species, "_"," ")) %>%
+  arrange(Species)
+
+
+# RSPM read in and clean up for species
+rspm_mpa_hmp_full <- fread("./05-results.backup/hmp.kraken2.report_mpa.rspm.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(SampleID = str_replace_all(SampleID, ".report.rspm.kraken",""),
+         Taxonomy = str_replace_all(Taxonomy, "k__","d__")) %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts") %>%
+  # need to fill in missing taxonomic levels in the taxonomy here to make the format better match the new kraken taxonomy
+  mutate(Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|c__","d__Bacteria\\|p__\\|c__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|o__","d__Bacteria\\|p__\\|c__\\|o__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|f__","d__Bacteria\\|p__\\|c__\\|o__\\|f__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|g__","d__Bacteria\\|p__\\|c__\\|o__\\|f__\\|g__"),
+         Taxonomy = str_replace_all(Taxonomy, "d__Bacteria\\|s__","d__Bacteria\\|p__\\|c__\\|o__\\|f__\\|g__\\|s__"))
+
+rspm_mpa_hmp_sp <- rspm_mpa_hmp_full %>%
+  # select only bacteria, then only species-level assignments
+  filter(str_detect(Taxonomy, "d__Bacteria"),
+         str_detect(Taxonomy, "s__")) %>%
+  # now replace the underscores in the species names with spaces so they can be combined with the other table
+  separate(Taxonomy, into = c("Domain","Phylum","Class","Order","Family","Genus","Species"), sep = "\\|") %>%
+  # some species still dont have the complete taxonomic lineage and it needs to be added
+  # for now we'll just take the species names and we'll combine with the other tables using just the species names
+  mutate(Species = ifelse(is.na(Species) & str_detect(Phylum, "s__"), Phylum,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Class, "s__"), Class,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Order, "s__"), Order,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Family, "s__"), Family,Species)) %>%
+  mutate(Species = ifelse(is.na(Species) & str_detect(Genus, "s__"), Genus,Species)) %>%
+  select(-c("Domain","Phylum","Class","Order","Family","Genus")) %>%
+  mutate(Species = str_replace_all(Species, "s__",""),
+         Species = str_replace_all(Species, "_"," ")) %>%
+  arrange(Species)
+
+
+```
+
+
+```{r}
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+## Taxonomic level differences
+```{r}
+phyla_abd <- rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus")) %>%
+  group_by(Phylum) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  filter(mean_prop_rs >= 0.00005) %>%
+  select(Phylum) %>%
+  pull()
+
+
+
+oral_phyla <- rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+  str_detect(Taxonomy, "p__")) %>% 
+  select(Taxonomy) %>%
+  filter(str_detect(Taxonomy, "Actinobacteria|Bacteroidetes|Chlamydiae|Chloroflexi|Euryarchaeota|Firmicutes|Fusobacteria|Proteobacteria|Spirochaetes|Gracilibacteria|Synergistetes|Tenericutes|Saccharibacteria")) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  arrange(Phylum) %>%
+  pull()
+
+```
+
+
+```{r phylum_changes}
+rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry)) %>%
+  # remove bad sample
+  filter(!str_detect(SampleID, "CMC032.B0101|SRR514202"))  %>%
+  group_by(Market_integration_split, Phylum) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+                   str_detect(Taxonomy, "p__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+            select(-domain) %>%
+            adorn_percentages(denominator = "col") %>%
+            pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+            # remove bad sample
+            filter(!str_detect(SampleID, "CMC032.B0101|SRR514202"))  %>%
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            group_by(Market_integration_split, Phylum) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus"),
+         # log_fold_change >= 1 | log_fold_change <= -1,
+         Phylum %in% oral_phyla # phyla_abd (phyla with a proportion  >= 0.00005 in all groups)
+         ) %>%
+  mutate(Phylum = str_replace_all(Phylum, "p__",""),
+         Market_integration_split = fct_drop(Market_integration_split),
+         Phylum = fct_relevel(Phylum, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Gracilibacteria","Candidatus Saccharibacteria","Chlamydiae","Euryarchaeota","Spirochaetes","Synergistetes","Chloroflexi","Tenericutes")) %>%
+  ggplot(., aes(x = Phylum, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+    theme_minimal() +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("") +
+    ylab("log10(Fold chang)e")
+
+```
+
+
+```{r synergistetes}
+rs_mpa_full %>%
+  # get only genus-level entries
+  filter(str_detect(Taxonomy, "g__"), # str_detect(Taxonomy, "p__Synergistetes")
+         !str_detect(Taxonomy, "s__")) %>%
+  arrange(Taxonomy) %>%
+  # convert counts to percents
+  adorn_percentages(denominator = "col") %>%
+  # filter for only p__Synergistetes
+  filter(str_detect(Taxonomy, "p__Synergistetes")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus"), sep = "\\|", extra = "merge") %>%
+  mutate(Genus = ifelse(is.na(Genus) & str_detect(Phylum, "g__"), Phylum,Genus)) %>%
+  mutate(Genus = ifelse(is.na(Genus) & str_detect(Class, "g__"), Class,Genus)) %>%
+  mutate(Genus = ifelse(is.na(Genus) & str_detect(Order, "g__"), Order,Genus)) %>%
+  mutate(Genus = ifelse(is.na(Genus) & str_detect(Family, "g__"), Order,Genus)) %>%
+  select(-c("domain","Phylum","Class","Order","Family")) %>%
+  pivot_longer(!Genus, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry,Village)) %>%
+  # remove bad sample
+  filter(!str_detect(SampleID, "CMC032.B0101|SRR514202")) %>%
+  group_by(Market_integration_split, Genus) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            filter(str_detect(Taxonomy, "g__"),
+                  !str_detect(Taxonomy, "s__")) %>%
+            arrange(Taxonomy) %>%
+            adorn_percentages(denominator = "col") %>%
+            filter(str_detect(Taxonomy, "p__Synergistetes")) %>%
+            separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus"), sep = "\\|", extra = "merge") %>%
+            mutate(Genus = ifelse(is.na(Genus) & str_detect(Phylum, "g__"), Phylum,Genus)) %>%
+            mutate(Genus = ifelse(is.na(Genus) & str_detect(Class, "g__"), Class,Genus)) %>%
+            mutate(Genus = ifelse(is.na(Genus) & str_detect(Order, "g__"), Order,Genus)) %>%
+            mutate(Genus = ifelse(is.na(Genus) & str_detect(Family, "g__"), Order,Genus)) %>%
+            select(-c("domain","Phylum","Class","Order","Family")) %>%
+            pivot_longer(!Genus, names_to = "SampleID", values_to = "Proportion") %>%
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            # remove bad sample
+            filter(!str_detect(SampleID, "CMC032.B0101|SRR514202")) %>%
+            group_by(Market_integration_split, Genus) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus")) %>%
+  mutate(Genus = str_replace_all(Genus, "g__","")) %>%
+  ggplot(., aes(x = Genus, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+    theme_minimal() +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("") +
+    ylab("log2(Fold change)")
+
+```
+
+```{r gracilibacteria}
+rs_mpa_full %>%
+  # get only species-level entries
+  filter(str_detect(Taxonomy, "s__"),
+         !str_detect(Taxonomy, "t__")) %>%
+  # convert counts to percent 
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Taxonomy, "p__Candidatus Gracilibacteria"),
+         str_detect(Taxonomy, "s__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Species"), sep = "\\|", extra = "merge") %>%
+  select(-c("domain","Phylum")) %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry,Village)) %>%
+  # remove bad sample
+  filter(!str_detect(SampleID, "CMC032.B0101|SRR514202")) %>%
+  group_by(Market_integration_split, Species) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            filter(str_detect(Taxonomy, "s__"),
+                  !str_detect(Taxonomy, "t__")) %>%
+            adorn_percentages(denominator = "col") %>%
+            filter(str_detect(Taxonomy, "p__Candidatus Gracilibacteria"),
+                   str_detect(Taxonomy, "s__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum","Species"), sep = "\\|", extra = "merge") %>%
+            select(-c("domain","Phylum")) %>%
+            pivot_longer(!Species, names_to = "SampleID", values_to = "Proportion") %>%
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            # remove bad sample
+            filter(!str_detect(SampleID, "CMC032.B0101|SRR514202")) %>%
+            group_by(Market_integration_split, Species) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus")) %>%
+  mutate(Species = str_replace_all(Species, "g__","")) %>%
+  ggplot(., aes(x = Species, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+    theme_minimal() +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("") +
+    ylab("log2(Fold change)")
+
+```
+
+```{r}
+# domain-level changes
+
+
+
+```
+
+
+```{r order_foldchanges}
+# set order for plotting by phylum
+
+order_fc_table <- rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "o__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order"), sep = "\\|", extra = "merge") %>%
+  mutate(Order = ifelse(is.na(Order) & str_detect(Phylum, "o__"), Phylum,Order)) %>%
+  mutate(Order = ifelse(is.na(Order) & str_detect(Class, "o__"), Class,Order)) %>%
+  select(-c("domain","Class")) %>%
+  adorn_percentages(denominator = "col") %>%
+  # select only oral phyla
+  filter(Phylum %in% oral_phyla) %>%
+  # combine phylum and order names again for now
+  unite(order, Phylum:Order, sep = ";") %>%
+  pivot_longer(!order, names_to = "SampleID", values_to = "Proportion") %>%
+  # add metadata for grouping
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry)) %>%
+  group_by(Market_integration_split, order) %>%
+  # calculate the average proportion of each order
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            filter(!str_detect(Taxonomy, "f__|g__|s__|Eukaryota|Virus"),
+                   str_detect(Taxonomy, "o__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum","Class","Order"), sep = "\\|", extra = "merge") %>%
+            mutate(Order = ifelse(is.na(Order) & str_detect(Phylum, "o__"), Phylum,Order)) %>%
+            mutate(Order = ifelse(is.na(Order) & str_detect(Class, "o__"), Class,Order)) %>%
+            select(-c("domain","Class")) %>%
+            adorn_percentages(denominator = "col") %>%
+            # select only oral phyla
+            filter(Phylum %in% oral_phyla) %>%
+            # combine phylum and order names again for now
+            unite(order, Phylum:Order, sep = ";") %>%
+            pivot_longer(!order, names_to = "SampleID", values_to = "Proportion") %>%
+            # add metadata for grouping
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            group_by(Market_integration_split, order) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus"),
+         # log_fold_change >= 1 | log_fold_change <= -1,
+         # Phylum %in% oral_phyla # phyla_abd (phyla with a proportion  >= 0.00005 in all groups)
+         )%>%
+  # separate order and phylum names
+  separate(order, into = c("Phylum","Order"), sep = ";") %>%
+  mutate(Order = str_replace_all(Order, "o__","")) 
+
+order_order <- order_fc_table %>%
+  filter(fold_change >= 2 | fold_change <= -2) %>%
+  arrange(Phylum, Order) %>%
+  pull(Order)
+
+order_fc_table %>%
+  filter(Order %in% order_order) %>%
+  mutate(Order = as_factor(Order)) %>%
+  arrange(Order) %>%
+  ggplot(., aes(x = Order, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+    theme_minimal() +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("") +
+    ylab("log2(Fold chang)e")
+
+```
+
+```{r family_foldchanges}
+# set order for plotting by phylum
+
+family_fc_table <- rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "f__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family"), sep = "\\|", extra = "merge") %>%
+  mutate(Family = ifelse(is.na(Family) & str_detect(Phylum, "f__"), Phylum,Family)) %>%
+  mutate(Family = ifelse(is.na(Family) & str_detect(Class, "f__"), Class,Family)) %>%
+  mutate(Family = ifelse(is.na(Family) & str_detect(Order, "f__"), Order,Family)) %>%
+  select(-c("domain","Class","Order")) %>%
+  adorn_percentages(denominator = "col") %>%
+  # select only oral phyla
+  filter(Phylum %in% oral_phyla) %>%
+  # combine phylum and order names again for now
+  unite(family, Phylum:Family, sep = ";") %>%
+  pivot_longer(!family, names_to = "SampleID", values_to = "Proportion") %>%
+  # add metadata for grouping
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry)) %>%
+  group_by(Market_integration_split, family) %>%
+  # calculate the average proportion of each order
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            filter(!str_detect(Taxonomy, "g__|s__|Eukaryota|Virus"),
+                   str_detect(Taxonomy, "f__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family"), sep = "\\|", extra = "merge") %>%
+            mutate(Family = ifelse(is.na(Family) & str_detect(Phylum, "f__"), Phylum,Family)) %>%
+            mutate(Family = ifelse(is.na(Family) & str_detect(Class, "f__"), Class,Family)) %>%
+            mutate(Family = ifelse(is.na(Family) & str_detect(Order, "f__"), Order,Family)) %>%
+            select(-c("domain","Class","Order")) %>%
+            adorn_percentages(denominator = "col") %>%
+            # select only oral phyla
+            filter(Phylum %in% oral_phyla) %>%
+            # combine phylum and order names again for now
+            unite(family, Phylum:Family, sep = ";") %>%
+            pivot_longer(!family, names_to = "SampleID", values_to = "Proportion") %>%
+            # add metadata for grouping
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            group_by(Market_integration_split, family) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus"),
+         # log_fold_change >= 1 | log_fold_change <= -1,
+         # Phylum %in% oral_phyla # phyla_abd (phyla with a proportion  >= 0.00005 in all groups)
+         )%>%
+  # separate family and phylum names
+  separate(family, into = c("Phylum","Family"), sep = ";") %>%
+  mutate(Family = str_replace_all(Family, "f__","")) 
+
+family_order <- family_fc_table %>%
+  filter(fold_change >= 5.6 | fold_change <= -5.6) %>%
+  arrange(Phylum, Family) %>%
+  pull(Family)
+
+family_fc_table %>%
+  filter(Family %in% family_order) %>%
+  mutate(Family = as_factor(Family)) %>%
+  arrange(Family) %>%
+  ggplot(., aes(x = Family, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+    theme_minimal() +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("") +
+    ylab("log2(Fold chang)e")
+
+```
+
+## Bacteriodetes/Firmicutes ratios
+
+```{r}
+
+rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Env, Ethnic_Group, Village), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  # group_by(Phylum, Market_integration_split) %>%
+  # summarize(Mean_pct = mean(Percent)) %>%
+  ggplot(., aes(x = SampleID, y = Percent, fill = Phylum)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = "dodge") +
+    # geom_point(alpha = 0.5, size = 0.5, position=position_jitterdodge(dodge.width = 0.75, jitter.width = 0.1)) +
+    # geom_jitter(size = 0.5, alpha = 0.5, width = 0.4) +
+    # scale_fill_manual(values = Kraken_db_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    xlab("Village") +
+    ylab("Percent of reads classified")
+
+
+
+```
+
+```{r}
+
+rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(Higher = ifelse(p__Bacteroidetes > p__Firmicutes, "Bacteroidetes","Firmicutes")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village), by = "SampleID") %>%
+  group_by(Village, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge", color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples")
+
+```
+
+```{r}
+
+rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva|Industrial")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(Higher = ifelse(p__Bacteroidetes > p__Firmicutes, "Bacteroidetes","Firmicutes")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Tooth_site, Village), by = "SampleID") %>%
+  group_by(Village, Tooth_site, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge", color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples") +
+    facet_wrap(~Tooth_site)
+
+
+
+```
+
+```{r}
+
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Env, Ethnic_Group, Village), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  # group_by(Phylum, Market_integration_split) %>%
+  # summarize(Mean_pct = mean(Percent)) %>%
+  ggplot(., aes(x = SampleID, y = Percent, fill = Phylum)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = "dodge") +
+    # geom_point(alpha = 0.5, size = 0.5, position=position_jitterdodge(dodge.width = 0.75, jitter.width = 0.1)) +
+    # geom_jitter(size = 0.5, alpha = 0.5, width = 0.4) +
+    # scale_fill_manual(values = Kraken_db_colors) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    xlab("Village") +
+    ylab("Percent of reads classified")
+
+
+
+```
+
+```{r}
+
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(Higher = ifelse(p__Bacteroidetes > p__Firmicutes, "Bacteroidetes","Firmicutes")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village), by = "SampleID") %>%
+  group_by(Village, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge", color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples")
+
+```
+
+```{r}
+# now instead plot the average of the ratio B:F per village w/error bars
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = p__Bacteroidetes / p__Firmicutes) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village), by = "SampleID") %>%
+  group_by(Village) %>%
+  summarize(mean_BF_ratio = mean(BF_ratio),
+            sd_BF_ratio = sd(BF_ratio)) %>%
+  ggplot(., aes(x = Village, y = mean_BF_ratio, ymin = (mean_BF_ratio - sd_BF_ratio), ymax = (mean_BF_ratio + sd_BF_ratio))) +
+    geom_bar(stat = "identity", color = "black", size = 0.2) +
+    geom_errorbar(size = 0.2, width = 0.3) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("Bacteriodetes:Firmicutes")
+
+```
+```{r}
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = p__Bacteroidetes / p__Firmicutes) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site), by = "SampleID") %>%
+  # group_by(Village) %>%
+  ggplot(., aes(x = Village, y = BF_ratio, fill = Tooth_site)) +
+    geom_boxplot(color = "black", size = 0.2) +
+    geom_point(alpha = 0.3, position = position_jitterdodge(), size = 0.8) +
+    theme_minimal() +
+    scale_fill_manual(values = Tooth_site_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("Bacteriodetes:Firmicutes")
+
+```
+
+```{r}
+
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Phylum, "Bacteroidetes|Firmicutes")) %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva|Industrial")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(Higher = ifelse(p__Bacteroidetes > p__Firmicutes, "Bacteroidetes","Firmicutes")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Tooth_site, Village), by = "SampleID") %>%
+  group_by(Village, Tooth_site, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge", color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples") +
+    facet_wrap(~Tooth_site)
+
+
+
+```
+
+
+## Bacteriodes / Prevotella
+```{r}
+
+rs_mpa_full %>%
+  select(Taxonomy) %>%
+  filter(str_detect(Taxonomy, "g__Prevotella|g__Bacteroides"),
+         !str_detect(Taxonomy, "s__|Prevotellamassilia|Hallella")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus"), sep = "\\|", extra = "merge") %>%
+  mutate(Genus = str_replace_all(Genus, "g__","")) %>%
+  select(Genus) %>%
+  arrange(Genus)
+
+
+```
+
+
+```{r}
+
+rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "g__")) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Taxonomy, "Bacteroides|Prevotella"),
+         !str_detect(Taxonomy, "s__|Prevotellamassilia|prevotella")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus"), sep = "\\|", extra = "merge") %>%
+  select(-c("domain","Phylum","Class","Order","Family")) %>%
+  pivot_longer(!Genus, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Genus", values_from = "Percent") %>%
+  mutate(Higher = ifelse(g__Bacteroides > g__Prevotella, "Bacteroides","Prevotella")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village), by = "SampleID") %>%
+  group_by(Village, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge",  color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples")
+
+```
+
+
+```{r}
+rspm_mpa_full %>%
+  filter(!str_detect(Taxonomy, "s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "g__")) %>%
+  adorn_percentages(denominator = "col") %>%
+  filter(str_detect(Taxonomy, "Bacteroides|Prevotella"),
+         !str_detect(Taxonomy, "s__|Prevotellamassilia|prevotella")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus"), sep = "\\|", extra = "merge") %>%
+  select(-c("domain","Phylum","Class","Order","Family")) %>%
+  pivot_longer(!Genus, names_to = "SampleID", values_to = "Percent") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(!str_detect(Market_integration_split, "Yanomami|Blank|Gauze|mucosa|saliva")) %>%
+  select(-Market_integration_split) %>%
+  pivot_wider(names_from = "Genus", values_from = "Percent") %>%
+  mutate(Higher = ifelse(g__Bacteroides > g__Prevotella, "Bacteroides","Prevotella")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village), by = "SampleID") %>%
+  group_by(Village, Higher) %>%
+  count(name = "NoSamples") %>%
+  ggplot(., aes(x = Village, y = NoSamples, fill = Higher)) +
+    geom_bar(stat = "identity", position = "dodge",  color = "black", size = 0.2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    xlab("Village") +
+    ylab("No. Samples")
+
+```
+
+```{r}
+
+# count the number of species for Prevotella and for Bacteroides for both RS and RSPM tables
+# are there differences?
+
+rs_mpa_full %>%
+  select(Taxonomy) %>%
+  filter(str_detect(Taxonomy, "g__Prevotella|g__Bacteroides"),
+         !str_detect(Taxonomy, "Prevotellamassilia|Hallella")) %>%
+  filter(str_detect(Taxonomy, "s__")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus","Species"), sep = "\\|", extra = "merge") %>%
+  mutate(Genus = str_replace_all(Genus, "g__","")) %>%
+  select(Genus, Species) %>%
+  group_by(Genus) %>%
+  count(name = "RS")
+
+
+rs_mpa_full %>%
+  select(Taxonomy) %>%
+  filter(str_detect(Taxonomy, "g__Prevotella|g__Bacteroides"),
+         !str_detect(Taxonomy, "Prevotellamassilia|Hallella")) %>%
+  filter(str_detect(Taxonomy, "s__")) %>%
+  separate(Taxonomy, into = c("domain","Phylum","Class","Order","Family","Genus","Species"), sep = "\\|", extra = "merge") %>%
+  mutate(Genus = str_replace_all(Genus, "g__","")) %>%
+  select(Genus, Species) %>%
+  group_by(Genus) %>%
+  count(name = "RSPM")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque metadata and colors"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(tidyverse)
+
+```
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+This creates an RData object that has the full metadata table, where the columns
+we use for plotting are set as factors, and lists the colors, shapes, and sizes of
+points for plotting PCAs and such for each of the metadata categories we're
+interested in.
+```{r metadata}
+# load the metadata file
+metadata <- fread("00-documentation.backup/dietary_div_Baka_Nzime.tsv")
+
+```
+
+```{r}
+sum_table <- metadata %>%
+  pivot_longer(!`iethnic group`:date, names_to = "dietary_group", values_to = "item") %>%
+  mutate_all(na_if,"") %>%
+  drop_na(item) %>%
+  mutate(dietary_group = str_replace_all(dietary_group, "V19","Fatty intake")) %>%
+  group_by(`iethnic group`, dietary_group, item) %>%
+  # summarize(Count = sum(n))
+  # make some of the names consistent
+  mutate(item = str_replace_all(item, "boiled ", ""),
+         item = str_replace_all(item, "grilled ", ""),
+         item = str_replace_all(item, "yams", "yam"),
+         item = str_replace_all(item, "irvingia s nuts salse", "irvingia s nut salse"),
+         item = str_replace_all(item, " andu", ""),
+         item = str_replace_all(item, " mundugule", ""),
+         item = str_replace_all(item, "chili", "chilli"),
+         item = str_replace_all(item, "papaye", "papaya"),
+         item = str_replace_all(item, "\\(alcohol\\)", ""),
+         item = str_replace_all(item, "sauce ", ""),
+         dietary_group = str_replace_all(dietary_group, "spices", "spice")) %>%
+  # change some dietary groups so that the same item is in only 1 group
+  mutate(dietary_group = ifelse(item == "avocado", "Other",dietary_group),
+         item = ifelse(str_detect(item, "koko"), "koko", item),
+         dietary_group = ifelse(item == "mushroom","vegetables",dietary_group),
+         dietary_group = ifelse(str_detect(item, "papaya"), "Fruits", dietary_group)) %>%
+  # now summarize counts of items with the same name
+  group_by(`iethnic group`, dietary_group) %>%
+  count(item) %>%
+  ungroup() %>%
+  mutate(dietary_group = str_replace_all(dietary_group, "carbohydrate food", "Carbohydrate"),
+         dietary_group = str_replace_all(dietary_group, "meat", "Meat"),
+         dietary_group = str_replace_all(dietary_group, "spice", "Spices"),
+         dietary_group = str_replace_all(dietary_group, "vegetables", "Vegetable"),
+         dietary_group = str_replace_all(dietary_group, "Fruits", "Fruit"),
+         dietary_group = str_replace_all(dietary_group, "carbohydrate food", "Carbohydrate")) %>%
+  mutate(dietary_group = fct_relevel(dietary_group, "Carbohydrate","Vegetable","Fruit","Fatty intake","Meat","Spices","Beverage","Other")) %>%
+  arrange(dietary_group, item) %>%
+  pivot_wider(names_from = "iethnic group", values_from = "n") %>%
+  mutate(Grooup = ifelse(is.na(Baka),"Nzime",
+                         ifelse(is.na(Nzime),"Baka","Both"))) %>%
+  mutate(Grooup = fct_relevel(Grooup, "Both","Baka","Nzime")) %>%
+  arrange(Grooup, dietary_group, item) %>%
+  select(-Baka, -Nzime) %>%
+  select(Grooup, dietary_group, item)
+
+sum_table
+
+fwrite(sum_table, "00-documentation.backup/dietary_sum_table.tsv", quote = F, sep = "\t")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

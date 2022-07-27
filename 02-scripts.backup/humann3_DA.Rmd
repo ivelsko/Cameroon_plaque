@@ -1,0 +1,1302 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque MALT discriminant taxa"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(ape)
+library(mixOmics)
+library(compositions)
+library(vegan)
+library(MASS)
+library(janitor)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+
+```{r load_data}
+load("./05-results.backup/CMC_humann2_tables.RData")
+load("./05-results.backup/CMC_metadata.RData")
+
+# remove unmapped and ungrouped reads
+humann2_KOs <- humann2_KOs_full %>% filter(str_detect(Ortholog, "UNMAPPED|UNGROUPED"))
+humann2_path.decontam <- humann2_path.decontam %>% filter(!str_detect(Pathway, "UNMAPPED|UNINTEGRATED"))
+
+```
+
+```{r load_metadata}
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+# so don't have extra unnecessary categories with factors
+metadata_nofactors <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv") %>%
+  rename(SampleID = `#SampleID`) %>%
+  filter(!str_detect(SampleID, "10M|SRR164|ERR|SRS|EXB|LIB"))
+
+Age_group_colors <- c(`18-29` = "#FF3200", `30-39` = "#E9B186", `40-49` = "#82CDAA", `50-59` = "#0686B8", `60+` = "#172869")
+Age_group_shapes <- c(`18-29` = 15, `30-39` = 16, `40-49` = 17, `50-59` = 18, `60+` = 25)
+Ethnic_Group_shapes <- c(Baka = 19, Nzime = 17,  `Industrial plaque` = 7, `Industrial calculus` = 7)
+Ethnic_Group_colors <- c(Baka = "#FF3200", Nzime = "#065FA3", `Industrial plaque` = "#969696", `Industrial calculus` = "#feb24c")
+Market_integration_colors <- c(`Logging road` = "#FF3200", `Forrest camp` = "#065FA3", Farming = "#82CDAA", Industrial  = "#969696")
+Market_integration_shapes <- c(`Logging road` = 19, `Forrest camp` = 17, Farming = 18, Industrial = 7)
+Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD", `Industrial plaque` = "#969696", `Industrial calculus` = "#feb24c")
+Village_shapes <- c(`202` = 15, `205` = 17, `204` = 18,`203` = 16, `206` = 25, `Industrial plaque` = 7, `Industrial calculus` = 7)
+Sex_colors <- c(Female = "#FF3200", Male = "#065FA3")
+Sex_shapes <- c(Female = 19, Male = 17)
+Tooth_site_colors <- c(Anterior = "#FF3200", Posterior = "#065FA3")
+Tooth_site_shapes <- c(Anterior = 19, Posterior = 17)
+
+```
+
+```{r}
+# save the species using in downstream discriminant analyses as a table
+
+humann2_KO_noblanks.fa.df <- fread("./05-results.backup/minres_oblimin_noblanks.fa_KO.tsv")
+humann2_KO_cmc.fa.df <- fread("./05-results.backup/minres_oblimin_cmc.fa_KO.tsv")
+
+humann2_path_noblanks.fa.df <- fread("./05-results.backup/minres_oblimin_noblanks.fa_path.tsv")
+humann2_path_cmc.fa.df <- fread("./05-results.backup/minres_oblimin_cmc.fa_path.tsv")
+
+```
+
+# Pathways
+```{r input_tables_noblanks}
+# Pathways, no blanks 
+
+humann2_path_noblanks_mat <- humann2_path.decontam %>%
+  select(-matches("ERR|SRR164|SRS|EXB|LIB|10M")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  # mutate(Counts = Counts + 1) %>%
+  spread(Pathway,Counts) %>%
+  column_to_rownames("SampleID")
+
+
+```
+
+## CMC - Industrial plaque
+```{r lda_h3_gf_cmc_ip}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+# 108 pathways in MR1, 86 pathways in MR2
+fa_paths_noblanks <- humann2_path_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_cmc_ip_lda_table <- humann2_path_noblanks_mat %>% # humann2_path_noblanks_clr
+  select(one_of(fa_paths_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Env)) %>%
+  select(SampleID, Env, everything()) %>%
+  # compare only 2 groups at once
+  filter(str_detect(Env, "CMC|Industrial plaque"))
+
+rownames(humann2_path_cmc_ip_lda_table) <- humann2_path_cmc_ip_lda_table$SampleID
+humann2_path_cmc_ip_lda_table <- humann2_path_cmc_ip_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Env, Env, Market_integration, Sex, Tooth_site, Village
+humann2_path_noblanks_lda <- lda(Env ~ ., humann2_path_cmc_ip_lda_table)
+# humann2_path_noblanks_lda # show results
+humann2_path_noblanks_lda
+plot(humann2_path_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_path_cmc_ip_lda_table, predict(humann2_path_noblanks_lda)$x)
+
+```
+
+
+
+```{r lda_h3_gf_cmc_ip_plot}
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(x = Env, y = LD1, group = Env, fill = Env)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Env)) +
+    # geom_jitter(size = 2, aes(shape = Env)) +
+    scale_fill_manual(values = Env_colors) +
+    scale_shape_manual(values = c(3,4)) +
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 18) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+xp <- humann2_path_noblanks_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_path_noblanks_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Pathway", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial plaque`), "CMC", "Industrial plaque"))
+
+xp
+
+```
+
+```{r, eval = F}
+
+xp %>%
+  select(Pathway, Color, everything()) %>%
+  pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque")) %>%
+  bind_rows(., xp %>%
+            select(Pathway, Color, everything()) %>%
+            pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque"))) %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = Counts, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    scale_fill_manual(values = c("#FF3200","#969696")) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r h3_path_cmc_ip_loadings_plot}
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+            select(Pathway, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., xp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD1, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#969696")) + # "#FF3200","#feb24c","#969696"
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab("Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+## CMC - Industrial calculus
+```{r lda_h3_path_cmc_ic}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_paths_noblanks <- humann2_path_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_cmc_ic_lda_table <- humann2_path_noblanks_mat %>%
+  select(one_of(fa_paths_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Env)) %>%
+  select(SampleID, Env, everything()) %>%
+  # compare only 2 groups at once
+  filter(str_detect(Env, "CMC|Industrial calculus"))
+
+rownames(humann2_path_cmc_ic_lda_table) <- humann2_path_cmc_ic_lda_table$SampleID
+humann2_path_cmc_ic_lda_table <- humann2_path_cmc_ic_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Env, Env, Market_integration, Sex, Tooth_site, Village
+humann2_path_noblanks_lda <- lda(Env ~ ., humann2_path_cmc_ic_lda_table)
+# humann2_path_noblanks_lda # show results
+humann2_path_noblanks_lda
+plot(humann2_path_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_path_cmc_ic_lda_table, predict(humann2_path_noblanks_lda)$x)
+
+```
+
+
+```{r lda_h3_path_cmc_ic_plot}
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(x = Env, y = LD1, group = Env, fill = Env)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Env)) +
+    # geom_jitter(size = 2, aes(shape = Env)) +
+    scale_fill_manual(values = Env_colors) +
+    scale_shape_manual(values = c(3,4)) +
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 18) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+vp <- humann2_path_noblanks_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_path_noblanks_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Pathway", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial calculus`), "CMC", "Industrial calculus"))
+
+vp
+
+```
+
+```{r, eval = F}
+
+vp %>%
+  select(Pathway, Color, everything()) %>%
+  pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color)%>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial calculus" & Env == "Industrial calculus")) %>%
+  bind_rows(., vp %>%
+            select(Pathway, Color, everything()) %>%
+            pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial calculus" & Env == "Industrial calculus"))) %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange(absCounts) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = Counts, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    scale_fill_manual(values = c("#FF3200","#feb24c")) +
+    xlab("") +
+    ylab("Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+# +
+#     theme(legend.title = element_blank())
+
+```
+
+```{r h3_path_cmc_ic_loadings_plot}
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+            select(Pathway, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., vp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD1, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#feb24c")) + # "#FF3200","#feb24c","#969696"
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+## Three-way comparison
+
+```{r three_comp}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_paths_noblanks <- humann2_path_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_noblanks_lda_table <- humann2_path_noblanks_mat %>%
+  select(one_of(fa_paths_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+               select(SampleID, Env)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+  select(SampleID, Env, everything())
+
+rownames(humann2_path_noblanks_lda_table) <- humann2_path_noblanks_lda_table$SampleID
+humann2_path_noblanks_lda_table <- humann2_path_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+humann2_path_noblanks_lda <- lda(Env ~ ., humann2_path_noblanks_lda_table)
+# humann2_path_noblanks_lda # show results
+humann2_path_noblanks_lda
+plot(humann2_path_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_path_noblanks_lda_table, predict(humann2_path_noblanks_lda)$x)
+
+```
+
+```{r three_way_comparisomF}
+
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(LD1, LD2, colour = Env, shape = Env)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Env_colors) +
+  scale_shape_manual(values = Env_shapes) +
+  xlab("LD1") +
+  ylab("LD2") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top") +
+  theme(legend.title = element_blank())
+
+
+```
+
+```{r three_table}
+
+zp <- humann2_path_noblanks_lda$means %>%
+  as_data_frame() %>%
+  mutate(names = rownames(humann2_path_noblanks_lda$means)) %>%
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Pathway", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial calculus`) & abs(CMC) > abs(`Industrial plaque`), "CMC",
+                 ifelse(abs(`Industrial calculus`) > abs(CMC) & abs(`Industrial calculus`) > abs(`Industrial plaque`), "Industrial calculus",
+                 ifelse(abs(`Industrial plaque`) > abs(CMC) & abs(`Industrial plaque`) > abs(`Industrial calculus`), "Industrial plaque", "Other"))))
+
+zp
+
+```
+
+```{r, eval = F}
+
+zp %>%
+  select(Pathway, Color, everything()) %>%
+  pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque") | (Color == "Industrial calculus" & Env == "Industrial calculus")) %>%
+  bind_rows(., zp %>%
+            select(Pathway, Color, everything()) %>%
+            pivot_longer(!Pathway:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque") | (Color == "Industrial calculus" & Env == "Industrial calculus"))) %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = Counts, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#feb24c","#969696")) +
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab("Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r three_bar_plot_path_ld1}
+
+# Max group mean
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 20, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+            select(Pathway, everything()) %>%
+            slice_min(n = 20, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., zp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway,
+         lowest = ifelse(Color == "CMC", "Industrial plaque", "CMC")) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD1, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#feb24c","#969696")) + # "#FF3200",
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("LD1") +
+    ylab("Pathway") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+# Min group mean
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 20, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>%
+            as_data_frame() %>%
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>%
+            select(Pathway, everything()) %>%
+            slice_min(n = 20, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., zp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway,
+         lowest = ifelse(Color == "CMC", "Industrial plaque", "CMC")) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD1, y = Path, fill = lowest)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#969696")) + # "#FF3200",
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("LD1") +
+    ylab("Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r three_bar_plot_path_ld2}
+
+# Max group mean
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 20, order_by = LD2, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+            select(Pathway, everything()) %>%
+            slice_min(n = 20, order_by = LD2, with_ties = FALSE)) %>%
+  left_join(., zp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD2)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway,
+         lowest = ifelse(Color == "CMC", "Industrial plaque", "CMC")) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD2, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#feb24c","#969696")) + # "#FF3200",
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("LD2") +
+    ylab("Pathway") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+# Min group mean
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 20, order_by = LD2, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>%
+            as_data_frame() %>%
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>%
+            select(Pathway, everything()) %>%
+            slice_min(n = 20, order_by = LD2, with_ties = FALSE)) %>%
+  left_join(., zp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD2)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway,
+         lowest = ifelse(Color == "CMC", "Industrial plaque", "CMC")) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD2, y = Path, fill = lowest)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#969696")) + # "#FF3200",
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("LD1") +
+    ylab("Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+
+## Baka - Nzime
+```{r lda_h3_gf_cmc_ip}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+# 90 pathways in MR1, 73 in MR2
+fa_paths_cmc <- humann2_path_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_path_ts_lda_table <- humann2_path_noblanks_mat %>%
+  select(one_of(fa_paths_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Ethnic_Group)) %>%
+  select(SampleID, Ethnic_Group, everything())
+
+rownames(humann2_path_ts_lda_table) <- humann2_path_ts_lda_table$SampleID
+humann2_path_ts_lda_table <- humann2_path_ts_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Ethnic_Group, Market_integration, Sex, Tooth_site, Village
+humann2_path_noblanks_lda <- lda(Ethnic_Group ~ ., humann2_path_ts_lda_table)
+# humann2_path_noblanks_lda # show results
+humann2_path_noblanks_lda
+plot(humann2_path_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_path_ts_lda_table, predict(humann2_path_noblanks_lda)$x)
+
+```
+
+
+```{r lda_h3_gf_cmc_ip_plot}
+lda.data %>%
+  mutate(Ethnic_Group = fct_drop(Ethnic_Group)) %>%
+  ggplot(., aes(x = Ethnic_Group, y = LD1, group = Ethnic_Group, fill = Ethnic_Group)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Ethnic_Group)) +
+    # geom_jitter(size = 2, aes(shape = Ethnic_Group)) +
+    scale_fill_manual(values = Ethnic_Group_colors) +
+    scale_shape_manual(values = c(3,4)) +
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 18) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+xp <- humann2_path_noblanks_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_path_noblanks_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Pathway", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(Baka) > abs(`Nzime`), "Baka", "Nzime"))
+
+xp
+
+```
+
+```{r, eval = F}
+
+xp %>%
+  select(Pathway, Color, everything()) %>%
+  pivot_longer(!Pathway:Color, names_to = "Ethnic_Group", values_to = "Counts") %>%
+  group_by(Ethnic_Group, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "Baka" & Ethnic_Group == "Baka") | (Color == "Nzime" & Ethnic_Group == "Nzime")) %>%
+  bind_rows(., xp %>%
+            select(Pathway, Color, everything()) %>%
+            pivot_longer(!Pathway:Color, names_to = "Ethnic_Group", values_to = "Counts") %>%
+            group_by(Ethnic_Group, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "Baka" & Ethnic_Group == "Baka") | (Color == "Nzime" & Ethnic_Group == "Nzime"))) %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = Counts, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    scale_fill_manual(values = c("#FF3200","#065FA3")) +
+    xlab("") +
+    ylab(" Pathway") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r h3_gf_cmc_ip_loadings_plot}
+humann2_path_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+  select(Pathway, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_path_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(Pathway = rownames(humann2_path_noblanks_lda$scaling)) %>% 
+            select(Pathway, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., xp %>% select(Pathway, Color), by = "Pathway") %>%
+  mutate(Pathway = str_replace_all(Pathway, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  distinct() %>%
+  mutate(Path2 = Pathway) %>%
+  separate(Path2, into = c("Path"), sep = ":", extra = "drop") %>%
+  select(Path, everything()) %>%
+  mutate(Path = fct_relevel(Path, Path)) %>%
+  ggplot(., aes(x = LD1, y = Path, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#065FA3")) + # "#FF3200","#feb24c","#969696"
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Pathway") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+
+
+
+
+# Gene Families
+```{r input_tables_gf}
+# Gene families, no blanks 
+# reduce the input table to only orthologs present in at least 1/3 of one ethnic group
+humann2_KO_noblanks_mat <- humann2_KOs.decontam %>%
+  select(-matches("ERR|SRR164|SRS|EXB|LIB|10M")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
+  column_to_rownames("SampleID")
+
+
+```
+
+## CMC - Industrial plaque
+```{r lda_h3_gf_cmc_ip}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+# 1016 gene families in MR1, 432 in MR2
+fa_proteins_noblanks <- humann2_KO_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_KO_cmc_ip_lda_table <- humann2_KO_noblanks_mat %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               select(SampleID, Env)) %>%
+  select(SampleID, Env, everything()) %>%
+  # compare only 2 groups at once
+  filter(str_detect(Env, "CMC|Industrial plaque"))
+
+## perform PCA to get a clr-transformed gene family table
+# humann2_KO_noblanks.pca <- mixOmics::pca(humann2_KO_noblanks_mat, ncomp = 3, logratio = 'CLR')
+## save the clr-transformed gene family table
+# humann2_KO_noblanks_clr <- as.data.frame.matrix(humann2_KO_noblanks.pca$X)
+
+
+rownames(humann2_KO_cmc_ip_lda_table) <- humann2_KO_cmc_ip_lda_table$SampleID
+humann2_KO_cmc_ip_lda_table <- humann2_KO_cmc_ip_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+humann2_KO_noblanks_lda <- lda(Env ~ ., humann2_KO_cmc_ip_lda_table)
+# humann2_KO_noblanks_lda # show results
+humann2_KO_noblanks_lda
+plot(humann2_KO_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_KO_cmc_ip_lda_table, predict(humann2_KO_noblanks_lda)$x)
+
+```
+
+
+```{r lda_h3_gf_cmc_ip_plot}
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(x = Env, y = LD1, group = Env, fill = Env)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Env)) +
+    # geom_jitter(size = 2, aes(shape = Env)) +
+    scale_fill_manual(values = Env_colors) +
+    scale_shape_manual(values = c(3,4)) +
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+x <- humann2_KO_noblanks_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_KO_noblanks_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Gene family", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial plaque`), "CMC", "Industrial plaque"))
+
+x
+
+```
+
+```{r, eval = F}
+
+x %>%
+  select(`Gene family`, Color, everything()) %>%
+  pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque")) %>%
+  bind_rows(., x %>%
+            select(`Gene family`, Color, everything()) %>%
+            pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque"))) %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = Counts, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    scale_fill_manual(values = c("#FF3200","#969696")) +
+    xlab("") +
+    ylab(" Gene Family") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r h3_gf_cmc_ip_loadings_plot}
+humann2_KO_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+  select(`Gene family`, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_KO_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+            select(`Gene family`, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., x %>% select(`Gene family`, Color), by = "Gene family") %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = LD1, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#969696")) + # "#FF3200","#feb24c","#969696"
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+## CMC - Industrial calculus
+
+```{r lda_h3_gf_cmc_ic}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- humann2_KO_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_KO_cmc_ic_lda_table <- humann2_KO_noblanks_mat %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+               select(SampleID, Env)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+  select(SampleID, Env, everything()) %>%
+  # compare only 2 groups at once
+  filter(str_detect(Env, "CMC|Industrial calculus"))
+
+rownames(humann2_KO_cmc_ic_lda_table) <- humann2_KO_cmc_ic_lda_table$SampleID
+humann2_KO_cmc_ic_lda_table <- humann2_KO_cmc_ic_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+humann2_KO_noblanks_lda <- lda(Env ~ ., humann2_KO_cmc_ic_lda_table)
+# humann2_KO_noblanks_lda # show results
+humann2_KO_noblanks_lda
+plot(humann2_KO_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_KO_cmc_ic_lda_table, predict(humann2_KO_noblanks_lda)$x)
+
+```
+
+
+```{r lda_h3_gf_cmc_ip_plot}
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(x = Env, y = LD1, group = Env, fill = Env)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Env)) +
+    # geom_jitter(size = 2, aes(shape = Env)) +
+    scale_fill_manual(values = Env_colors) +
+    scale_shape_manual(values = c(3,4)) +
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+v <- humann2_KO_noblanks_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_KO_noblanks_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Gene family", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial calculus`), "CMC", "Industrial calculus"))
+
+v
+
+```
+
+```{r, eval = F}
+
+v %>%
+  select(`Gene family`, Color, everything()) %>%
+  pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial calculus" & Env == "Industrial calculus")) %>%
+  bind_rows(., v %>%
+            select(`Gene family`, Color, everything()) %>%
+            pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial calculus" & Env == "Industrial calculus"))) %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = Counts, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#feb24c")) +
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r h3_gf_cmc_ip_loadings_plot}
+
+humann2_KO_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+  select(`Gene family`, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_KO_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+            select(`Gene family`, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., v %>% select(`Gene family`, Color), by = "Gene family") %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = LD1, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#FF3200","#feb24c")) + # "#FF3200","#feb24c","#969696"
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+
+```
+
+
+## Three-way comparison
+
+```{r three_comp}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+fa_proteins_noblanks <- humann2_KO_noblanks.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_KO_noblanks_lda_table <- humann2_KO_noblanks_mat %>%
+  select(one_of(fa_proteins_noblanks)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+               select(SampleID, Env)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+  select(SampleID, Env, everything())
+
+rownames(humann2_KO_noblanks_lda_table) <- humann2_KO_noblanks_lda_table$SampleID
+humann2_KO_noblanks_lda_table <- humann2_KO_noblanks_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+humann2_KO_noblanks_lda <- lda(Env ~ ., humann2_KO_noblanks_lda_table)
+# humann2_KO_noblanks_lda # show results
+humann2_KO_noblanks_lda
+plot(humann2_KO_noblanks_lda, dimen = 2)
+
+lda.data <- cbind(humann2_KO_noblanks_lda_table, predict(humann2_KO_noblanks_lda)$x)
+
+```
+
+```{r three_way_comparisom, eval = F}
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+lda.data %>%
+  mutate(Env = fct_drop(Env)) %>%
+  ggplot(., aes(LD1, LD2, colour = Env, shape = Env)) +
+  geom_point(size = 4) +
+  scale_colour_manual(values = Env_colors) +
+  scale_shape_manual(values = Env_shapes) +
+  xlab("LD1") +
+  ylab("LD2") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top") +
+  theme(legend.title = element_blank())
+
+
+```
+
+```{r three_table}
+
+z <- humann2_KO_noblanks_lda$means %>%
+  as_data_frame() %>%
+  mutate(names = rownames(humann2_KO_noblanks_lda$means)) %>%
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Gene family", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(CMC) > abs(`Industrial calculus`) & abs(CMC) > abs(`Industrial plaque`), "CMC",
+  ifelse(abs(`Industrial calculus`) > abs(CMC) & abs(`Industrial calculus`) > abs(`Industrial plaque`), "Industrial calculus",
+         ifelse(abs(`Industrial plaque`) > abs(CMC) & abs(`Industrial plaque`) > abs(`Industrial calculus`), "Industrial plaque", "Other"))))
+
+z
+
+```
+
+```{r, eval = F}
+
+z %>%
+  select(`Gene family`, Color, everything()) %>%
+  pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+  group_by(Env, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque") | (Color == "Industrial calculus" & Env == "Industrial calculus")) %>%
+  bind_rows(., z %>%
+            select(`Gene family`, Color, everything()) %>%
+            pivot_longer(!`Gene family`:Color, names_to = "Env", values_to = "Counts") %>%
+            group_by(Env, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "CMC" & Env == "CMC") | (Color == "Industrial plaque" & Env == "Industrial plaque") | (Color == "Industrial calculus" & Env == "Industrial calculus"))) %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = Counts, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#feb24c","#969696")) +
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+```{r three_bar_plot_gf}
+humann2_KO_noblanks_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+  select(`Gene family`, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_KO_noblanks_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(`Gene family` = rownames(humann2_KO_noblanks_lda$scaling)) %>% 
+            select(`Gene family`, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., z %>% select(`Gene family`, Color), by = "Gene family") %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = LD1, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = c("#feb24c","#969696")) + # "#FF3200",
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+
+## CMC only
+```{r input_tables_cmc}
+# Gene families, no blanks 
+# reduce the input table to only orthologs present in at least 1/3 of one ethnic group
+humann2_KO_cmc_mat <- humann2_KOs.decontam %>%
+  select(matches("Ortholog|CMC")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Ortholog,Counts) %>%
+  column_to_rownames("SampleID")
+
+```
+
+
+```{r lda_h3_gf_cmc_ip}
+# select only the species that make up the 1st 3 residuals, based on the scree plot above
+# 974 gene families in MR1, 483 gene families in MR2
+fa_proteins_cmc <- humann2_KO_cmc.fa.df %>% 
+  filter(Residual %in% c("MR1")) %>%
+  pull(Ortholog)
+
+# sub-sample the gene family table for only those gene families
+humann2_KO_cmc_lda_table <- humann2_KO_cmc_mat %>%
+  select(one_of(fa_proteins_cmc)) %>%
+  rownames_to_column("SampleID") %>%
+  inner_join(., metadata %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+               select(SampleID, Tooth_site)) %>%
+               # change the column after SampleID to get the metadata category you want 
+               # Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village
+  select(SampleID, Tooth_site, everything())
+
+rownames(humann2_KO_cmc_lda_table) <- humann2_KO_cmc_lda_table$SampleID
+humann2_KO_cmc_lda_table <- humann2_KO_cmc_lda_table %>% select(-SampleID)
+
+# change the first variable here to get the metadata category you want # Age_group, Ethnic_Group, Env, Market_integration, Sex, Tooth_site, Village
+humann2_KO_cmc_lda <- lda(Tooth_site ~ ., humann2_KO_cmc_lda_table)
+# humann2_KO_cmc_lda # show results
+humann2_KO_cmc_lda
+plot(humann2_KO_cmc_lda, dimen = 2)
+
+lda.data <- cbind(humann2_KO_cmc_lda_table, predict(humann2_KO_cmc_lda)$x)
+
+```
+
+```{r lda_h3_gf_ts_plot}
+lda.data %>%
+  mutate(Tooth_site = fct_drop(Tooth_site)) %>%
+  ggplot(., aes(x = Tooth_site, y = LD1, group = Tooth_site, fill = Tooth_site)) +
+    geom_boxplot() + 
+    ggpointgrid::geom_pointrect(scale_x = 0.2, size = 2.5, aes(shape = Tooth_site)) +
+    # geom_jitter(size = 2, aes(shape = Tooth_site)) +
+    scale_fill_manual(values = Tooth_site_colors) +
+    scale_shape_manual(values = c(3,4)) + # 1,0
+    xlab("") +
+    ylab("LD1") +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    coord_flip() +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top") +
+    theme(legend.title = element_blank())
+
+
+```
+
+```{r}
+
+w <- humann2_KO_cmc_lda$means %>% 
+  as_data_frame() %>% 
+  mutate(names = rownames(humann2_KO_cmc_lda$means)) %>% 
+  select(names, everything()) %>%
+  pivot_longer(!names, names_to = "Gene family", values_to = "Loadings") %>%
+  pivot_wider(names_from = "names", values_from = "Loadings") %>%
+  mutate(Color = ifelse(abs(Anterior) > abs(Posterior), "Anterior", "Posterior"))
+
+w
+
+```
+
+```{r, eval = F}
+
+w %>%
+  select(`Gene family`, Color, everything()) %>%
+  pivot_longer(!`Gene family`:Color, names_to = "Tooth_site", values_to = "Counts") %>%
+  group_by(Tooth_site, Color) %>%
+  slice_max(n = 10, order_by = Counts, with_ties = FALSE) %>%
+  filter((Color == "Anterior" & Tooth_site == "Anterior") | (Color == "Posterior" & Tooth_site == "Posterior")) %>%
+  bind_rows(., w %>%
+            select(`Gene family`, Color, everything()) %>%
+            pivot_longer(!`Gene family`:Color, names_to = "Tooth_site", values_to = "Counts") %>%
+            group_by(Tooth_site, Color) %>%
+            slice_min(n = 10, order_by = Counts, with_ties = FALSE) %>%
+            filter((Color == "Anterior" & Tooth_site == "Anterior") | (Color == "Posterior" & Tooth_site == "Posterior"))) %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(Counts)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = Counts, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = Tooth_site_colors) +
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+```
+
+
+```{r ts_loadings_plot_gf}
+humann2_KO_cmc_lda$scaling %>% 
+  as_data_frame() %>% 
+  mutate(`Gene family` = rownames(humann2_KO_cmc_lda$scaling)) %>% 
+  select(`Gene family`, everything()) %>%
+  slice_max(n = 10, order_by = LD1, with_ties = FALSE) %>%
+  bind_rows(., humann2_KO_cmc_lda$scaling %>% 
+            as_data_frame() %>% 
+            mutate(`Gene family` = rownames(humann2_KO_cmc_lda$scaling)) %>% 
+            select(`Gene family`, everything()) %>%
+            slice_min(n = 10, order_by = LD1, with_ties = FALSE)) %>%
+  left_join(., w %>% select(`Gene family`, Color), by = "Gene family") %>%
+  mutate(`Gene family` = str_replace_all(`Gene family`, "`","")) %>%
+  mutate(absCounts = abs(LD1)) %>%
+  arrange((absCounts)) %>%
+  mutate(`Gene family` = fct_relevel(`Gene family`, `Gene family`)) %>%
+  ggplot(., aes(x = LD1, y = `Gene family`, fill = Color)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_manual(values = Tooth_site_colors) +
+    geom_vline(xintercept = 0, linetype = "solid", size = 0.25) +
+    xlab("") +
+    ylab(" Gene Family") +
+    labs(fill='Group') +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "top")
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
