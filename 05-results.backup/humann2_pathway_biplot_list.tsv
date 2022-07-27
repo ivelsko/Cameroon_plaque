@@ -1,81 +1,81 @@
 pathway	Direction	Samples
-GLYCOCAT-PWY: glycogen degradation I (bacterial)	PC1+	Industrial+CMC
-GALACTUROCAT-PWY: D-galacturonate degradation I	PC1+	Industrial+CMC
-PWY-7204: pyridoxal 5'-phosphate salvage II (plants)	PC1+	Industrial+CMC
-PWY-5104: L-isoleucine biosynthesis IV	PC1+	Industrial+CMC
-PWY-6630: superpathway of L-tyrosine biosynthesis	PC1+	Industrial+CMC
-PWY-5005: biotin biosynthesis II	PC1+	Industrial+CMC
-PWY-5941: glycogen degradation II (eukaryotic)	PC1+	Industrial+CMC
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation	PC1+	Industrial+CMC
+PWY-7200: superpathway of pyrimidine deoxyribonucleoside salvage	PC1+	Industrial+CMC
+PWY-6470: peptidoglycan biosynthesis V (&beta;-lactam resistance)	PC1+	Industrial+CMC
+PWY-622: starch biosynthesis	PC1+	Industrial+CMC
 PWY-7371: 1,4-dihydroxy-6-naphthoate biosynthesis II	PC1+	Industrial+CMC
-PWY1G-0: mycothiol biosynthesis	PC1+	Industrial+CMC
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate)	PC1-	Industrial+CMC
-PWY-6859: all-trans-farnesol biosynthesis	PC1-	Industrial+CMC
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP)	PC1-	Industrial+CMC
-P122-PWY: heterolactic fermentation	PC1-	Industrial+CMC
-PWY-5675: nitrate reduction V (assimilatory)	PC1-	Industrial+CMC
-PWY-6113: superpathway of mycolate biosynthesis	PC1-	Industrial+CMC
-PWY-6803: phosphatidylcholine acyl editing	PC1-	Industrial+CMC
-PWY-7391: isoprene biosynthesis II (engineered)	PC1-	Industrial+CMC
-PWY-5971: palmitate biosynthesis II (bacteria and plants)	PC1-	Industrial+CMC
-PWY-6285: superpathway of fatty acids biosynthesis (E. coli)	PC1-	Industrial+CMC
-P23-PWY: reductive TCA cycle I	PC2+	Industrial+CMC
-PWY-5104: L-isoleucine biosynthesis IV	PC2+	Industrial+CMC
-PWY-7003: glycerol degradation to butanol	PC2+	Industrial+CMC
-PWY4LZ-257: superpathway of fermentation (Chlamydomonas reinhardtii)	PC2+	Industrial+CMC
-PWY-6588: pyruvate fermentation to acetone	PC2+	Industrial+CMC
-PWY66-398: TCA cycle III (animals)	PC2+	Industrial+CMC
-PWY-6269: adenosylcobalamin salvage from cobinamide II	PC2+	Industrial+CMC
-PWY-6549: L-glutamine biosynthesis III	PC2+	Industrial+CMC
-PWY-7254: TCA cycle VII (acetate-producers)	PC2+	Industrial+CMC
-REDCITCYC: TCA cycle VIII (helicobacter)	PC2+	Industrial+CMC
-PWY-5675: nitrate reduction V (assimilatory)	PC2-	Industrial+CMC
-PWY-6891: thiazole biosynthesis II (Bacillus)	PC2-	Industrial+CMC
-PWY-6892: thiazole biosynthesis I (E. coli)	PC2-	Industrial+CMC
-PWY-7210: pyrimidine deoxyribonucleotides biosynthesis from CTP	PC2-	Industrial+CMC
-PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis	PC2-	Industrial+CMC
-PWY-5838: superpathway of menaquinol-8 biosynthesis I	PC2-	Industrial+CMC
-PWY-5083: NAD/NADH phosphorylation and dephosphorylation	PC2-	Industrial+CMC
-THISYN-PWY: superpathway of thiamin diphosphate biosynthesis I	PC2-	Industrial+CMC
-PWY-6895: superpathway of thiamin diphosphate biosynthesis II	PC2-	Industrial+CMC
-PWY0-1241: ADP-L-glycero-&beta;-D-manno-heptose biosynthesis	PC2-	Industrial+CMC
-GLYCOCAT-PWY: glycogen degradation I (bacterial)	PC1+	CMC
-PWY-7204: pyridoxal 5'-phosphate salvage II (plants)	PC1+	CMC
-PWY-5005: biotin biosynthesis II	PC1+	CMC
-GALACTUROCAT-PWY: D-galacturonate degradation I	PC1+	CMC
-PWY-6630: superpathway of L-tyrosine biosynthesis	PC1+	CMC
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation	PC1+	CMC
-RHAMCAT-PWY: L-rhamnose degradation I	PC1+	CMC
-PWY-5941: glycogen degradation II (eukaryotic)	PC1+	CMC
-PWY-5101: L-isoleucine biosynthesis II	PC1+	CMC
-PWY-7209: superpathway of pyrimidine ribonucleosides degradation	PC1+	CMC
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate)	PC1-	CMC
-PWY-6859: all-trans-farnesol biosynthesis	PC1-	CMC
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP)	PC1-	CMC
-P122-PWY: heterolactic fermentation	PC1-	CMC
-PWY-5675: nitrate reduction V (assimilatory)	PC1-	CMC
-PWY-6113: superpathway of mycolate biosynthesis	PC1-	CMC
-PWY-6803: phosphatidylcholine acyl editing	PC1-	CMC
-PWY-7391: isoprene biosynthesis II (engineered)	PC1-	CMC
-PWY-5971: palmitate biosynthesis II (bacteria and plants)	PC1-	CMC
-PWY-6285: superpathway of fatty acids biosynthesis (E. coli)	PC1-	CMC
-PWY-5101: L-isoleucine biosynthesis II	PC2+	CMC
-GALACTUROCAT-PWY: D-galacturonate degradation I	PC2+	CMC
-GALACT-GLUCUROCAT-PWY: superpathway of hexuronide and hexuronate degradation	PC2+	CMC
-GLYCOCAT-PWY: glycogen degradation I (bacterial)	PC2+	CMC
-PWY-5005: biotin biosynthesis II	PC2+	CMC
-PWY-6630: superpathway of L-tyrosine biosynthesis	PC2+	CMC
-PWY-5941: glycogen degradation II (eukaryotic)	PC2+	CMC
-RHAMCAT-PWY: L-rhamnose degradation I	PC2+	CMC
-PWY-7204: pyridoxal 5'-phosphate salvage II (plants)	PC2+	CMC
-PWY-7209: superpathway of pyrimidine ribonucleosides degradation	PC2+	CMC
-PWY-5910: superpathway of geranylgeranyldiphosphate biosynthesis I (via mevalonate)	PC2-	CMC
-PWY-5121: superpathway of geranylgeranyl diphosphate biosynthesis II (via MEP)	PC2-	CMC
-PWY-6113: superpathway of mycolate biosynthesis	PC2-	CMC
-PWY-5971: palmitate biosynthesis II (bacteria and plants)	PC2-	CMC
-PWY-6859: all-trans-farnesol biosynthesis	PC2-	CMC
-PWY-6803: phosphatidylcholine acyl editing	PC2-	CMC
-PWY-7391: isoprene biosynthesis II (engineered)	PC2-	CMC
+P108-PWY: pyruvate fermentation to propanoate I	PC1+	Industrial+CMC
+PWY0-1297: superpathway of purine deoxyribonucleosides degradation	PC1+	Industrial+CMC
+PWY-7198: pyrimidine deoxyribonucleotides de novo biosynthesis IV	PC1+	Industrial+CMC
+PWY-4981: L-proline biosynthesis II (from arginine)	PC1+	Industrial+CMC
+RIBOSYN2-PWY: flavin biosynthesis I (bacteria and plants)	PC1+	Industrial+CMC
+GLUCONEO-PWY: gluconeogenesis I	PC1+	Industrial+CMC
+GLYOXYLATE-BYPASS: glyoxylate cycle	PC1-	Industrial+CMC
+PWY1F-823: leucopelargonidin and leucocyanidin biosynthesis	PC1-	Industrial+CMC
+SO4ASSIM-PWY: assimilatory sulfate reduction I	PC1-	Industrial+CMC
+PWY0-1479: tRNA processing	PC1-	Industrial+CMC
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	PC1-	Industrial+CMC
+PWY-5855: ubiquinol-7 biosynthesis (early decarboxylation)	PC1-	Industrial+CMC
+PWY-5856: ubiquinol-9 biosynthesis (early decarboxylation)	PC1-	Industrial+CMC
+PWY-5857: ubiquinol-10 biosynthesis (early decarboxylation)	PC1-	Industrial+CMC
+PWY-6708: ubiquinol-8 biosynthesis (early decarboxylation)	PC1-	Industrial+CMC
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	PC1-	Industrial+CMC
+PWY-5838: superpathway of menaquinol-8 biosynthesis I	PC2+	Industrial+CMC
+PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis I	PC2+	Industrial+CMC
+UBISYN-PWY: superpathway of ubiquinol-8 biosynthesis (early decarboxylation)	PC2+	Industrial+CMC
+PWY-7391: isoprene biosynthesis II (engineered)	PC2+	Industrial+CMC
+PWY-6307: L-tryptophan degradation X (mammalian, via tryptamine)	PC2+	Industrial+CMC
+PWY-6313: serotonin degradation	PC2+	Industrial+CMC
+PWY-6470: peptidoglycan biosynthesis V (&beta;-lactam resistance)	PC2+	Industrial+CMC
+PWY-7371: 1,4-dihydroxy-6-naphthoate biosynthesis II	PC2+	Industrial+CMC
+PWY-7200: superpathway of pyrimidine deoxyribonucleoside salvage	PC2+	Industrial+CMC
+PWY-7431: aromatic biogenic amine degradation (bacteria)	PC2+	Industrial+CMC
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	PC2-	Industrial+CMC
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	PC2-	Industrial+CMC
+GLYOXYLATE-BYPASS: glyoxylate cycle	PC2-	Industrial+CMC
+PWY1F-823: leucopelargonidin and leucocyanidin biosynthesis	PC2-	Industrial+CMC
+P105-PWY: TCA cycle IV (2-oxoglutarate decarboxylase)	PC2-	Industrial+CMC
+PWY-5154: L-arginine biosynthesis III (via N-acetyl-L-citrulline)	PC2-	Industrial+CMC
+P122-PWY: heterolactic fermentation	PC2-	Industrial+CMC
+P125-PWY: superpathway of (R,R)-butanediol biosynthesis	PC2-	Industrial+CMC
+PWY-5723: Rubisco shunt	PC2-	Industrial+CMC
+P124-PWY: Bifidobacterium shunt	PC2-	Industrial+CMC
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	PC1+	CMC
+PWY0-1479: tRNA processing	PC1+	CMC
+PWY-5855: ubiquinol-7 biosynthesis (early decarboxylation)	PC1+	CMC
+PWY-5856: ubiquinol-9 biosynthesis (early decarboxylation)	PC1+	CMC
+PWY-5857: ubiquinol-10 biosynthesis (early decarboxylation)	PC1+	CMC
+PWY-6708: ubiquinol-8 biosynthesis (early decarboxylation)	PC1+	CMC
+SO4ASSIM-PWY: assimilatory sulfate reduction I	PC1+	CMC
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	PC1+	CMC
+PWY-6803: phosphatidylcholine acyl editing	PC1+	CMC
+SULFATE-CYS-PWY: superpathway of sulfate assimilation and cysteine biosynthesis	PC1+	CMC
+GLYOXYLATE-BYPASS: glyoxylate cycle	PC1-	CMC
+PWY1F-823: leucopelargonidin and leucocyanidin biosynthesis	PC1-	CMC
+SO4ASSIM-PWY: assimilatory sulfate reduction I	PC1-	CMC
+PWY0-1479: tRNA processing	PC1-	CMC
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	PC1-	CMC
+PWY-5855: ubiquinol-7 biosynthesis (early decarboxylation)	PC1-	CMC
+PWY-5856: ubiquinol-9 biosynthesis (early decarboxylation)	PC1-	CMC
+PWY-5857: ubiquinol-10 biosynthesis (early decarboxylation)	PC1-	CMC
+PWY-6708: ubiquinol-8 biosynthesis (early decarboxylation)	PC1-	CMC
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	PC1-	CMC
+PWY-5838: superpathway of menaquinol-8 biosynthesis I	PC2+	CMC
+PWY-5861: superpathway of demethylmenaquinol-8 biosynthesis I	PC2+	CMC
+UBISYN-PWY: superpathway of ubiquinol-8 biosynthesis (early decarboxylation)	PC2+	CMC
+PWY-7391: isoprene biosynthesis II (engineered)	PC2+	CMC
+PWY-6519: 8-amino-7-oxononanoate biosynthesis I	PC2+	CMC
+P23-PWY: reductive TCA cycle I	PC2+	CMC
+BIOTIN-BIOSYNTHESIS-PWY: biotin biosynthesis I	PC2+	CMC
+PWY-7200: superpathway of pyrimidine deoxyribonucleoside salvage	PC2+	CMC
+PWY-6307: L-tryptophan degradation X (mammalian, via tryptamine)	PC2+	CMC
+PWY-7013: (S)-propane-1,2-diol degradation	PC2+	CMC
+TCA-GLYOX-BYPASS: superpathway of glyoxylate bypass and TCA	PC2-	CMC
+GLYCOLYSIS-TCA-GLYOX-BYPASS: superpathway of glycolysis, pyruvate dehydrogenase, TCA, and glyoxylate bypass	PC2-	CMC
+GLYOXYLATE-BYPASS: glyoxylate cycle	PC2-	CMC
+PWY1F-823: leucopelargonidin and leucocyanidin biosynthesis	PC2-	CMC
+P105-PWY: TCA cycle IV (2-oxoglutarate decarboxylase)	PC2-	CMC
+PWY-5154: L-arginine biosynthesis III (via N-acetyl-L-citrulline)	PC2-	CMC
 P122-PWY: heterolactic fermentation	PC2-	CMC
-PWY-6285: superpathway of fatty acids biosynthesis (E. coli)	PC2-	CMC
-PWY-5675: nitrate reduction V (assimilatory)	PC2-	CMC
+P125-PWY: superpathway of (R,R)-butanediol biosynthesis	PC2-	CMC
+PWY-5723: Rubisco shunt	PC2-	CMC
+P124-PWY: Bifidobacterium shunt	PC2-	CMC

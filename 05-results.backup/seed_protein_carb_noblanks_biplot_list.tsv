@@ -1,41 +1,41 @@
 Function	PC1	PC2	PC3	Direction	Samples	Filter
-Aldehyde dehydrogenase A (EC 1.2.1.22)	0.0938868002709177	-0.0762084233797778	0.0376081660243346	PC1+	CMC+Industrial	Carbs
-Glycolate dehydrogenase (EC 1.1.99.14), iron-sulfur subunit GlcF	0.0862750647622889	-0.0706066112178434	0.0278688690330432	PC1+	CMC+Industrial	Carbs
-Acetate permease ActP (cation/acetate symporter)	0.0860565480321167	-0.100530314153429	0.0122589251011309	PC1+	CMC+Industrial	Carbs
-Glycolate dehydrogenase (EC 1.1.99.14), subunit GlcD	0.0832016760316429	-0.0897144610766439	-0.00550489181705566	PC1+	CMC+Industrial	Carbs
-Aconitate hydratase 2 (EC 4.2.1.3)	0.0831922878455042	-0.0989138975503579	-0.00215547853801115	PC1+	CMC+Industrial	Carbs
-2,3-butanediol dehydrogenase, R-alcohol forming, (R)- and (S)-acetoin-specific (EC 1.1.1.4)	0.0830408631187765	-0.0318981855450568	0.0293789093244899	PC1+	CMC+Industrial	Carbs
-D-amino acid dehydrogenase small subunit (EC 1.4.99.1)	0.0830160506438113	-0.0751674804932944	0.0228937944991819	PC1+	CMC+Industrial	Carbs
-Pyruvate decarboxylase (EC 4.1.1.1)	0.0829816562115328	-0.069537777174179	0.0533767143656256	PC1+	CMC+Industrial	Carbs
-Phosphogluconate dehydratase (EC 4.2.1.12)	0.0823345543686104	-0.0524515114788759	0.0475241795100934	PC1+	CMC+Industrial	Carbs
-Dihydrolipoamide dehydrogenase of pyruvate dehydrogenase complex (EC 1.8.1.4)	0.0808150439649467	-0.0710177264572672	0.0118173107670868	PC1+	CMC+Industrial	Carbs
-Glycogen branching enzyme, GH-57-type, archaeal (EC 2.4.1.18)	-0.0580605779922812	0.0234003887638684	-0.0730048711446089	PC1-	CMC+Industrial	Carbs
-Alpha-N-acetylglucosaminidase (EC 3.2.1.50)	-0.0595469124519761	0.0805330348126233	-0.0821396740898119	PC1-	CMC+Industrial	Carbs
-Two-component sensor histidine kinase, malate (EC 2.7.3.-)	-0.0616357728233453	0.0152064269051216	-0.0046200989538361	PC1-	CMC+Industrial	Carbs
-L-idonate 5-dehydrogenase (EC 1.1.1.264)	-0.0638311835367948	0.014851271238423	0.0663506700050647	PC1-	CMC+Industrial	Carbs
-Outer membrane protein SusF	-0.0661407819885127	0.0396640627958124	0.01726855064831	PC1-	CMC+Industrial	Carbs
-Outer membrane protein SusE	-0.0689532372503847	0.0496979325998959	0.0308663460180143	PC1-	CMC+Industrial	Carbs
-PTS system, diacetylchitobiose-specific IIB component (EC 2.7.1.69)	-0.0692881697082396	0.0784276017612524	0.0248521450452788	PC1-	CMC+Industrial	Carbs
-Alpha-L-arabinofuranosidase II precursor (EC 3.2.1.55)	-0.0694076910668352	0.0384089920748809	-0.0245832502300476	PC1-	CMC+Industrial	Carbs
-Predicted transcriptional regulator of N-Acetylglucosamine utilization, GntR family	-0.0710980998493194	0.0577753769854607	-0.0611672188212957	PC1-	CMC+Industrial	Carbs
-Oxaloacetate decarboxylase involved in citrate fermentation, predicted (EC 4.1.1.3)	-0.0904275284466486	-0.00901265050721087	-0.0784984504832149	PC1-	CMC+Industrial	Carbs
-1,3-propanediol dehydrogenase (EC 1.1.1.202)	-0.00615234702523302	0.124661337743586	0.0174201833331584	PC2+	CMC+Industrial	Carbs
-Outer surface protein of unknown function, cellobiose operon	-0.0476508100876055	0.120896199867442	0.00614421006135069	PC2+	CMC+Industrial	Carbs
-Polygalacturonase (EC 3.2.1.15)	-0.0435111087431857	0.101614779216019	-0.0550311371357819	PC2+	CMC+Industrial	Carbs
-(S)-2-hydroxy-acid oxidase (EC 1.1.3.15)	-0.0262888850316806	0.0989130081532351	-0.0588730863863364	PC2+	CMC+Industrial	Carbs
-Two-component sensor kinase YesM (EC 2.7.3.-)	-0.0222620889524537	0.0980799554346636	0.0126266768253543	PC2+	CMC+Industrial	Carbs
-2,3-butanediol dehydrogenase, S-alcohol forming, (R)-acetoin-specific (EC 1.1.1.4)	0.0125872759856011	0.0980687078636542	0.0502636749179144	PC2+	CMC+Industrial	Carbs
-PTS system, trehalose-specific IIB component (EC 2.7.1.69)	-0.0504762850792568	0.0957380672523359	-0.0266110555847579	PC2+	CMC+Industrial	Carbs
-Sorbitol operon transcription regulator	-0.036099198584051	0.0957258361340052	0.0286075077182844	PC2+	CMC+Industrial	Carbs
-Acetolactate synthase, catabolic (EC 2.2.1.6)	-0.0233161381831353	0.0898653767645895	0.0583446601679301	PC2+	CMC+Industrial	Carbs
-predicted xylose isomerase	-0.0487081740350156	0.0850216513686841	-0.0437543948648354	PC2+	CMC+Industrial	Carbs
-2-methylcitrate synthase (EC 2.3.3.5)	0.0595131177987319	-0.0958169760636165	0.0507093538587387	PC2-	CMC+Industrial	Carbs
-Aconitate hydratase 2 (EC 4.2.1.3)	0.0831922878455042	-0.0989138975503579	-0.00215547853801115	PC2-	CMC+Industrial	Carbs
-Acetate permease ActP (cation/acetate symporter)	0.0860565480321167	-0.100530314153429	0.0122589251011309	PC2-	CMC+Industrial	Carbs
-Glycerol-3-phosphate ABC transporter, periplasmic glycerol-3-phosphate-binding protein (TC 3.A.1.1.3)	0.00853063303423012	-0.102271140928837	-0.101476670980437	PC2-	CMC+Industrial	Carbs
-Pyruvate:ferredoxin oxidoreductase, alpha subunit (EC 1.2.7.1)	-0.0476879780570846	-0.10230340735882	-0.0380132151877052	PC2-	CMC+Industrial	Carbs
-Propionyl-CoA carboxylase carboxyl transferase subunit (EC 6.4.1.3)	0.0208284985235463	-0.109912731272149	-0.0415534990107287	PC2-	CMC+Industrial	Carbs
-Probable glycerol transport protein	-0.0386120189034585	-0.113974675799029	-0.109332221107794	PC2-	CMC+Industrial	Carbs
-D-Lactate dehydrogenase, cytochrome c-dependent (EC 1.1.2.4)	0.0620713560576655	-0.114095813018363	0.000939611500628535	PC2-	CMC+Industrial	Carbs
-Fumarate hydratase class I (EC 4.2.1.2)	-0.0383877374368394	-0.124001963958388	-0.0595164165789136	PC2-	CMC+Industrial	Carbs
-Propionyl-CoA carboxylase biotin-containing subunit (EC 6.4.1.3)	0.0370405972037924	-0.14905253920054	-0.0271691430698824	PC2-	CMC+Industrial	Carbs
+Aldehyde dehydrogenase A (EC 1.2.1.22)	0.0937076829446652	-0.0761073420446842	0.0371514458293657	PC1+	CMC+Industrial	Carbs
+Glycolate dehydrogenase (EC 1.1.99.14), iron-sulfur subunit GlcF	0.0861356689250198	-0.0705256340281876	0.0274509945826598	PC1+	CMC+Industrial	Carbs
+Acetate permease ActP (cation/acetate symporter)	0.0859586360753071	-0.100361649383	0.0116341079534702	PC1+	CMC+Industrial	Carbs
+Glycolate dehydrogenase (EC 1.1.99.14), subunit GlcD	0.0830998343410786	-0.0894069665675043	-0.00608064462276369	PC1+	CMC+Industrial	Carbs
+Aconitate hydratase 2 (EC 4.2.1.3)	0.0830847651383292	-0.0986115293278789	-0.00276210728308038	PC1+	CMC+Industrial	Carbs
+D-amino acid dehydrogenase small subunit (EC 1.4.99.1)	0.0829224565626094	-0.0751664037207724	0.0225023126586834	PC1+	CMC+Industrial	Carbs
+2,3-butanediol dehydrogenase, R-alcohol forming, (R)- and (S)-acetoin-specific (EC 1.1.1.4)	0.0828790101497945	-0.0318026161856486	0.0291860483300561	PC1+	CMC+Industrial	Carbs
+Pyruvate decarboxylase (EC 4.1.1.1)	0.0828572328393325	-0.0696223176605082	0.0528872749977607	PC1+	CMC+Industrial	Carbs
+Phosphogluconate dehydratase (EC 4.2.1.12)	0.0821688997578307	-0.0524235202863577	0.0471641479434062	PC1+	CMC+Industrial	Carbs
+Dihydrolipoamide dehydrogenase of pyruvate dehydrogenase complex (EC 1.8.1.4)	0.0806934091708116	-0.0708263801635852	0.0113867144391016	PC1+	CMC+Industrial	Carbs
+Glycogen branching enzyme, GH-57-type, archaeal (EC 2.4.1.18)	-0.0578918655024584	0.0238146613228575	-0.0728957218663469	PC1-	CMC+Industrial	Carbs
+Alpha-N-acetylglucosaminidase (EC 3.2.1.50)	-0.0593906541977472	0.0808842531665299	-0.0815405836917518	PC1-	CMC+Industrial	Carbs
+Two-component sensor histidine kinase, malate (EC 2.7.3.-)	-0.0614816865949693	0.0152349176556318	-0.00470451481801802	PC1-	CMC+Industrial	Carbs
+L-idonate 5-dehydrogenase (EC 1.1.1.264)	-0.0637115949367172	0.0145046388780763	0.0661428380447104	PC1-	CMC+Industrial	Carbs
+Outer membrane protein SusF	-0.066007500587054	0.03949673791575	0.0174158570317679	PC1-	CMC+Industrial	Carbs
+Outer membrane protein SusE	-0.0688257840044492	0.0494247865949942	0.0310856926631442	PC1-	CMC+Industrial	Carbs
+PTS system, diacetylchitobiose-specific IIB component (EC 2.7.1.69)	-0.0691501248159026	0.0780849515991365	0.0253263121003612	PC1-	CMC+Industrial	Carbs
+Alpha-L-arabinofuranosidase II precursor (EC 3.2.1.55)	-0.0692347340868073	0.0385094540021394	-0.0244764847909959	PC1-	CMC+Industrial	Carbs
+Predicted transcriptional regulator of N-Acetylglucosamine utilization, GntR family	-0.0709281897336374	0.0580826114336092	-0.0608413687539307	PC1-	CMC+Industrial	Carbs
+Oxaloacetate decarboxylase involved in citrate fermentation, predicted (EC 4.1.1.3)	-0.0902014093660165	-0.00852570183448201	-0.0786505820762468	PC1-	CMC+Industrial	Carbs
+1,3-propanediol dehydrogenase (EC 1.1.1.202)	-0.00620631406659076	0.124572730427641	0.0182510781483064	PC2+	CMC+Industrial	Carbs
+Outer surface protein of unknown function, cellobiose operon	-0.0475700174056145	0.120664461410965	0.0069865627856945	PC2+	CMC+Industrial	Carbs
+Polygalacturonase (EC 3.2.1.15)	-0.0434307995024309	0.101905431684267	-0.0543495992940566	PC2+	CMC+Industrial	Carbs
+(S)-2-hydroxy-acid oxidase (EC 1.1.3.15)	-0.0262082944627534	0.0991947190050312	-0.0582118761075311	PC2+	CMC+Industrial	Carbs
+Two-component sensor kinase YesM (EC 2.7.3.-)	-0.0222584424992677	0.0980046244880914	0.0132400478588262	PC2+	CMC+Industrial	Carbs
+2,3-butanediol dehydrogenase, S-alcohol forming, (R)-acetoin-specific (EC 1.1.1.4)	0.0125440603268294	0.0978086471279399	0.0507655958181599	PC2+	CMC+Industrial	Carbs
+PTS system, trehalose-specific IIB component (EC 2.7.1.69)	-0.0503415279042872	0.095664971137037	-0.0259149010494177	PC2+	CMC+Industrial	Carbs
+Sorbitol operon transcription regulator	-0.0360369444104029	0.0955326332728308	0.0290525225247958	PC2+	CMC+Industrial	Carbs
+Acetolactate synthase, catabolic (EC 2.2.1.6)	-0.0233229367015129	0.0896889120244035	0.0586029861997301	PC2+	CMC+Industrial	Carbs
+predicted xylose isomerase	-0.0485979637570803	0.0851898313628028	-0.0431777049620546	PC2+	CMC+Industrial	Carbs
+2-methylcitrate synthase (EC 2.3.3.5)	0.0594239693113745	-0.0958245240443944	0.0500052913789866	PC2-	CMC+Industrial	Carbs
+Aconitate hydratase 2 (EC 4.2.1.3)	0.0830847651383292	-0.0986115293278789	-0.00276210728308038	PC2-	CMC+Industrial	Carbs
+Acetate permease ActP (cation/acetate symporter)	0.0859586360753071	-0.100361649383	0.0116341079534702	PC2-	CMC+Industrial	Carbs
+Glycerol-3-phosphate ABC transporter, periplasmic glycerol-3-phosphate-binding protein (TC 3.A.1.1.3)	0.00859493538367802	-0.101286382927005	-0.102313069136328	PC2-	CMC+Industrial	Carbs
+Pyruvate:ferredoxin oxidoreductase, alpha subunit (EC 1.2.7.1)	-0.0474775127570037	-0.101887869359287	-0.0390335430001671	PC2-	CMC+Industrial	Carbs
+Propionyl-CoA carboxylase carboxyl transferase subunit (EC 6.4.1.3)	0.0208755694307185	-0.109304573015521	-0.042523729518593	PC2-	CMC+Industrial	Carbs
+Probable glycerol transport protein	-0.0384279368504852	-0.112990774955488	-0.110359065089594	PC2-	CMC+Industrial	Carbs
+D-Lactate dehydrogenase, cytochrome c-dependent (EC 1.1.2.4)	0.0620599831614339	-0.113902788472983	0.00012543420922101	PC2-	CMC+Industrial	Carbs
+Fumarate hydratase class I (EC 4.2.1.2)	-0.0382041390490457	-0.123328243149666	-0.0606976377644877	PC2-	CMC+Industrial	Carbs
+Propionyl-CoA carboxylase biotin-containing subunit (EC 6.4.1.3)	0.0370602518154631	-0.1484457939181	-0.0284356395377635	PC2-	CMC+Industrial	Carbs
