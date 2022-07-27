@@ -1,0 +1,291 @@
+---
+title: "Cameroon hunter-gatherer calculus/plaque MALT Strep groups"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(tidyverse)
+library(patchwork)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("../../.."))
+```
+
+# MALT read stats
+
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+```{r}
+# read in the Strep group table updated from James' by me for the MID manuscript
+
+strep_groups <- fread("./00-documentation.backup/dRep_strep_groups.tsv") %>%
+  # remove the extrac column with the old Clade_consensus
+  select(-Clade_Consensus) %>%
+  # make a factor for plotting
+  mutate(dRep = fct_relevel(dRep, "Sanguinis","Mitis","Salivarius","Anginosus","Bovis","Pyogenic","Mutans","Other_oral","Other","Unknown"))
+
+```
+
+```{r}
+# set colors to resemble James' figure
+
+clade_colors <- c("Sanguinis" = "#a50026",
+                  "Mitis" = "#d73027",
+                  "Salivarius" = "#f46d43",
+                  "Anginosus" = "#fee090",
+                  "Bovis" = "#abd9e9",
+                  "Pyogenic" = "#74add1",
+                  "Mutans" = "#4575b4",
+                  "Oral_other" = "#313695",
+                  "Other" = "#4d4d4d",
+                  "Unknown" = "#e0e0e0")
+
+genus_colors <- c("Streptococcus" = "#a50026", "Other" = "#e0e0e0")
+
+```
+
+```{r}
+# which samples have mutans?
+mutans_samples <- malt_species.decontam %>%
+  select(matches("Species|CMC|SRR|JAE|VLC"),
+         -matches("SRR164")) %>%
+  filter(str_detect(Species, "Streptococcus mutans")) %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(Counts > 0)%>%
+  arrange(Library_ID) %>%
+  pull(Library_ID)
+
+```
+
+```{r}
+# which species?
+malt_species.decontam %>%
+  select(matches("Species|CMC|SRR|JAE|VLC"),
+         -matches("SRR164")) %>%
+  filter(Species == "Streptococcus mutans") %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(Library_ID %in% mutans_samples,
+         Counts > 0) %>%
+  left_join(., metadata %>%
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Ethnic_Group, Age, Sex, Village, Tooth_site, Decayed, No_decayed, Missing, No_missing)) %>%
+  select(-Species, -Counts) %>%
+  arrange(Library_ID)
+
+```
+
+
+```{r}
+# which species?
+path_plot <- malt_species.decontam %>%
+  select(matches("Species|CMC|SRR|JAE|VLC"),
+         -matches("SRR164")) %>%
+  filter(Species == "Streptococcus mutans") %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(Library_ID %in% mutans_samples,
+         Counts > 0) %>%
+  left_join(., metadata %>%
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, No_decayed, No_missing)) %>%
+  select(Library_ID, No_decayed, No_missing) %>%
+  rename(Decayed = No_decayed,
+         Missing = No_missing) %>%
+    pivot_longer(!Library_ID, names_to = "Pathology", values_to = "Counts") %>%
+  mutate(Pathology = fct_relevel(Pathology, "Decayed","Missing")) %>%
+  arrange(Library_ID) %>%
+  ggplot(., aes(x = Library_ID, y = Counts, fill = Pathology)) +
+         geom_bar(stat = "identity", color = "black", size = 0.25) + # , color = "black"
+         theme_minimal(base_size = 12) +
+         scale_fill_manual(values = c("#065FA3","#FF3200")) +
+         # theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+         #       axis.text = element_text(size = 12)) +
+         scale_y_continuous(breaks=scales::pretty_breaks(n=5)) +
+         theme(axis.text.x = element_blank()) +
+         theme(axis.text.y = element_text(size = 10)) +
+        # scale_y_continuous(labels = function(x) paste0(x*100)) + # Multiply by 100
+         ylab("No. teeth") +
+         xlab("") +
+         ggtitle("")
+  
+path_plot
+
+```
+
+```{r all_percents}
+# % of mutans, other strep, other genera
+aardvark <- malt_species.decontam  %>%
+  select(matches("Species|CMC|SRR|JAE|VLC"),
+         -matches("SRR164")) %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(Library_ID %in% mutans_samples) %>%
+  pivot_wider(names_from = "Library_ID", values_from = "Counts") %>%
+  # make a column with Strep or other
+  mutate(Genus_inc = ifelse(str_detect(Species,"Streptococcus"),"Streptococcus", "NonStrep")) %>%
+  left_join(., strep_groups , by = "Species") %>%
+  # remove Species column leaving Genus column
+  # also remove Streptococcus devriesei from the Mutans group b/c this is the only other species in that group with counts, and we ony want S. mutans
+  mutate(Genus = replace_na(as.character(dRep), "NonStrep"),
+         Genus = ifelse(Species == "Streptococcus devriesei","Other",Genus)) %>% 
+  select(Genus, everything()) %>%
+  select(-matches("Species|dRep|Genus_inc")) %>%
+  # convert to long format
+  gather("Library_ID","Counts", 2:ncol(.)) %>%
+  group_by(Library_ID, Genus) %>%
+  # sum all Strep read counts and all Other read counts
+  summarize(Reads = sum(Counts)) %>%
+  pivot_wider(names_from = "Genus", values_from = "Reads") %>%
+  # convert to proportions
+  adorn_percentages() %>%
+  ungroup() %>%
+  # rearrange column order
+  select(Library_ID, NonStrep, Mutans, everything()) %>%
+  # now sum counts for columns we're not interested in 
+  mutate(OtherStrep = select(., Anginosus:Sanguinis) %>% rowSums()) %>%
+  # rearrange column order again and drop the unwanted columns
+  select(Library_ID, NonStrep, Mutans, OtherStrep) %>%
+  pivot_longer(!Library_ID, names_to = "Genus", values_to = "Counts") 
+
+```
+
+```{r strep_pct}
+# percent of total strep
+armadillo <- malt_species.decontam  %>%
+  select(matches("Species|CMC|SRR|JAE|VLC"),
+         -matches("SRR164")) %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  filter(Library_ID %in% mutans_samples) %>%
+  pivot_wider(names_from = "Library_ID", values_from = "Counts") %>%
+  # make a column with Strep or other
+  mutate(Genus_inc = ifelse(str_detect(Species,"Streptococcus"),"Streptococcus", "NonStrep")) %>%
+  left_join(., strep_groups , by = "Species") %>%
+  # remove Species column leaving Genus column
+  mutate(Genus = replace_na(as.character(dRep), "NonStrep"),
+         Genus = ifelse(Species == "Streptococcus devriesei","Other",Genus)) %>%
+  select(Genus, everything()) %>%
+  select(-matches("Species|dRep|Genus_inc")) %>%
+  # convert to long format
+  gather("Library_ID","Counts", 2:ncol(.)) %>%
+  group_by(Library_ID, Genus) %>%
+  # sum all Strep read counts and all Other read counts
+  summarize(Reads = sum(Counts)) %>%
+  pivot_wider(names_from = "Genus", values_from = "Reads") %>%
+  ungroup() %>%
+  # rearrange column order
+  select(-NonStrep) %>%
+  select(Library_ID, Mutans, everything()) %>%
+  # now sum counts for columns we're not interested in 
+  mutate(OtherStrep = select(., Anginosus:Sanguinis) %>% rowSums()) %>%
+  # rearrange column order again and drop the unwanted columns
+  select(Library_ID, Mutans, OtherStrep) %>%
+  # convert to percentages
+  adorn_percentages() %>%
+  pivot_longer(!Library_ID, names_to = "Genus", values_to = "Counts")
+
+
+```
+
+```{r plot}
+
+strep_plot <- aardvark %>%
+  full_join(., armadillo %>%
+              filter(Genus == "Mutans") %>%
+              rename(Pct_mut = Counts) %>%
+              mutate(Pct_mut = Pct_mut * 100)) %>%
+  mutate(Genus = fct_relevel(Genus, "NonStrep","OtherStrep","Mutans"),
+         Counts = Counts * 100) %>%
+  arrange(Library_ID) %>%
+  ggplot(., aes(x = Library_ID, y = Counts, fill = Genus)) +
+         geom_bar(stat = "identity", color = "black", size = 0.25) + # , color = "black"
+         theme_minimal(base_size = 12) +
+         scale_fill_manual(values = c("#e0e0e0","#044c82","#377eb5")) +
+         # theme(axis.text.x = element_text(angle = 90, hjust = 1),
+         #       axis.text = element_text(size = 12)) +
+         coord_cartesian(ylim = c(NA,50)) +
+         scale_y_continuous(breaks=scales::pretty_breaks(n=5)) +
+         theme(axis.text.x = element_blank()) +
+         theme(axis.text.y = element_text(size = 10)) +
+        # scale_y_continuous(labels = function(x) paste0(x*100)) + # Multiply by 100
+         ylab("Percent") +
+         xlab("") +
+         ggtitle("")
+
+
+strep_plot
+
+```
+
+```{r plot}
+
+dot_plot <- aardvark %>%
+  full_join(., armadillo %>%
+              filter(Genus == "Mutans") %>%
+              rename(Pct_mut = Counts) %>%
+              mutate(Pct_mut = Pct_mut * 100)) %>%
+  mutate(Genus = fct_relevel(Genus, "NonStrep","OtherStrep","Mutans"),
+         Counts = Counts * 100) %>%
+  arrange(Library_ID) %>%
+  ggplot(., aes(x = Library_ID, y = Counts, fill = Genus)) +
+         geom_point(aes(x = Library_ID, y = Pct_mut), size =  1) +
+         theme_minimal(base_size = 12) +
+         # scale_fill_manual(values = c("#e0e0e0","#313695","#4575b4")) +
+         theme(panel.grid.minor.y = element_blank()) +
+         scale_y_continuous(breaks=scales::pretty_breaks(n=10)) +
+         theme(axis.text.x = element_blank()) +
+         theme(axis.text.y = element_text(size = 10)) +
+        # scale_y_continuous(labels = function(x) paste0(x*100)) + # Multiply by 100
+         ylab("Percent") +
+         xlab("") +
+         ggtitle("")
+
+
+dot_plot
+
+```
+
+```{r}
+mutans_plot <- dot_plot / strep_plot / path_plot +
+  plot_layout(heights = c(1,1,1))
+
+mutans_plot
+
+# ggsave("./06-publication/main_figures/Figure_5/strep_mutans.pdf", plot = mutans_plot, device = "pdf",
+#        scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

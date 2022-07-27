@@ -1,0 +1,533 @@
+---
+title: "Kraken Main Figure"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(taxa)
+library(metacoder)
+library(plyr)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(patchwork)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("../../.."))
+```
+
+## Read assignment stats
+Load data files 
+```{r load_data}
+rs_readstats <- fread("./05-results.backup/read_classification_stats.rs.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
+
+rspm_readstats <- fread("./05-results.backup/read_classification_stats.rspm.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
+
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+# merge the tables into 1
+kraken_readstats <- rs_readstats %>%
+  mutate(Unclassified_T = Unclassified + Classified_0,
+         Percent_classified = Classified / (Classified + Unclassified_T) *100) %>%
+  select(SampleID, Classified, Unclassified_T, Percent_classified) %>%
+  pivot_longer(!SampleID, names_to = "Classification", values_to = "Counts") %>%
+  mutate(DB = "RefSeqOnly") %>%
+  bind_rows(., rspm_readstats %>%
+            mutate(Unclassified_T = Unclassified + Classified_0,
+         Percent_classified = Classified / (Classified + Unclassified_T) *100) %>%
+            select(SampleID, Classified, Unclassified_T, Percent_classified) %>%
+            pivot_longer(!SampleID, names_to = "Classification", values_to = "Counts") %>%
+            mutate(DB = "RefSeqPasolliMAGs")) %>%
+  inner_join(., metadata %>%
+               select(SampleID,Env,Description,Ethnic_Group,Market_integration_split,Age_group,Sex,Tooth_site,Type,Village)) %>%
+  # remove unneeded sample groups
+  filter(!str_detect(Description, "Saliva|Buccal"))
+
+```
+
+```{r}
+RSPM_kraken_compare <- kraken_readstats %>%
+  filter(!str_detect(SampleID, "EXB|LIB|10M|SRR164")) %>%
+  filter(Classification == "Percent_classified") %>%
+  ggplot(., aes(x = Market_integration_split, y = Counts, fill = DB)) +
+    geom_boxplot() +
+    geom_point(position = position_jitterdodge(dodge.width = 0.85, jitter.width = 0.2), size = 1.0, alpha = 0.5) +
+    scale_fill_manual(values = Kraken_db_colors) +
+    theme_minimal(base_size = 28) +
+    theme(axis.text.x = element_text(vjust = 1)) +
+    theme(legend.position = "top") +
+    xlab("") +
+    ylab("Reads classified (%)")
+
+RSPM_kraken_compare
+
+# ggsave("./06-publication/main_figures/Figure_9/panel_parts/Figure_9_RSPM_kraken_compare.pdf", plot = RSPM_kraken_compare, device = "pdf",
+#        scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r stats}
+
+wilcox_p <- kraken_readstats %>%
+  filter(Classification == "Percent_classified") %>%
+  filter(!str_detect(SampleID, "EXB|LIB|SRR164")) %>%
+  group_by(Market_integration_split) %>%
+  summarise(pvalue = pairwise.wilcox.test(Counts, DB, p.adjust.method = "fdr")$p.value)
+
+wilcox_p %>% filter(pvalue <= 0.05)
+
+```
+
+
+## Phylum-level differences
+```{r load_data}
+# get the sample names from here
+rs_readstats <- fread("./05-results.backup/read_classification_stats.rs.tsv") %>%
+  rename(SampleID = 1,
+         Classified = 2,
+         Unclassified = 3,
+         Classified_0 = 4)
+
+```
+
+```{r full_data}
+# all data except original HMP plaque
+rs_mpa_full <- fread("./05-results.backup/combined.kraken2.report_mpa.rs.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleNo", values_to = "Counts") %>%
+  pivot_wider(names_from = "Taxonomy", values_from = "Counts") %>%
+  bind_cols(., rs_readstats %>%
+              select(SampleID)) %>%
+  select(-SampleNo) %>%
+  select(SampleID, everything()) %>%
+  pivot_longer(!SampleID, names_to = "Taxonomy", values_to = "Counts") %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts")
+
+rspm_mpa_full <- fread("./05-results.backup/combined.kraken2.report_mpa.rspm.tsv") %>%
+  rename(Taxonomy =  `#Classification`) %>%
+  pivot_longer(!Taxonomy, names_to = "SampleNo", values_to = "Counts") %>%
+  pivot_wider(names_from = "Taxonomy", values_from = "Counts") %>%
+  bind_cols(., rs_readstats %>%
+              select(SampleID)) %>%
+  select(-SampleNo) %>%
+  select(SampleID, everything()) %>%
+  pivot_longer(!SampleID, names_to = "Taxonomy", values_to = "Counts") %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts")
+
+rs_mpa_sp <- rs_mpa_full %>%
+  filter(str_detect(Taxonomy, "s__"),
+         !str_detect(Taxonomy, "t__"))
+
+rspm_mpa_sp <- rspm_mpa_full %>%
+  filter(str_detect(Taxonomy, "s__"),
+         !str_detect(Taxonomy, "t__"))
+
+```
+
+
+```{r}
+phyla_abd <- rs_mpa_full %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus")) %>%
+  group_by(Phylum) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  filter(mean_prop_rs >= 0.00005) %>%
+  select(Phylum) %>%
+  pull()
+
+
+
+oral_phyla <- rs_mpa_full %>%
+  # give Vampirococcus a phylum b/c it's the only one in Candidatus Absconditabacteria
+  mutate(Taxonomy = str_replace_all(Taxonomy, "g__Vampirococcus","p__Candidatus Absconditabacteria")) %>%
+  # select(Taxonomy) %>%
+  # filter(str_detect(Taxonomy, "Vampir"))
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>% 
+  select(Taxonomy) %>%
+  filter(str_detect(Taxonomy, "Actinobacteria|Bacteroidetes|Chlamydiae|Chloroflexi|Euryarchaeota|Firmicutes|Fusobacteria|Proteobacteria|Spirochaetes|Absconditabacteria|Gracilibacteria|Synergistetes|Tenericutes|Saccharibacteria")) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  arrange(Phylum) %>%
+  pull()
+
+```
+
+
+```{r phylum_changes}
+phylum_plot <- rs_mpa_full %>%
+  # give Vampirococcus a phylum b/c it's the only one in Candidatus Absconditabacteria
+  mutate(Taxonomy = str_replace_all(Taxonomy, "g__Vampirococcus","p__Candidatus Absconditabacteria")) %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry)) %>%
+  # remove bad sample
+  filter(!str_detect(SampleID, "CMC032.B0101|SRR514202"))  %>%
+  group_by(Market_integration_split, Phylum) %>%
+  summarize(mean_prop_rs = mean(Proportion)) %>%
+  ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            # give Vampirococcus a phylum b/c it's the only one in Candidatus Absconditabacteria
+            mutate(Taxonomy = str_replace_all(Taxonomy, "g__Vampirococcus","p__Candidatus Absconditabacteria")) %>%
+            filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+                   str_detect(Taxonomy, "p__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+            select(-domain) %>%
+            adorn_percentages(denominator = "col") %>%
+            pivot_longer(!Phylum, names_to = "SampleID", values_to = "Proportion") %>%
+            # remove bad sample
+            filter(!str_detect(SampleID, "CMC032.B0101|SRR514202"))  %>%
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) %>%
+            group_by(Market_integration_split, Phylum) %>%
+            summarize(mean_prop_rspm = mean(Proportion)) %>%
+            ungroup()) %>%
+  mutate(fold_change = gtools::foldchange(mean_prop_rspm, mean_prop_rs),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus"),
+         # log_fold_change >= 1 | log_fold_change <= -1,
+         Phylum %in% oral_phyla # phyla_abd (phyla with a proportion  >= 0.00005 in all groups)
+         ) %>%
+  mutate(Phylum = str_replace_all(Phylum, "p__",""),
+         Market_integration_split = fct_drop(Market_integration_split),
+         # Phylum = fct_relevel(Phylum, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Absconditabacteria","Candidatus Gracilibacteria","Candidatus Saccharibacteria","Chlamydiae","Euryarchaeota","Spirochaetes","Synergistetes","Chloroflexi","Tenericutes")) %>%
+         # Phylum = fct_relevel(Phylum, "Bacteroidetes","Fusobacteria","Firmicutes","Proteobacteria","Actinobacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Candidatus Absconditabacteria","Candidatus Gracilibacteria","Synergistetes","Chlamydiae","Tenericutes","Chloroflexi")) %>%
+         Phylum = fct_relevel(Phylum, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Candidatus Gracilibacteria","Synergistetes","Chlamydiae","Candidatus Absconditabacteria","Tenericutes","Chloroflexi")) %>%
+  ggplot(., aes(x = Phylum, y = log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single"), color = "black", size = 0.2) +
+    theme_minimal(base_size = 18) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    theme(legend.position = "top") +
+    xlab("") +
+    ylab("log2(Fold change)")
+
+phylum_plot
+
+```
+
+```{r phylum_changes_eb}
+phylum_eb_plot <- rs_mpa_full %>%
+  # give Vampirococcus a phylum b/c it's the only one in Candidatus Absconditabacteria
+  mutate(Taxonomy = str_replace_all(Taxonomy, "g__Vampirococcus","p__Candidatus Absconditabacteria")) %>%
+  filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+         str_detect(Taxonomy, "p__")) %>%
+  arrange(Taxonomy) %>%
+  separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+  select(-domain) %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "RS_Proportion") %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split, Industry)) %>%
+  # remove bad sample
+  filter(!str_detect(SampleID, "CMC032.B0101|SRR514202")) %>%
+  # group_by(Market_integration_split, Phylum) %>%
+  # summarize(mean_prop_rs = mean(Proportion)) %>%
+  # ungroup() %>%
+  full_join(., rspm_mpa_full %>%
+            # give Vampirococcus a phylum b/c it's the only one in Candidatus Absconditabacteria
+            mutate(Taxonomy = str_replace_all(Taxonomy, "g__Vampirococcus","p__Candidatus Absconditabacteria")) %>%
+            filter(!str_detect(Taxonomy, "c__|o__|f__|g__|s__|Eukaryota|Virus"),
+                   str_detect(Taxonomy, "p__")) %>%
+            arrange(Taxonomy) %>%
+            separate(Taxonomy, into = c("domain","Phylum"), sep = "\\|", extra = "merge") %>%
+            select(-domain) %>%
+            adorn_percentages(denominator = "col") %>%
+            pivot_longer(!Phylum, names_to = "SampleID", values_to = "RSPM_Proportion") %>%
+            # remove bad sample
+            filter(!str_detect(SampleID, "CMC032.B0101|SRR514202"))  %>%
+            left_join(., metadata %>%
+                      select(SampleID, Market_integration_split)) 
+            # %>%
+            # group_by(Market_integration_split, Phylum) %>%
+            # summarize(mean_prop_rspm = mean(Proportion)) %>%
+            # ungroup()
+              ) %>%
+  mutate(fold_change = gtools::foldchange(RSPM_Proportion, RS_Proportion),
+         log_fold_change = gtools::foldchange2logratio(fold_change, base = 2)) %>%
+  filter(str_detect(Market_integration_split, "Forest camp|Logging road|Farming|Industrial plaque|Industrial calculus"),
+         # log_fold_change >= 1 | log_fold_change <= -1,
+         Phylum %in% oral_phyla # phyla_abd (phyla with a proportion  >= 0.00005 in all groups)
+         ) %>%
+  drop_na(log_fold_change) %>%
+  filter_at(vars(log_fold_change), all_vars(is.finite(.))) %>%
+  group_by(Market_integration_split, Phylum) %>%
+  summarize(mean_log_fold_change = mean(log_fold_change),
+            sd_log_fold_change = sd(log_fold_change)) %>%
+  mutate(Phylum = str_replace_all(Phylum, "p__",""),
+         Market_integration_split = fct_drop(Market_integration_split),
+         Phylum = fct_relevel(Phylum, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Gracilibacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Synergistetes","Chlamydiae","Candidatus Absconditabacteria","Tenericutes","Chloroflexi")) %>%
+  ggplot(., aes(x = Phylum, y = mean_log_fold_change, ymin = mean_log_fold_change - sd_log_fold_change, ymax = mean_log_fold_change + sd_log_fold_change, fill = Market_integration_split)) +
+    # geom_boxplot() +
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single"), color = "black", size = 0.2) +
+    geom_errorbar(position = position_dodge(0.9), size = 0.2, width = 0.3) +
+    theme_minimal(base_size = 24) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+    scale_fill_manual(values = Market_integration_split_colors) +
+    # theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+      theme(axis.text.x = element_blank()) +
+    theme(legend.position = "none") +
+    xlab("") +
+    ylab("log2(Fold change)")
+
+phylum_eb_plot
+
+```
+
+```{r known_abund}
+
+# load taxonomic abundance tables downloaded from HOMD (https://www.homd.org/download#abundance)
+eren1 <- fread("~/Downloads/HOMD_abundance_table_erenv1v32022-04-25_1650885860.txt") %>%
+  select(matches("TAX|SubP_mean|SupP_mean")) %>%
+  pivot_longer(!TAX, names_to = "Site", values_to = "Percent") %>%
+  mutate(Study = "Eren1")
+eren1_phylum <- eren1[str_count(eren1$TAX, ";") == 1, ]
+
+eren3 <- fread("~/Downloads/HOMD_abundance_table_erenv3v52022-04-25_1650885860.txt") %>%
+  select(matches("TAX|SubP_mean|SupP_mean")) %>%
+  pivot_longer(!TAX, names_to = "Site", values_to = "Percent") %>%
+  mutate(Study = "Eren3")
+eren3_phylum <- eren3[str_count(eren3$TAX, ";") == 1, ]
+
+dewhirst <- fread("~/Downloads/HOMD_abundance_table_dewhirst2022-04-25_1650885860.txt") %>%
+  select(matches("TAX|SubP_mean|SupP_mean")) %>%
+  pivot_longer(!TAX, names_to = "Site", values_to = "Percent") %>%
+  mutate(Study = "Dewhirst")
+dewhirst_phylum <- dewhirst[str_count(dewhirst$TAX, ";") == 1, ]
+
+segata2012 <- fread("~/Downloads/HOMD_abundance_table_segata2022-04-25_1650885860.txt") %>%
+  select(matches("TAX|SubP_mean|SupP_mean")) %>%
+  pivot_longer(!TAX, names_to = "Site", values_to = "Percent") %>%
+  mutate(Study = "Segata")
+segata2012_phylum <- segata2012[str_count(segata2012$TAX, ";") == 1, ]
+
+# Chlamydiae table
+chl <- as_data_frame(c("Chlamydiae")) %>%
+  rename(TAX = 1) %>%
+  mutate(SubP_mean = 0,
+         SupP_mean = 0)
+
+
+suppq_means <- eren1_phylum %>%
+  bind_rows(., eren3_phylum) %>%
+  bind_rows(., dewhirst_phylum) %>%
+  bind_rows(., segata2012_phylum) %>%
+  group_by(TAX, Site) %>%
+  summarize(mean_subpq = mean(Percent)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = "Site", values_from = "mean_subpq") %>%
+  filter(!str_detect(TAX, "Cyanobacteria")) %>%
+  mutate(TAX = str_trim(TAX, side = "right"),
+         TAX = str_replace_all(TAX, "Bacteria;",""),
+         TAX = str_replace_all(TAX, "Archaea;","")) %>%
+  mutate(TAX = str_replace_all(TAX, "Saccharibacteria_\\(TM7\\)","Candidatus Saccharibacteria"),
+         TAX = str_replace_all(TAX, "Gracilibacteria_\\(GN02\\)","Candidatus Gracilibacteria"),
+         TAX = str_replace_all(TAX, "Absconditabacteria_\\(SR1\\)","Candidatus Absconditabacteria")) %>%
+  # no Chlamydiae detected in any of the tables so add a row with 0s
+  bind_rows(., as_data_frame(c("Chlamydiae")) %>%
+             rename(TAX = 1) %>%
+             mutate(SubP_mean = 0,
+                    SupP_mean = 0)) %>%
+  mutate(TAX = fct_relevel(TAX, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Gracilibacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Synergistetes","Chlamydiae","Candidatus Absconditabacteria","Tenericutes","Chloroflexi")) %>%  
+  arrange(TAX) %>%
+  mutate(cumPercent = cumsum(SupP_mean))
+
+    
+```
+
+```{r}
+
+relabs <- suppq_means %>%
+  mutate(TAX = fct_relevel(TAX, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Gracilibacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Synergistetes","Chlamydiae","Candidatus Absconditabacteria","Tenericutes","Chloroflexi")) %>%
+    ggplot(., aes(x = TAX, y = SupP_mean)) +
+      geom_bar(stat = "identity", color = "black", size = 0.2) +
+      theme_classic(base_size = 24) +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+      # theme(axis.text.x = element_blank()) +
+      scale_y_continuous(breaks=scales::pretty_breaks(n=4), limits = c(0,30)) +
+      theme(panel.grid.major.y = element_line()) +
+      xlab("") +
+      ylab("Abund. (%)")
+relabs
+
+suppq_means %>%
+  mutate(TAX = fct_relevel(TAX, "Actinobacteria","Bacteroidetes","Firmicutes","Fusobacteria","Proteobacteria","Candidatus Gracilibacteria","Euryarchaeota","Spirochaetes","Candidatus Saccharibacteria","Synergistetes","Chlamydiae","Candidatus Absconditabacteria","Tenericutes","Chloroflexi")) %>%
+    ggplot(., aes(x = TAX, y = cumPercent)) +
+      geom_bar(stat = "identity", color = "black", size = 0.2) +
+      theme_classic() +
+      # theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+      theme(axis.text.x = element_blank()) +
+      theme(panel.grid.major.y = element_line()) +
+      ylab("Relative abundance (%)")
+
+```
+
+
+
+```{r, eval = F}
+
+bars <- phylum_eb_plot / relabs +
+  plot_layout(heights = c(4,1))
+bars
+
+fig <- RSPM_kraken_compare + bars +
+  plot_layout(widths = c(1,3))
+
+# fig <- RSPM_kraken_compare + phylum_eb_plot +
+#   plot_layout(widths = c(1,3))
+
+fig
+
+ggsave("./06-publication/main_figures/Figure_9/Figure_9_pre.pdf", plot = fig, device = "pdf",
+       scale = 1, width = 22, height = 12, units = c("in"), dpi = 300)
+# ggsave("./06-publication/main_figures/Figure_XX3/panel_parts/ratios.pdf", plot = ratios, device = "pdf",
+#        scale = 1, width = 32, height = 7, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+## MetacodeR plots
+```{r load_rsomp_envt, eval = F}
+
+load("./05-results.backup/kraken_RSOMP_taxa_envt.RData") # this is the saved taxa environment so you don't have to wait to generate it
+
+# combine metadata with new sample names
+metadata_both <- metadata_mcR %>%
+  mutate(SampleID = str_replace_all(SampleID, "$", "_rso"),
+         Database = "RefSeqOnly",
+         SampleDB = str_replace(Industry, "$","_rso")) %>%
+  bind_rows(., metadata_mcR %>%
+              mutate(SampleID = str_replace_all(SampleID, "$","_rsmp"),
+                     Database = "RefSeqPasolliMAGs",
+                     SampleDB = str_replace(Industry, "$","_rsmp")))
+
+```
+
+
+Calculate differences in taxonomic assignments between the databases and plot
+trees colored to show the taxa that are significantly more/less abundant in
+samples based on RSMP vs RSO assignments.
+```{r metacoder_ex_cont_database_diff_plots, eval = F}
+
+# set the color scale for a diverging pallette
+colorscale <- c("#172869","grey97","#FF3200")
+
+# adjust the color interval scale by checking the interval of the log2meanratio of taxa with q-values <0.05
+rsomp_obj$data$diff_table %>% filter(wilcox_q_value < 0.05) %>% filter(!str_detect(log2_median_ratio, "Inf")) %>% select(log2_median_ratio) %>% max(.) # 10.78728
+rsomp_obj$data$diff_table %>% filter(wilcox_q_value < 0.05) %>% filter(!str_detect(log2_median_ratio, "Inf")) %>% select(log2_median_ratio) %>% min(.) # -8.297033
+
+plot_database_diff <- function(site_1, site_2, seed = 1) {
+  set.seed(seed)
+  rsomp_obj %>%
+    # mutate_obs("tax_prop", abundance = rowMeans(rsomp_obj$data$tax_prop[sample_data$sample_id])) %>%
+    filter_taxa(abundance >= 0.001, reassign_obs = FALSE) %>%
+    filter_taxa(taxon_names != "", reassign_obs = FALSE) %>% # Some taxonomic levels are not named
+    filter_obs("diff_table", treatment_1 %in% c(site_1, site_2), treatment_2 %in% c(site_1, site_2)) %>%
+    heat_tree(node_size_axis_label = "Number of OTUs",
+              node_size = n_obs,
+              node_color_axis_label = "Log 2 ratio of median proportions",
+              node_color = log2_median_ratio,
+              node_color_range = colorscale,
+              node_color_trans = "linear",
+              node_color_interval = c(-10, 10),
+              edge_color_interval = c(-10, 10),
+              node_label = taxon_names)
+}
+
+rso_vs_rsmp_NI <- plot_database_diff("NonIndustrial_rsmp", "NonIndustrial_rso")
+rso_vs_rsmp_NI
+
+rso_vs_rsmp_I <- plot_database_diff("Industrial_rsmp", "Industrial_rso")
+rso_vs_rsmp_I
+
+rso_NI_vs_I <- plot_database_diff("NonIndustrial_rso", "Industrial_rso")
+rso_NI_vs_I
+
+rsmp_NI_vs_I <- plot_database_diff("NonIndustrial_rsmp", "Industrial_rsmp")
+rsmp_NI_vs_I
+
+
+# to combine plots
+library(gridExtra)
+library(grid)
+combo_plot_1 <- grid.arrange(ncol = 2, nrow = 1,
+                           top = "Non-industrial                                                  Idustrial",
+                           left = "RSMP over RSO",
+                           rso_vs_rsmp_NI, rso_vs_rsmp_I)
+
+combo_plot_2 <- grid.arrange(ncol = 2, nrow = 1,
+                           top = "RSO                                                             RSMP",
+                           left = "Non-industrial over Industrial",
+                           rso_NI_vs_I, rsmp_NI_vs_I)
+
+# ggsave("./06-publication/main_figures/Figure_9/panel_parts/Figure_9_rsmp_vs_rso.pdf", plot = combo_plot_1, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("./06-publication/main_figures/Figure_9/panel_parts/Figure_9_NI_vs_I.pdf", plot = combo_plot_2, device = "pdf",
+#        scale = 1, width = 7, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

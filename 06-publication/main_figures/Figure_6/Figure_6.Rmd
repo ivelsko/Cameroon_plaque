@@ -1,0 +1,217 @@
+---
+title: "Alpha-diversity Main Figure"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(ape)
+library(mixOmics)
+library(compositions)
+library(vegan)
+library(janitor)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(patchwork)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("../../05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("../../05-results.backup/CMC_metadata.RData")
+
+# load the lists of species/genera that are in MR1-MR3 from the factor analysis
+mr_species <- fread("../../05-results.backup/minres_oblimin_noblanks.fa_species.tsv")
+mr_cmc_species <- fread("../../05-results.backup/minres_oblimin_cmc.fa_species.tsv")
+
+```
+
+Define outlier samples to remove
+```{r}
+outliers <- c("CMC032.B0101",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+
+PCA plot function
+```{r}
+# plot PCA with colored dots and the title including the # of species or genera
+plot_pca_titles <- function(df, pc1, pc2, color_group, shape_group, size_group, ncomps) {
+    metadata_group_colors <- get(paste(color_group, "_colors", sep = ""))
+    metadata_group_shapes <- get(paste(shape_group, "_shapes", sep = ""))
+    metadata_group_size <- get(paste(size_group, "_size", sep = ""))
+
+    pca.list <- mixOmics::pca(df, ncomp = ncomps, logratio = 'CLR')
+
+    exp_var <- paste0(round(pca.list$prop_expl_var$X * 100, 2), "%")
+    df_X <- pca.list$variates$X %>%
+              as.data.frame() %>%
+              rownames_to_column("SampleID") %>%
+              inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_integration_split, Village, Tooth_site, Type, ExtractionBatch, LibraryBatch), by = "SampleID")
+    
+    color_group = df_X[[color_group]]
+    shape_group = df_X[[shape_group]]
+    size_group = df_X[[size_group]]
+   
+                       if (pc1 == 'PC1') {
+                           pc1 <- df_X$PC1
+                           exp_var_pc1 <- exp_var[1]
+                           xaxis <- c("PC1")
+                       }  else if (pc1 == 'PC2') {
+                           pc1 <- df_X$PC2
+                           exp_var_pc1 <- exp_var[2]
+                           xaxis <- c("PC2")
+                       } else if (pc1 == 'PC3') {
+                           pc1 <- df_X$PC3
+                           exp_var_pc1 <- exp_var[3]
+                           xaxis <- c("PC3")
+                       }
+
+                       if (pc2 == 'PC1') {
+                           pc2 <- df_X$PC1
+                           exp_var_pc2 <- exp_var[1]
+                           yaxis <- c("PC1")
+                       }  else if (pc2 == 'PC2') {
+                           pc2 <- df_X$PC2
+                           exp_var_pc2 <- exp_var[2]
+                           yaxis <- c("PC2")
+                       } else if (pc2 == 'PC3') {
+                           pc2 <- df_X$PC3
+                           exp_var_pc2 <- exp_var[3]
+                           yaxis <- c("PC3")
+                       }
+
+    title_text <- df %>%
+                     rownames_to_column("SampleID") %>%
+                     gather("Species","Counts",2:ncol(.)) %>%
+                     spread(SampleID, Counts) %>%
+                     count
+    
+    pca_plot <- ggplot(df_X, aes(pc1, pc2, colour = color_group, shape = shape_group, size = size_group)) +
+                        geom_point() +
+                        scale_colour_manual(values = metadata_group_colors) +
+                        scale_shape_manual(values = metadata_group_shapes) +
+                        scale_size_manual(values = metadata_group_size) +
+                        # coord_fixed(ylim = c(-50,50)) +
+                        # stat_ellipse() +
+                        xlab(paste(xaxis, " - ", exp_var_pc1)) +
+                        ylab(paste(yaxis, " - ", exp_var_pc2)) +
+                        theme_minimal(base_size = 16) +
+                        theme(text = element_text(size=16)) +
+                        theme(legend.position = "none") +
+                        ggtitle(paste(title_text))
+
+    return(pca_plot)
+}
+
+```
+
+
+```{r pca_mr_noblanks_noyanomami_species}
+# Now keep only the proteins that are in MR1 from the factor analysis
+malt_species.decontam_filtered_noblanks_mr <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|SRR164|EXB|LIB|ERR|SRS")) %>%
+  inner_join(., mr_species %>%
+               filter(str_detect(Residual, "MR1")) %>%
+               select(-Residual)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = as.numeric(Counts),
+         Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_species.decontam_filtered_noblanks_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_species.decontam_filtered_noblanks_mr.pca <- pca(malt_species.decontam_filtered_noblanks_mr, ncomp = 3, logratio = 'CLR')
+
+# perform and plot a PCA to see how the data cluster
+# by Market integration
+pca_noyanomami_mi <- plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split", 3)
+pca_noyanomami_mi
+
+
+```
+
+
+```{r pca_mr_cmc_species}
+# Now keep only the proteins that are in MR1 from the factor analysis
+malt_species.decontam_filtered_cmc_mr <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|SRR|JAE|EXB|LIB|SRS|ERR|VLC")) %>%
+  inner_join(., mr_cmc_species %>%
+               filter(str_detect(Residual, "MR1")) %>%
+               select(-Residual)) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = as.numeric(Counts),
+         Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
+
+# prepare to run a PCA
+# check the number of components to retain by tuning the PCA
+tune.pca(malt_species.decontam_filtered_cmc_mr, logratio = 'CLR')
+
+# perform a PCA to see how the data cluster
+malt_species.decontam_filtered_cmc_mr.pca <- pca(malt_species.decontam_filtered_cmc_mr, ncomp = 3, logratio = 'CLR')
+
+# perform and plot a PCA to see how the data cluster
+# by Village
+pca_cmc_mi_pc12 <- plot_pca_titles(malt_species.decontam_filtered_cmc_mr, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split", 3)
+pca_cmc_mi_pc12
+
+
+# by Tooth site
+cmc_pca_toothsite_pc12 <- plot_pca_titles(malt_species.decontam_filtered_cmc_mr, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
+cmc_pca_toothsite_pc12
+
+
+
+```
+
+```{r}
+
+plotall <- pca_noyanomami_mi + pca_cmc_mi_pc12 + cmc_pca_toothsite_pc12  +
+  plot_layout(widths = c(1, 0.8, 0.8)) + 
+  plot_annotation(tag_levels = 'A')
+
+plotall
+
+# ggsave("../../06-publication/main_figures/Figure_6/panel_parts/Figure_6_betadiv.pdf", plot = plotall, device = "pdf",
+#        scale = 1, width = 20, height = 4.5, units = c("in"), dpi = 300)
+
+
+```
+
+
+

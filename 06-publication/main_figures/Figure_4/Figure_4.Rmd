@@ -1,0 +1,388 @@
+---
+title: "Bacteriodetes/Firmicutes Bacteriodes/Prevotella Main Figure"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(janitor)
+library(vegan)
+library(compositions)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(patchwork)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("../../.."))
+```
+
+```{r}
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+```
+
+
+Load data files 
+```{r load_hm_data}
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD", `Industrial plaque` = "#969696", `Industrial calculus` = "#feb24c", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+
+metadata <- metadata %>%
+  mutate(Market_integration_split = fct_relevel(Market_integration_split, "Logging road","Forest camp", "Farming","Industrial plaque","Industrial calculus"))
+
+# load the metadata file again without factors for stats
+metadata_nofactors <- fread("./00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata_nofactors <- metadata_nofactors %>% 
+  rename(SampleID = `#SampleID`) %>%
+  select(SampleID, Env, Age, Age_group, Ethnic_Group, Market_integration, Market_integration_split, Sex, Tooth_site, Village, Is_Oral)
+
+```
+
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+```
+
+
+```{r phylum_table}
+phylum <- fread("./05-results.backup/MALT_all_data_combined_phylum.tsv") %>%
+  rename(Phylum = 1) %>%
+  select(-matches("VLC")) %>%
+  full_join(., fread("./05-results.backup/Iberian_samples-controls_phylum.tsv") %>%
+              rename(Phylum = 1) %>%
+              select(matches("Phylum|VLC|SRR")), by = "Phylum") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(SampleID = str_replace_all(SampleID, ".SG1.unmapped",""),
+         SampleID = str_replace_all(SampleID, ".unmapped",""))  %>%
+  pivot_wider(names_from = "SampleID", values_from = "Counts")
+
+
+```
+
+## Taxonomic ratios
+```{r genus_table}
+# genus-level proportions
+
+malt_genus <- fread("./05-results.backup/MALT_all_data_combined_Comparison_genus_names.tsv") %>%
+  rename(Species = `#Datasets`)
+
+malt_genus_contaminants <- fread("./05-results.backup/malt_contaminants_genus.tsv")
+
+malt_genus_decontam <- malt_genus %>%
+  anti_join(., malt_genus_contaminants) %>%
+  rename(Genus = Species) %>%
+  filter(!str_detect(Genus, "Homo|Not assigned")) %>%
+  select(-matches("VLC")) %>%
+  # remove extra samples from Clemente study (these might be industrial samples) 
+  select(-matches("SRR1646026|SRR1646027|SRR1646028|SRR1646029|SRR1646034|SRR1646035|SRR1646036|SRR1646037"))
+
+# now get the missing data from 
+malt_missed_table <- fread("./00-documentation.backup/Iberian_samples-controls_comparison-genus.tsv") %>%
+  select(matches("Data|JAE014|JAE015|VLC|SRR061192|SRR061294|SRR061320|SRR061365|SRR061562|SRR062083|SRR062298|SRR062299|SRR063517|SRR1804664|SRR1804823|SRR512767|SRR513165|SRR513768|SRR513775|SRR513828|SRR514202|SRR514239|SRR514306|SRR514329")) %>%
+  rename(Genus = `#Datasets`) %>%
+  filter(!str_detect(Genus, "Homo|Not assigned"))
+
+malt_genus_decontam <- malt_genus_decontam %>%
+  select(-matches("ERR|SRS|SRR164|EXB|LIB|VLC")) %>%
+  # add the missing data
+  full_join(., malt_missed_table, by = "Genus")
+
+```
+
+## Bacteroidetes/Firmicutes
+```{r bf_ratio}
+
+bf_ratio_plot <- phylum %>%
+  as_tibble() %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = Bacteroidetes / Firmicutes) %>%
+  select(matches("Sample|BF_ratio")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site, Env), by = "SampleID") %>%
+  filter(!str_detect(SampleID, "CMC032.B")) %>%
+  filter(str_detect(Env, "CMC|plaque|calculus")) %>%
+ggplot(., aes(x = Market_integration_split, y = BF_ratio, fill = Market_integration_split)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 0.1
+  ) + 
+  ## remove white space on the left
+coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 14) +
+  scale_fill_manual(values = Market_integration_split_colors) +
+  theme(axis.text = element_text(size = 14)) +
+  theme(legend.position = "none") +
+  xlab("Market integration") +
+  ylab("Bacteroidetes:Firmicutes ratio") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+
+bf_ratio_plot
+
+```
+
+```{r wilcox_test_bf}
+# test for significant differences between market integration groups
+phylum %>%
+  as_tibble() %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = Bacteroidetes / Firmicutes) %>%
+  select(matches("Sample|BF_ratio")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site, Env), by = "SampleID") %>%
+  filter(!str_detect(SampleID, "CMC032.B")) %>%
+  filter(str_detect(Env, "CMC|plaque|calculus")) %>%
+  mutate(Market_integration_split = as.character(Market_integration_split)) %>%
+  select(SampleID, BF_ratio, Market_integration_split) %>%
+  rstatix::wilcox_test(BF_ratio ~ Market_integration_split, p.adjust.method = "fdr")
+
+# test for significant differences between tooth sites within market integration groups
+phylum %>%
+  as_tibble() %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = Bacteroidetes / Firmicutes) %>%
+  select(matches("Sample|BF_ratio")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site, Env), by = "SampleID") %>%
+  filter(!str_detect(SampleID, "CMC032.B")) %>%
+  filter(str_detect(Env, "CMC|plaque|calculus")) %>%
+  mutate(Market_integration_split = as.character(Market_integration_split),
+         Tooth_site = as.character(Tooth_site),
+         Village = as.character(Village)) %>%
+  filter(!str_detect(Env, "Industrial")) %>%
+  mutate(Tooth_site = ifelse(str_detect(Village, "Industrial"), Village, Tooth_site)) %>%
+  select(SampleID, BF_ratio, Market_integration_split, Tooth_site) %>%
+  group_by(Market_integration_split) %>%
+  rstatix::wilcox_test(BF_ratio ~ Tooth_site, p.adjust.method = "fdr")
+
+
+```
+
+```{r effect_size_bf}
+phylum %>%
+  as_tibble() %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = Bacteroidetes / Firmicutes) %>%
+  select(matches("Sample|BF_ratio")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site, Env), by = "SampleID") %>%
+  filter(!str_detect(SampleID, "CMC032.B")) %>%
+  filter(str_detect(Env, "CMC|plaque|calculus")) %>%
+  mutate(Market_integration_split = as.character(Market_integration_split)) %>%
+  select(SampleID, BF_ratio, Market_integration_split) %>%
+  rstatix::wilcox_effsize(BF_ratio ~ Market_integration_split, p.adjust.method = "fdr")
+
+phylum %>%
+  as_tibble() %>%
+  adorn_percentages(denominator = "col") %>%
+  pivot_longer(!Phylum, names_to = "SampleID", values_to = "Percent") %>%
+  pivot_wider(names_from = "Phylum", values_from = "Percent") %>%
+  mutate(BF_ratio = Bacteroidetes / Firmicutes) %>%
+  select(matches("Sample|BF_ratio")) %>%
+  inner_join(., metadata %>%
+               select(SampleID, Market_integration_split, Village, Tooth_site, Env), by = "SampleID") %>%
+  filter(str_detect(Env, "CMC|plaque|calculus")) %>%
+  filter(!str_detect(SampleID, "CMC032.B")) %>%
+  mutate(Market_integration_split = as.character(Market_integration_split),
+         Tooth_site = as.character(Tooth_site),
+         Village = as.character(Village)) %>%
+  filter(!str_detect(Env, "Industrial")) %>%
+  mutate(Tooth_site = ifelse(str_detect(Village, "Industrial"), Village, Tooth_site)) %>%
+  select(SampleID, BF_ratio, Market_integration_split, Tooth_site) %>%
+  group_by(Market_integration_split) %>%
+  rstatix::wilcox_effsize(BF_ratio ~ Tooth_site, p.adjust.method = "fdr")
+
+```
+
+
+
+## Bacteriodes/Prevotella
+```{r bp_ratio}
+
+bp_ratio_plot <- malt_genus_decontam %>%
+  # convert to percentages, where the samples total 1 (samples are columns, species are rows)
+  adorn_percentages(denominator = "col") %>%
+  # select the 3 genera of interest 
+  filter(str_detect(Genus, "Prevotella|Phocaeicola|Bacteroides"),
+         Genus != "Prevotellamassilia") %>%
+  pivot_longer(!Genus, names_to = "Library_ID", values_to = "Proportion") %>%
+  mutate(Library_ID = str_replace_all(Library_ID, ".SG1.unmapped",""),
+         Library_ID = str_replace_all(Library_ID, ".unmapped",""),
+         Library_ID = str_replace_all(Library_ID, "-1","")) %>%
+  pivot_wider(names_from = "Genus", values_from = "Proportion") %>%
+  mutate(PB_ratio = Prevotella / Bacteroides) %>%
+  left_join(., metadata %>%
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Market_integration_split)) %>%
+  filter(!str_detect(Library_ID, "CMC032.B")) %>%
+  mutate(PB_ratio = ifelse(is.infinite(PB_ratio),500,PB_ratio)) %>% # fill with the highest ratio value
+ggplot(., aes(x = Market_integration_split, y = PB_ratio, fill = Market_integration_split)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 11
+  ) + 
+  ## remove white space on the left
+coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 14) +
+  scale_fill_manual(values = Market_integration_split_colors) +
+  theme(axis.text = element_text(size = 14)) +
+  theme(legend.position = "none") +
+  xlab("Market integration") +
+  ylab("Prevotella:Bacteroides ratio") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+
+bp_ratio_plot
+
+```
+
+```{r wilcox_test_bp}
+# test for significant differences between market integration groups
+malt_genus_decontam %>%
+  # convert to percentages, where the samples total 1 (samples are columns, species are rows)
+  adorn_percentages(denominator = "col") %>%
+  # select the 3 genera of interest 
+  filter(str_detect(Genus, "Prevotella|Phocaeicola|Bacteroides"),
+         Genus != "Prevotellamassilia") %>%
+  pivot_longer(!Genus, names_to = "Library_ID", values_to = "Proportion") %>%
+  mutate(Library_ID = str_replace_all(Library_ID, ".SG1.unmapped",""),
+         Library_ID = str_replace_all(Library_ID, ".unmapped",""),
+         Library_ID = str_replace_all(Library_ID, "-1","")) %>%
+  pivot_wider(names_from = "Genus", values_from = "Proportion") %>%
+  mutate(PB_ratio = Prevotella / Bacteroides) %>%
+  left_join(., metadata %>%
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Market_integration_split)) %>%
+  filter(!str_detect(Library_ID, "CMC032.B")) %>%
+  filter(!is.infinite(PB_ratio))%>% # remove all Inf entries
+  mutate(Market_integration_split = as.character(Market_integration_split)) %>%
+  select(Library_ID, PB_ratio, Market_integration_split) %>%
+  rstatix::pairwise_wilcox_test(PB_ratio ~ Market_integration_split, p.adjust.method = "fdr") %>%
+  arrange(p.adj)
+
+# test for significant differences between tooth sites within market integration groups
+malt_genus_decontam %>%
+  # convert to percentages, where the samples total 1 (samples are columns, species are rows)
+  adorn_percentages(denominator = "col") %>%
+  # select the 3 genera of interest 
+  filter(str_detect(Genus, "Prevotella|Phocaeicola|Bacteroides"),
+         Genus != "Prevotellamassilia") %>%
+  pivot_longer(!Genus, names_to = "Library_ID", values_to = "Proportion") %>%
+  mutate(Library_ID = str_replace_all(Library_ID, ".SG1.unmapped",""),
+         Library_ID = str_replace_all(Library_ID, ".unmapped",""),
+         Library_ID = str_replace_all(Library_ID, "-1","")) %>%
+  pivot_wider(names_from = "Genus", values_from = "Proportion") %>%
+  mutate(PB_ratio = Prevotella / Bacteroides) %>%
+  left_join(., metadata %>%
+              rename(Library_ID = SampleID) %>%
+              select(Library_ID, Market_integration_split, Tooth_site, Village, Env)) %>%
+  filter(!str_detect(Library_ID, "CMC032.B")) %>%
+  filter(!is.infinite(PB_ratio)) %>% # remove all Inf entries
+  mutate(Market_integration_split = as.character(Market_integration_split),
+         Tooth_site = as.character(Tooth_site),
+         Village = as.character(Village)) %>%
+  filter(!str_detect(Env, "Industrial")) %>%
+  # mutate(Tooth_site = ifelse(str_detect(Village, "Industrial"))) %>%
+  select(Library_ID, PB_ratio, Market_integration_split, Tooth_site) %>%
+  group_by(Market_integration_split) %>%
+  rstatix::pairwise_wilcox_test(PB_ratio ~ Tooth_site, p.adjust.method = "fdr") %>%
+  arrange(p.adj)
+  
+```
+
+```{r}
+ratios <- bf_ratio_plot + bp_ratio_plot
+
+ratios
+
+# ggsave("./06-publication/main_figures/Figure_4/panel_parts/ratios.pdf", plot = ratios, device = "pdf",
+#        scale = 1, width = 32, height = 7, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+

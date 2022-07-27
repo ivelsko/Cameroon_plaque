@@ -1,0 +1,41 @@
+Function	PC1	Direction	Samples
+Type IV fimbrial biogenesis protein PilW	0.198115728111056	PC1+	Industrial+CMC
+Type IV secretion system protein VirD4	0.196692697896097	PC1+	Industrial+CMC
+Type IV fimbrial biogenesis protein PilX	0.18814746401674	PC1+	Industrial+CMC
+Type IV pilus biogenesis protein PilO	0.183645877725866	PC1+	Industrial+CMC
+Sialic acid biosynthesis protein NeuD, O-acetyltransferase	0.175747470227274	PC1+	Industrial+CMC
+UDP-glucose:(glucosyl)lipopolysaccharide alpha-1,2-glucosyltransferase (EC 2.4.1.58)	0.151194588946462	PC1+	Industrial+CMC
+Type IV pilus biogenesis protein PilP	0.148579329657096	PC1+	Industrial+CMC
+Outer membrane component of tripartite multidrug resistance system	0.142266787131283	PC1+	Industrial+CMC
+Legionaminic acid cytidylyltransferase (EC 2.7.7.43)	0.13217449754091	PC1+	Industrial+CMC
+putative ATP-dependent DNA helicase YjcD	0.129631351515881	PC1+	Industrial+CMC
+Ribonuclease HI (EC 3.1.26.4)	-0.0441262509056823	PC1-	Industrial+CMC
+Methylmalonate-semialdehyde dehydrogenase [inositol] (EC 1.2.1.27)	-0.0468108763789792	PC1-	Industrial+CMC
+Copper chaperone	-0.0471598578569302	PC1-	Industrial+CMC
+Streptothricin acetyltransferase, Streptomyces lavendulae type	-0.0491287931761401	PC1-	Industrial+CMC
+Major myo-inositol transporter IolT	-0.0508486057876483	PC1-	Industrial+CMC
+Epi-inositol hydrolase (EC 3.7.1.-)	-0.0554700520214043	PC1-	Industrial+CMC
+Acting phosphoribosylanthranilate isomerase (EC 5.3.1.24)	-0.055815189539279	PC1-	Industrial+CMC
+Biosynthetic Aromatic amino acid aminotransferase beta (EC 2.6.1.57)	-0.0612954862830646	PC1-	Industrial+CMC
+Excinuclease ABC subunit A paralog of unknown function	-0.0764406937275927	PC1-	Industrial+CMC
+NAD-dependent malic enzyme (EC 1.1.1.38)	-0.077513220090135	PC1-	Industrial+CMC
+ATP-dependent protease LonB-like Type I	0.0669251776289602	PC1+	CMC
+Colicin I receptor precursor	0.0627776640272184	PC1+	CMC
+Predicted cell-wall-anchored protein SasA (LPXTG motif)	0.0604989077017571	PC1+	CMC
+Adenylylsulfate reductase alpha-subunit (EC 1.8.99.2)	0.0603351072036607	PC1+	CMC
+rubredoxin-oxygen oxidoreductase	0.0601254984068446	PC1+	CMC
+Cell envelope-associated transcriptional attenuator LytR-CpsA-Psr, subfamily M (as in PMID19099556)	0.0581780560507669	PC1+	CMC
+(S)-2-hydroxy-acid oxidase (EC 1.1.3.15)	0.0573347834090491	PC1+	CMC
+PTS system, trehalose-specific IIB component (EC 2.7.1.69)	0.0572571129245357	PC1+	CMC
+Outer surface protein of unknown function, cellobiose operon	0.057167237488103	PC1+	CMC
+Endo-1,4-beta-xylanase A precursor (EC 3.2.1.8)	0.0562651603283677	PC1+	CMC
+Ribonuclease HI (EC 3.1.26.4)	-0.0441262509056823	PC1-	CMC
+Methylmalonate-semialdehyde dehydrogenase [inositol] (EC 1.2.1.27)	-0.0468108763789792	PC1-	CMC
+Copper chaperone	-0.0471598578569302	PC1-	CMC
+Streptothricin acetyltransferase, Streptomyces lavendulae type	-0.0491287931761401	PC1-	CMC
+Major myo-inositol transporter IolT	-0.0508486057876483	PC1-	CMC
+Epi-inositol hydrolase (EC 3.7.1.-)	-0.0554700520214043	PC1-	CMC
+Acting phosphoribosylanthranilate isomerase (EC 5.3.1.24)	-0.055815189539279	PC1-	CMC
+Biosynthetic Aromatic amino acid aminotransferase beta (EC 2.6.1.57)	-0.0612954862830646	PC1-	CMC
+Excinuclease ABC subunit A paralog of unknown function	-0.0764406937275927	PC1-	CMC
+NAD-dependent malic enzyme (EC 1.1.1.38)	-0.077513220090135	PC1-	CMC

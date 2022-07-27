@@ -1,0 +1,372 @@
+---
+title: "Differential abudnance Main Figure"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(psych)
+library(ape)
+library(mixOmics)
+library(compositions)
+library(vegan)
+library(janitor)
+library(pander)
+library(tidyverse)
+library(gplots)
+library(ggrepel)
+library(viridis)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("../../../"))
+```
+
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("./05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("./05-results.backup/CMC_metadata.RData")
+
+# load the lists of species/genera that are in MR1-MR3 from the factor analysis
+mr_species <- fread("./05-results.backup/minres_oblimin_noblanks.fa_species.tsv")
+mr_cmc_species <- fread("./05-results.backup/minres_oblimin_cmc.fa_species.tsv")
+
+# load the genus-level oxygen tolerance info
+oxygen <- fread("./00-documentation.backup/genus_oxygen.tsv")
+
+```
+
+Define outlier samples to remove
+```{r}
+outliers <- c("CMC032.B0101",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+```{r}
+# set oxygen colors for plotting
+
+oxygen_colors <- c(Aerobic = "#fcfdbfff", Facultative = "#de4968ff", Anaerobic = "#3b0f70ff", Unknown = "grey50")
+
+```
+
+
+# Differential abundance plots
+```{r env_plots}
+res_noblanks.ANCOM_BC_cmc_hmp <- fread("./05-results.backup/ancomBC_species_noblanks_IP_CMC.tsv")
+
+# Cameroon vs HMP
+res.ANCOM_BC_env_HMP_HG <- res_noblanks.ANCOM_BC_cmc_hmp %>%
+  filter(`log fold change (Industrial plaque - CMC)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res_noblanks.ANCOM_BC_cmc_hmp %>%
+  filter(`log fold change (Industrial plaque - CMC)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))) %>%
+  # make a column with just genus names to be able to add the table with oxygen use for coloring
+  mutate(septhis = Species) %>%
+  separate(septhis, into = c("Genus", "sp"), sep = " ", extra = "drop") %>%
+  select(-sp) %>%
+  left_join(., oxygen, by = "Genus")
+
+ancom_HMP_CMC_plot <- res.ANCOM_BC_env_HMP_HG %>%
+  filter(`log fold change (Industrial plaque - CMC)` >= 4.1 | `log fold change (Industrial plaque - CMC)` <= -4.73) %>%
+  arrange(`log fold change (Industrial plaque - CMC)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Industrial plaque - CMC)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = Oxygen)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal(base_size = 10) +
+    scale_fill_manual(values = oxygen_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10)) +
+    # scale_fill_viridis_d(option = "C") +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Industrial plaque / CMC") +
+    geom_text(aes(y=`log fold change (Industrial plaque - CMC)`+4*sign(`log fold change (Industrial plaque - CMC)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Industrial plaque - CMC)`+4*sign(`log fold change (Industrial plaque - CMC)`), label=star_down),
+              vjust=0, hjust = 0.5, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (Industrial plaque)` == 1) %>%
+                      filter(`log fold change (Industrial plaque - CMC)` >= 4.1 | `log fold change (Industrial plaque - CMC)` <= -4.73) %>%
+                      arrange(`log fold change (Industrial plaque - CMC)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Industrial plaque - CMC)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_env_HMP_HG %>% filter(`structural.zero (CMC)` == 1) %>%
+                      filter(`log fold change (Industrial plaque - CMC)` >= 4.1 | `log fold change (Industrial plaque - CMC)` <= -4.73) %>%
+                      arrange(`log fold change (Industrial plaque - CMC)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Industrial plaque - CMC)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+ancom_HMP_CMC_plot
+
+# Cameroon vs JAE
+res_noblanks.ANCOM_BC_cmc_jae <- fread("./05-results.backup/ancomBC_species_noblanks_IC_CMC.tsv")
+
+res.ANCOM_BC_env_JAE_HG <- res_noblanks.ANCOM_BC_cmc_jae %>%
+  filter(`log fold change (Industrial calculus - CMC)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res_noblanks.ANCOM_BC_cmc_jae %>%
+  filter(`log fold change (Industrial calculus - CMC)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))) %>%
+  # make a column with just genus names to be able to add the table with oxygen use for coloring
+  mutate(septhis = Species) %>%
+  separate(septhis, into = c("Genus", "sp"), sep = " ", extra = "drop") %>%
+  select(-sp) %>%
+  left_join(., oxygen, by = "Genus")
+
+ancom_JAE_CMC_plot <- res.ANCOM_BC_env_JAE_HG %>%
+  filter(`log fold change (Industrial calculus - CMC)` >= 5.32 | `log fold change (Industrial calculus - CMC)` <= -3.86) %>%
+  arrange(`log fold change (Industrial calculus - CMC)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Industrial calculus - CMC)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = Oxygen)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    # coord_flip() +
+    theme_minimal(base_size = 10) +
+    scale_fill_manual(values = oxygen_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10),
+          axis.text.y = element_text(size = 10)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Indudstrial calculus / CMC") +
+    geom_text(aes(y=`log fold change (Industrial calculus - CMC)`+4*sign(`log fold change (Industrial calculus - CMC)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Industrial calculus - CMC)`+4*sign(`log fold change (Industrial calculus - CMC)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (Industrial calculus)` == 1) %>%
+                      filter(`log fold change (Industrial calculus - CMC)` >= 5.32 | `log fold change (Industrial calculus - CMC)` <= -3.86) %>%
+                      arrange(`log fold change (Industrial calculus - CMC)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Industrial calculus - CMC)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_env_JAE_HG %>% filter(`structural.zero (CMC)` == 1) %>%
+                      filter(`log fold change (Industrial calculus - CMC)` >= 5.32 | `log fold change (Industrial calculus - CMC)` <= -3.86) %>%
+                      arrange(`log fold change (Industrial calculus - CMC)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Industrial calculus - CMC)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+ancom_JAE_CMC_plot
+
+ # ggsave("./06-publication/main_figures/Figure_7/panel_parts/Figure_7_ancom_IP_CMC_plot.pdf", plot = ancom_HMP_CMC_plot, device = "pdf",
+ #        scale = 1, width = 8, height = 4.5, units = c("in"), dpi = 300)
+ # 
+ # ggsave("./06-publication/main_figures/Figure_7/panel_parts/Figure_7_ancom_IC_CMC_plot.pdf", plot = ancom_JAE_CMC_plot, device = "pdf",
+ #        scale = 1, width = 8, height = 4.5, units = c("in"), dpi = 300)
+
+```
+
+```{r}
+# now calculate the mean proportion of these pathways in each group
+cmcicpm <- c
+malt_species.decontam %>%
+  inner_join(., res.ANCOM_BC_env_HMP_HG %>%
+                    filter(`log fold change (Industrial plaque - CMC)` >= 5.32 | `log fold change (Industrial plaque - CMC)` <= -3.86) %>%
+                    select(Species), by = "Species") %>%
+  pivot_longer(!Species, names_to = "Library_ID", values_to = "Counts") %>%
+  left_join(., metadata %>%
+              select(SampleID, Env, Tooth_site) %>%
+              rename(Library_ID = SampleID), by = "Library_ID") %>%
+  group_by(Env, Species) %>%
+  summarize(Mean_cpm = mean(Counts),
+            sd_cpm = sd(Counts)) %>%
+  ungroup() %>%
+  filter(str_detect(Env, "CMC|plaque")) %>%
+  mutate(Species = fct_relevel(Species, res.ANCOM_BC_env_HMP_HG %>%
+                                 filter(`log fold change (Industrial plaque - CMC)` >= 5.32 | `log fold change (Industrial plaque - CMC)` <= -3.86) %>%
+                                 arrange(desc(`log fold change (Industrial plaque - CMC)`)) %>%
+                                 pull(Species))) %>%
+  arrange(Species) %>%
+  ggplot(., aes(x = Mean_cpm, y = Species, shape = Env, bg = Env)) + 
+    # geom_bar(position = "dodge", stat = "identity", color = "black", size = 0.25) +
+    geom_point(position = position_dodge(0.9), size = 2) +
+    geom_errorbar(aes(xmax = (Mean_cpm + sd_cpm), xmin = (Mean_cpm - sd_cpm)), width = 0.2, position=position_dodge(0.9), color = "grey20") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 0.5, size = 14),
+          axis.text.y = element_text(size = 14)) +
+    # scale_y_continuous(breaks=scales::pretty_breaks(n=10)) +
+    # ylim(-4,4) +
+    scale_shape_manual(values = c(21, 21)) +
+    ylab("") +
+    xlab("Mean Counts") +
+    scale_fill_manual(values = c("#FF3200","#feb24c")) +
+    # scale_x_log10() +
+    theme(legend.position="bottom",
+          axis.text.y = element_blank())
+
+cmcicpm
+```
+
+
+```{r}
+res.ANCOM_BC_cmcTS <- fread("./05-results.backup/ancomBC_species_cmc_toothsite.tsv")
+
+res.ANCOM_BC_ts <- res.ANCOM_BC_cmcTS %>%
+  filter(`log fold change (Anterior - Posterior)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC_cmcTS %>%
+  filter(`log fold change (Anterior - Posterior)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))) %>%
+  # make a column with just genus names to be able to add the table with oxygen use for coloring
+  mutate(septhis = Species) %>%
+  separate(septhis, into = c("Genus", "sp"), sep = " ", extra = "drop") %>%
+  select(-sp) %>%
+  left_join(., oxygen, by = "Genus")
+
+cmc_tooth_site_ancom <- res.ANCOM_BC_ts %>%
+  filter(`log fold change (Anterior - Posterior)` >= 2.8 | `log fold change (Anterior - Posterior)` <= -4.6) %>%
+  arrange(`log fold change (Anterior - Posterior)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Anterior - Posterior)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = Oxygen)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal(base_size = 10) +
+    scale_fill_manual(values = oxygen_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Anterior - Posterior") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Posterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 2.8 | `log fold change (Anterior - Posterior)` <= -4.6) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Anterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 2.8 | `log fold change (Anterior - Posterior)` <= -4.6) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+cmc_tooth_site_ancom
+
+ # ggsave("./06-publication/main_figures/Figure_7/panel_parts/Figure_7_ancom_CMC_toothsite_plot.pdf", plot = cmc_tooth_site_ancom, device = "pdf",
+ #        scale = 1, width = 8, height = 4.5, units = c("in"), dpi = 300)
+
+```
+
+```{r}
+
+res.ANCOM_BC_ts <- res.ANCOM_BC_cmcTS %>%
+  filter(`log fold change (Anterior - Posterior)` > 0) %>%
+  mutate(star_up = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))),
+         star_down = "") %>%
+  bind_rows(., res.ANCOM_BC_cmcTS %>%
+  filter(`log fold change (Anterior - Posterior)` < 0) %>%
+  mutate(star_up = "",
+         star_down = ifelse(q.val<0.001, "***",
+                      ifelse(q.val<0.01, "**",
+                         ifelse(q.val<0.05, "*", ""))))) %>%
+  # make a column with just genus names to be able to add the table with oxygen use for coloring
+  mutate(septhis = Species) %>%
+  separate(septhis, into = c("Genus", "sp"), sep = " ", extra = "drop") %>%
+  select(-sp) %>%
+  left_join(., oxygen, by = "Genus")
+
+cmc_tooth_site_ancom <- res.ANCOM_BC_ts %>%
+  filter(`log fold change (Anterior - Posterior)` >= 3 | `log fold change (Anterior - Posterior)` <= -4) %>%
+  arrange(`log fold change (Anterior - Posterior)`) %>%
+  mutate(Species = as_factor(Species)) %>%
+  ggplot(., aes(x = Species, y = `log fold change (Anterior - Posterior)`, ymin = ci.lo.adj, ymax = ci.up.adj, fill = Oxygen)) +
+    geom_col() +
+    geom_errorbar(width=0.2, size=0.25, position=position_dodge(width = 0.4)) +
+    geom_abline(slope = 0, intercept = 0, linetype="dashed", alpha=0.5) +
+    theme_minimal(base_size = 10) +
+    scale_fill_manual(values = oxygen_colors) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 10)) +
+    ylab("Log fold change") +
+    xlab("Species") +
+    ggtitle("Anterior - Posterior") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_up),
+              vjust=0, hjust = 0, nudge_y = -3, nudge_x = 0.5, angle = 90, color="black") +
+    geom_text(aes(y=`log fold change (Anterior - Posterior)`+4*sign(`log fold change (Anterior - Posterior)`), label=star_down),
+              vjust=0, hjust = 0, nudge_y = 1, nudge_x = 0.5, angle = 90, color="black") +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Posterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 3 | `log fold change (Anterior - Posterior)` <= -4) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18) +
+    geom_point(data = res.ANCOM_BC_ts %>% filter(`structural.zero (Anterior)` == 1) %>%
+                      filter(`log fold change (Anterior - Posterior)` >= 3 | `log fold change (Anterior - Posterior)` <= -4) %>%
+                      arrange(`log fold change (Anterior - Posterior)`) %>%
+                      mutate(Species = as_factor(Species)), 
+               aes(x=Species, y=`log fold change (Anterior - Posterior)`),
+                   position=position_dodge(width = 0.4), shape=18)
+
+cmc_tooth_site_ancom
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

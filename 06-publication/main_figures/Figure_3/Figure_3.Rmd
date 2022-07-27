@@ -1,0 +1,501 @@
+---
+title: "Alpha-diversity Main Figure"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+    github_document:
+        fig_width: 8
+        fig_height: 6
+        toc: true
+---
+
+```{r load_libraries, echo = F, message = F}
+library(knitr)
+library(data.table)
+library(rstatix)
+library(vegan)
+library(compositions)
+library(janitor)
+library(ggheatmap)
+library(tidyverse)
+library(gplots)
+library(cowplot)
+opts_chunk$set(echo=F, warning=F, message=F, dpi=150)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+```{r load_data}
+
+# load the taxonomy tables that have been decontaminated and the column headers are cleaned up
+load("../../05-results.backup/CMC_taxonomy_tables.RData")
+
+# load the metadata file
+load("../../05-results.backup/CMC_metadata.RData")
+
+Village_colors <- c(`202` = "#FF3200", `205` = "#EF8158", `204` = "#E9BD8E", `203` = "#CBDDA7", `206` = "#38BCAD", `Industrial plaque` = "#969696", `Industrial calculus` = "#feb24c", ExtractionGauze = "#252525", ExtractionBlank = "#737373", LibraryBlank = "#bdbdbd")
+
+metadata <- metadata %>%
+  mutate(Market_integration_split = fct_relevel(Market_integration_split, "Logging road","Forest camp", "Farming","Industrial plaque","Industrial calculus"))
+
+# load the metadata file again without factors for stats
+metadata_nofactors <- fread("../../00-documentation.backup/01-cameroon_hunter_gatherer_metadata.tsv")
+metadata_nofactors <- metadata_nofactors %>% 
+  rename(SampleID = `#SampleID`) %>%
+  select(SampleID, Env, Age, Age_group, Ethnic_Group, Market_integration, Market_integration_split, Sex, Tooth_site, Village, Is_Oral)
+
+```
+
+
+```{r box_plotting_functions}
+
+plot_box_whisker <- function(df, stat_info, metadata_group, fill_group, x_text, y_text) {
+    fill_group_colors <- get(paste(fill_group, "_colors", sep = ""))
+
+      df_X <- df %>%
+              inner_join(metadata %>%
+                           select(SampleID, Env, Description, Ethnic_Group, Age_group, Sex, Market_integration,
+                                  Market_integration_split, Village, Tooth_site, ExtractionBatch, LibraryBatch, Type) %>%
+                           mutate(Village = fct_relevel(Village, "202","205","204","203","206","JAE","HMP")), by = "SampleID")
+
+    stat_info_table = df_X[[stat_info]]
+    metadata_group = df_X[[metadata_group]]
+    fill_group = df_X[[fill_group]]
+
+    bx_wh_plot <- ggplot(df_X, aes(x = metadata_group, y = stat_info_table, fill = fill_group)) +
+                         geom_boxplot() +
+                         scale_fill_manual(values = fill_group_colors) +
+                         theme_minimal() +
+                         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+                               text = element_text(size=20)) +
+                         ylab(y_text) +
+                         xlab(x_text) #+
+                         #ggtitle(title_text)
+
+    return(bx_wh_plot)
+}
+
+```
+
+
+List the outliers from the plot in section `raw_plot` in `Cameroon_h-g_taxonomy.Rmd` and remove them from the taxonomy table. 
+```{r outliers}
+outliers <- c("CMC002.B0201","CMC032.B0101","CMC037.B0201","CMC047.A0201",
+              "EXB059.A1901","EXB059.A1301","EXB059.A1101","EXB059.A0901",
+              "SRR1646041","SRR1646032","SRR1646042","SRR1646045","SRR1646030","SRR1646047")
+
+outliersF <- str_c(outliers, collapse = "|")
+
+```
+
+# Sample numbers
+```{r}
+
+metadata %>%
+  select(SampleID, Ethnic_Group, Market_integration, Village, Tooth_site) %>%
+  filter(Village == 202)
+
+metadata %>%
+  select(SampleID, Ethnic_Group, Market_integration, Village, Tooth_site) %>%
+  filter(Village == 205)
+
+metadata %>%
+  select(SampleID, Ethnic_Group, Market_integration, Village, Tooth_site) %>%
+  filter(Village == 204)
+
+metadata %>%
+  select(SampleID, Ethnic_Group, Market_integration, Village, Tooth_site) %>%
+  filter(Village == 203)
+
+metadata %>%
+  select(SampleID, Ethnic_Group, Market_integration, Village, Tooth_site) %>%
+  filter(Village == 206)
+
+```
+
+
+
+
+# Alpha-diversity
+```{r samples_stats_species}
+# Filtered species tables alpha-diversity stats
+# get the number of observed species
+presabs_table_f <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164|ERR|SRS")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>%
+  gather("Species","Counts",2:ncol(.)) %>%
+  mutate(Counts = ifelse(Counts > 0, 1, 0)) %>%
+  spread(Species, Counts) %>%
+  column_to_rownames("SampleID")
+  
+# calculate observed species for each sample with janitor 'adorn_totals'
+malt_species.decontam_filtered.alpha <- presabs_table_f %>%
+  adorn_totals(., where = "col", name = "Observed_species") %>%
+  select(Observed_species) %>%
+  rownames_to_column("SampleID") 
+
+
+# get the Shannon index
+malt_species.decontam_filtered.matrix <- as.matrix(malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  select(-matches("10M|EXB|LIB|SRR164|ERR|SRS")) %>%
+  adorn_totals(where = "col", name = "Sum_species.decontam") %>%
+  mutate(Percent = Sum_species.decontam/sum(Sum_species.decontam)*100) %>%
+  filter(Percent > 0.001) %>%
+  select(-one_of(c("Sum_species.decontam","Percent"))) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  spread(Species,Counts) %>% 
+  column_to_rownames("SampleID"))
+
+malt_species.decontam_filtered.shannon <- as.data.frame(diversity(malt_species.decontam_filtered.matrix, index = "shannon"))
+names(malt_species.decontam_filtered.shannon)[1] <- "Shannon_index"
+
+# convert row names to a column and combine with the observed species table
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., malt_species.decontam_filtered.shannon %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+  
+# Get the evenness index
+evenness.species_filtered <- diversity(malt_species.decontam_filtered.matrix)
+evenness.species_filtered <- as.data.frame(evenness.species_filtered/log(specnumber(malt_species.decontam_filtered.matrix)))
+names(evenness.species_filtered)[1] <- "Pileou_evenness"
+
+# merge with the metadata file and plot
+malt_species.decontam_filtered.alpha <- malt_species.decontam_filtered.alpha %>%
+  full_join(., evenness.species_filtered %>%
+  rownames_to_column("SampleID"), by = "SampleID")
+
+# now plot the observed species
+# os_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Observed_species", "Market_integration_split", "Market_integration_split", "Market integration", "Number of species")
+# os_market_split
+# shannon_market_split <- plot_box_whisker(malt_species.decontam_filtered.alpha, "Shannon_index", "Market_integration_split", "Market_integration_split", "Market integration", "Shannon index")
+# shannon_market_split
+
+# ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_os_market_split.pdf", plot = os_market_split, device = "pdf",
+#        scale = 1, width = 9, height = 5, units = c("in"), dpi = 300)
+# 
+# ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_shannon_market_split.pdf", plot = shannon_market_split, device = "pdf",
+#        scale = 1, width = 9, height = 5, units = c("in"), dpi = 300)
+
+```
+
+Raincloud plots
+```{r raincloud_plots_os_me}
+obssp <- malt_species.decontam_filtered.alpha %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split)) %>%
+ggplot(., aes(x = Market_integration_split, y = Observed_species, fill = Market_integration_split)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 2.6
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Market_integration_split_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  xlab("Market integration") +
+  ylab("Observed species") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+
+obssp
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_observed_species_me.pdf", plot = obssp, device = "pdf",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r raincloud_plots_shannon_me}
+shannon <- malt_species.decontam_filtered.alpha %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split)) %>%
+ggplot(., aes(x = Market_integration_split, y = Shannon_index, fill = Market_integration_split)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 0.03
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Market_integration_split_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  xlab("Market integration") +
+  ylab("Shannon index") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+shannon
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_shannon_me.pdf", plot = shannon, device = "pdf",
+       scale = 1, width = 8, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
+```{r raincloud_plots_os_sex}
+ossex <- malt_species.decontam_filtered.alpha %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Sex)) %>%
+ggplot(., aes(x = Sex, y = Observed_species, fill = Sex)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 2.5
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Sex_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  ylab("Observed species") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+ossex
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_os_sex.pdf", plot = ossex, device = "pdf",
+       scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r raincloud_plots_shannon_sex}
+shannonsex <- malt_species.decontam_filtered.alpha %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Sex)) %>%
+ggplot(., aes(x = Sex, y = Shannon_index, fill = Sex)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 0.025
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Sex_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  ylab("Shannon index") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+shannonsex
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_shannon_sex.pdf", plot = shannonsex, device = "pdf",
+       scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r raincloud_plots_os_ts}
+osts <- malt_species.decontam_filtered.alpha %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Tooth_site)) %>%
+ggplot(., aes(x = Tooth_site, y = Observed_species, fill = Tooth_site)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 2
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Tooth_site_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  ylab("Observed species") +
+  theme(axis.title.x = element_text(vjust=-1.5)) +
+  theme(axis.title.y = element_text(vjust=1.9))
+osts
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_os_ts.pdf", plot = osts, device = "pdf",
+       scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+```
+
+```{r raincloud_plots_shannon_ts}
+shannonts <- malt_species.decontam_filtered.alpha %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  left_join(., metadata %>%
+              select(SampleID, Tooth_site)) %>%
+ggplot(., aes(x = Tooth_site, y = Shannon_index, fill = Tooth_site)) + 
+  ## add half-violin from {ggdist} package
+  ggdist::stat_halfeye(
+    ## custom bandwidth
+    adjust = .5, 
+    ## adjust height
+    width = .6, 
+    ## move geom to the right
+    justification = -.2, 
+    ## remove slab interval
+    .width = 0, 
+    point_colour = NA
+  ) + 
+  geom_boxplot(
+    width = .12, 
+    ## remove outliers
+    outlier.color = NA, ## `outlier.shape = NA` works as well
+    color = "grey30"
+  ) +
+  ## add dot plots from {ggdist} package
+  ggdist::stat_dots(
+    ## orientation to the left
+    side = "left", 
+    ## move geom to the left
+    justification = 1.1, 
+    ## adjust grouping (binning) of observations 
+    binwidth = 0.02
+  ) + 
+  ## remove white space on the left
+  coord_cartesian(xlim = c(1.2, NA)) +
+  theme_minimal(base_size = 18) +
+  scale_fill_manual(values = Tooth_site_colors) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  ylab("Shannon index") +
+  theme(axis.title.x = element_text(vjust=-1.5),
+) +
+  theme(axis.title.y = element_text(vjust=1.9))
+shannonts
+
+ggsave("../../06-publication/main_figures/Figure_3/panel_parts/Figure_3_shannon_ts.pdf", plot = shannonts, device = "pdf",
+       scale = 1, width = 6, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

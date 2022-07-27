@@ -1,0 +1,486 @@
+---
+title: "Maps for Cameroon"
+author: "Irina Velsko"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output: html_notebook
+---
+
+```{r load_libraries, echo = F, message = F}
+library(spData)
+library(tmap)    # for static and interactive maps
+library(osmdata) # package for working with streets
+library(showtext) # for custom fonts
+library(ggmap)
+library(rvest)
+library(data.table)
+library(janitor)
+library(rstatix)
+library(mixOmics)
+library(tidyverse)
+library(patchwork)
+```
+
+Set the working directory of the notebook to the parent directory of the 
+notebook itself.  
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+```
+
+## Oral health
+```{r}
+
+# load the metadata file
+load("../../05-results.backup/CMC_metadata.RData")
+
+metadata <- metadata %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(SampleID, Individual_ID, everything(.))
+
+```
+
+```{r}
+oral_health_plot <- metadata %>%
+  filter(SampleID != "CMC001.A0201") %>%
+  select(Individual_ID, No_decayed, No_missing) %>%
+  group_by(Individual_ID) %>%
+  summarize(Decayed_teeth = sum(No_decayed),
+            Missing_teeth = sum(No_missing)) %>%
+  mutate(`Decayed teeth` = ifelse(Decayed_teeth > 0, "Yes", "No"),
+         `Missing teeth` = ifelse(Missing_teeth > 0, "Yes", "No")) %>%
+  full_join(., metadata %>%
+              select(Individual_ID, Market_integration, Ethnic_Group, Village, Age_group, Sex)) %>%
+  select(Individual_ID, Market_integration, everything()) %>%
+  distinct() %>%
+  filter(str_detect(Individual_ID, "CMC")) %>%
+  select(-matches("Decayed_teeth|Missing_teeth"))  %>%
+  pivot_longer(!Individual_ID:Market_integration, names_to = "metadata", values_to = "data") %>%
+  filter(str_detect(metadata, "teeth")) %>%
+    ggplot(., aes(x = Market_integration, fill = data)) +
+         geom_bar(color = "black") +
+         scale_fill_manual(values = c("#065FA3","#FF3200")) +
+         theme_minimal(base_size = 12) +
+         theme(axis.text.x = element_text(hjust = 1, angle = 90, vjust = 0.5),
+               axis.text = element_text(size = 12)) +
+         scale_y_continuous(breaks=scales::pretty_breaks(n=12)) +
+         ylab("# Individuals") +
+         xlab("") +
+         labs(fill="Pathology") +
+         facet_wrap(~metadata)
+
+oral_health_plot
+
+# ggsave("./Figure_1/panel_parts/S1_oral_health.pdf", plot = oral_health_plot, device = "pdf",
+#        scale = 1, width = 4, height = 4, units = c("in"), dpi = 300)
+
+```
+
+
+```{r}
+
+# village_age_sex <- metadata %>%
+#   filter(str_detect(SampleID, "CMC")) %>%
+#   mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+#   select(Individual_ID, Age_group, Market_integration, Sex) %>%
+#   unique() %>%
+#   # filter(str_detect(Tooth_site, "Posterior")) %>%
+#   group_by(Market_integration, Age_group, Sex) %>%
+#   count()
+# 
+# village_age_sex_plot <- village_age_sex %>%
+#   ggplot(., aes(x = Market_integration, y = n, fill = Age_group)) +
+#          geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
+#          scale_fill_manual(values = Age_group_colors) +
+#          theme_minimal(base_size = 14) +
+#          theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+#                axis.text = element_text(size = 14)) +
+#          ylab("Number of individuals") +
+#   facet_wrap(~Sex, )
+# village_age_sex_plot
+
+
+
+# village_age <- metadata %>%
+#   filter(str_detect(SampleID, "CMC")) %>%
+#   mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+#   select(Individual_ID, Age_group, Market_integration, Sex) %>%
+#   unique() %>%
+#   # filter(str_detect(Tooth_site, "Posterior")) %>%
+#   group_by(Market_integration, Sex) %>%
+#   count()
+# 
+# village_age_plot <- village_age %>%
+#   ggplot(., aes(x = Market_integration, y = n, fill = Sex)) +
+#          geom_bar(stat = "identity", position = position_dodge2(width = 0.9, preserve = "single"), color = "black") +
+#          scale_fill_manual(values = Sex_colors) +
+#          theme_minimal(base_size = 14) +
+#          theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+#                axis.text = element_text(size = 14)) +
+#          theme(panel.grid.minor.y = element_blank()) +
+#          scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+#          ylab("Number of individuals") +
+#          xlab("")
+# village_age_plot
+# 
+
+
+village_tooth_plot <- metadata %>%
+  filter(str_detect(SampleID, "CMC")) %>%
+  mutate(Individual_ID = str_trunc(SampleID, width = 6, side = "right", ellipsis = "")) %>%
+  select(Individual_ID, Age_group, Market_integration, Sex,  Tooth_site) %>%
+  unique() %>%
+  # filter(str_detect(Tooth_site, "Posterior")) %>%
+  group_by(Market_integration, Tooth_site) %>%
+  count() %>%
+    ggplot(., aes(x = Market_integration, y = n, fill = Tooth_site)) +
+         geom_bar(stat = "identity", position = "dodge", color = "black") +
+         scale_fill_manual(values = Tooth_site_colors) +
+         theme_minimal(base_size = 12) +
+         theme(axis.text.x = element_text(angle = 0, hjust = 0.5),
+               axis.text = element_text(size = 12)) +
+         scale_y_continuous(breaks=scales::pretty_breaks(n=8)) +
+         ylab("# Individuals") +
+         xlab("") +
+         labs(fill="Tooth site")
+village_tooth_plot
+
+
+# ggsave("./Figure_1/panel_parts/S1_mi_tooth_plot.pdf", plot = village_tooth_plot, device = "pdf",
+#        scale = 1, width = 5, height = 4, units = c("in"), dpi = 300)
+
+```
+
+```{r}
+
+fig1 <- oral_health_plot + village_tooth_plot
+
+fig1
+
+# ggsave("./Figure_1/panel_parts/S1_redblue.pdf", plot = fig1, device = "pdf",
+#        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+
+```
+
+
+```{r stats}
+metadata %>%
+  filter(SampleID != "CMC001.A0201") %>%
+  select(Individual_ID, No_decayed, No_missing) %>%
+  group_by(Individual_ID) %>%
+  summarize(Decayed_teeth = sum(No_decayed),
+            Missing_teeth = sum(No_missing)) %>%
+  mutate(Decayed_teeth = as.numeric(Decayed_teeth),
+         Missing_teeth = as.numeric(Missing_teeth)) %>%
+  ungroup() %>%
+  full_join(., metadata %>%
+              select(Individual_ID, Ethnic_Group, Village, Market_integration, Age_group, Sex)) %>%
+  distinct() %>%
+  filter(str_detect(Individual_ID, "CMC")) %>%
+  filter(Missing_teeth > 0) %>%
+  # can't have factors for testing
+  mutate(Market_integration = as.character(Market_integration)) %>%
+  pairwise_wilcox_test(Missing_teeth ~ Market_integration, p.adjust.method = "fdr")
+
+metadata %>%
+  filter(SampleID != "CMC001.A0201") %>%
+  select(Individual_ID, No_decayed, No_missing) %>%
+  group_by(Individual_ID) %>%
+  summarize(Decayed_teeth = sum(No_decayed),
+            Missing_teeth = sum(No_missing)) %>%
+  mutate(Decayed_teeth = as.numeric(Decayed_teeth),
+         Missing_teeth = as.numeric(Missing_teeth)) %>%
+  ungroup() %>%
+  full_join(., metadata %>%
+              select(Individual_ID, Ethnic_Group, Village, Market_integration, Age_group, Sex)) %>%
+  distinct() %>%
+  filter(str_detect(Individual_ID, "CMC")) %>%
+  filter(Decayed_teeth > 0) %>%
+  # can't have factors for testing
+  mutate(Market_integration = as.character(Market_integration)) %>%
+  pairwise_wilcox_test(Decayed_teeth ~ Market_integration, p.adjust.method = "fdr")
+
+```
+
+
+
+## Oral sample PCA
+```{r load_non_plaque}
+
+# for the Lassalle2017 and hmp2012 non-plaque oral samples
+oral_non_pq <- fread("../../05-results.backup/oral_non_plaque_species.txt") %>%
+  rename(Species = `#Datasets`)
+
+colnames(oral_non_pq) <- gsub(".unmapped","", colnames(oral_non_pq))
+
+oral_non_pq <- oral_non_pq  %>%
+  filter(!str_detect(Species, "Homo sapiens|Not assigned"))
+
+```
+
+Read in the saved tables from `Cameroon_kraken_RSPM_add_taxonomy.Rmd` with CMC and Clemente2015 data
+
+```{r}
+load("../../05-results.backup/CMC_taxonomy_tables.RData")
+
+```
+
+
+Read in metadata for plotting
+```{r}
+oral_nonpq_metadata <- fread("../../00-documentation.backup/oral_nonpq_metadata.tsv")
+
+oral_nonpq_metadata <- oral_nonpq_metadata %>% 
+  mutate(Full = fct_relevel(Full, "Plaque - Industrial","Plaque - Non-industrial","Buccal mucosa - Industrial","Buccal mucosa - Non-industrial","Saliva - Industrial","Saliva - Non-industrial"))
+
+```
+
+Make a PCA plot
+```{r}
+# prep the table for input to PCA
+malt_otu_df <- malt_species.decontam %>%
+  select(matches("Species|CMC|SRR")) %>%
+  full_join(., oral_non_pq, by = "Species") %>%
+  replace(is.na(.), 0) %>%
+  adorn_totals(where = "col") %>%
+  mutate(Percent = Total / sum(Total)) %>%
+  filter(Percent >=  0.0001) %>%
+  select(-c("Total", "Percent")) %>%
+  gather("SampleID","Counts",2:ncol(.)) %>%
+  mutate(Counts = Counts + 1) %>%
+  spread(Species,Counts) %>%
+  column_to_rownames("SampleID")
+
+malt_otu.pca <- mixOmics::pca(malt_otu_df, ncomp = 3, logratio = 'CLR')
+plot(malt_otu.pca)
+
+# Select out the PC variates into a new table and add the metadata for plotting
+malt_otu.pca.variates <- as.data.frame(malt_otu.pca$variates$X)
+malt_otu.pca.variates <- malt_otu.pca.variates %>%
+  rownames_to_column("Library_ID")
+
+malt_otu.pca.varmet <- inner_join(malt_otu.pca.variates, oral_nonpq_metadata, by = "Library_ID")
+
+oral_non_pq_pc12 <- malt_otu.pca.varmet %>%
+  ggplot(., aes(PC1, PC2, colour = Full, shape = Full)) +
+    geom_point(size = 2.5) +
+    scale_shape_manual(values = c(1,16,2,17,0,15)) +
+    scale_color_manual(values = c("#FF3200","#FF3200","#82CDAA","#82CDAA","#065FA3","#065FA3")) +
+    xlab(paste("PC1 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[1]), digits = 4)), "%", sep = "")) +
+    ylab(paste("PC2 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[2]), digits = 4)), "%", sep = "")) +
+    theme_minimal(base_size = 14) +
+    labs(color = "Source", shape = "Source") +
+    theme(legend.title = element_text(size = 10))
+oral_non_pq_pc12
+
+# ggsave("./Figure_1/panel_parts/oral_non_pq_pc12.pdf", plot = oral_non_pq_pc12, device = "pdf",
+#        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+
+
+```
+
+
+
+## Map
+
+```{r village_coords}
+# GPS coordinates of the villages
+villages <- data.frame(longitude = c(14.121694, 14.109, 13.885306, 11.518004), latitude = c(3.015528, 3.042111, 3.126889, 3.857706), Site = c("202,203","204,206","205", "Yaounde"))
+
+```
+
+
+```{r plot_africa}
+tm_shape(world) +
+  tm_borders() 
+
+# pull Africa out of the world
+africa <- world %>% 
+  filter(continent == "Africa", !is.na(iso_a2))
+
+# define the zoomed area (Cameroon)
+big_rect <- data.frame(xmin=8.0, xmax=16.3, ymin=1.5, ymax=13.2)
+
+# plot
+africa_plot <- ggplot(africa) +
+  geom_sf(aes(geometry = geom), fill = "#d8f0ce") +
+  # theme_void() +
+  theme_minimal() +
+  geom_point(data = villages %>%
+               filter(Site == "Yaounde"), aes(x = longitude, y = latitude), size = 1,
+        shape = 20) +
+  theme(panel.grid.major = element_blank()) +
+  geom_rect(data=big_rect, mapping=aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), color="black", alpha = 0.01, size = 1.5)
+
+africa_plot
+
+# ggsave("./Figure_1/panel_parts/africa_plot.pdf", plot = africa_plot, device = "pdf",
+#        scale = 1, width = 5, height = 5, units = c("in"), dpi = 300)
+
+```
+
+
+```{r plot_cameroon}
+cameroon <- world %>%
+  filter(name_long == "Cameroon", !is.na(iso_a2))
+
+```
+
+```{r cameroon_roads}
+# use this tutorial: http://joshuamccrain.com/tutorials/maps/streets_tutorial.html
+
+getbb("haut-nyong cameroon")
+
+cmc <- getbb("Cameroon", featuretype = "country")
+
+# get each of the major roads and the international borders
+motorway_cmc <- cmc %>%
+  opq(timeout = 150) %>% 
+  add_osm_feature(key = "highway", value = c("motorway","motorway_link")) %>%
+  osmdata_sf()
+
+primary_cmc <- cmc %>%
+  opq(timeout = 150) %>% 
+  add_osm_feature(key = "highway", value = c("primary", "primary_link")) %>%
+  osmdata_sf()
+
+secondary_cmc <- cmc %>%
+  opq(timeout = 150) %>% 
+  add_osm_feature(key = "highway", value = c("secondary", "secondary_link")) %>%
+  osmdata_sf()
+
+trunk_cmc <- cmc %>%
+  opq(timeout = 150) %>% 
+  add_osm_feature(key = "highway", value = c("trunk", "trunk_link")) %>%
+  osmdata_sf()
+
+border_cmc <- cmc %>%
+  opq(timeout = 150) %>% 
+  add_osm_feature(key = "boundary", value = c("administrative")) %>% 
+  add_osm_feature(key = "admin_level", value = "2") %>%
+  osmdata_sf()
+
+# make sure they all have data
+motorway_cmc
+primary_cmc
+secondary_cmc
+trunk_cmc
+border_cmc
+
+# view the data tables
+# View(motorway_cmc[["osm_lines"]])
+# View(primary_cmc[["osm_lines"]])
+
+# need to transform the data otherwise get an error about projection
+sf::st_crs(motorway_cmc$osm_lines) <- 4326
+sf::st_crs(primary_cmc$osm_lines) <- 4326
+sf::st_crs(secondary_cmc$osm_lines) <- 4326
+sf::st_crs(trunk_cmc$osm_lines) <- 4326
+sf::st_crs(border_cmc$osm_lines) <- 4326
+
+
+```
+
+```{r }
+
+# crop the roads to only those inside the country of Cameroon
+motorway_cmc_sf_cropped <- motorway_cmc$osm_lines %>%
+  sf::st_intersection(cameroon)
+primary_cmc_sf_cropped <- primary_cmc$osm_lines %>%
+  sf::st_intersection(cameroon)
+secondary_cmc_sf_cropped <- secondary_cmc$osm_lines %>%
+  sf::st_intersection(cameroon)
+trunk_cmc_sf_cropped <- trunk_cmc$osm_lines %>%
+  sf::st_intersection(cameroon)
+
+```
+
+```{r plot_cameroon_roads}
+# make a rectangle border for the whole plot and the inset
+# inset_rect <- data.frame(xmin=c(13.8,8.0), xmax=c(14.2,16.3), ymin=c(2.85,1.5), ymax=c(3.2,13.2))
+inset_rect <- data.frame(xmin=c(13.5,8.0), xmax=c(14.5,16.3), ymin=c(2.6,1.5), ymax=c(3.5,13.2))
+  
+# plot
+cameroon_roads <- ggplot() +
+  geom_sf(data = cameroon,
+          inherit.aes = FALSE,
+          color = "black", fill = "#d8f0ce") +
+  geom_sf(data = motorway_cmc_sf_cropped,
+          inherit.aes = FALSE,
+          color = "black", linetype = "solid") +
+  geom_sf(data = primary_cmc_sf_cropped,
+          inherit.aes = FALSE,
+          color = "black", linetype = "solid") +
+  geom_sf(data = trunk_cmc_sf_cropped,
+          inherit.aes = FALSE,
+          color = "black", linetype = "solid") +
+  geom_point(data = villages, aes(x = longitude, y = latitude), size = c(4,4,4,7),
+        shape = c(23,23,23,21), bg = "yellow") +
+  geom_rect(data=inset_rect, mapping=aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), color="black", alpha = 0.01, size = 1.5) +
+  coord_sf(xlim = c(8.0, 16.3),
+           ylim = c(1.5, 13.2),
+           expand = FALSE) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.background = element_blank()
+  )
+cameroon_roads
+
+# ggsave("./Figure_1/panel_parts/cameroon_roads.pdf", plot = cameroon_roads, device = "pdf",
+#        scale = 1, width = 5, height = 6, units = c("in"), dpi = 300)
+
+```
+
+
+```{r cameroon_zoom}
+# get each of the major roads
+primary_streets <- opq ("haut-nyong cameroon") %>%
+  add_osm_feature(key = "highway", value = c("primary", "primary_link")) %>%
+  osmdata_sf()
+
+secondary_streets <- opq ("haut-nyong cameroon") %>%
+  add_osm_feature(key = "highway", value = c("secondary","secondary_link")) %>%
+  osmdata_sf()
+
+# make sure they have data
+primary_streets
+secondary_streets
+
+# view the data tables
+# View(primary_streets[["osm_lines"]])
+# View(trunk_streets[["osm_lines"]])
+
+# need to transform the data otherwise get an error about projection
+st_crs(primary_streets$osm_lines) <- 4326
+st_crs(secondary_streets$osm_lines) <- 4326
+
+# make a rectangle border for the whole plot and the inset
+little_rect <- data.frame(xmin=13.8, xmax=14.2, ymin=2.85, ymax=3.15)
+
+# plot
+zoom_plot <- ggplot() +
+  geom_sf(data = primary_streets$osm_lines,
+          inherit.aes = FALSE,
+          color = "black") +
+  geom_sf(data = secondary_streets$osm_lines,
+          inherit.aes = FALSE,
+          color = "black", linetype = "dotted") +
+  geom_point(data = villages, aes(x = longitude, y = latitude), size = c(4,4,4,4),
+        shape = c(22,23,25,21), bg = "yellow") +
+  coord_sf(xlim = c(13.8, 14.2),
+           ylim = c(2.85, 3.15),
+           expand = FALSE)+
+  geom_rect(data=little_rect, mapping=aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), color="black", alpha = 0.01) +
+  theme(panel.background = element_rect(fill = "#d8f0ce")) +
+  theme(panel.grid.major = element_blank())
+
+zoom_plot
+
+# ggsave("./Figure_1/panel_parts/cameroon_roads_zoom.pdf", plot = zoom_plot, device = "pdf",
+#        scale = 1, width = 5, height = 6, units = c("in"), dpi = 300)
+
+
+```
+
+
+
+
