@@ -649,8 +649,17 @@ ggplot(contam.comb.genus, aes(x=p)) +
 
 ```
 
-We'll use the prevalence method, because this doesn't include known oral taxa in the contaminant list (frequency method does), and it picks up a lot more than the combined method does (but is that important if we cut off the tail of low-abundance taxa (say <0.01% abundance) anyway?). But which cut-off to use? How does changing the cut-off affect the tail of low-abundance taxa?
-List out the pathways that are considered contaminants, to be removed from the table prior to all analyses. Then remove them from the table to make the decontaminated input table for analysis. *Note that the genus list includes Actinomyces, and this needs to be removed from the list b/c Actinomyces are a well known oral genus*
+We'll use the prevalence method, because this doesn't include known oral taxa in
+the contaminant list (frequency method does), and it picks up a lot more than
+the combined method does (but is that important if we cut off the tail of
+low-abundance taxa (say <0.01% abundance) anyway?). But which cut-off to use?
+How does changing the cut-off affect the tail of low-abundance taxa? List out
+the pathways that are considered contaminants, to be removed from the table
+prior to all analyses. Then remove them from the table to make the
+decontaminated input table for analysis. *Note that the genus list includes*
+*Actinomyces, and this needs to be removed from the list b/c Actinomyces are a*
+*well known oral genus*
+
 ```{r contaminants}
 contaminants_species <- cont_prev_species_list %>% rownames_to_column("Species") %>% select(Species)
 malt_species.decontam <- malt_species_raw %>%

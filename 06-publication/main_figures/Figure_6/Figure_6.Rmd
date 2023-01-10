@@ -1,5 +1,5 @@
 ---
-title: "Alpha-diversity Main Figure"
+title: "Beta-diversity Main Figure"
 author: "Irina Velsko"
 date: "`r format(Sys.time(), '%b %d, %Y')`"
 output:
@@ -153,13 +153,41 @@ malt_species.decontam_filtered_noblanks_mr <- malt_species.decontam %>%
 tune.pca(malt_species.decontam_filtered_noblanks_mr, logratio = 'CLR')
 
 # perform a PCA to see how the data cluster
-malt_species.decontam_filtered_noblanks_mr.pca <- pca(malt_species.decontam_filtered_noblanks_mr, ncomp = 3, logratio = 'CLR')
+malt_species.decontam_filtered_noblanks_mr.pca <- mixOmics::pca(malt_species.decontam_filtered_noblanks_mr, ncomp = 3, logratio = 'CLR')
 
 # perform and plot a PCA to see how the data cluster
 # by Market integration
 pca_noyanomami_mi <- plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Market_integration_split", "Market_integration_split", "Market_integration_split", 3)
 pca_noyanomami_mi
 
+
+# with sub and supra plaque separated
+# Select out the PC variates into a new table and add the metadata for plotting
+malt_species.decontam_filtered_noblanks_mr.pca.variates <- as.data.frame(malt_species.decontam_filtered_noblanks_mr.pca$variates$X)
+malt_species.decontam_filtered_noblanks_mr.pca.variates <- malt_species.decontam_filtered_noblanks_mr.pca.variates %>%
+  rownames_to_column("SampleID")
+
+malt_species.decontam_filtered_noblanks_mr.pca.varmet <- inner_join(malt_species.decontam_filtered_noblanks_mr.pca.variates, metadata, by = "SampleID")
+
+oral_non_pq_pc12_s <- malt_species.decontam_filtered_noblanks_mr.pca.varmet %>%
+  mutate(Market_integration_split = as.character(Market_integration_split)) %>%
+  mutate(Market_integration_split = ifelse(str_detect(Description, "sup"),"supPlaque - Industrial",
+                       ifelse(str_detect(Description, "sub"), "subPlaque - Industrial",Market_integration_split))) %>%
+  mutate(Market_integration_split = fct_relevel(Market_integration_split, "Farming","Forest camp","Logging road","supPlaque - Industrial","subPlaque - Industrial","Industrial calculus",)) %>%
+  ggplot(., aes(PC1, PC2, colour = Market_integration_split, shape = Market_integration_split, size = Market_integration_split)) +
+    geom_point() +
+    scale_shape_manual(values = c(19,18,17,9,7,7)) +
+    scale_color_manual(values = c("#FF3200","#82CDAA","#065FA3","#969696","#969696","#feb24c")) +
+    scale_size_manual(values = c(2.5,4,2.5,2.5,2.5,2.5)) +
+    xlab(paste("PC1 - ", 100*(round(data.frame(malt_species.decontam_filtered_noblanks_mr.pca$prop_expl_var$X[1]), digits = 4)), "%", sep = "")) +
+    ylab(paste("PC2 - ", 100*(round(data.frame(malt_species.decontam_filtered_noblanks_mr.pca$prop_expl_var$X[2]), digits = 4)), "%", sep = "")) +
+    theme_minimal(base_size = 14) +
+    labs(color = "Source", shape = "Source") +
+    theme(legend.title = element_text(size = 10))
+oral_non_pq_pc12_s
+
+ggsave("../../06-publication/supplemental_figures/SX17/panel_parts/supsub_pca_species.pdf", plot = oral_non_pq_pc12_s, device = "pdf",
+       scale = 1, width = 9, height = 4.5, units = c("in"), dpi = 300)
 
 ```
 

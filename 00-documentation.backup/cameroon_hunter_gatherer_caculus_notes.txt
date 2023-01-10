@@ -941,13 +941,52 @@ seqs.fa \
 ###############################################################
 # upload data to ENA
 ###############################################################
-# run all data through eager w/o collapse here /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/all_data_combined
+# run all data through eager w/o collapse here /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip
 
 # input tsv
 all_cmc_eager2_input_not_collapsed.tsv
 
+# update eager to get the version with working host read removal
+# nextflow pull nf-core/eager -r 2.4.5 # doesn't work with the version
+nextflow pull nf-core/eager -r 42c9d5f
+
+nextflow run nf-core/eager \
+-r 2.4.5 \
+-profile eva,archgen \
+--outdir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip/eager2 \
+-work-dir /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip/work \
+--input /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip/all_cmc_eager2_input_not_collapsed.tsv \
+--complexity_filter_poly_g \
+--fasta /mnt/archgen/Reference_Genomes/Human/HG19/hg19_complete.fasta \
+--seq_dict /mnt/projects1/Reference_Genomes/Human/HG19/hg19_complete.dict \
+--bwa_index /mnt/archgen/Reference_Genomes/Human/HG19/ \
+--run_bam_filtering \
+--bam_unmapped_type fastq \
+--skip_damage_calculation \
+--skip_qualimap \
+--hostremoval_input_fastq \
+--hostremoval_mode replace \
+--email irina_marie_velsko@eva.mpg.de \
+-name cmc_strip \
+-with-tower
 
 
+# files are here: /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip/for_ena_upload
+# remove all SG1.1 b/c that's already uploaded
+# calculate the md5 sums
+md5sum *fwd* > R1_md5sums.txt
+md5sum *rev* > R2_md5sums.txt
+
+# create a folder on the ENA ftp server
+ftp webin.ebi.ac.uk
+Webin-42290
+
+bin
+mkdir cmc_additional
+bye
+
+# upload data to ENA with aspera
+~/.aspera/cli/bin/ascp -QT -l100M -L /mnt/archgen/microbiome_calculus/Cameroon_plaque/03-preprocessing/cmc_host_strip/for_ena_upload/*.gz Webin-42290@webin.ebi.ac.uk:/cmc_additional
 
 
 

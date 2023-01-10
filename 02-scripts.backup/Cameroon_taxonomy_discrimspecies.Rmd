@@ -346,17 +346,20 @@ malt_species.decontam_filtered_noblanks.fa.df <- malt_species.decontam_filtered_
          MR21 = as.character(MR21),
          MR31 = as.character(MR31),
          MR41 = as.character(MR41),
+         MR61 = as.character(MR61),
          MR51 = as.character(MR51)) %>%
   mutate(MR11 = replace(MR11, MR11 != "0", "MR1"),
          MR21 = replace(MR21, MR21 != "0", "MR2"),
          MR31 = replace(MR31, MR31 != "0", "MR3"),
          MR41 = replace(MR41, MR41 != "0", "MR4"),
+         MR61 = replace(MR61, MR61 != "0", "MR6"),
          MR51 = replace(MR51, MR51 != "0", "MR5")) %>%
   select(Species,everything(.)) %>%
-  select(-matches("MR5|MR6|MR7")) %>%
-  gather("Group","Residual", 6:ncol(.)) %>%
+  # select(-matches("MR5|MR6|MR7")) %>%
+  pivot_longer(!1:7, names_to = "Group", values_to = "Residual") %>%
+  # gather("Group","Residual", 6:ncol(.)) %>%
   filter(Residual != "0") %>%
-  select(Residual, Species, MR1, MR2, MR3, MR4)
+  select(Residual, Species, MR1, MR2, MR3, MR4, MR5, MR6)
 
 head(malt_species.decontam_filtered_noblanks.fa.df)
 
@@ -855,10 +858,10 @@ heatmap_smp_cluster <- malt_species.decontam_FA_all_clr_long %>%
 
 heatmap_smp_cluster
 
-ggsave("./06-publication/supplemental_figures/SXX11/SXX11_all_fa_heatmaps.pdf", plot = heatmap_smp_cluster, device = "pdf",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
-ggsave("./06-publication/supplemental_figures/SXX11/SXX11_all_fa_heatmaps.png", plot = heatmap_smp_cluster, device = "png",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX11/SXX11_all_fa_heatmaps.pdf", plot = heatmap_smp_cluster, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX11/SXX11_all_fa_heatmaps.png", plot = heatmap_smp_cluster, device = "png",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
@@ -1398,10 +1401,10 @@ heatmap_cmc_smp_cluster <- ggplot(malt_species.decontam_FA_cmc_clr_long, aes(Sam
 
 heatmap_cmc_smp_cluster
 
-ggsave("./06-publication/supplemental_figures/SXX12/SXX12_cmc_fa_heatmaps.pdf", plot = heatmap_cmc_smp_cluster, device = "pdf",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
-ggsave("./06-publication/supplemental_figures/SXX12/SXX12_cmc_fa_heatmaps.png", plot = heatmap_cmc_smp_cluster, device = "png",
-       scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX12/SXX12_cmc_fa_heatmaps.pdf", plot = heatmap_cmc_smp_cluster, device = "pdf",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX12/SXX12_cmc_fa_heatmaps.png", plot = heatmap_cmc_smp_cluster, device = "png",
+#        scale = 1, width = 10, height = 10, units = c("in"), dpi = 300)
 
 # Plot the heatmap with samples ordered by Village, then alphabetical
 # make the SampleIDs a factor so they're in the correct order for the heatmap using the vector from the step above

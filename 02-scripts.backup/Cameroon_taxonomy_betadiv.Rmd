@@ -371,8 +371,8 @@ raw_sp_pca32 <- plot_pca(malt_species.pca, "PC3", "PC2", "Description")
 raw_sp_pca32
 plot_pca_names(malt_species.pca,  "PC1", "PC2", "Env")
 
-ggsave("./06-publication/supplemental_figures/SXX29/SXX29_raw_sp_pca12.pdf", plot = raw_sp_pca12, device = "pdf",
-       scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX29/SXX29_raw_sp_pca12.pdf", plot = raw_sp_pca12, device = "pdf",
+#        scale = 1, width = 8, height = 7, units = c("in"), dpi = 300)
 # ggsave("./06-publication/supplemental_figures/SXX29/SXX29_raw_sp_pca32.pdf", plot = raw_sp_pca32, device = "pdf",
 #        scale = 1, width = 7.5, height = 7, units = c("in"), dpi = 300)
 
@@ -506,10 +506,10 @@ all_samples_sp_pca12
 all_samples_sp_pca32 <- plot_pca_titles(malt_species.decontam_filtered, "PC3", "PC2", "Description", "Env", "Env", 3)
 all_samples_sp_pca32
 
-ggsave("./06-publication/supplemental_figures/SXX28/SXX28_all_samples_sp_pca12.pdf", plot = all_samples_sp_pca12, device = "pdf",
-       scale = 1, width = 7, height = 7, units = c("in"), dpi = 300)
-ggsave("./06-publication/supplemental_figures/SXX28/SXX28_all_samples_sp_pca32.pdf", plot = all_samples_sp_pca32, device = "pdf",
-       scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX28/SXX28_all_samples_sp_pca12.pdf", plot = all_samples_sp_pca12, device = "pdf",
+#        scale = 1, width = 7, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX28/SXX28_all_samples_sp_pca32.pdf", plot = all_samples_sp_pca32, device = "pdf",
+#        scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 
 ```
@@ -605,8 +605,8 @@ pca_noyanomami_village <- plot_pca_titles(malt_species.decontam_filtered_noblank
 pca_noyanomami_village
 plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC3", "PC2", "Village", "Ethnic_Group", "Ethnic_Group", 3)
 
-ggsave("./06-publication/supplemental_figures/SXX35/panel_parts/SXX35_species_village_pc12.pdf", plot = pca_noyanomami_village,
-       device = "pdf", scale = 1, width = 8, height = 6, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX35/panel_parts/SXX35_species_village_pc12.pdf", plot = pca_noyanomami_village,
+#        device = "pdf", scale = 1, width = 8, height = 6, units = c("in"), dpi = 300)
 
 # by Sex
 species_sex_pc12 <- plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Sex", "Ethnic_Group", "Ethnic_Group", 3)
@@ -634,8 +634,8 @@ plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC3", "PC2", "Marke
 ts <- plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC3", "PC2", "Tooth_site", "Ethnic_Group", "Ethnic_Group", 3)
 
-ggsave("./06-publication/supplemental_figures/SXX35/panel_parts/SXX35_species_ts_pc12.pdf", plot = ts,
-       device = "pdf", scale = 1, width = 8, height = 6, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX35/panel_parts/SXX35_species_ts_pc12.pdf", plot = ts,
+#        device = "pdf", scale = 1, width = 8, height = 6, units = c("in"), dpi = 300)
 
 # by Description (do HMP supragingival and HMP subgingival plaque samples separate?)
 plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC1", "PC2", "Description", "Description", "Description", 3)
@@ -707,8 +707,8 @@ plot_pca_titles(malt_species.decontam_filtered_noblanks_mr, "PC3", "PC2", "Tooth
 malt_species_decontam_filtered_noyanomami_biplot_121 <- plot_pca_bi(malt_species.decontam_filtered_noblanks_mr.pca, "PC1", "PC2", "Ethnic_Group", PC1)
 malt_species_decontam_filtered_noyanomami_biplot_121
 
-ggsave("./06-publication/supplemental_figures/SXX19/panel_parts/SXX19_species_all_biplot_121.pdf", plot = malt_species_decontam_filtered_noyanomami_biplot_121,
-       device = "pdf", scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX19/panel_parts/SXX19_species_all_biplot_121.pdf", plot = malt_species_decontam_filtered_noyanomami_biplot_121,
+#        device = "pdf", scale = 1, width = 6, height = 7, units = c("in"), dpi = 300)
 
 pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_121$plot_env$pws_10 %>% arrange(desc(PC1)),
              digits = 5,
@@ -736,7 +736,7 @@ cmc_hmp_jae_sp_pc_list <- cmc_hmp_jae_sp_pc_list %>%
 cmc_hmp_jae_sp_pc_list <- cmc_hmp_jae_sp_pc_list %>%
   bind_rows(malt_species_decontam_filtered_noyanomami_biplot_122$plot_env$neg_10 %>% arrange(desc(PC2)) %>% mutate(Direction = "PC2-", Samples = "Industrial_CMC", Filter = "MR1"))
 
-fwrite(cmc_hmp_jae_sp_pc_list, "./05-results.backup/cmc_hmp_jae_sp_pc_list.tsv", sep = "\t", quote = F)
+# fwrite(cmc_hmp_jae_sp_pc_list, "./05-results.backup/cmc_hmp_jae_sp_pc_list.tsv", sep = "\t", quote = F)
 
 pandoc.table(malt_species_decontam_filtered_noyanomami_biplot_122$plot_env$pws_10 %>% arrange(desc(PC2)),
              digits = 5,
@@ -789,16 +789,16 @@ metadata_noblanks <- metadata_noblanks %>%
   filter(!SampleID %in% outliers) %>%
   filter(!str_detect(SampleID, "SRR16460|EXB|LIB|10M|SRS|ERR")) %>%
   as_tibble() %>%
-  mutate(Market_integration = str_replace(Market_integration, "HMP","Industrial"))%>%
+  # mutate(Market_integration_spli = str_replace(Market_integration, "HMP","Industrial"))%>%
   mutate(Ethnic_Group = fct_relevel(Ethnic_Group, "Baka","Nzime","Industrial plaque","Industrial calculus"),
          Env = fct_relevel(Env, "CMC","Industrial plaque","Industrial calculus"),
          Industry = fct_relevel(Industry, "Non-industrial","Industrial"),
-         Market_integration = fct_relevel(Market_integration, "Logging road","Forrest camp","Farming","Industrial"),
+         Market_integration_split = fct_relevel(Market_integration_split, "Logging road","Forrest camp","Farming","Industrial calculus","Industrial plaque"),
          Age_group = fct_relevel(Age_group, "18-29","30-39","40-49","50-59","60+","HMP"),
          Sex = fct_relevel(Sex, "Male","Female"),
          Tooth_site = fct_relevel(Tooth_site, "Anterior","Posterior"),
          Village = fct_relevel(Village, "202","205","204","203","206","Industrial plaque","Industrial calculus")) %>%
-  select(SampleID, Age_group, Ethnic_Group, Env, Industry, Market_integration, Sex, Tooth_site, Village, ExtractionBatch, LibraryBatch)
+  select(SampleID, Age_group, Ethnic_Group, Env, Industry, Market_integration_split, Sex, Tooth_site, Village, ExtractionBatch, LibraryBatch)
 
 ```
 
@@ -826,12 +826,12 @@ malt_species.decontam_filtered_noblanks_mr.euc.vecmet %>%
   ggtitle("Industry")
 
 # test for difference between different metadata categories 
-adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ ExtractionBatch +  LibraryBatch, metadata_noblanks, permutations = 999, by = "margin")
-adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Ethnic_Group + Market_integration, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ ExtractionBatch +  LibraryBatch, malt_species.decontam_filtered_noblanks_mr.euc.vecmet, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Ethnic_Group + Market_integration, malt_species.decontam_filtered_noblanks_mr.euc.vecmet, permutations = 999, by = "margin")
 
 # test for difference between different metadata categories excluding Village, which influences Ethnic_Group, Industry, and Market_integration
 # this still has Ethnic_Group and Indistry as -Inf
-adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Industry + Market_integration, metadata_noblanks, permutations = 999, by = "margin")
+adonis2(malt_species.decontam_filtered_noblanks_mr.euc ~ Industry + Market_integration, malt_species.decontam_filtered_noblanks_mr.euc.vecmet, permutations = 999, by = "margin")
 
 # controlled for tooth site
 # controlled for tooth site
@@ -906,6 +906,32 @@ plot(village_betadisper_noblanks_mr, ellipse = TRUE, hull = FALSE) # 1 sd data e
 
 ## Draw a boxplot of the distances to centroid for each group
 boxplot(village_betadisper_noblanks_mr)
+
+
+# Market integration
+groups_mi <- metadata_noblanks %>%
+  select(Market_integration_split) %>% 
+  pull()
+
+## Calculate multivariate dispersions
+mi_betadisper_noblanks_mr <- betadisper(malt_species.decontam_filtered_noblanks_mr.euc, groups_mi, bias.adjust =TRUE)
+mi_betadisper_noblanks_mr
+
+## Perform test
+anova(mi_betadisper_noblanks_mr)
+
+## Permutation test for F
+permutest(mi_betadisper_noblanks_mr, pairwise = TRUE, permutations = 99)
+
+## Tukey's Honest Significant Differences
+mi_betadisper_noblanks_mr.HSD <- TukeyHSD(mi_betadisper_noblanks_mr)
+plot(mi_betadisper_noblanks_mr.HSD)
+
+## Plot with data ellipses instead of hulls
+plot(mi_betadisper_noblanks_mr, ellipse = TRUE, hull = FALSE) # 1 sd data ellipse
+
+## Draw a boxplot of the distances to centroid for each group
+boxplot(mi_betadisper_noblanks_mr)
 
 
 ```
@@ -1094,11 +1120,11 @@ pca_malt_species_pc1pc2 <- ggplot(malt_species_decontam_filtered_cmc_mr.pca.varm
 
 pca_malt_species_pc1pc2
 
-ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_betadiv_mr1_sp.pdf", plot = extractionbatch, device = "pdf",
-       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
-
-ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_betadiv_mr1_sp.pdf", plot = librarybatch, device = "pdf",
-       scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+# ggsave("./06-publication/supplemental_figures/SXX2/SXX2_exb_betadiv_mr1_sp.pdf", plot = extractionbatch, device = "pdf",
+#        scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
+# 
+# ggsave("./06-publication/supplemental_figures/SXX2/SXX2_lib_betadiv_mr1_sp.pdf", plot = librarybatch, device = "pdf",
+#        scale = 1, width = 6, height = 6, units = c("in"), dpi = 300)
 
 ```
 

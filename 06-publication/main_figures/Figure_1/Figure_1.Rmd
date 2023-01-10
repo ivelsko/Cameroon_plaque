@@ -234,6 +234,29 @@ oral_nonpq_metadata <- oral_nonpq_metadata %>%
 
 ```
 
+```{r}
+malt_otu_df <- malt_species.decontam %>%
+  select(matches("Species|CMC|SRR")) %>%
+  full_join(., oral_non_pq, by = "Species") %>%
+  replace(is.na(.), 0) %>%
+  adorn_totals(where = "col") %>%
+  filter(Total >  0) %>%
+  select(-Total) %>%
+  adorn_percentages(denominator = "col") %>%
+  mutate(Species = str_replace_all(Species, "Candidatus ","Candidatus_")) %>%
+  mutate(genus = Species) %>%
+  separate(genus, into = c("Genus"), sep = " ", extra = "drop") %>%
+  select(Species, Genus, everything()) %>%
+  pivot_longer(!Genus:Species, names_to = "Library_ID", values_to = "Percent") %>%
+  left_join(., oral_nonpq_metadata, by = "Library_ID") %>%
+  group_by(Full, Genus) %>%
+  mutate(Percent = Percent * 100) %>%
+  summarize(mean_pct = mean(Percent)) %>%
+  pivot_wider(names_from = "Full", values_from = "mean_pct")
+  
+```
+
+
 Make a PCA plot
 ```{r}
 # prep the table for input to PCA
@@ -274,6 +297,28 @@ oral_non_pq_pc12
 
 # ggsave("./Figure_1/panel_parts/oral_non_pq_pc12.pdf", plot = oral_non_pq_pc12, device = "pdf",
 #        scale = 1, width = 8, height = 4, units = c("in"), dpi = 300)
+
+
+oral_non_pq_pc12_s <- malt_otu.pca.varmet %>%
+  mutate(Full = as.character(Full)) %>%
+  left_join(., metadata %>% select(SampleID, Description) %>%
+              rename(Library_ID = SampleID), by = "Library_ID") %>%
+  mutate(Full = ifelse(str_detect(Description, "sup"),"supPlaque - Industrial",
+                       ifelse(str_detect(Description, "sub"), "subPlaque - Industrial",Full))) %>%
+  mutate(Full = fct_relevel(Full, "supPlaque - Industrial","subPlaque - Industrial","Plaque - Non-industrial","Buccal mucosa - Industrial","Buccal mucosa - Non-industrial","Saliva - Industrial","Saliva - Non-industrial")) %>%
+  ggplot(., aes(PC1, PC2, colour = Full, shape = Full)) +
+    geom_point(size = 2.5) +
+    scale_shape_manual(values = c(10,1,16,2,17,0,15)) +
+    scale_color_manual(values = c("#FF3200","#FF3200","#FF3200","#82CDAA","#82CDAA","#065FA3","#065FA3")) +
+    xlab(paste("PC1 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[1]), digits = 4)), "%", sep = "")) +
+    ylab(paste("PC2 - ", 100*(round(data.frame(malt_otu.pca$prop_expl_var$X[2]), digits = 4)), "%", sep = "")) +
+    theme_minimal(base_size = 14) +
+    labs(color = "Source", shape = "Source") +
+    theme(legend.title = element_text(size = 10))
+oral_non_pq_pc12_s
+
+# ggsave("../../06-publication/supplemental_figures/SX17/panel_parts/supsub_pca_sites.pdf", plot = oral_non_pq_pc12_s, device = "pdf",
+#        scale = 1, width = 9, height = 4.5, units = c("in"), dpi = 300)
 
 
 ```

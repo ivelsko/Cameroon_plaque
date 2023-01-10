@@ -433,5 +433,87 @@ all3_genera %>% as_tibble(.) %>% filter(Total == 1, JAE == 1) # 18 species
 
 
 ```
+```{r}
+# determine the prevalence of each species in each group
+
+prevalence_all <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  inner_join(., all3 %>%
+               select(Species), by = "Species") %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(Counts = ifelse(Counts > 0,1,0)) %>%
+  left_join(., metadata %>%
+              select(SampleID, Market_integration_split), by = "SampleID") %>%
+  filter(str_detect(Market_integration_split, "Logging|Forest|Farming|Industrial plaque|Industrial calculus")) %>%
+  group_by(Market_integration_split, Species) %>%
+  summarize(Prevalence = sum(Counts) / length(Market_integration_split) * 100) %>%
+  pivot_wider(names_from = "Market_integration_split", values_from = "Prevalence")
+
+# Prevalence of CMC top 50 in Baka on the logging road
+prevalence_all %>%
+  select(Species, `Logging road`) %>%
+  inner_join(., all3 %>%
+               select(Species, CMC) %>%
+               filter(CMC > 0)) %>%
+  arrange(desc(`Logging road`))
+
+
+# Prevalence of CMC top 50 in Baka in the forest camp
+prevalence_all %>%
+  select(Species, `Forest camp`) %>%
+  inner_join(., all3 %>%
+               select(Species, CMC) %>%
+               filter(CMC > 0)) %>%
+  arrange(desc(`Forest camp`))
+
+
+# Prevalence of CMC top 50 in Nzime
+prevalence_all %>%
+  select(Species, `Farming`) %>%
+  inner_join(., all3 %>%
+               select(Species, CMC) %>%
+               filter(CMC > 0)) %>%
+  arrange(desc(`Farming`))
+
+# Prevalence of industrial plaque top 50 in industrial plaque
+prevalence_all %>%
+  select(Species, `Industrial plaque`) %>%
+  inner_join(., all3 %>%
+               select(Species, HMP) %>%
+               filter(HMP > 0)) %>%
+  arrange(desc(`Industrial plaque`))
+
+# Prevalence of industrial calculus top 50 in industrial calculus
+prevalence_all %>%
+  select(Species, `Industrial calculus`) %>%
+  inner_join(., all3 %>%
+               select(Species, JAE) %>%
+               filter(JAE > 0)) %>%
+  arrange(desc(`Industrial calculus`))
+
+prevalence_all <- malt_species.decontam %>%
+  select(-one_of(outliers)) %>%
+  inner_join(., all3 %>%
+               select(Species), by = "Species") %>%
+  pivot_longer(!Species, names_to = "SampleID", values_to = "Counts") %>%
+  mutate(Counts = ifelse(Counts > 0,1,0)) %>%
+  left_join(., metadata %>%
+              select(SampleID, Env), by = "SampleID") %>%
+  filter(str_detect(Env, "CMC|Industrial plaque|Industrial calculus")) %>%
+  group_by(Env, Species) %>%
+  summarize(Prevalence = sum(Counts) / length(Env) * 100) %>%
+  pivot_wider(names_from = "Env", values_from = "Prevalence")
+
+# Prevalence of CMC top 50 in all CMC samples
+prevalence_all %>%
+  rename(CMC_all = CMC) %>%
+  select(Species, CMC_all) %>%
+  inner_join(., all3 %>%
+               select(Species, CMC) %>%
+               filter(CMC > 0)) %>%
+  arrange(desc(CMC_all))
+
+
+```
 
 
